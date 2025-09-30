@@ -1,0 +1,3 @@
+coverage:
+  min: 100.0
+  ignore: []
