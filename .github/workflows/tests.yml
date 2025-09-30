@@ -69,11 +69,6 @@ jobs:
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --prefer-dist --no-progress --prefer-stable --no-interaction
 
-      - name: Configure Test Suite
-        run: |
-          cp .env.testing .env
-          php artisan key:generate
-
       - name: Run Tests
         run: |
           mkdir -p build/logs
