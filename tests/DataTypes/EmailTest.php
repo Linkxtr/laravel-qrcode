@@ -1,9 +1,12 @@
 <?php
 
+namespace Linkxtr\QrCode\Tests\DataTypes;
+
+use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\Email;
 
 beforeEach(function () {
-    $this->email = new Email();
+    $this->email = new Email;
 });
 
 it('should generate a valid email QR code', function () {

@@ -2,11 +2,11 @@
 
 namespace Linkxtr\QrCode\Tests\DataTypes;
 
-use Linkxtr\QrCode\DataTypes\PhoneNumber;
 use InvalidArgumentException;
+use Linkxtr\QrCode\DataTypes\PhoneNumber;
 
 beforeEach(function () {
-    $this->phoneNumber = new PhoneNumber();
+    $this->phoneNumber = new PhoneNumber;
 });
 
 it('should generate a valid phone number QR code', function () {
@@ -26,5 +26,5 @@ it('throws an exception when phone number is not a string', function () {
 
 it('throws an exception when phone number is not a valid phone number', function () {
     expect(fn () => $this->phoneNumber->create(['invalid']))
-        ->toThrow(InvalidArgumentException::class, 'Invalid phone number format.');
+        ->toThrow(InvalidArgumentException::class, 'Invalid phone number format. Must be 1-15 digits, optionally starting with +');
 });

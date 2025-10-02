@@ -2,11 +2,11 @@
 
 namespace Linkxtr\QrCode\Tests\DataTypes;
 
-use Linkxtr\QrCode\DataTypes\SMS;
 use InvalidArgumentException;
+use Linkxtr\QrCode\DataTypes\SMS;
 
 beforeEach(function () {
-    $this->sms = new SMS();
+    $this->sms = new SMS;
 });
 
 it('should generate a valid SMS QR code', function () {
@@ -36,5 +36,5 @@ it('throws an exception when SMS address is not a string', function () {
 
 it('throws an exception when SMS address is not a valid SMS address', function () {
     expect(fn () => $this->sms->create(['invalid']))
-        ->toThrow(InvalidArgumentException::class, 'Invalid SMS address format.');
+        ->toThrow(InvalidArgumentException::class, 'Invalid phone number format. Must be 1-15 digits, optionally starting with +');
 });

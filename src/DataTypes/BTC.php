@@ -2,7 +2,7 @@
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use Linkxtr\QrCode\DataTypes\DataTypeInterface;
+use InvalidArgumentException;
 
 class BTC implements DataTypeInterface
 {
@@ -18,6 +18,9 @@ class BTC implements DataTypeInterface
 
     protected ?string $returnAddress = null;
 
+    /**
+     * @param  list<mixed>  $arguments
+     */
     public function create(array $arguments): void
     {
         $this->setProperties($arguments);
@@ -28,47 +31,58 @@ class BTC implements DataTypeInterface
         return $this->buildBitCoinString();
     }
 
-    protected function setProperties(array $arguments)
+    /**
+     * @param  list<mixed>  $arguments
+     */
+    protected function setProperties(array $arguments): void
     {
-        if (isset($arguments[0])) {
-            $this->address = $arguments[0];
+        if (! isset($arguments[0]) || ! isset($arguments[1])) {
+            throw new InvalidArgumentException('Bitcoin address and amount are required.');
         }
 
-        if (isset($arguments[1])) {
-            $this->amount = $arguments[1];
+        if (! is_string($arguments[0])) {
+            throw new InvalidArgumentException('Bitcoin address must be a string.');
         }
 
-        if (isset($arguments[2])) {
+        if (! is_float($arguments[1])) {
+            throw new InvalidArgumentException('Bitcoin amount must be a float.');
+        }
+
+        $this->address = $arguments[0];
+        $this->amount = $arguments[1];
+
+        if (isset($arguments[2]) && is_array($arguments[2])) {
             $this->setOptions($arguments[2]);
         }
     }
 
-    protected function setOptions(array $options)
+    /**
+     * @param  array<string, mixed>  $options
+     */
+    protected function setOptions(array $options): void
     {
-        if (isset($options['label'])) {
+        if (isset($options['label']) && is_string($options['label'])) {
             $this->label = $options['label'];
         }
 
-        if (isset($options['message'])) {
+        if (isset($options['message']) && is_string($options['message'])) {
             $this->message = $options['message'];
         }
 
-        if (isset($options['returnAddress'])) {
+        if (isset($options['returnAddress']) && is_string($options['returnAddress'])) {
             $this->returnAddress = $options['returnAddress'];
         }
     }
 
     protected function buildBitCoinString(): string
     {
-        $query = http_build_query([
-            'amount'    => $this->amount,
-            'label'     => $this->label,
-            'message'  => $this->message,
-            'r'         => $this->returnAddress,
+        $params = array_filter([
+            'amount' => $this->amount,
+            'label' => $this->label,
+            'message' => $this->message,
+            'r' => $this->returnAddress,
         ]);
 
-        $btc = $this->prefix.$this->address.'?'.$query;
-
-        return $btc;
+        return $this->prefix.$this->address.'?'.http_build_query($params);
     }
 }

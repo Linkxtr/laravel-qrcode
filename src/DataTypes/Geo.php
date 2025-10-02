@@ -3,36 +3,38 @@
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
-use Linkxtr\QrCode\DataTypes\DataTypeInterface;
 
 class Geo implements DataTypeInterface
 {
     protected string $prefix = 'geo:';
 
-    protected ?string $latitude = null;
+    protected ?float $latitude = null;
 
-    protected ?string $longitude = null;
+    protected ?float $longitude = null;
 
     protected ?string $name = null;
 
+    /**
+     * @param  list<mixed>  $arguments
+     */
     public function create(array $arguments): void
     {
         $this->setProperties($arguments);
     }
 
-    protected function setProperties(array $arguments)
+    /**
+     * @param  list<mixed>  $arguments
+     */
+    protected function setProperties(array $arguments): void
     {
-        if (!isset($arguments[0]) || !isset($arguments[1])) {
+        if (! isset($arguments[0]) || ! isset($arguments[1])) {
             throw new InvalidArgumentException('Both latitude and longitude are required.');
         }
 
-        $this->validateCoordinate($arguments[0], 'latitude');
-        $this->validateCoordinate($arguments[1], 'longitude');
+        $this->latitude = $this->validateCoordinate($arguments[0], 'latitude');
+        $this->longitude = $this->validateCoordinate($arguments[1], 'longitude');
 
-        $this->latitude = $arguments[0];
-        $this->longitude = $arguments[1];
-
-        if (isset($arguments[2])) {
+        if (isset($arguments[2]) && is_string($arguments[2])) {
             $this->name = $arguments[2];
         }
     }
@@ -42,21 +44,23 @@ class Geo implements DataTypeInterface
         return $this->buildGeoString();
     }
 
-    protected function validateCoordinate($value, string $type): void
+    protected function validateCoordinate(mixed $value, string $type): float
     {
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             throw new InvalidArgumentException("Invalid {$type} value: must be a number");
         }
 
         $value = (float) $value;
-        
+
         if ($type === 'latitude' && ($value < -90 || $value > 90)) {
             throw new InvalidArgumentException('Latitude must be between -90 and 90 degrees');
         }
-        
+
         if ($type === 'longitude' && ($value < -180 || $value > 180)) {
             throw new InvalidArgumentException('Longitude must be between -180 and 180 degrees');
         }
+
+        return $value;
     }
 
     protected function buildGeoString(): string

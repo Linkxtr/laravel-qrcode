@@ -3,26 +3,34 @@
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
-use Linkxtr\QrCode\DataTypes\DataTypeInterface;
+use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
 
 class PhoneNumber implements DataTypeInterface
 {
+    use ValidatesPhoneNumbers;
+
     protected string $prefix = 'tel:';
 
     protected ?string $phoneNumber = null;
 
+    /**
+     * @param  list<mixed>  $arguments
+     */
     public function create(array $arguments): void
     {
         $this->setProperties($arguments);
     }
 
-    protected function setProperties(array $arguments)
+    /**
+     * @param  list<mixed>  $arguments
+     */
+    protected function setProperties(array $arguments): void
     {
-        if (!isset($arguments[0])) {
+        if (! isset($arguments[0])) {
             throw new InvalidArgumentException('Phone number is required.');
         }
 
-        if (!is_string($arguments[0])) {
+        if (! is_string($arguments[0])) {
             throw new InvalidArgumentException('Phone number must be a string.');
         }
 
@@ -35,17 +43,8 @@ class PhoneNumber implements DataTypeInterface
         return $this->buildPhoneNumberString();
     }
 
-    protected function validatePhoneNumber(string $phoneNumber): void
-    {
-        $cleaned = preg_replace('/[^\d+]/', '', $phoneNumber);
-        
-        if (!preg_match('/^\+?[0-9]{1,15}$/', $cleaned)) {
-            throw new InvalidArgumentException('Invalid phone number format. Must be 1-15 digits, optionally starting with +');
-        }
-    }
-
     protected function buildPhoneNumberString(): string
     {
-        return $this->prefix . $this->phoneNumber;
+        return $this->prefix.$this->phoneNumber;
     }
 }
