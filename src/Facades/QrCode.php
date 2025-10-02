@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\Facades;
 
 use Illuminate\Support\Facades\Facade;
@@ -13,7 +15,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Linkxtr\QrCode\QrCode encoding(string $encoding)
  * @method static \Linkxtr\QrCode\QrCode format(string $format)
  * @method static \Linkxtr\QrCode\QrCode merge(string $path, float $percentage = 0.2, bool $absolute = false)
- * @method static string generate(string $text, ?string $filename = null)
+ * @method static \Linkxtr\QrCode\QrCode setData(string $data)
+ * @method static string generate(?string $filename = null)
  *
  * @see \Linkxtr\QrCode\QrCode
  */
@@ -22,8 +25,10 @@ class QrCode extends Facade
     /**
      * Get the registered name of the component.
      */
-    protected static function getFacadeAccessor(): string
+    protected static function getFacadeAccessor()
     {
-        return 'qrcode';
+        self::clearResolvedInstance(QrCode::class);
+
+        return QrCode::class;
     }
 }

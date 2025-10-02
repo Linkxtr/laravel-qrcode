@@ -2,7 +2,5 @@ parameters:
   level: 9
   paths:
     - src
-    - tests
-    - config
-
+    
   tmpDir: build/phpstan
