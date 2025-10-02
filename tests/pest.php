@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\QrCodeServiceProvider;
+use Tests\TestCase;
 
 beforeEach(function () {
-    // Additional setup for each test if needed
+    app()->register(QrCodeServiceProvider::class);
 });
 
 /*
@@ -17,7 +18,7 @@ beforeEach(function () {
 |
 */
 
-uses(\Tests\TestCase::class)
+uses(TestCase::class)
     ->beforeEach(function () {
         // Additional setup for each test if needed
     })
@@ -53,13 +54,3 @@ function something()
 {
     // ..
 }
-
-/*
-|--------------------------------------------------------------------------
-| Test Service Provider
-|--------------------------------------------------------------------------
-*/
-
-uses()
-    ->beforeEach(fn () => app()->register(QrCodeServiceProvider::class))
-    ->in('Feature');

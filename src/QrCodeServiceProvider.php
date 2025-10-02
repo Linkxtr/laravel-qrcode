@@ -6,25 +6,18 @@ use Illuminate\Support\ServiceProvider;
 
 class QrCodeServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/qrcode.php', 'qrcode'
-        );
+        $this->app->bind('qrcode', function () {
+            return new QrCode;
+        });
     }
 
     /**
-     * Bootstrap any application services.
+     * @return class-string[]
      */
-    public function boot(): void
+    public function provides(): array
     {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../config/qrcode.php' => config_path('qrcode.php'),
-            ], 'qrcode-config');
-        }
+        return [QrCode::class];
     }
 }

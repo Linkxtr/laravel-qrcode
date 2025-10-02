@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" bootstrap="vendor/autoload.php" colors="true" cacheResultFile=".phpunit.cache/test-results.xml" executionOrder="depends,defects" beStrictAboutCoverageMetadata="true" beStrictAboutOutputDuringTests="true" failOnRisky="true" failOnWarning="true">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd" bootstrap="vendor/autoload.php" colors="true" executionOrder="depends,defects" beStrictAboutCoverageMetadata="true" beStrictAboutOutputDuringTests="true" failOnRisky="true" failOnWarning="true">
   <testsuites>
-    <testsuite name="Unit">
-      <directory suffix="Test.php">./tests/Unit</directory>
+    <testsuite name="package">
+      <directory suffix="Test.php">./tests</directory>
     </testsuite>
   </testsuites>
-  <coverage cacheDirectory=".phpunit.cache/coverage" includeUncoveredFiles="true">
+  <coverage includeUncoveredFiles="true">
     <report>
       <clover outputFile="build/logs/clover.xml"/>
       <text outputFile="php://stdout" showUncoveredFiles="true" showOnlySummary="false"/>
@@ -28,7 +28,6 @@
     </include>
     <exclude>
       <directory>./vendor</directory>
-      <directory>./tests</directory>
     </exclude>
   </source>
 </phpunit>
