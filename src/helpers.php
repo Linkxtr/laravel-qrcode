@@ -4,16 +4,10 @@ use Linkxtr\QrCode\Facades\QrCode as QrCodeFacade;
 use Linkxtr\QrCode\QrCode;
 
 if (! function_exists('qrcode')) {
-    /**
-     * Generate a QR code or get a new QrCode instance.
-     *
-     * @return QrCode|string
-     */
-    function qrcode(?string $text = null)
+    function qrcode(?string $text = null): QrCode|string
     {
         if ($text === null) {
-            /** @var QrCode */
-            return app('qrcode');
+            return app(QrCode::class);
         }
 
         return QrCodeFacade::generate($text);

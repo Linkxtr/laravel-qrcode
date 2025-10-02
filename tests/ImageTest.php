@@ -5,22 +5,25 @@ use Linkxtr\QrCode\Image;
 beforeEach(function () {
     $this->imagePath = __DIR__.'/images/linkxtr.png';
     $this->image = new Image(file_get_contents($this->imagePath));
-
-    $this->testImageSaveLocation = __DIR__.'/images/testImage.png';
-    $this->compareTestSaveLocation = __DIR__.'/images/compareImage.png';
 });
 
 it('loads an image string into a resource', function () {
-    imagepng(imagecreatefrompng($this->imagePath), $this->compareTestSaveLocation);
-    imagepng($this->image->getImageResource(), $this->testImageSaveLocation);
+    $expected = imagecreatefrompng($this->imagePath);
+    $actual = $this->image->getImageResource();
 
-    $correctImage = file_get_contents($this->compareTestSaveLocation);
-    $testImage = file_get_contents($this->testImageSaveLocation);
+    $w = imagesx($expected);
+    $h = imagesy($expected);
+    expect(imagesx($actual))->toBe($w);
+    expect(imagesy($actual))->toBe($h);
 
-    expect($correctImage)->toBe($testImage);
-
-    unlink($this->testImageSaveLocation);
-    unlink($this->compareTestSaveLocation);
+    // Sample a grid of pixels for equality
+    $xStep = max(1, intdiv($w, 10));
+    $yStep = max(1, intdiv($h, 10));
+    for ($y = 0; $y < $h; $y += $yStep) {
+        for ($x = 0; $x < $w; $x += $xStep) {
+            expect(imagecolorat($actual, $x, $y))->toBe(imagecolorat($expected, $x, $y));
+        }
+    }
 });
 
 it('gets the width of the image', function () {

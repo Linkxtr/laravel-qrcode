@@ -67,7 +67,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option controls the default background color of the QR code.
-    | Format: [R, G, B, A] where each value is 0-255
+    | Format: [R, G, B, A] where each value is 0-255 and A is optional between 0-127
     |
     */
     'background_color' => [

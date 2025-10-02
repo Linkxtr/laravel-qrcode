@@ -10,7 +10,13 @@ class Image
 
     public function __construct(string $image)
     {
-        $this->image = imagecreatefromstring($image) ?: imagecreate(1, 1);
+        $img = @imagecreatefromstring($image);
+        
+        if ($img === false) {
+            throw new \InvalidArgumentException('Invalid image data provided to Image.');
+        }
+
+        $this->image = $img;
     }
 
     public function getWidth(): int
