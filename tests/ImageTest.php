@@ -4,6 +4,9 @@ use Linkxtr\QrCode\Image;
 
 beforeEach(function () {
     $this->imagePath = __DIR__.'/images/linkxtr.png';
+    if (! file_exists($this->imagePath)) {
+        throw new \RuntimeException('Image not found at '.$this->imagePath);
+    }
     $this->image = new Image(file_get_contents($this->imagePath));
 });
 
@@ -27,9 +30,27 @@ it('loads an image string into a resource', function () {
 });
 
 it('gets the width of the image', function () {
-    expect($this->image->getWidth())->toBe(325);
+    $expected = imagecreatefrompng($this->imagePath);
+    expect($this->image->getWidth())->toBe(imagesx($expected));
+    imagedestroy($expected);
 });
 
 it('gets the height of the image', function () {
-    expect($this->image->getHeight())->toBe(326);
+    $expected = imagecreatefrompng($this->imagePath);
+    expect($this->image->getHeight())->toBe(imagesy($expected));
+    imagedestroy($expected);
+});
+
+it('throws exception for invalid image data', function () {
+    expect(fn () => new Image('invalid data'))
+        ->toThrow(\InvalidArgumentException::class, 'Invalid image data provided to Image.');
+});
+
+it('can replace the image resource', function () {
+    $newImg = imagecreate(100, 100);
+    $this->image->setImageResource($newImg);
+
+    expect($this->image->getWidth())->toBe(100);
+    expect($this->image->getHeight())->toBe(100);
+    expect($this->image->getImageResource())->toBe($newImg);
 });

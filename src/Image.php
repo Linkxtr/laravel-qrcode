@@ -10,13 +10,22 @@ class Image
 
     public function __construct(string $image)
     {
-        $img = @imagecreatefromstring($image);
-        
+        set_error_handler(null);
+        $img = imagecreatefromstring($image);
+        restore_error_handler();
+
         if ($img === false) {
             throw new \InvalidArgumentException('Invalid image data provided to Image.');
         }
 
         $this->image = $img;
+    }
+
+    public function __destruct()
+    {
+        if (isset($this->image)) {
+            imagedestroy($this->image);
+        }
     }
 
     public function getWidth(): int
@@ -36,6 +45,10 @@ class Image
 
     public function setImageResource(GdImage $image): void
     {
+        if (isset($this->image)) {
+            imagedestroy($this->image);
+        }
+
         $this->image = $image;
     }
 }
