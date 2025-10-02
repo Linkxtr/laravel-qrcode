@@ -24,9 +24,11 @@ it('loads an image string into a resource', function () {
     $yStep = max(1, intdiv($h, 10));
     for ($y = 0; $y < $h; $y += $yStep) {
         for ($x = 0; $x < $w; $x += $xStep) {
-            expect(imagecolorat($actual, $x, $y))->toBe(imagecolorat($expected, $x, $y));
+            expect(imagecolorat($actual, $x, $y))
+                ->toBe(imagecolorat($expected, $x, $y));
         }
     }
+    imagedestroy($expected);
 });
 
 it('gets the width of the image', function () {
