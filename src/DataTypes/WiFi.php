@@ -8,9 +8,9 @@ class WiFi implements DataTypeInterface
 {
     protected string $prefix = 'WIFI:';
 
-    protected string $ssid;
+    protected string $ssid = '';
 
-    protected string $password;
+    protected string $password = '';
 
     protected bool $hidden = false;
 
@@ -35,12 +35,16 @@ class WiFi implements DataTypeInterface
 
         $arguments = $arguments[0];
 
-        if (isset($arguments['ssid']) && is_string($arguments['ssid'])) {
-            $this->ssid = $arguments['ssid'];
+        if (! isset($arguments['ssid']) || ! is_string($arguments['ssid']) || $arguments['ssid'] === '') {
+            throw new InvalidArgumentException('SSID is required and must be a string.');
         }
+
+        $this->ssid = $arguments['ssid'];
+
         if (isset($arguments['password']) && is_string($arguments['password'])) {
             $this->password = $arguments['password'];
         }
+
         if (isset($arguments['hidden']) && is_bool($arguments['hidden'])) {
             $this->hidden = $arguments['hidden'];
         }
@@ -55,13 +59,13 @@ class WiFi implements DataTypeInterface
     {
         $wifi = $this->prefix;
 
-        if (isset($this->password)) {
+        if ($this->password !== '') {
             $wifi .= 'T:WPA'.$this->separator;
         }
-        if (isset($this->ssid)) {
+        if ($this->ssid !== '') {
             $wifi .= 'S:'.$this->ssid.$this->separator;
         }
-        if (isset($this->password)) {
+        if ($this->password !== '') {
             $wifi .= 'P:'.$this->password.$this->separator;
         }
         if ($this->hidden) {

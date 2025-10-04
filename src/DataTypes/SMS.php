@@ -9,9 +9,9 @@ class SMS implements DataTypeInterface
 {
     use ValidatesPhoneNumbers;
 
-    protected string $prefix = 'sms:';
+    protected string $prefix = 'SMSTO:';
 
-    protected string $separator = '&body=';
+    protected string $separator = ':';
 
     protected ?string $smsAddress = null;
 
@@ -30,7 +30,7 @@ class SMS implements DataTypeInterface
      */
     protected function setProperties(array $arguments): void
     {
-        if (empty($arguments[0]) && empty($arguments[1])) {
+        if (! isset($arguments[0]) && ! isset($arguments[1])) {
             throw new InvalidArgumentException('Either SMS address or message is required.');
         }
 
@@ -39,10 +39,12 @@ class SMS implements DataTypeInterface
                 throw new InvalidArgumentException('SMS address must be a string.');
             }
 
-            if ($arguments[0] !== null) {
-                $this->validatePhoneNumber($arguments[0]);
-                $this->smsAddress = $arguments[0];
+            if ($arguments[0] === '') {
+                throw new InvalidArgumentException('SMS address cannot be empty.');
             }
+
+            $this->validatePhoneNumber($arguments[0]);
+            $this->smsAddress = $arguments[0];
         }
 
         if (isset($arguments[1]) && is_string($arguments[1])) {
@@ -60,7 +62,7 @@ class SMS implements DataTypeInterface
         $sms = $this->prefix.($this->smsAddress ?? '');
 
         if (isset($this->message)) {
-            $sms .= $this->separator.$this->message;
+            $sms .= $this->separator.rawurlencode($this->message);
         }
 
         return $sms;

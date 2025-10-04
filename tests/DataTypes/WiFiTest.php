@@ -52,4 +52,24 @@ it('should generate a valid WiFi QR code for a hidden SSID and password', functi
 it('throws an exception when SSID is missing', function () {
     expect(fn () => $this->wifi->create([]))
         ->toThrow(InvalidArgumentException::class);
+    expect(fn () => $this->wifi->create([
+        0 => [
+            'password' => 'password',
+        ],
+    ]))
+        ->toThrow(InvalidArgumentException::class);
+    expect(fn () => $this->wifi->create([
+        0 => [
+            'hidden' => true,
+        ],
+    ]))
+        ->toThrow(InvalidArgumentException::class);
+
+    expect(fn () => $this->wifi->create([
+        0 => [
+            'hidden' => true,
+            'password' => 'password',
+        ],
+    ]))
+        ->toThrow(InvalidArgumentException::class);
 });

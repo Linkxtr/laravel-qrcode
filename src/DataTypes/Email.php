@@ -44,11 +44,11 @@ class Email implements DataTypeInterface
         }
 
         if (isset($arguments[3]) && is_string($arguments[3])) {
-            $this->cc = $arguments[3];
+            $this->cc = $this->setAddress($arguments[3]);
         }
 
         if (isset($arguments[4]) && is_string($arguments[4])) {
-            $this->bcc = $arguments[4];
+            $this->bcc = $this->setAddress($arguments[4]);
         }
     }
 

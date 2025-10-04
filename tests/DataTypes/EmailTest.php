@@ -35,11 +35,11 @@ it('throws an exception when the email is invalid', function () {
 });
 
 it('should generate a valid email QR code with cc', function () {
-    $this->email->create(['email@example.com', 'subject', 'body', 'cc']);
-    expect(strval($this->email))->toBe('mailto:email@example.com?subject=subject&body=body&cc=cc');
+    $this->email->create(['email@example.com', 'subject', 'body', 'cc@example.com']);
+    expect(strval($this->email))->toBe('mailto:email@example.com?subject=subject&body=body&cc=cc%40example.com');
 });
 
 it('should generate a valid email QR code with cc and bcc', function () {
-    $this->email->create(['email@example.com', 'subject', 'body', 'cc', 'bcc']);
-    expect(strval($this->email))->toBe('mailto:email@example.com?subject=subject&body=body&cc=cc&bcc=bcc');
+    $this->email->create(['email@example.com', 'subject', 'body', 'cc@example.com', 'bcc@example.com']);
+    expect(strval($this->email))->toBe('mailto:email@example.com?subject=subject&body=body&cc=cc%40example.com&bcc=bcc%40example.com');
 });
