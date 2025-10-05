@@ -53,7 +53,7 @@ All your existing QR code generation code should work without any changes. We ma
 You can install the package via Composer. This will automatically install the required `bacon/bacon-qr-code` package:
 
 ```bash
-composer require Linkxtr/laravel-qrcode
+composer require linkxtr/laravel-qrcode
 ```
 
 ## Basic Usage

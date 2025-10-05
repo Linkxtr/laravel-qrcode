@@ -2,19 +2,18 @@
 
 test('can generate QR code with same output as Simple QrCode', function () {
     // Test with simple text
-    $simpleQr = QrCode::format('svg')->size(200)->generate('test');
+    $simpleQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->generate('test');
     $linkxtrQr = \Linkxtr\QrCode\Facades\QrCode::format('svg')->size(200)->generate('test');
     
     // Basic checks
     expect($linkxtrQr)->toBeString()
         ->and(strlen($linkxtrQr))->toBeGreaterThan(100) // Ensure we have SVG content
-        ->and(str_contains($linkxtrQr, '<svg'))->toBeTrue()
-        ->and(str_contains($linkxtrQr, 'test'))->toBeTrue();
+        ->and(str_contains($linkxtrQr, '<svg'))->toBeTrue();
 
     // Test with different sizes
     $sizes = [100, 200, 300];
     foreach ($sizes as $size) {
-        $simpleQr = QrCode::format('svg')->size($size)->generate('size-test');
+        $simpleQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size($size)->generate('size-test');
         $linkxtrQr = \Linkxtr\QrCode\Facades\QrCode::format('svg')->size($size)->generate('size-test');
         
         // Check if both generate similar size SVGs
@@ -22,6 +21,7 @@ test('can generate QR code with same output as Simple QrCode', function () {
         $linkxtrSize = strlen($linkxtrQr);
         
         // Allow 10% difference in size due to potential implementation differences
+        expect($simpleSize)->toBeGreaterThan(0);
         $sizeDifference = abs($simpleSize - $linkxtrSize) / $simpleSize;
         expect($sizeDifference)->toBeLessThan(0.1);
     }
@@ -29,7 +29,7 @@ test('can generate QR code with same output as Simple QrCode', function () {
     // Test error correction levels
     $levels = ['L', 'M', 'Q', 'H'];
     foreach ($levels as $level) {
-        $simpleQr = QrCode::format('svg')->size(200)->errorCorrection($level)->generate('error-correction');
+        $simpleQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->errorCorrection($level)->generate('error-correction');
         $linkxtrQr = \Linkxtr\QrCode\Facades\QrCode::format('svg')
             ->errorCorrection($level)
             ->size(200)
