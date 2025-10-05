@@ -1,0 +1,55 @@
+name: Compatibility Test with Simple QrCode
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-compatibility:
+    name: Test Compatibility with Simple QrCode
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.2, 8.3]
+        laravel: [^10.0, ^11.0]
+        include:
+          - laravel: ^10.0
+            testbench: ^8.6
+          - laravel: ^11.0
+            testbench: ^9.0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: gd, dom, fileinfo, mbstring, xml, ctype, iconv, intl, json, pdo, pdo_sqlite, sqlite3
+          coverage: none
+
+      - name: Install Dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer require simplesoftwareio/simple-qrcode --dev
+          composer update --prefer-dist --no-interaction
+
+      - name: Execute tests
+        run: |
+          mkdir -p tests/Compatibility
+          cp .github/workflows/compatibility-test.php tests/Compatibility/SimpleQrCodeTest.php
+          ./vendor/bin/pest tests/Compatibility/SimpleQrCodeTest.php --colors=always
+
+      - name: Upload test results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: |
+            tests/Compatibility/SimpleQrCodeTest.php
+            storage/logs/*.log

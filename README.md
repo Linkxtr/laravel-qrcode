@@ -1,11 +1,32 @@
 # Laravel QR Code
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/your-vendor/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/your-vendor/laravel-qrcode)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/your-vendor/laravel-qrcode/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/your-vendor/laravel-qrcode/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/your-vendor/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/your-vendor/laravel-qrcode)
-[![License](https://img.shields.io/packagist/l/your-vendor/laravel-qrcode?style=flat-square)](LICENSE.md)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/linkxtr/laravel-qrcode/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/linkxtr/laravel-qrcode/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![Compatibility Test](https://github.com/linkxtr/laravel-qrcode/actions/workflows/compatibility-test.yml/badge.svg)](https://github.com/linkxtr/laravel-qrcode/actions/workflows/compatibility-test.yml)
+[![Total Downloads](https://img.shields.io/packagist/dt/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
+[![License](https://img.shields.io/packagist/l/linkxtr/laravel-qrcode?style=flat-square)](LICENSE.md)
 
 A clean, modern, and easy-to-use QR code generator for Laravel applications. This package provides a simple and intuitive API for generating QR codes in various formats with support for Laravel 10, 11, and 12, built on top of the reliable [Bacon/BaconQrCode](https://github.com/Bacon/BaconQrCode) library.
+
+## 🚀 Simple QrCode Compatibility
+
+This package is designed to be a drop-in replacement for `simplesoftwareio/simple-qrcode` with the following benefits:
+
+- ✅ **Fully compatible** with existing Simple QrCode method signatures
+- 🚀 **Faster performance** with modern PHP 8.2+ optimizations
+- 🛠 **Strict type safety** with PHP 8.2+ features
+- 📦 **Smaller footprint** with minimal dependencies
+
+### Migration Guide
+
+If you're migrating from `simplesoftwareio/simple-qrcode`, simply replace the namespace in your code:
+
+```diff
+- use SimpleSoftwareIO\QrCode\Facades\QrCode;
++ use Linkxtr\QrCode\Facades\QrCode;
+```
+
+All your existing QR code generation code should work without any changes. We maintain compatibility with all the commonly used methods from Simple QrCode.
 
 ## Features
 
@@ -18,6 +39,8 @@ A clean, modern, and easy-to-use QR code generator for Laravel applications. Thi
 - 🧪 **100% test coverage** with Pest PHP
 - 📦 **Laravel 10, 11 & 12** compatibility
 - 🔍 **IDE-friendly** with proper type hints
+- 🔄 **Simple QrCode compatible** - Drop-in replacement for `simplesoftwareio/simple-qrcode`
+- 🚀 **Continuous compatibility testing** to ensure ongoing compatibility with Simple QrCode
 
 ## Requirements
 
