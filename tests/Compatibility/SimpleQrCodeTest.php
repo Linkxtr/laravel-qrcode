@@ -4,8 +4,8 @@ use Illuminate\Support\Arr;
 
 test('can generate QR code with same output as Simple QrCode', function () {
     // Test with simple text
-    $simpleQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->generate('test');
-    $linkxtrQr = \Linkxtr\QrCode\Facades\QrCode::format('svg')->size(200)->generate('test');
+    $simpleQr = (new \SimpleSoftwareIO\QrCode\Generator)->format('svg')->size(200)->generate('test')->toHtml();
+    $linkxtrQr = (new \Linkxtr\QrCode\QrCode)->format('svg')->size(200)->generate('test')->toHtml();
 
     // Basic checks
     expect($linkxtrQr)->toBeString()
@@ -15,8 +15,8 @@ test('can generate QR code with same output as Simple QrCode', function () {
     // Test with different sizes
     $sizes = [100, 200, 300];
     foreach ($sizes as $size) {
-        $simpleQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size($size)->generate('size-test');
-        $linkxtrQr = \Linkxtr\QrCode\Facades\QrCode::format('svg')->size($size)->generate('size-test');
+        $simpleQr = (new \SimpleSoftwareIO\QrCode\Generator)->format('svg')->size($size)->generate('size-test')->toHtml();
+        $linkxtrQr = (new \Linkxtr\QrCode\QrCode)->format('svg')->size($size)->generate('size-test')->toHtml();
 
         // Check if both generate similar size SVGs
         $simpleSize = strlen($simpleQr);
@@ -31,11 +31,11 @@ test('can generate QR code with same output as Simple QrCode', function () {
     // Test error correction levels
     $levels = ['L', 'M', 'Q', 'H'];
     foreach ($levels as $level) {
-        $simpleQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->errorCorrection($level)->generate('error-correction');
-        $linkxtrQr = \Linkxtr\QrCode\Facades\QrCode::format('svg')
+        $simpleQr = (new \SimpleSoftwareIO\QrCode\Generator)->format('svg')->size(200)->errorCorrection($level)->generate('error-correction')->toHtml();
+        $linkxtrQr = (new \Linkxtr\QrCode\QrCode)->format('svg')
             ->errorCorrection($level)
             ->size(200)
-            ->generate('error-correction');
+            ->generate('error-correction')->toHtml();
 
         // Both should generate valid QR codes
         expect($simpleQr)->toBeString()
@@ -57,7 +57,7 @@ test('supports same methods as Simple QrCode', function () {
     ];
 
     foreach ($methods as $method => $value) {
-        $qrCode = \Linkxtr\QrCode\Facades\QrCode::{$method}(...Arr::wrap($value));
+        $qrCode = (new \Linkxtr\QrCode\QrCode)->{$method}(...Arr::wrap($value));
         expect($qrCode)->toBeInstanceOf(\Linkxtr\QrCode\QrCode::class);
     }
 })->group('compatibility');
