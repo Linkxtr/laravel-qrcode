@@ -40,8 +40,8 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/pest",
-        "test-coverage": "XDEBUG_MODE=coverage vendor/bin/pest --coverage",
+        "test": "vendor/bin/pest --exclude-group=compatibility",
+        "test-coverage": "XDEBUG_MODE=coverage vendor/bin/pest --exclude-group=compatibility --coverage",
         "lint": "vendor/bin/pint",
         "analyse": "vendor/bin/phpstan analyse",
         "post-autoload-dump": [

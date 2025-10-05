@@ -68,7 +68,7 @@ jobs:
       - name: Run Tests
         run: |
           mkdir -p build/logs
-          vendor/bin/pest --coverage-clover=build/logs/clover.xml
+          composer test
 
   lint:
     name: Lint

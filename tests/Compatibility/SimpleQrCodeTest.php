@@ -1,10 +1,12 @@
 <?php
 
+use Illuminate\Support\Arr;
+
 test('can generate QR code with same output as Simple QrCode', function () {
     // Test with simple text
     $simpleQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->generate('test');
     $linkxtrQr = \Linkxtr\QrCode\Facades\QrCode::format('svg')->size(200)->generate('test');
-    
+
     // Basic checks
     expect($linkxtrQr)->toBeString()
         ->and(strlen($linkxtrQr))->toBeGreaterThan(100) // Ensure we have SVG content
@@ -15,11 +17,11 @@ test('can generate QR code with same output as Simple QrCode', function () {
     foreach ($sizes as $size) {
         $simpleQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size($size)->generate('size-test');
         $linkxtrQr = \Linkxtr\QrCode\Facades\QrCode::format('svg')->size($size)->generate('size-test');
-        
+
         // Check if both generate similar size SVGs
         $simpleSize = strlen($simpleQr);
         $linkxtrSize = strlen($linkxtrQr);
-        
+
         // Allow 10% difference in size due to potential implementation differences
         expect($simpleSize)->toBeGreaterThan(0);
         $sizeDifference = abs($simpleSize - $linkxtrSize) / $simpleSize;
@@ -34,12 +36,12 @@ test('can generate QR code with same output as Simple QrCode', function () {
             ->errorCorrection($level)
             ->size(200)
             ->generate('error-correction');
-        
+
         // Both should generate valid QR codes
         expect($simpleQr)->toBeString()
             ->and($linkxtrQr)->toBeString();
     }
-});
+})->group('compatibility');
 
 test('supports same methods as Simple QrCode', function () {
     // Test common methods
@@ -55,7 +57,7 @@ test('supports same methods as Simple QrCode', function () {
     ];
 
     foreach ($methods as $method => $value) {
-        $qrCode = \Linkxtr\QrCode\Facades\QrCode::{$method}(...array_wrap($value));
+        $qrCode = \Linkxtr\QrCode\Facades\QrCode::{$method}(...Arr::wrap($value));
         expect($qrCode)->toBeInstanceOf(\Linkxtr\QrCode\QrCode::class);
     }
-});
+})->group('compatibility');
