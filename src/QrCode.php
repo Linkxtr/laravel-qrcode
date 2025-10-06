@@ -41,7 +41,7 @@ class QrCode
     /**
      * The size of the QR code in pixels.
      */
-    protected int $size = 200;
+    protected int $size = 100;
 
     /**
      * The margin around the QR code.
