@@ -1,7 +1,7 @@
 # Laravel QR Code
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/linkxtr/laravel-qrcode/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/linkxtr/laravel-qrcode/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/linkxtr/laravel-qrcode/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/linkxtr/laravel-qrcode/actions?query=workflow%3Atests+branch%3Amain)
 [![Compatibility Test](https://github.com/linkxtr/laravel-qrcode/actions/workflows/compatibility-test.yml/badge.svg)](https://github.com/linkxtr/laravel-qrcode/actions/workflows/compatibility-test.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
 [![License](https://img.shields.io/packagist/l/linkxtr/laravel-qrcode?style=flat-square)](LICENSE.md)
