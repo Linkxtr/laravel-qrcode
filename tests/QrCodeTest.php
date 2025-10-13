@@ -18,7 +18,9 @@ test('chaining is working', function () {
     expect((new QrCode)->size(100))->toBeInstanceOf(QrCode::class);
     expect((new QrCode)->format('png'))->toBeInstanceOf(QrCode::class);
     expect((new QrCode)->color(100, 100, 100))->toBeInstanceOf(QrCode::class);
+    expect((new QrCode)->color(100, 100, 100, 25))->toBeInstanceOf(QrCode::class);
     expect((new QrCode)->backgroundColor(100, 100, 100))->toBeInstanceOf(QrCode::class);
+    expect((new QrCode)->backgroundColor(100, 100, 100, 25))->toBeInstanceOf(QrCode::class);
     expect((new QrCode)->eyeColor(0, 100, 100, 100))->toBeInstanceOf(QrCode::class);
     expect((new QrCode)->gradient(100, 100, 100, 100, 100, 100, 'vertical'))->toBeInstanceOf(QrCode::class);
     expect((new QrCode)->eye('square'))->toBeInstanceOf(QrCode::class);

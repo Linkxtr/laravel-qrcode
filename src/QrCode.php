@@ -65,7 +65,7 @@ class QrCode
      * SHIFT-JIS, WINDOWS-1250, WINDOWS-1251, WINDOWS-1252, WINDOWS-1256,
      * UTF-16BE, UTF-8, ASCII, GBK, EUC-KR.
      */
-    protected string $encoding = Encoder::DEFAULT_BYTE_MODE_ECODING;
+    protected string $encoding = Encoder::DEFAULT_BYTE_MODE_ENCODING;
 
     /**
      * The style of the blocks within the QrCode.
