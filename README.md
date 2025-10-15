@@ -1,161 +1,308 @@
-# Laravel QR Code
+# Laravel QR Code Generator
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/linkxtr/laravel-qrcode/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/linkxtr/laravel-qrcode/actions?query=workflow%3Atests+branch%3Amain)
-[![Compatibility Test](https://github.com/linkxtr/laravel-qrcode/actions/workflows/compatibility-test.yml/badge.svg)](https://github.com/linkxtr/laravel-qrcode/actions/workflows/compatibility-test.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
-[![License](https://img.shields.io/packagist/l/linkxtr/laravel-qrcode?style=flat-square)](LICENSE.md)
+[![PHP Version](https://img.shields.io/packagist/php-v/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
+[![License](https://img.shields.io/packagist/l/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
 
-A clean, modern, and easy-to-use QR code generator for Laravel applications. This package provides a simple and intuitive API for generating QR codes in various formats with support for Laravel 10, 11, and 12, built on top of the reliable [Bacon/BaconQrCode](https://github.com/Bacon/BaconQrCode) library.
+> **🚀 Maintained Alternative**: This package is a fully compatible, actively maintained alternative to [`simplesoftwareio/simple-qrcode`](https://github.com/simplesoftwareio/simple-qrcode) with additional features and better support.
 
-## 🚀 Simple QrCode Compatibility
+A beautiful and simple QR code generator for Laravel. This package provides an expressive interface for generating QR codes in various formats with extensive customization options.
 
-This package is designed to be a drop-in replacement for `simplesoftwareio/simple-qrcode` with the following benefits:
+## 🔄 Migration from [simplesoftwareio/simple-qrcode](https://github.com/simplesoftwareio/simple-qrcode)
 
-- ✅ **Fully compatible** with existing Simple QrCode method signatures
-- 🚀 **Faster performance** with modern PHP 8.2+ optimizations
-- 🛠 **Strict type safety** with PHP 8.2+ features
-- 📦 **Smaller footprint** with minimal dependencies
+Switching from the original package is straightforward:
 
-### Migration Guide
-
-If you're migrating from `simplesoftwareio/simple-qrcode`, simply replace the namespace in your code:
-
-```diff
-- use SimpleSoftwareIO\QrCode\Facades\QrCode;
-+ use Linkxtr\QrCode\Facades\QrCode;
+### Step 1: Update Composer
+```bash
+composer remove simplesoftwareio/simple-qrcode
+composer require linkxtr/laravel-qrcode
 ```
 
-All your existing QR code generation code should work without any changes. We maintain compatibility with all the commonly used methods from Simple QrCode.
+### Step 2: Update Imports (if using in classes)
 
-## Features
+```php
+// Replace:
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-- 🔥 **Modern PHP 8.2+** with strict types and modern syntax
-- 🎨 **Multiple output formats**: PNG, SVG, EPS, and more
-- 🖌️ **Customizable appearance**: Colors, size, margins, and more
-- 🔄 **Built-in caching** for improved performance
-- 🔒 **Support for different encodings**: UTF-8, ISO-8859-1, etc.
-- 📱 **Responsive by default** with SVG output
-- 🧪 **100% test coverage** with Pest PHP
-- 📦 **Laravel 10, 11 & 12** compatibility
-- 🔍 **IDE-friendly** with proper type hints
-- 🔄 **Simple QrCode compatible** - Drop-in replacement for `simplesoftwareio/simple-qrcode`
-- 🚀 **Continuous compatibility testing** to ensure ongoing compatibility with Simple QrCode
+// With:
+use Linkxtr\LaravelQrCode\Facades\QrCode;
+```
 
-## Requirements
+### ✅ That's it! All your existing code will work exactly the same.
 
-- PHP 8.2 or higher
-- Laravel 10, 11, or 12
-- GD Library or Imagick extension for image manipulation
+**Why migrate?**
+- ✅ **Active Maintenance**: Regular updates and bug fixes
+- ✅ **Better Performance**: Updated dependencies
+- ✅ **Enhanced Security**: Security patches applied
+- ✅ **Future Features**: Roadmap includes new formats and data types
+- ✅ **Community Support**: Active issue response and PR merging
 
-## Installation
-
-You can install the package via Composer. This will automatically install the required `bacon/bacon-qr-code` package:
+## 📦 Installation
 
 ```bash
 composer require linkxtr/laravel-qrcode
 ```
 
-## Basic Usage
+The package uses Laravel's package auto-discovery, so the service provider and facade are registered automatically.
 
-### Generating QR Codes
+## 🚀 Quick Start
 
-```php
-use Linkxtr\QrCode\Facades\QrCode;
-
-// Generate a simple QR code
-$qrCode = QrCode::generate('https://example.com');
-
-// Generate QR code with custom size and margin
-$qrCode = QrCode::size(300)
-    ->margin(10)
-    ->generate('https://example.com');
-```
-
-### Available Methods
-
-```php
-// Set QR code size (in pixels)
-QrCode::size(250);
-
-// Set QR code margin (in pixels)
-QrCode::margin(10);
-
-// Set foreground color
-QrCode::color(255, 0, 0); // RGB
-
-// Set background color
-QrCode::backgroundColor(255, 255, 255, 0); // RGB with alpha
-
-// Set error correction level (L, M, Q, H)
-QrCode::errorCorrection('H');
-
-// Set encoding
-QrCode::encoding('UTF-8');
-
-// Generate a data URL
-$dataUrl = QrCode::format('png')->generate('https://example.com');
-```
-
-### Blade Directive
-
+### Basic Usage in Blade Templates
 ```blade
-<!-- Generate QR code in a view -->
-<div class="qr-code">
-    {!! QrCode::size(200)->generate('https://example.com') !!}
-</div>
+<!-- Display QR code -->
+{!! QrCode::generate('Hello World!'); !!}
+
+<!-- Generate and save to file -->
+{!! QrCode::generate('Hello World!', public_path('qrcode.svg')); !!}
 ```
 
-## Advanced Usage
-
-### Custom Logo Overlay
-
+### In Controllers
 ```php
-$qrCode = QrCode::format('png')
-    ->size(300)
-    ->merge(public_path('logo.png'), 0.3, true)
-    ->generate('https://example.com');
-```
+use Linkxtr\LaravelQrCode\Facades\QrCode;
 
-### Response in Controller
-
-```php
-use Linkxtr\QrCode\Facades\QrCode;
-use Illuminate\Support\Facades\Response;
-
-public function qrCode()
+public function generate()
 {
-    $png = QrCode::format('png')
-        ->size(200)
-        ->generate('QR Code with custom data');
-        
-    return response($png)->header('Content-type', 'image/png');
+    // Return as SVG response
+    return QrCode::generate('QR Code Content');
+    
+    // Or save to file
+    QrCode::generate('Content', storage_path('app/qrcodes/qr.svg'));
+    
+    // Or get as string
+    $svg = QrCode::generate('Content');
 }
 ```
 
-## Testing
+## ✨ Features
 
-```bash
-composer test
+### 🔄 Full Compatibility
+- **Drop-in replacement** for `simplesoftwareio/simple-qrcode`
+- **Same API** - no code changes required
+- **All original methods supported**
+
+### 🎨 Enhanced Customization
+```php
+// Colors and styling
+QrCode::size(300)
+    ->color(255, 0, 0)
+    ->backgroundColor(255, 255, 255)
+    ->style('dot')
+    ->eye('circle')
+    ->generate('Styled QR Code');
+
+// Error correction
+QrCode::errorCorrection('H')->generate('Important Data');
+
+// Merge images
+QrCode::merge('path/to/logo.png')->generate('With Logo');
 ```
 
-## Changelog
+### 📱 Multiple Data Types
+```php
+// URLs
+QrCode::generate('https://example.com');
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+// Emails
+QrCode::email('to@example.com', 'Subject', 'Body');
 
-## Contributing
+// Phone numbers
+QrCode::phoneNumber('+1234567890');
 
-Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
+// SMS
+QrCode::SMS('+1234567890', 'Message body');
 
-## Security
+// WiFi
+QrCode::wiFi([
+    'ssid' => 'Network',
+    'encryption' => 'WPA',
+    'password' => 'Password'
+]);
 
-If you discover any security-related issues, please email security@your-email.com instead of using the issue tracker.
+// Geolocation
+QrCode::geo(37.7749, -122.4194);
 
-## Credits
+// BTC
+QrCode::btc(['btcaddress', 0.0034, ['label' => 'label', 'message' => 'message', 'returnAddress' => 'https://www.returnaddress.com']]);
+```
 
-- [Khaled Sadek](https://github.com/khaledsadek)
-- [All Contributors](../../contributors)
+### 🆕 Coming in Version 2
+- 📅 Calendar events
+- 👤 vCard contacts  
+- 🎬 WebP and animated formats
+- 🎯 More styling options
 
-## License
+## 📊 Comparison with simplesoftwareio/simple-qrcode
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+| Feature | simplesoftwareio/simple-qrcode | linkxtr/laravel-qrcode |
+|---------|--------------------------------|------------------------|
+| Active Maintenance | ❌ | ✅ |
+| Security Updates | ❌ | ✅ |
+| Issue Response | ❌ | ✅ |
+| PR Merging | ❌ | ✅ |
+| API Compatibility | ✅ | ✅ |
+| Performance | Standard | Improved |
+| Future Features | None planned | Active roadmap |
+
+> **Note**: This package maintains 100% API compatibility with the original.
+
+## 🔧 Advanced Usage
+
+### All Available Methods
+```php
+// Size and format
+QrCode::size(250)->format('png')->generate('Content');
+
+// Colors with RGB
+QrCode::color(255, 0, 0)->generate('Red QR');
+
+// Background color
+QrCode::backgroundColor(255, 255, 0)->generate('Yellow background');
+
+// Margin
+QrCode::margin(2)->generate('With margin');
+
+// Encoding
+QrCode::encoding('UTF-8')->generate('Unicode content');
+
+// Gradient colors
+QrCode::gradient(0, 0, 255, 255, 0, 0, 'vertical')->generate('Gradient');
+```
+
+### Error Correction Levels
+- `L` - 7% of data bytes can be restored
+- `M` - 15% of data bytes can be restored  
+- `Q` - 25% of data bytes can be restored
+- `H` - 30% of data bytes can be restored (default)
+
+```php
+QrCode::errorCorrection('H')->generate('High error correction');
+```
+
+### Image Merging
+```php
+// Merge with logo
+QrCode::merge('path/to/logo.png', 0.3, true)->generate('With Logo');
+```
+
+## 💡 Common Examples
+
+### Generate QR for Website
+```php
+QrCode::size(200)
+    ->generate('https://your-website.com');
+```
+
+### QR Code with Logo
+```php
+QrCode::size(300)
+    ->merge(public_path('logo.png'), 0.3, true)
+    ->generate('QR with logo');
+```
+
+### Colorful QR Code
+```php
+QrCode::size(300)
+    ->color(58, 94, 255)
+    ->backgroundColor(255, 255, 255)
+    ->generate('Colorful QR');
+```
+
+### WiFi QR Code
+```php
+QrCode::wiFi([
+    'ssid' => 'MyWiFi',
+    'encryption' => 'WPA',
+    'password' => 'my-password'
+]);
+```
+
+### Styled QR Code
+```php
+QrCode::size(250)
+    ->color(255, 0, 0)
+    ->style('dot')
+    ->eye('circle')
+    ->margin(1)
+    ->generate('Styled QR Code');
+```
+
+## 🤝 Contributing & 🗺️ Roadmap
+
+### Version 2 Roadmap
+We're actively working on Version 2 with these planned features:
+- [ ] vCard data type
+- [ ] Calendar event data type  
+- [ ] WebP format support
+- [ ] Animated QR codes
+- [ ] Bitcoin payment QR codes
+- [ ] Extended customization options
+
+### Contributing
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+### Request Features
+Have an idea? [Open an issue](https://github.com/linkxtr/laravel-qrcode/issues) with your feature request!
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**QR code not displaying in blade:**
+```blade
+<!-- Make sure to use unescaped output -->
+{!! QrCode::generate('Content') !!}  ✅
+{{ QrCode::generate('Content') }}     ❌
+```
+
+**File permission errors:**
+```php
+// Ensure directory exists and is writable
+QrCode::generate('Content', storage_path('app/qrcodes/qr.svg'));
+```
+
+**Large QR codes:**
+```php
+// For large content, use higher error correction
+QrCode::size(400)
+    ->errorCorrection('H')
+    ->generate('Very long content...');
+```
+
+## 📚 API Reference
+
+### Core Methods
+- `generate($text, $filename = null)` - Generate QR code
+- `size($size)` - Set size in pixels
+- `color($red, $green, $blue)` - Set QR color
+- `backgroundColor($red, $green, $blue)` - Set background color
+- `margin($margin)` - Set margin size
+- `format($format)` - Set format (svg, png, eps)
+
+### Data Type Methods
+- `email($to, $subject, $body)` - Generate email QR
+- `phoneNumber($phone)` - Generate phone QR
+- `SMS($phone, $message)` - Generate SMS QR
+- `geo($lat, $lng)` - Generate location QR
+- `wiFi($config)` - Generate WiFi QR
+- `btc($config)` - Generate BTC QR
+
+## 📄 License
+
+This package is open-sourced software licensed under the [MIT license](LICENSE).
+
+## 🙏 Acknowledgments
+
+- Based on the original work by [`simplesoftwareio/simple-qrcode`](https://github.com/simplesoftwareio/simple-qrcode)
+- Built upon [`bacon/bacon-qr-code`](https://github.com/Bacon/BaconQrCode)
+- Maintained by [khaled-sadek](https://github.com/khaled-sadek) and [contributors](../../contributors)
+
+---
+
+<div align="center">
+  
+**Need help?** [Open an issue](https://github.com/linkxtr/laravel-qrcode/issues) • **Found a bug?** [Report it](https://github.com/linkxtr/laravel-qrcode/issues)
+
+*⭐ Don't forget to star this repository if you find it useful!*
+
+</div>
