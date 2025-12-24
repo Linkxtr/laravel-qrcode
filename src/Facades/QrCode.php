@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Linkxtr\QrCode\QrCode as Generator;
 
 /**
  * @method static \Linkxtr\QrCode\QrCode size(int $size)
@@ -27,8 +28,8 @@ class QrCode extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        self::clearResolvedInstance(QrCode::class);
+        self::clearResolvedInstance(Generator::class);
 
-        return QrCode::class;
+        return Generator::class;
     }
 }
