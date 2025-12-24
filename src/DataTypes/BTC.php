@@ -57,7 +57,7 @@ class BTC implements DataTypeInterface
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param  array<mixed>  $options
      */
     protected function setOptions(array $options): void
     {

@@ -6,7 +6,7 @@ use GdImage;
 
 class Image
 {
-    protected GdImage $image;
+    protected ?GdImage $image = null;
 
     public function __construct(string $image)
     {
@@ -21,34 +21,42 @@ class Image
         $this->image = $img;
     }
 
-    public function __destruct()
+    public function __destruct(): void
     {
-        if (isset($this->image)) {
-            imagedestroy($this->image);
-        }
+        $this->image = null;
     }
 
+    /** @return int<1, max> */
     public function getWidth(): int
     {
+        if ($this->image === null) {
+            throw new \RuntimeException('Image resource has been released.');
+        }
+
         return imagesx($this->image);
     }
 
+    /** @return int<1, max> */
     public function getHeight(): int
     {
+        if ($this->image === null) {
+            throw new \RuntimeException('Image resource has been released.');
+        }
+
         return imagesy($this->image);
     }
 
     public function getImageResource(): GdImage
     {
+        if ($this->image === null) {
+            throw new \RuntimeException('Image resource has been released.');
+        }
+
         return $this->image;
     }
 
     public function setImageResource(GdImage $image): void
     {
-        if (isset($this->image)) {
-            imagedestroy($this->image);
-        }
-
         $this->image = $image;
     }
 }
