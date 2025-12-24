@@ -43,7 +43,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: gd, dom, fileinfo, mbstring, xml, ctype, iconv, intl, json, pdo, pdo_sqlite, sqlite3
-          coverage: none
+          coverage: xdebug
 
       - name: Install Dependencies
         run: |
