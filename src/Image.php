@@ -21,7 +21,7 @@ class Image
         $this->image = $img;
     }
 
-    public function __destruct(): void
+    public function __destruct()
     {
         $this->image = null;
     }
