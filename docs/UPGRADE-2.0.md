@@ -35,8 +35,9 @@ Several classes have been reorganized. The most significant changes are:
 - `BaconQrCode\Common\ErrorCorrectionLevel` has been updated with new constants
 
 ### 3. Color System
-- The `Rgb` constructor now requires an alpha channel parameter
+- The color methods (`color()` and `backgroundColor()`) now support an optional alpha channel parameter for transparency
 - Color handling has been updated for better type safety
+- Alpha channel values use the range 0-127, where 0 is fully opaque and 127 is fully transparent
 
 ## Upgrade Steps
 
