@@ -222,6 +222,10 @@ class Generator
     {
         $type = strtoupper($type);
 
+        if (! in_array($type, ['VERTICAL', 'HORIZONTAL', 'DIAGONAL', 'INVERSE_DIAGONAL', 'RADIAL'])) {
+            throw new InvalidArgumentException("\$type must be VERTICAL or HORIZONTAL or DIAGONAL or INVERSE_DIAGONAL or RADIAL. {$type} is not a valid gradient type.");
+        }
+
         $this->gradient = new Gradient(
             $this->createColor($startRed, $startGreen, $startBlue),
             $this->createColor($endRed, $endGreen, $endBlue),
@@ -268,6 +272,11 @@ class Generator
     public function errorCorrection(string $errorCorrection): self
     {
         $errorCorrection = strtoupper($errorCorrection);
+
+        if (! in_array($errorCorrection, ['L', 'M', 'Q', 'H'])) {
+            throw new InvalidArgumentException("\$errorCorrection must be L, M, Q, or H. {$errorCorrection} is not a valid error correction level.");
+        }
+
         $this->errorCorrection = ErrorCorrectionLevel::$errorCorrection();
 
         return $this;

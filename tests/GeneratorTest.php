@@ -120,7 +120,7 @@ test('gradient is passed to renderer', function () {
 
 it('throws exception if gradient type is not supported', function () {
     (new Generator)->gradient(100, 150, 200, 50, 75, 100, 'foo');
-})->throws(IllegalArgumentException::class);
+})->throws(InvalidArgumentException::class);
 
 test('eye style is passed to renderer', function () {
     $qrCode = (new Generator)->eye('circle');
@@ -189,16 +189,18 @@ it('return html string', function () {
 
 it('saves generated qrcode to file', function () {
     $file = __DIR__.'/generated_qr.svg';
+
     if (file_exists($file)) {
         unlink($file);
     }
 
-    (new Generator)->generate('test file', $file);
-
-    expect(file_exists($file))->toBeTrue();
-    expect(file_get_contents($file))->toContain('<svg');
-
-    unlink($file);
+    try {
+        (new Generator)->generate('test file', $file);
+        expect(file_exists($file))->toBeTrue();
+        expect(file_get_contents($file))->toContain('<svg');
+    } finally {
+        unlink($file);
+    }
 });
 
 test('Data types magic call', function () {
@@ -243,3 +245,7 @@ it('can merge image with relative path', function () {
 
     expect($pngData)->not->toBeEmpty();
 });
+
+it('throws exception if error correction level is not supported', function () {
+    (new Generator)->errorCorrection('foo');
+})->throws(InvalidArgumentException::class);

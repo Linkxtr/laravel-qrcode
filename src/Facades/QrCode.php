@@ -17,7 +17,7 @@ use Linkxtr\QrCode\Generator;
  * @method static \Linkxtr\QrCode\Generator format(string $format)
  * @method static \Linkxtr\QrCode\Generator merge(string $path, float $percentage = 0.2, bool $absolute = false)
  * @method static \Linkxtr\QrCode\Generator setData(string $data)
- * @method static string generate(?string $filename = null)
+ * @method static \Illuminate\Support\HtmlString|void generate(string $text, ?string $filename = null)
  *
  * @see \Linkxtr\QrCode\Generator
  */
