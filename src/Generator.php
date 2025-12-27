@@ -31,7 +31,7 @@ use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\DataTypeInterface;
 
-class QrCode
+class Generator
 {
     /**
      * The output format.
@@ -68,7 +68,7 @@ class QrCode
     protected string $encoding = Encoder::DEFAULT_BYTE_MODE_ENCODING;
 
     /**
-     * The style of the blocks within the QrCode.
+     * The style of the blocks within the QR code.
      * Possible values are 'square', 'dot' and 'round'.
      */
     protected string $style = 'square';
@@ -103,14 +103,14 @@ class QrCode
     protected array $eyeColors = [];
 
     /**
-     * The gradient to apply to the QrCode.
+     * The gradient to apply to the QR code.
      *
      * @var ?Gradient
      */
     protected $gradient = null;
 
     /**
-     * Holds an image string that will be merged with the QrCode.
+     * Holds an image string that will be merged with the QR code.
      */
     protected ?string $imageMerge = null;
 

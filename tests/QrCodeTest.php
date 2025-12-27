@@ -13,63 +13,63 @@ use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use DASPRiD\Enum\Exception\IllegalArgumentException;
 use Illuminate\Support\HtmlString;
-use Linkxtr\QrCode\QrCode;
+use Linkxtr\QrCode\Generator;
 
 test('chaining is working', function () {
-    expect((new QrCode)->size(100))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->format('png'))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->color(100, 100, 100))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->color(100, 100, 100, 25))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->backgroundColor(100, 100, 100))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->backgroundColor(100, 100, 100, 25))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->eyeColor(0, 100, 100, 100))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->gradient(100, 100, 100, 100, 100, 100, 'vertical'))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->eye('square'))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->style('square'))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->encoding('utf-8'))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->errorCorrection('L'))->toBeInstanceOf(QrCode::class);
-    expect((new QrCode)->margin(10))->toBeInstanceOf(QrCode::class);
+    expect((new Generator)->size(100))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->format('png'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->color(100, 100, 100))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->color(100, 100, 100, 25))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->backgroundColor(100, 100, 100))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->backgroundColor(100, 100, 100, 25))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->eyeColor(0, 100, 100, 100))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->gradient(100, 100, 100, 100, 100, 100, 'vertical'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->eye('square'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->style('square'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->encoding('utf-8'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->errorCorrection('L'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->margin(10))->toBeInstanceOf(Generator::class);
 });
 
 test('size is passed to renderer', function () {
-    $qrCode = (new QrCode)->size(200);
+    $qrCode = (new Generator)->size(200);
 
     expect($qrCode->getRendererStyle()->getSize())->toBe(200);
 });
 
 test('style format is passed to renderer', function () {
-    $qrCode = (new QrCode)->format('png');
+    $qrCode = (new Generator)->format('png');
     expect($qrCode->getFormatter())->toBeInstanceOf(ImagickImageBackEnd::class);
 
-    $qrCode = (new QrCode)->format('svg');
+    $qrCode = (new Generator)->format('svg');
     expect($qrCode->getFormatter())->toBeInstanceOf(SvgImageBackEnd::class);
 
-    $qrCode = (new QrCode)->format('eps');
+    $qrCode = (new Generator)->format('eps');
     expect($qrCode->getFormatter())->toBeInstanceOf(EpsImageBackEnd::class);
 });
 
 it('throws exception if format is not supported', function () {
-    (new QrCode)->format('jpg');
+    (new Generator)->format('jpg');
 })->throws(InvalidArgumentException::class);
 
 test('color is passed to renderer', function () {
-    $qrCode = (new QrCode)->color(100, 150, 200);
+    $qrCode = (new Generator)->color(100, 150, 200);
     expect($qrCode->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(100);
     expect($qrCode->getFill()->getForegroundColor()->toRgb()->getGreen())->toBe(150);
     expect($qrCode->getFill()->getForegroundColor()->toRgb()->getBlue())->toBe(200);
 
-    $qrCode = (new QrCode)->backgroundColor(50, 75, 100);
+    $qrCode = (new Generator)->backgroundColor(50, 75, 100);
     expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(50);
     expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getGreen())->toBe(75);
     expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getBlue())->toBe(100);
 
-    $qrCode = (new QrCode)->color(100, 150, 200, 100);
+    $qrCode = (new Generator)->color(100, 150, 200, 100);
     /** @var Alpha $foregroundColor */
     $foregroundColor = $qrCode->getFill()->getForegroundColor();
     expect($foregroundColor)->toBeInstanceOf(Alpha::class);
     expect($foregroundColor->getAlpha())->toBe(100);
 
-    $qrCode = (new QrCode)->backgroundColor(50, 75, 100, 75);
+    $qrCode = (new Generator)->backgroundColor(50, 75, 100, 75);
     /** @var Alpha $backgroundColor */
     $backgroundColor = $qrCode->getFill()->getBackgroundColor();
     expect($backgroundColor)->toBeInstanceOf(Alpha::class);
@@ -77,7 +77,7 @@ test('color is passed to renderer', function () {
 });
 
 test('eye color is passed to renderer', function () {
-    $qrCode = (new QrCode)->eyeColor(0, 0, 10, 50, 1, 8, 18);
+    $qrCode = (new Generator)->eyeColor(0, 0, 10, 50, 1, 8, 18);
     $qrCode->eyeColor(1, 100, 20, 60, 2, 10, 20);
     $qrCode->eyeColor(2, 200, 30, 70, 3, 12, 22);
 
@@ -103,83 +103,83 @@ test('eye color is passed to renderer', function () {
 });
 
 it('throws exception if eye color greater than 2', function () {
-    (new QrCode)->eyeColor(3, 0, 0, 0, 255, 255, 255);
+    (new Generator)->eyeColor(3, 0, 0, 0, 255, 255, 255);
 })->throws(InvalidArgumentException::class);
 
 it('throws exception if eye color less than 0', function () {
-    (new QrCode)->eyeColor(-1, 0, 0, 0, 255, 255, 255);
+    (new Generator)->eyeColor(-1, 0, 0, 0, 255, 255, 255);
 })->throws(InvalidArgumentException::class);
 
 test('gradient is passed to renderer', function () {
-    $qrCode = (new QrCode)->gradient(100, 150, 200, 50, 75, 100, 'vertical');
+    $qrCode = (new Generator)->gradient(100, 150, 200, 50, 75, 100, 'vertical');
     expect($qrCode->getFill()->getForegroundGradient())->toBeInstanceOf(Gradient::class);
 });
 
 it('throws exception if gradient type is not supported', function () {
-    (new QrCode)->gradient(100, 150, 200, 50, 75, 100, 'foo');
+    (new Generator)->gradient(100, 150, 200, 50, 75, 100, 'foo');
 })->throws(IllegalArgumentException::class);
 
 test('eye style is passed to renderer', function () {
-    $qrCode = (new QrCode)->eye('circle');
+    $qrCode = (new Generator)->eye('circle');
     expect($qrCode->getEye())->toBeInstanceOf(SimpleCircleEye::class);
 
-    $qrCode = (new QrCode)->eye('square');
+    $qrCode = (new Generator)->eye('square');
     expect($qrCode->getEye())->toBeInstanceOf(SquareEye::class);
 });
 
 it('throws exception if eye style is not supported', function () {
-    (new QrCode)->eye('dot');
+    (new Generator)->eye('dot');
 })->throws(InvalidArgumentException::class);
 
 test('module style is passed to renderer', function () {
-    $qrCode = (new QrCode)->style('dot');
+    $qrCode = (new Generator)->style('dot');
     expect($qrCode->getModule())->toBeInstanceOf(DotsModule::class);
 
-    $qrCode = (new QrCode)->style('square');
+    $qrCode = (new Generator)->style('square');
     expect($qrCode->getModule())->toBeInstanceOf(SquareModule::class);
 
-    $qrCode = (new QrCode)->style('round');
+    $qrCode = (new Generator)->style('round');
     expect($qrCode->getModule())->toBeInstanceOf(RoundnessModule::class);
 });
 
 it('throws exception if module style is not supported', function () {
-    (new QrCode)->style('triangle');
+    (new Generator)->style('triangle');
 })->throws(InvalidArgumentException::class);
 
 it('throws exception if roundness module with negative roundness is set', function () {
-    (new QrCode)->style('round', -.5);
+    (new Generator)->style('round', -.5);
 })->throws(InvalidArgumentException::class);
 
 it('throws exception if roundness module with more than 1 roundness is set', function () {
-    (new QrCode)->style('round', 1.1);
+    (new Generator)->style('round', 1.1);
 })->throws(InvalidArgumentException::class);
 
 it('throws exception if roundness module with 1 roundness is set', function () {
-    (new QrCode)->style('round', 1);
+    (new Generator)->style('round', 1);
 })->throws(InvalidArgumentException::class);
 
 it('throws exception if dot module with negative roundness is set', function () {
-    (new QrCode)->style('dot', -.5);
+    (new Generator)->style('dot', -.5);
 })->throws(InvalidArgumentException::class);
 
 it('throws exception if dot module with more than 1 roundness is set', function () {
-    (new QrCode)->style('dot', 1.1);
+    (new Generator)->style('dot', 1.1);
 })->throws(InvalidArgumentException::class);
 
 it('throws exception if dot module with 1 roundness is set', function () {
-    (new QrCode)->style('dot', 1);
+    (new Generator)->style('dot', 1);
 })->throws(InvalidArgumentException::class);
 
 test('get renderer return a renderer instance', function () {
-    $qrCode = new QrCode;
+    $qrCode = new Generator;
     expect($qrCode->getRendererStyle())->not->toBeNull()->toBeInstanceOf(RendererStyle::class);
 });
 
 it('throws exception if data type is not supported', function () {
-    (new QrCode)->notReal('fooBar');
+    (new Generator)->notReal('fooBar');
 })->throws(BadMethodCallException::class);
 
 it('return html string', function () {
-    $qrCode = new QrCode;
+    $qrCode = new Generator;
     expect($qrCode->generate('This is a test'))->toBeInstanceOf(HtmlString::class);
 });
