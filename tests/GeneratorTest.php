@@ -11,7 +11,6 @@ use BaconQrCode\Renderer\Module\RoundnessModule;
 use BaconQrCode\Renderer\Module\SquareModule;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use DASPRiD\Enum\Exception\IllegalArgumentException;
 use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\Image;

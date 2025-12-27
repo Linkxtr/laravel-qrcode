@@ -10,8 +10,8 @@ use Linkxtr\QrCode\Generator;
 /**
  * @method static \Linkxtr\QrCode\Generator size(int $size)
  * @method static \Linkxtr\QrCode\Generator margin(int $margin)
- * @method static \Linkxtr\QrCode\Generator color(int $red, int $green, int $blue, int $alpha = 0)
- * @method static \Linkxtr\QrCode\Generator backgroundColor(int $red, int $green, int $blue, int $alpha = 0)
+ * @method static \Linkxtr\QrCode\Generator color(int $red, int $green, int $blue, ?int $alpha = null)
+ * @method static \Linkxtr\QrCode\Generator backgroundColor(int $red, int $green, int $blue, ?int $alpha = null)
  * @method static \Linkxtr\QrCode\Generator errorCorrection(string $level)
  * @method static \Linkxtr\QrCode\Generator encoding(string $encoding)
  * @method static \Linkxtr\QrCode\Generator format(string $format)

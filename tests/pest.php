@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Linkxtr\QrCode\QrCodeServiceProvider;
 use Tests\TestCase;
 
 /*
@@ -14,11 +13,7 @@ use Tests\TestCase;
 |
 */
 
-uses(TestCase::class)
-    ->beforeEach(function () {
-        app()->register(QrCodeServiceProvider::class);
-    })
-    ->in(__DIR__);
+uses(TestCase::class)->in(__DIR__);
 
 /*
 |--------------------------------------------------------------------------
