@@ -3,6 +3,7 @@
 This guide provides detailed instructions for upgrading from `linkxtr/laravel-qrcode` v1.x to v2.0, which includes upgrading the underlying `bacon/bacon-qr-code` package from v2.x to v3.x.
 
 ## Table of Contents
+
 - [Upgrade Guide to v2.0](#upgrade-guide-to-v20)
   - [Table of Contents](#table-of-contents)
   - [System Requirements](#system-requirements)
@@ -26,15 +27,18 @@ This guide provides detailed instructions for upgrading from `linkxtr/laravel-qr
 ## Breaking Changes
 
 ### 1. PHP Version Requirement
+
 Minimum PHP version has been increased to 8.2 to match `bacon/bacon-qr-code` v3 requirements.
 
 ### 2. Namespace Changes
+
 Several classes have been reorganized. The most significant changes are:
 
 - `BaconQrCode\Writer` → `BaconQrCode\Writer\Writer`
 - `BaconQrCode\Common\ErrorCorrectionLevel` has been updated with new constants
 
 ### 3. Color System
+
 - The color methods (`color()` and `backgroundColor()`) now support an optional alpha channel parameter for transparency
 - Color handling has been updated for better type safety
 - Alpha channel values use the range 0-127, where 0 is fully opaque and 127 is fully transparent
@@ -56,6 +60,7 @@ TODO
 ## Support
 
 If you encounter any issues during the upgrade, please:
+
 1. Check the [GitHub issues](https://github.com/linkxtr/laravel-qrcode/issues) for known problems
 2. Open a new issue if your problem isn't listed
 3. Include your PHP version, Laravel version, and any error messages

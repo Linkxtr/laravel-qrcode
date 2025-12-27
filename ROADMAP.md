@@ -13,10 +13,12 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ---
 
-## 🔥 Version 2.x** - Enhanced Data Types & Modern Formats
+## 🔥 Version 2.x\*\* - Enhanced Data Types & Modern Formats
 
 ### New Data Types
+
 - [ ] **vCard Support**
+
   ```php
   QrCode::vCard([
       'name' => 'John Doe',
@@ -29,6 +31,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 - [ ] **Calendar Events**
+
   ```php
   QrCode::calendarEvent([
       'summary' => 'Team Meeting',
@@ -40,6 +43,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 - [ ] **Cryptocurrency Payments**
+
   ```php
   QrCode::bitcoin('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', 0.001);
   QrCode::ethereum('0x742d35Cc6634C0532925a3b8D...');
@@ -51,12 +55,15 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 ### New Formats
+
 - [ ] **WebP Format Support**
+
   ```php
   QrCode::format('webp')->generate('Content');
   ```
 
 - [ ] **AVIF Format Support**
+
   ```php
   QrCode::format('avif')->generate('Content');
   ```
@@ -70,25 +77,30 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 ### Enhanced Core Features
+
 - [ ] **Binary Data Support**
   ```php
   QrCode::binary($binaryData)->generate('binary_qr.png');
   ```
 
 ### Advanced Styling Options
+
 - [ ] **Gradient Backgrounds**
+
   ```php
   QrCode::gradientBackground('#FF0000', '#0000FF', 'diagonal')
       ->generate('Content');
   ```
 
 - [ ] **Custom Dot Shapes**
+
   ```php
   QrCode::dotStyle('star')
       ->generate('Content');
   ```
 
 - [ ] **Logo Positioning & Scaling**
+
   ```php
   QrCode::merge('logo.png')
       ->logoPosition('center')
@@ -103,11 +115,13 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 ### Template System
+
 - [ ] **QR Code Templates**
+
   ```php
   QrCode::template('modern')
       ->generate('Content');
-  
+
   QrCode::template('corporate')
       ->generate('Content');
   ```
@@ -122,13 +136,16 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 ### Performance Improvements
+
 - [ ] **Caching System**
+
   ```php
   QrCode::cache(3600) // Cache for 1 hour
       ->generate('Content');
   ```
 
 - [ ] **Batch Generation**
+
   ```php
   QrCode::batch()
       ->add('QR1', 'Content 1')
@@ -143,12 +160,15 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 ### Developer Experience
+
 - [ ] **Better IDE Support**
+
   - Enhanced PHPDoc annotations
   - IDE helper file generation
   - Laravel Idea compatibility
 
 - [ ] **Configuration File**
+
   ```php
   // config/qrcode.php
   return [
@@ -169,13 +189,16 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 ### Testing & Quality
+
 - [ ] **Increased Test Coverage** (95%+)
 - [ ] **Performance Benchmarking**
 - [ ] **Security Auditing**
 
 ### Modern PHP Features
+
 - [ ] **PHP 8.2+ Minimum Requirement**
 - [ ] **Native Enums**
+
   ```php
   QrCode::format(Format::WebP);
   QrCode::errorCorrection(ErrorCorrection::High);
@@ -185,18 +208,21 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 - [ ] **Readonly Properties**
 
 ### New Architecture
+
 - [ ] **Renderer Abstraction**
+
   ```php
   QrCode::renderWith(CustomRenderer::class)
       ->generate('Content');
   ```
 
 - [ ] **Event System**
+
   ```php
   QrCode::creating(function($content, $options) {
       // Modify before generation
   });
-  
+
   QrCode::created(function($qrCode, $content) {
       // Post-generation hooks
   });
@@ -210,7 +236,9 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 ### Advanced Features
+
 - [ ] **Dynamic QR Codes**
+
   ```php
   QrCode::dynamic()
       ->url('https://example.com/track/{id}')
@@ -218,6 +246,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 - [ ] **QR Code Analytics**
+
   ```php
   QrCode::analytics(true)
       ->generate('Trackable Content');
@@ -231,6 +260,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 ## 🔄 Maintenance & Compatibility
 
 ### Backward Compatibility Promise
+
 - **Major versions** may contain breaking changes
 - **Minor versions** maintain backward compatibility
 - **Patch versions** contain only bug fixes
@@ -241,17 +271,20 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 ## 🤝 How to Contribute
 
 ### Getting Involved
+
 1. **Test Pre-releases**: Help test beta versions
 2. **Code Contributions**: Pick up issues labeled "good first issue"
 3. **Documentation**: Improve docs and examples
 4. **Feature Requests**: Use GitHub issues with the `enhancement` label
 
 ### Priority Areas for Contribution
+
 - 🔴 **High Priority**: vCard and calendar event support
-- 🟡 **Medium Priority**: WebP format and styling improvements  
+- 🟡 **Medium Priority**: WebP format and styling improvements
 - 🟢 **Low Priority**: Artisan commands and developer tools
 
 ### Recognition
+
 - Contributors listed in README.md
 - Mention in release notes
 - Featured in "Community Contributions" blog posts
@@ -263,6 +296,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 Have an idea that's not on the roadmap? [Open a feature request](https://github.com/linkxtr/laravel-qrcode/issues/new?template=feature_request.md)!
 
 We particularly welcome ideas for:
+
 - New QR code data types
 - Integration with other Laravel packages
 - Performance improvements
@@ -282,6 +316,6 @@ We particularly welcome ideas for:
 
 **This roadmap is a living document and may change based on community feedback and technological developments.**
 
-*Last updated: Oct 2025*
+_Last updated: Oct 2025_
 
 </div>
