@@ -9,6 +9,7 @@ use BaconQrCode\Renderer\Module\DotsModule;
 use BaconQrCode\Renderer\Module\RoundnessModule;
 use BaconQrCode\Renderer\Module\SquareModule;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
+use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use DASPRiD\Enum\Exception\IllegalArgumentException;
 use Illuminate\Support\HtmlString;
@@ -63,10 +64,16 @@ test('color is passed to renderer', function () {
     expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getBlue())->toBe(100);
 
     $qrCode = (new QrCode)->color(100, 150, 200, 100);
-    expect($qrCode->getFill()->getForegroundColor()->getAlpha())->toBe(100);
+    /** @var Alpha $foregroundColor */
+    $foregroundColor = $qrCode->getFill()->getForegroundColor();
+    expect($foregroundColor)->toBeInstanceOf(Alpha::class);
+    expect($foregroundColor->getAlpha())->toBe(100);
 
     $qrCode = (new QrCode)->backgroundColor(50, 75, 100, 75);
-    expect($qrCode->getFill()->getBackgroundColor()->getAlpha())->toBe(75);
+    /** @var Alpha $backgroundColor */
+    $backgroundColor = $qrCode->getFill()->getBackgroundColor();
+    expect($backgroundColor)->toBeInstanceOf(Alpha::class);
+    expect($backgroundColor->getAlpha())->toBe(75);
 });
 
 test('eye color is passed to renderer', function () {
@@ -74,25 +81,25 @@ test('eye color is passed to renderer', function () {
     $qrCode->eyeColor(1, 100, 20, 60, 2, 10, 20);
     $qrCode->eyeColor(2, 200, 30, 70, 3, 12, 22);
 
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getExternalColor()->getRed())->toBe(0);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getExternalColor()->getRed())->toBe(100);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getExternalColor()->getRed())->toBe(200);
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getExternalColor()->getGreen())->toBe(10);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getExternalColor()->getGreen())->toBe(20);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getExternalColor()->getGreen())->toBe(30);
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getExternalColor()->getBlue())->toBe(50);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getExternalColor()->getBlue())->toBe(60);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getExternalColor()->getBlue())->toBe(70);
+    expect($qrCode->getFill()->getTopLeftEyeFill()->getExternalColor()->toRgb()->getRed())->toBe(0);
+    expect($qrCode->getFill()->getTopRightEyeFill()->getExternalColor()->toRgb()->getRed())->toBe(100);
+    expect($qrCode->getFill()->getBottomLeftEyeFill()->getExternalColor()->toRgb()->getRed())->toBe(200);
+    expect($qrCode->getFill()->getTopLeftEyeFill()->getExternalColor()->toRgb()->getGreen())->toBe(10);
+    expect($qrCode->getFill()->getTopRightEyeFill()->getExternalColor()->toRgb()->getGreen())->toBe(20);
+    expect($qrCode->getFill()->getBottomLeftEyeFill()->getExternalColor()->toRgb()->getGreen())->toBe(30);
+    expect($qrCode->getFill()->getTopLeftEyeFill()->getExternalColor()->toRgb()->getBlue())->toBe(50);
+    expect($qrCode->getFill()->getTopRightEyeFill()->getExternalColor()->toRgb()->getBlue())->toBe(60);
+    expect($qrCode->getFill()->getBottomLeftEyeFill()->getExternalColor()->toRgb()->getBlue())->toBe(70);
 
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getInternalColor()->getRed())->toBe(1);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getInternalColor()->getRed())->toBe(2);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getInternalColor()->getRed())->toBe(3);
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getInternalColor()->getGreen())->toBe(8);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getInternalColor()->getGreen())->toBe(10);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getInternalColor()->getGreen())->toBe(12);
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getInternalColor()->getBlue())->toBe(18);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getInternalColor()->getBlue())->toBe(20);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getInternalColor()->getBlue())->toBe(22);
+    expect($qrCode->getFill()->getTopLeftEyeFill()->getInternalColor()->toRgb()->getRed())->toBe(1);
+    expect($qrCode->getFill()->getTopRightEyeFill()->getInternalColor()->toRgb()->getRed())->toBe(2);
+    expect($qrCode->getFill()->getBottomLeftEyeFill()->getInternalColor()->toRgb()->getRed())->toBe(3);
+    expect($qrCode->getFill()->getTopLeftEyeFill()->getInternalColor()->toRgb()->getGreen())->toBe(8);
+    expect($qrCode->getFill()->getTopRightEyeFill()->getInternalColor()->toRgb()->getGreen())->toBe(10);
+    expect($qrCode->getFill()->getBottomLeftEyeFill()->getInternalColor()->toRgb()->getGreen())->toBe(12);
+    expect($qrCode->getFill()->getTopLeftEyeFill()->getInternalColor()->toRgb()->getBlue())->toBe(18);
+    expect($qrCode->getFill()->getTopRightEyeFill()->getInternalColor()->toRgb()->getBlue())->toBe(20);
+    expect($qrCode->getFill()->getBottomLeftEyeFill()->getInternalColor()->toRgb()->getBlue())->toBe(22);
 });
 
 it('throws exception if eye color greater than 2', function () {
