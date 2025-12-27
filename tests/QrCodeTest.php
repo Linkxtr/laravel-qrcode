@@ -1,5 +1,6 @@
 <?php
 
+use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Eye\SimpleCircleEye;
 use BaconQrCode\Renderer\Eye\SquareEye;
 use BaconQrCode\Renderer\Image\EpsImageBackEnd;
@@ -9,7 +10,6 @@ use BaconQrCode\Renderer\Module\DotsModule;
 use BaconQrCode\Renderer\Module\RoundnessModule;
 use BaconQrCode\Renderer\Module\SquareModule;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
-use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use DASPRiD\Enum\Exception\IllegalArgumentException;
 use Illuminate\Support\HtmlString;

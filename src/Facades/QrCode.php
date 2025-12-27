@@ -28,8 +28,6 @@ class QrCode extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        self::clearResolvedInstance(Generator::class);
-
         return Generator::class;
     }
 }
