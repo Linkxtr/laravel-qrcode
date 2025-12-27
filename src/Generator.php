@@ -149,11 +149,7 @@ class Generator
             return;
         }
 
-        if (class_exists(HtmlString::class)) {
-            return new HtmlString($qrCode);
-        }
-
-        return $qrCode;
+        return new HtmlString($qrCode);
     }
 
     public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self

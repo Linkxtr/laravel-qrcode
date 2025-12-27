@@ -2,17 +2,28 @@
 
 use Linkxtr\QrCode\Image;
 
-beforeEach(function () {
-    $this->imagePath = __DIR__.'/images/linkxtr.png';
-    if (! file_exists($this->imagePath)) {
-        throw new \RuntimeException('Image not found at '.$this->imagePath);
+function getImageTestAssetPath(): string
+{
+    $path = __DIR__.'/images/linkxtr.png';
+
+    if (! file_exists($path)) {
+        throw new \RuntimeException('Image not found at '.$path);
     }
-    $this->image = new Image(file_get_contents($this->imagePath));
-});
+
+    return $path;
+}
+
+function getImageTestAsset(): Image
+{
+    return new Image(file_get_contents(getImageTestAssetPath()));
+}
 
 it('loads an image string into a resource', function () {
-    $expected = imagecreatefrompng($this->imagePath);
-    $actual = $this->image->getImageResource();
+    $path = getImageTestAssetPath();
+    $image = getImageTestAsset();
+
+    $expected = imagecreatefrompng($path);
+    $actual = $image->getImageResource();
 
     $w = imagesx($expected);
     $h = imagesy($expected);
@@ -28,19 +39,25 @@ it('loads an image string into a resource', function () {
                 ->toBe(imagecolorat($expected, $x, $y));
         }
     }
-    imagedestroy($expected);
+    unset($expected);
 });
 
 it('gets the width of the image', function () {
-    $expected = imagecreatefrompng($this->imagePath);
-    expect($this->image->getWidth())->toBe(imagesx($expected));
-    imagedestroy($expected);
+    $path = getImageTestAssetPath();
+    $image = getImageTestAsset();
+
+    $expected = imagecreatefrompng($path);
+    expect($image->getWidth())->toBe(imagesx($expected));
+    unset($expected);
 });
 
 it('gets the height of the image', function () {
-    $expected = imagecreatefrompng($this->imagePath);
-    expect($this->image->getHeight())->toBe(imagesy($expected));
-    imagedestroy($expected);
+    $path = getImageTestAssetPath();
+    $image = getImageTestAsset();
+
+    $expected = imagecreatefrompng($path);
+    expect($image->getHeight())->toBe(imagesy($expected));
+    unset($expected);
 });
 
 it('throws exception for invalid image data', function () {
@@ -49,10 +66,21 @@ it('throws exception for invalid image data', function () {
 });
 
 it('can replace the image resource', function () {
-    $newImg = imagecreate(100, 100);
-    $this->image->setImageResource($newImg);
+    $image = getImageTestAsset();
 
-    expect($this->image->getWidth())->toBe(100);
-    expect($this->image->getHeight())->toBe(100);
-    expect($this->image->getImageResource())->toBe($newImg);
+    $newImg = imagecreate(100, 100);
+    $image->setImageResource($newImg);
+
+    expect($image->getWidth())->toBe(100);
+    expect($image->getHeight())->toBe(100);
+    expect($image->getImageResource())->toBe($newImg);
+});
+
+it('throws exception when accessing methods after destruction', function () {
+    $image = new Image(file_get_contents(getImageTestAssetPath()));
+    $image->__destruct();
+
+    expect(fn () => $image->getWidth())->toThrow(\RuntimeException::class);
+    expect(fn () => $image->getHeight())->toThrow(\RuntimeException::class);
+    expect(fn () => $image->getImageResource())->toThrow(\RuntimeException::class);
 });

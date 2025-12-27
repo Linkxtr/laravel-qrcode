@@ -14,6 +14,9 @@ use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use DASPRiD\Enum\Exception\IllegalArgumentException;
 use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Generator;
+use Linkxtr\QrCode\Image;
+
+require_once __DIR__.'/Overrides.php';
 
 test('chaining is working', function () {
     expect((new Generator)->size(100))->toBeInstanceOf(Generator::class);
@@ -37,7 +40,7 @@ test('size is passed to renderer', function () {
     expect($qrCode->getRendererStyle()->getSize())->toBe(200);
 });
 
-test('style format is passed to renderer', function () {
+test('format is passed to formatter', function () {
     $qrCode = (new Generator)->format('png');
     expect($qrCode->getFormatter())->toBeInstanceOf(ImagickImageBackEnd::class);
 
@@ -49,10 +52,10 @@ test('style format is passed to renderer', function () {
 });
 
 it('throws exception if format is not supported', function () {
-    (new Generator)->format('jpg');
+    (new Generator)->format('format');
 })->throws(InvalidArgumentException::class);
 
-test('color is passed to renderer', function () {
+test('color is passed to formatter', function () {
     $qrCode = (new Generator)->color(100, 150, 200);
     expect($qrCode->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(100);
     expect($qrCode->getFill()->getForegroundColor()->toRgb()->getGreen())->toBe(150);
@@ -182,4 +185,61 @@ it('throws exception if data type is not supported', function () {
 it('return html string', function () {
     $qrCode = new Generator;
     expect($qrCode->generate('This is a test'))->toBeInstanceOf(HtmlString::class);
+});
+
+it('saves generated qrcode to file', function () {
+    $file = __DIR__.'/generated_qr.svg';
+    if (file_exists($file)) {
+        unlink($file);
+    }
+
+    (new Generator)->generate('test file', $file);
+
+    expect(file_exists($file))->toBeTrue();
+    expect(file_get_contents($file))->toContain('<svg');
+
+    unlink($file);
+});
+
+test('Data types magic call', function () {
+    $qrCode = new Generator;
+    expect($qrCode->BTC('btcaddress', 0.0034))->toBeInstanceOf(HtmlString::class);
+    expect($qrCode->Email('email@example.com'))->toBeInstanceOf(HtmlString::class);
+    expect($qrCode->Geo('40.7128', '-74.0060'))->toBeInstanceOf(HtmlString::class);
+    expect($qrCode->PhoneNumber('1234567890'))->toBeInstanceOf(HtmlString::class);
+    expect($qrCode->SMS('1234567890'))->toBeInstanceOf(HtmlString::class);
+    expect($qrCode->WiFi(['ssid' => 'SSID']))->toBeInstanceOf(HtmlString::class);
+});
+
+it('merges image into qrcode', function () {
+    $pngData = (new Generator)
+        ->format('png')
+        ->size(300)
+        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
+        ->generate('test');
+
+    $image = new Image($pngData);
+    expect($image->getWidth())->toBe(300);
+});
+
+it('merges string content', function () {
+    $content = file_get_contents(__DIR__.'/images/linkxtr.png');
+    $pngData = (new Generator)
+        ->format('png')
+        ->mergeString($content, 0.2)
+        ->generate('test');
+
+    expect($pngData)->not->toBeEmpty();
+});
+
+it('can merge image with relative path', function () {
+    // base_path() is mocked in Overrides.php to return __DIR__ (tests/)
+    $path = 'images/linkxtr.png';
+
+    $pngData = (new Generator)
+        ->format('png')
+        ->merge($path, 0.2, false)
+        ->generate('test');
+
+    expect($pngData)->not->toBeEmpty();
 });

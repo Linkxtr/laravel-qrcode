@@ -17,7 +17,6 @@ it('can call methods via the facade', function () {
     $size = 250;
     QrCode::size($size);
 
-    // access the underlying instance to verify state change
     expect(QrCode::getFacadeRoot()->getRendererStyle()->getSize())->toBe($size);
 });
 
@@ -27,4 +26,9 @@ it('resolves alias correctly', function () {
 
     expect(app()->bound('qrcode'))->toBeTrue();
     expect(resolve('qrcode'))->toBeInstanceOf(Generator::class);
+});
+
+it('provides generator class', function () {
+    $provider = new \Linkxtr\QrCode\QrCodeServiceProvider(app());
+    expect($provider->provides())->toContain(Generator::class);
 });

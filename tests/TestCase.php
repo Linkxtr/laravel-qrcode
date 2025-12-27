@@ -9,7 +9,6 @@ class TestCase extends Orchestra
     protected function setUp(): void
     {
         parent::setUp();
-        // additional setup
     }
 
     protected function getPackageProviders($app)
