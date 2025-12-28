@@ -4,6 +4,14 @@ use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Generator;
 
+require_once __DIR__.'/Overrides.php';
+
+beforeEach(function () {
+    global $mockImagickLoaded, $mockGdLoaded;
+    $mockImagickLoaded = true;
+    $mockGdLoaded = true;
+});
+
 test('webp format is supported', function () {
     $qrCode = (new Generator)->format('webp');
     expect($qrCode->getFormatter())->toBeInstanceOf(ImagickImageBackEnd::class);

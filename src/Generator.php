@@ -15,7 +15,6 @@ use BaconQrCode\Renderer\Image\EpsImageBackEnd;
 use BaconQrCode\Renderer\Image\ImageBackEndInterface;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use Linkxtr\QrCode\Renderer\Image\GdImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Module\DotsModule;
 use BaconQrCode\Renderer\Module\ModuleInterface;
@@ -31,6 +30,7 @@ use BadMethodCallException;
 use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\DataTypeInterface;
+use Linkxtr\QrCode\Renderer\Image\GdImageBackEnd;
 
 final class Generator
 {
@@ -150,6 +150,8 @@ final class Generator
 
     protected function mergeImage(string $qrCode): string
     {
+        assert($this->imageMerge !== null);
+
         if ($this->format === 'png' || $this->format === 'webp') {
             $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
 

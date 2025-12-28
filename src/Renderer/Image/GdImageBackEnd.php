@@ -1,11 +1,16 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Renderer\Image;
 
 use BaconQrCode\Exception\RuntimeException;
+use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\ColorInterface;
 use BaconQrCode\Renderer\Image\ImageBackEndInterface;
+use BaconQrCode\Renderer\Path\Close;
+use BaconQrCode\Renderer\Path\Line;
+use BaconQrCode\Renderer\Path\Move;
 use BaconQrCode\Renderer\Path\Path;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
 use GdImage;
@@ -13,10 +18,13 @@ use GdImage;
 final class GdImageBackEnd implements ImageBackEndInterface
 {
     private ?GdImage $image = null;
-    private int $width;
-    private int $height;
-    private array $transformationMatrix = [1, 0, 0, 1, 0, 0];
+
+    /** @var array<int, float> */
+    private array $transformationMatrix = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0];
+
+    /** @var array<int, array<int, float>> */
     private array $matrixStack = [];
+
     private string $format;
 
     public function __construct(string $format = 'png')
@@ -26,20 +34,35 @@ final class GdImageBackEnd implements ImageBackEndInterface
 
     public function new(int $size, ColorInterface $backgroundColor): void
     {
-        $this->width = $size;
-        $this->height = $size;
-        $this->image = imagecreatetruecolor($size, $size);
 
-        if ($this->image === false) {
+        if ($size < 1) {
+            throw new RuntimeException('Image size must be at least 1 pixel');
+        }
+
+        $image = imagecreatetruecolor($size, $size);
+
+        if ($image === false) {
             throw new RuntimeException('Could not create GD image resource');
         }
 
+        $this->image = $image;
+
         $rgb = $backgroundColor->toRgb();
-        $color = imagecolorallocate($this->image, $rgb->getRed(), $rgb->getGreen(), $rgb->getBlue());
+        $color = imagecolorallocate(
+            $this->image,
+            max(0, min(255, (int) $rgb->getRed())),
+            max(0, min(255, (int) $rgb->getGreen())),
+            max(0, min(255, (int) $rgb->getBlue()))
+        );
+
+        if ($color === false) {
+            throw new RuntimeException('Could not allocate background color');
+        }
+
         imagefill($this->image, 0, 0, $color);
 
-        if ($backgroundColor->getAlpha() < 100) {
-             imagecolortransparent($this->image, $color);
+        if ($backgroundColor instanceof Alpha && $backgroundColor->getAlpha() < 100) {
+            imagecolortransparent($this->image, $color);
         }
     }
 
@@ -81,56 +104,65 @@ final class GdImageBackEnd implements ImageBackEndInterface
         }
 
         $rgb = $color->toRgb();
-        $alpha = (int) (127 - ($color->getAlpha() / 100 * 127));
-        $gdColor = imagecolorallocatealpha($this->image, $rgb->getRed(), $rgb->getGreen(), $rgb->getBlue(), $alpha);
+        $alphaValue = 0;
+
+        if ($color instanceof Alpha) {
+            $alphaValue = $color->getAlpha();
+        }
+
+        $alpha = max(0, min(127, (int) (127 - ($alphaValue / 100 * 127))));
+        $gdColor = imagecolorallocatealpha(
+            $this->image,
+            max(0, min(255, (int) $rgb->getRed())),
+            max(0, min(255, (int) $rgb->getGreen())),
+            max(0, min(255, (int) $rgb->getBlue())),
+            $alpha
+        );
+
+        if ($gdColor === false) {
+            throw new RuntimeException('Could not allocate color');
+        }
 
         $this->drawPath($path, $gdColor);
     }
 
     private function drawPath(Path $path, int $color): void
     {
-         // Implementation assuming polygons (e.g. square modules).
-         // Complex paths with curves (Cubic bezier 'C', Elliptic arc 'A') are not fully supported
-         // in this basic GD implementation and will result in skipped segments or simplified rendering.
-         // This is sufficient for standard square-module QR codes.
-         $points = [];
-         $currentPoint = [0, 0];
+        $points = [];
+        $currentPoint = [0.0, 0.0];
 
-         foreach ($path as $op) {
-             switch ($op[0]) {
-                 case 'M': // MoveTo
-                     if (!empty($points)) {
-                         $this->flushPolygon($points, $color);
-                         $points = [];
-                     }
-                     $currentPoint = $this->transformPoint($op[1], $op[2]);
-                     $points[] = $currentPoint[0];
-                     $points[] = $currentPoint[1];
-                     break;
-                 case 'L': // LineTo
-                     $currentPoint = $this->transformPoint($op[1], $op[2]);
-                     $points[] = $currentPoint[0];
-                     $points[] = $currentPoint[1];
-                     break;
-                 case 'C': // CurveTo
-                 case 'A': // EllipticArc
-                     // Not supported in this basic GD backend.
-                     break;
-                 case 'Z': // Close
-                     $this->flushPolygon($points, $color);
-                     $points = [];
-                     break;
-             }
-         }
+        foreach ($path as $op) {
+            if ($op instanceof Move) {
+                if (! empty($points)) {
+                    $this->flushPolygon($points, $color);
+                    $points = [];
+                }
+                $currentPoint = $this->transformPoint($op->getX(), $op->getY());
+                $points[] = $currentPoint[0];
+                $points[] = $currentPoint[1];
+            } elseif ($op instanceof Line) {
+                $currentPoint = $this->transformPoint($op->getX(), $op->getY());
+                $points[] = $currentPoint[0];
+                $points[] = $currentPoint[1];
+            } elseif ($op instanceof Close) {
+                $this->flushPolygon($points, $color);
+                $points = [];
+            }
+        }
 
-         if (!empty($points)) {
-             $this->flushPolygon($points, $color);
-         }
+        if (! empty($points)) {
+            $this->flushPolygon($points, $color);
+        }
     }
 
+    /** @param array<int, float> $points */
     private function flushPolygon(array $points, int $color): void
     {
-        if (count($points) >= 6) { // At least 3 points (x,y)
+        if ($this->image === null) {
+            return;
+        }
+
+        if (count($points) >= 6) {
             imagefilledpolygon($this->image, $points, $color);
         }
     }
@@ -143,8 +175,6 @@ final class GdImageBackEnd implements ImageBackEndInterface
         float $width,
         float $height
     ): void {
-        // Gradient support in GD is not implemented.
-        // Fallback to the start color of the gradient.
         $start = $gradient->getStartColor();
         $this->drawPathWithColor($path, $start);
     }
@@ -183,9 +213,11 @@ final class GdImageBackEnd implements ImageBackEndInterface
         ];
     }
 
+    /** @return array<int, float> */
     private function transformPoint(float $x, float $y): array
     {
         $m = $this->transformationMatrix;
+
         return [
             $m[0] * $x + $m[2] * $y + $m[4],
             $m[1] * $x + $m[3] * $y + $m[5],

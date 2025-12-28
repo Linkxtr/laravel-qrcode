@@ -303,7 +303,6 @@ it('can merge image with relative path', function () {
     expect($pngData)->not->toBeEmpty();
 });
 
-
 it('throws exception if error correction level is not supported', function () {
     (new Generator)->errorCorrection('foo');
 })->throws(InvalidArgumentException::class);
