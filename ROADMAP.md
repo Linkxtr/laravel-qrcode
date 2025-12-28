@@ -30,7 +30,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ]);
   ```
 
-- [ ] **Calendar Events**
+- [x] **Calendar Events**
 
   ```php
   QrCode::calendarEvent([
