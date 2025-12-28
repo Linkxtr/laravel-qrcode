@@ -71,7 +71,7 @@ class Geo implements DataTypeInterface
 
     protected function buildGeoString(): string
     {
-        if (empty($this->name)) {
+        if (! isset($this->name) || empty($this->name)) {
             return $this->prefix.$this->latitude.','.$this->longitude;
         }
 

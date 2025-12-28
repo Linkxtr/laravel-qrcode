@@ -64,19 +64,19 @@ class Email implements DataTypeInterface
     {
         $params = [];
 
-        if (! empty($this->subject)) {
+        if (isset($this->subject) && $this->subject !== '') {
             $params['subject'] = $this->subject;
         }
 
-        if (! empty($this->body)) {
+        if (isset($this->body) && $this->body !== '') {
             $params['body'] = $this->body;
         }
 
-        if (! empty($this->cc)) {
+        if (isset($this->cc) && $this->cc !== '') {
             $params['cc'] = $this->cc;
         }
 
-        if (! empty($this->bcc)) {
+        if (isset($this->bcc) && $this->bcc !== '') {
             $params['bcc'] = $this->bcc;
         }
 

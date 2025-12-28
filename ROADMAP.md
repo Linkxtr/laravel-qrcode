@@ -316,6 +316,6 @@ We particularly welcome ideas for:
 
 **This roadmap is a living document and may change based on community feedback and technological developments.**
 
-_Last updated: Dec 2025_
+Last updated: Dec 2025
 
 </div>

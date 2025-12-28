@@ -83,6 +83,8 @@ class BTC implements DataTypeInterface
             'r' => $this->returnAddress,
         ];
 
+        $params = array_filter($params, fn ($value) => $value !== null);
+
         return $this->prefix.$this->address.'?'.http_build_query($params);
     }
 }
