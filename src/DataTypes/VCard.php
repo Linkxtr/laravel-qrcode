@@ -8,6 +8,10 @@ final class VCard implements DataTypeInterface
 {
     protected ?string $name = null;
 
+    protected ?string $firstName = null;
+
+    protected ?string $lastName = null;
+
     protected ?string $email = null;
 
     protected ?string $phone = null;
@@ -33,6 +37,14 @@ final class VCard implements DataTypeInterface
             $this->name = $properties['name'];
         }
 
+        if (isset($properties['first_name']) && is_string($properties['first_name'])) {
+            $this->firstName = $properties['first_name'];
+        }
+
+        if (isset($properties['last_name']) && is_string($properties['last_name'])) {
+            $this->lastName = $properties['last_name'];
+        }
+
         if (isset($properties['email']) && is_string($properties['email'])) {
             if (! filter_var($properties['email'], FILTER_VALIDATE_EMAIL)) {
                 throw new InvalidArgumentException('Invalid email address provided to vCard.');
@@ -53,6 +65,10 @@ final class VCard implements DataTypeInterface
         }
 
         if (isset($properties['url']) && is_string($properties['url'])) {
+            if (! filter_var($properties['url'], FILTER_VALIDATE_URL)) {
+                throw new InvalidArgumentException('Invalid URL provided to vCard.');
+            }
+
             $this->url = $properties['url'];
         }
     }
@@ -72,9 +88,12 @@ final class VCard implements DataTypeInterface
     {
         $vCard = "BEGIN:VCARD\r\nVERSION:3.0\r\n";
 
-        if ($this->name) {
-            $vCard .= "FN:{$this->escapeValue($this->name)}\r\n";
+        if (! $this->name) {
+            throw new InvalidArgumentException('vCard FN (Formatted Name) is mandatory.');
         }
+
+        $vCard .= "FN:{$this->escapeValue($this->name)}\r\n";
+        $vCard .= "N:{$this->escapeValue($this->lastName ?? '')};{$this->escapeValue($this->firstName ?? '')};;;\r\n";
 
         if ($this->email) {
             $vCard .= "EMAIL:{$this->escapeValue($this->email)}\r\n";

@@ -77,7 +77,7 @@ final class Generator
      * The size of the selected style between 0 and 1.
      * Only applicable to 'dot' and 'round' styles.
      */
-    protected float $styleSize;
+    protected float $styleSize = 0.5;
 
     /**
      * The style to apply to the eyes of the QR code.
@@ -117,7 +117,7 @@ final class Generator
     /**
      * The percentage that a merged image should take over the source image.
      */
-    protected float $imagePercentage;
+    protected float $imagePercentage = .2;
 
     /**
      * @param  array<int, mixed>  $arguments
@@ -185,7 +185,7 @@ final class Generator
     public function format(string $format): self
     {
         if (! in_array($format, ['svg', 'eps', 'png', 'webp'])) {
-            throw new InvalidArgumentException("\$format must be svg, eps, png, or webp. {$format} is not a valid.");
+            throw new InvalidArgumentException("\$format must be svg, eps, png, or webp. {$format} is not a valid format.");
         }
 
         $this->format = $format;
@@ -252,7 +252,7 @@ final class Generator
     public function style(string $style, float $size = 0.5): self
     {
         if (! in_array($style, ['square', 'dot', 'round'])) {
-            throw new InvalidArgumentException("\$style must be square, dot, or round. {$style} is not a valid.");
+            throw new InvalidArgumentException("\$style must be square, dot, or round. {$style} is not a valid style.");
         }
 
         if ($size <= 0 || $size > 1) {
