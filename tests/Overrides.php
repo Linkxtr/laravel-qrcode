@@ -23,3 +23,18 @@ if (! function_exists('Linkxtr\QrCode\file_put_contents')) {
         return \file_put_contents($filename, $data, $flags, $context);
     }
 }
+
+$mockImagickLoaded = true;
+
+if (! function_exists('Linkxtr\QrCode\extension_loaded')) {
+    function extension_loaded($extension)
+    {
+        global $mockImagickLoaded;
+
+        if ($extension === 'imagick') {
+            return $mockImagickLoaded;
+        }
+
+        return \extension_loaded($extension);
+    }
+}

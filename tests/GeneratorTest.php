@@ -19,6 +19,11 @@ require_once __DIR__.'/Overrides.php';
 
 covers(Generator::class);
 
+beforeEach(function () {
+    global $mockImagickLoaded;
+    $mockImagickLoaded = true;
+});
+
 test('chaining is working', function () {
     expect((new Generator)->size(100))->toBeInstanceOf(Generator::class);
     expect((new Generator)->format('png'))->toBeInstanceOf(Generator::class);
@@ -310,5 +315,31 @@ it('throws exception if file_put_contents fails', function () {
     global $mockFilePutContents;
     $mockFilePutContents = true;
 
-    (new Generator)->generate('test file', 'fail_file.svg');
+    try {
+        (new Generator)->generate('test file', 'fail_file.svg');
+    } finally {
+        $mockFilePutContents = false;
+    }
 })->throws(RuntimeException::class, 'Failed to write QR code to file');
+
+it('throws exception if imagick is not loaded and format is png', function () {
+    global $mockImagickLoaded;
+    $mockImagickLoaded = false;
+
+    try {
+        (new Generator)->format('png')->getFormatter();
+    } finally {
+        $mockImagickLoaded = true;
+    }
+})->throws(RuntimeException::class, 'The imagick extension is required to generate PNG QR codes.');
+
+it('throws exception if imagick is not loaded and format is webp', function () {
+    global $mockImagickLoaded;
+    $mockImagickLoaded = false;
+
+    try {
+        (new Generator)->format('webp')->getFormatter();
+    } finally {
+        $mockImagickLoaded = true;
+    }
+})->throws(RuntimeException::class, 'The imagick extension is required to generate WebP QR codes.');

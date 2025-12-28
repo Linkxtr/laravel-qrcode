@@ -312,10 +312,18 @@ final class Generator
     public function getFormatter(): ImageBackEndInterface
     {
         if ($this->format === 'png') {
+            if (! extension_loaded('imagick')) {
+                throw new \RuntimeException('The imagick extension is required to generate PNG QR codes.');
+            }
+
             return new ImagickImageBackEnd('png');
         }
 
         if ($this->format === 'webp') {
+            if (! extension_loaded('imagick')) {
+                throw new \RuntimeException('The imagick extension is required to generate WebP QR codes.');
+            }
+
             return new ImagickImageBackEnd('webp');
         }
 
