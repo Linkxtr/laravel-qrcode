@@ -77,11 +77,91 @@ test('CalendarEvent class generates correct string with minimal data', function 
     expect($string)->toContain('END:VEVENT');
 });
 
-test('it throws exception when required fields are missing', function () {
+test('it throws exception when attributes are not an array', function () {
     $qrCode = new Generator;
-    // Missing start
+    $qrCode->CalendarEvent('invalid');
+})->throws(InvalidArgumentException::class, 'Invalid CalendarEvent arguments.');
+
+test('it throws exception when summary is missing', function () {
+    $qrCode = new Generator;
     $qrCode->CalendarEvent([
-        'summary' => 'Team Meeting',
+        'start' => '2024-06-01 10:00:00',
         'end' => '2024-06-01 11:00:00',
     ]);
-})->throws(InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class, 'Summary is required and must be a string.');
+
+test('it throws exception when summary is empty', function () {
+    $qrCode = new Generator;
+    $qrCode->CalendarEvent([
+        'summary' => '',
+        'start' => '2024-06-01 10:00:00',
+        'end' => '2024-06-01 11:00:00',
+    ]);
+})->throws(InvalidArgumentException::class, 'Summary is required and must be a string.');
+
+test('it throws exception when start date is missing', function () {
+    $qrCode = new Generator;
+    $qrCode->CalendarEvent([
+        'summary' => 'Meeting',
+        'end' => '2024-06-01 11:00:00',
+    ]);
+})->throws(InvalidArgumentException::class, 'Start date is required.');
+
+test('it throws exception when end date is missing', function () {
+    $qrCode = new Generator;
+    $qrCode->CalendarEvent([
+        'summary' => 'Meeting',
+        'start' => '2024-06-01 10:00:00',
+    ]);
+})->throws(InvalidArgumentException::class, 'End date is required.');
+
+test('it throws exception when start date is invalid', function () {
+    $qrCode = new Generator;
+    $qrCode->CalendarEvent([
+        'summary' => 'Meeting',
+        'start' => new stdClass,
+        'end' => '2024-06-01 11:00:00',
+    ]);
+})->throws(InvalidArgumentException::class, 'Date must be a string, numeric or DateTimeInterface.');
+
+test('it throws exception when end date is invalid', function () {
+    $qrCode = new Generator;
+    $qrCode->CalendarEvent([
+        'summary' => 'Meeting',
+        'start' => '2024-06-01 10:00:00',
+        'end' => new stdClass,
+    ]);
+})->throws(InvalidArgumentException::class, 'Date must be a string, numeric or DateTimeInterface.');
+
+test('it ignores non-string description and location', function () {
+    $calendarEvent = new CalendarEvent;
+    $calendarEvent->create([[
+        'summary' => 'Meeting',
+        'start' => '2024-06-01 10:00:00',
+        'end' => '2024-06-01 11:00:00',
+        'description' => 123,
+        'location' => ['array'],
+    ]]);
+
+    $string = (string) $calendarEvent;
+
+    expect($string)->not->toContain('DESCRIPTION:');
+    expect($string)->not->toContain('LOCATION:');
+});
+
+test('it accepts DateTimeInterface and numeric dates', function () {
+    $calendarEvent = new CalendarEvent;
+    $now = new DateTime();
+    $tomorrow = time() + 86400;
+
+    $calendarEvent->create([[
+        'summary' => 'Meeting',
+        'start' => $now,
+        'end' => $tomorrow,
+    ]]);
+
+    $string = (string) $calendarEvent;
+
+    expect($string)->toContain('DTSTART:' . $now->format('Ymd\THis'));
+    expect($string)->toContain('DTEND:' . date('Ymd\THis', $tomorrow));
+});
