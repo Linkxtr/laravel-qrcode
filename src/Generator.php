@@ -150,6 +150,10 @@ final class Generator
 
     protected function mergeImage(string $qrCode): string
     {
+        if ($this->imageMerge === null) {
+            return $qrCode;
+        }
+
         if ($this->format === 'png' || $this->format === 'webp') {
             $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
 
