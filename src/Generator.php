@@ -130,10 +130,7 @@ final class Generator
         return $this->generate(strval($dataType));
     }
 
-    /**
-     * @return HtmlString
-     */
-    public function generate(string $text, ?string $filename = null)
+    public function generate(string $text, ?string $filename = null): HtmlString
     {
         $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrection);
 
