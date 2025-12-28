@@ -34,6 +34,7 @@ final class GdImageBackEnd implements ImageBackEndInterface
 
     public function new(int $size, ColorInterface $backgroundColor): void
     {
+
         if ($size < 1) {
             throw new RuntimeException('Image size must be at least 1 pixel');
         }
