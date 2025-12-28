@@ -167,6 +167,12 @@ final class GdImageBackEnd implements ImageBackEndInterface
         }
     }
 
+    /**
+     * Draw a path with gradient fill.
+     *
+     * Note: This is a simplified implementation that uses only the gradient's start color.
+     * Full gradient rendering is not implemented for the GD backend.
+     */
     public function drawPathWithGradient(
         Path $path,
         Gradient $gradient,

@@ -103,12 +103,24 @@ QrCode::geo(37.7749, -122.4194);
 
 // BTC
 QrCode::btc(['btcaddress', 0.0034, ['label' => 'label', 'message' => 'message', 'returnAddress' => 'https://www.returnaddress.com']]);
+
+// vCard
+QrCode::vCard([
+    'name' => 'John Doe',
+    'first_name' => 'John',
+    'last_name' => 'Doe',
+    'email' => 'john@example.com',
+    'phone' => '+1234567890',
+    'company' => 'Tech Corp',
+    'title' => 'Developer',
+    'url' => 'https://example.com'
+]);
 ```
 
 ### 🆕 Coming in Version 2
 
 - 📅 Calendar events
-- 👤 vCard contacts
+
 - 🎯 More styling options
 
 ## 🔧 Advanced Usage
@@ -293,6 +305,6 @@ This package is open-sourced software licensed under the [MIT license](LICENSE).
   
 **Need help?** [Open an issue](https://github.com/linkxtr/laravel-qrcode/issues) • **Found a bug?** [Report it](https://github.com/linkxtr/laravel-qrcode/issues)
 
-_⭐ Don't forget to star this repository if you find it useful!_
+_⭐ If you find this repository useful, please consider starring it._
 
 </div>

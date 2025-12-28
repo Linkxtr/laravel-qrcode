@@ -9,6 +9,10 @@ use Linkxtr\QrCode\Renderer\Image\GdImageBackEnd;
 require_once __DIR__.'/Overrides.php';
 
 test('GD backend full coverage', function () {
+    if (! extension_loaded('gd')) {
+        $this->markTestSkipped('The GD extension is required for this test.');
+    }
+
     global $mockImagickLoaded;
     $mockImagickLoaded = false;
 

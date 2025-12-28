@@ -9,14 +9,12 @@ if (! function_exists('Linkxtr\QrCode\base_path')) {
     }
 }
 
-$mockFilePutContents = false;
+$GLOBALS['mockFilePutContents'] = false;
 
 if (! function_exists('Linkxtr\QrCode\file_put_contents')) {
     function file_put_contents($filename, $data, $flags = 0, $context = null)
     {
-        global $mockFilePutContents;
-
-        if ($mockFilePutContents) {
+        if (isset($GLOBALS['mockFilePutContents']) && $GLOBALS['mockFilePutContents']) {
             return false;
         }
 
@@ -24,21 +22,18 @@ if (! function_exists('Linkxtr\QrCode\file_put_contents')) {
     }
 }
 
-$mockImagickLoaded = true;
-$mockGdLoaded = true;
+$GLOBALS['mockImagickLoaded'] = true;
+$GLOBALS['mockGdLoaded'] = true;
 
 if (! function_exists('Linkxtr\QrCode\extension_loaded')) {
     function extension_loaded($extension)
     {
-        global $mockImagickLoaded;
-        global $mockGdLoaded;
-
         if ($extension === 'imagick') {
-            return $mockImagickLoaded;
+            return $GLOBALS['mockImagickLoaded'] ?? true;
         }
 
         if ($extension === 'gd') {
-            return $mockGdLoaded;
+            return $GLOBALS['mockGdLoaded'] ?? true;
         }
 
         return \extension_loaded($extension);
