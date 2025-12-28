@@ -57,32 +57,43 @@ final class VCard implements DataTypeInterface
         }
     }
 
+    protected function escapeValue(string $value): string
+    {
+        return strtr($value, [
+            '\\' => '\\\\',
+            ',' => '\\,',
+            ';' => '\\;',
+            "\n" => '\\n',
+            "\r" => '',
+        ]);
+    }
+
     public function __toString(): string
     {
         $vCard = "BEGIN:VCARD\r\nVERSION:3.0\r\n";
 
         if ($this->name) {
-            $vCard .= "FN:{$this->name}\r\n";
+            $vCard .= "FN:{$this->escapeValue($this->name)}\r\n";
         }
 
         if ($this->email) {
-            $vCard .= "EMAIL:{$this->email}\r\n";
+            $vCard .= "EMAIL:{$this->escapeValue($this->email)}\r\n";
         }
 
         if ($this->phone) {
-            $vCard .= "TEL:{$this->phone}\r\n";
+            $vCard .= "TEL:{$this->escapeValue($this->phone)}\r\n";
         }
 
         if ($this->company) {
-            $vCard .= "ORG:{$this->company}\r\n";
+            $vCard .= "ORG:{$this->escapeValue($this->company)}\r\n";
         }
 
         if ($this->title) {
-            $vCard .= "TITLE:{$this->title}\r\n";
+            $vCard .= "TITLE:{$this->escapeValue($this->title)}\r\n";
         }
 
         if ($this->url) {
-            $vCard .= "URL:{$this->url}\r\n";
+            $vCard .= "URL:{$this->escapeValue($this->url)}\r\n";
         }
 
         $vCard .= 'END:VCARD';
