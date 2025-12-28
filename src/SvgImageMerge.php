@@ -48,7 +48,14 @@ final class SvgImageMerge
         $mergeImageHeight = 0;
 
         // Try to get dimensions using GD
-        $img = @imagecreatefromstring($this->mergeImageContent);
+        $img = false;
+        set_error_handler(function () {
+            return true;
+        });
+
+        $img = imagecreatefromstring($this->mergeImageContent);
+
+        restore_error_handler();
 
         if ($img !== false) {
             $mergeImageWidth = imagesx($img);
