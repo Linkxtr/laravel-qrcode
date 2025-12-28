@@ -253,7 +253,7 @@ final class Generator
         }
 
         if ($size <= 0 || $size > 1) {
-            throw new InvalidArgumentException("\$size must be between 0 and 1.  {$size} is not valid.");
+            throw new InvalidArgumentException("\$size must be greater than 0 and less than or equal to 1. {$size} is not valid.");
         }
 
         $this->style = $style;
