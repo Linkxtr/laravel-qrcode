@@ -227,7 +227,7 @@ We're actively working on Version 2 with these planned features:
 
 - [x] vCard data type
 - [ ] Calendar event data type
-- [ ] WebP format support
+- [x] WebP format support
 - [ ] Animated QR codes
 - [ ] Bitcoin payment QR codes
 - [ ] Extended customization options

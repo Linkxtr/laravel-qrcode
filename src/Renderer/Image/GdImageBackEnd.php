@@ -34,7 +34,6 @@ final class GdImageBackEnd implements ImageBackEndInterface
 
     public function new(int $size, ColorInterface $backgroundColor): void
     {
-
         if ($size < 1) {
             throw new RuntimeException('Image size must be at least 1 pixel');
         }
@@ -47,12 +46,28 @@ final class GdImageBackEnd implements ImageBackEndInterface
 
         $this->image = $image;
 
+        // Enable true alpha transparency
+        imagealphablending($this->image, false);
+        imagesavealpha($this->image, true);
+
         $rgb = $backgroundColor->toRgb();
-        $color = imagecolorallocate(
+        $alpha = 0;
+
+        if ($backgroundColor instanceof Alpha) {
+            // Convert 0-100 alpha to 0-127 GD alpha (0 is opaque, 127 is transparent in GD)
+            // BaconQrCode Alpha is 0 (transparent) to 100 (opaque) usually?
+            // Let's double check implementation of drawPathWithColor which uses:
+            // $alpha = max(0, min(127, (int) (127 - ($alphaValue / 100 * 127))));
+            // So Alpha->getAlpha() returns opacity percentage (0-100).
+            $alpha = max(0, min(127, (int) (127 - ($backgroundColor->getAlpha() / 100 * 127))));
+        }
+
+        $color = imagecolorallocatealpha(
             $this->image,
             max(0, min(255, (int) $rgb->getRed())),
             max(0, min(255, (int) $rgb->getGreen())),
-            max(0, min(255, (int) $rgb->getBlue()))
+            max(0, min(255, (int) $rgb->getBlue())),
+            $alpha
         );
 
         if ($color === false) {
@@ -60,10 +75,6 @@ final class GdImageBackEnd implements ImageBackEndInterface
         }
 
         imagefill($this->image, 0, 0, $color);
-
-        if ($backgroundColor instanceof Alpha && $backgroundColor->getAlpha() < 100) {
-            imagecolortransparent($this->image, $color);
-        }
     }
 
     public function scale(float $size): void
