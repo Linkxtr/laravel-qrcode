@@ -4,7 +4,7 @@ namespace Linkxtr\QrCode;
 
 use GdImage;
 
-class Image
+final class Image
 {
     protected ?GdImage $image = null;
 

@@ -4,7 +4,7 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
 
-class Geo implements DataTypeInterface
+final class Geo implements DataTypeInterface
 {
     protected string $prefix = 'geo:';
 

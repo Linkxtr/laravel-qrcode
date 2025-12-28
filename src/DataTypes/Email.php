@@ -4,7 +4,7 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
 
-class Email implements DataTypeInterface
+final class Email implements DataTypeInterface
 {
     protected string $prefix = 'mailto:';
 

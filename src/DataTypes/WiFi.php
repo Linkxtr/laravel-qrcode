@@ -4,7 +4,7 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
 
-class WiFi implements DataTypeInterface
+final class WiFi implements DataTypeInterface
 {
     protected string $prefix = 'WIFI:';
 

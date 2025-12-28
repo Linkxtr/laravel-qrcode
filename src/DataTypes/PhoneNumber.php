@@ -5,7 +5,7 @@ namespace Linkxtr\QrCode\DataTypes;
 use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
 
-class PhoneNumber implements DataTypeInterface
+final class PhoneNumber implements DataTypeInterface
 {
     use ValidatesPhoneNumbers;
 

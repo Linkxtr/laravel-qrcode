@@ -4,7 +4,7 @@ namespace Linkxtr\QrCode;
 
 use InvalidArgumentException;
 
-class ImageMerge
+final class ImageMerge
 {
     protected Image $sourceImage;
 

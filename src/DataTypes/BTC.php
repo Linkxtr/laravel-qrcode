@@ -4,7 +4,7 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
 
-class BTC implements DataTypeInterface
+final class BTC implements DataTypeInterface
 {
     protected string $prefix = 'bitcoin:';
 
