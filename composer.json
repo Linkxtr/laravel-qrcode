@@ -47,7 +47,7 @@
   },
   "scripts": {
     "test": "vendor/bin/pest --coverage --min=100",
-    "lint": "vendor/bin/pint",
+    "lint": "vendor/bin/pint --parallel",
     "analyse": "vendor/bin/phpstan analyse",
     "post-autoload-dump": [
       "@php ./vendor/bin/testbench package:discover --ansi"

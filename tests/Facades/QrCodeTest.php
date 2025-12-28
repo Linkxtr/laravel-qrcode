@@ -2,6 +2,10 @@
 
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
+use Linkxtr\QrCode\QrCodeServiceProvider;
+
+covers(QrCode::class);
+covers(QrCodeServiceProvider::class);
 
 it('confirms the facade class exists', function () {
     expect(class_exists(QrCode::class))->toBeTrue();

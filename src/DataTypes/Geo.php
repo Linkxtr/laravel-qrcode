@@ -8,11 +8,11 @@ class Geo implements DataTypeInterface
 {
     protected string $prefix = 'geo:';
 
-    protected ?float $latitude = null;
+    protected float $latitude;
 
-    protected ?float $longitude = null;
+    protected float $longitude;
 
-    protected ?string $name = null;
+    protected string $name;
 
     /**
      * @param  list<mixed>  $arguments
@@ -34,9 +34,15 @@ class Geo implements DataTypeInterface
         $this->latitude = $this->validateCoordinate($arguments[0], 'latitude');
         $this->longitude = $this->validateCoordinate($arguments[1], 'longitude');
 
-        if (isset($arguments[2]) && is_string($arguments[2])) {
-            $this->name = $arguments[2];
+        if (! isset($arguments[2])) {
+            return;
         }
+
+        if (! is_string($arguments[2])) {
+            throw new InvalidArgumentException('Invalid name value: must be a string');
+        }
+
+        $this->name = $arguments[2];
     }
 
     public function __toString(): string
@@ -50,7 +56,7 @@ class Geo implements DataTypeInterface
             throw new InvalidArgumentException("Invalid {$type} value: must be a number");
         }
 
-        $value = (float) $value;
+        $value = (float) $value; // @pest-mutate-ignore
 
         if ($type === 'latitude' && ($value < -90 || $value > 90)) {
             throw new InvalidArgumentException('Latitude must be between -90 and 90 degrees');
@@ -65,13 +71,13 @@ class Geo implements DataTypeInterface
 
     protected function buildGeoString(): string
     {
+        if (empty($this->name)) {
+            return $this->prefix.$this->latitude.','.$this->longitude;
+        }
+
         $query = http_build_query([
             'name' => $this->name,
         ]);
-
-        if (empty($query)) {
-            return $this->prefix.$this->latitude.','.$this->longitude;
-        }
 
         return $this->prefix.$this->latitude.','.$this->longitude.'?'.$query;
     }

@@ -5,6 +5,8 @@ namespace Linkxtr\QrCode\Tests\DataTypes;
 use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\Geo;
 
+covers(Geo::class);
+
 beforeEach(function () {
     $this->geo = new Geo;
 });
@@ -16,6 +18,15 @@ it('should generate a valid geo QR code with name', function () {
 
 it('should generate a valid geo QR code without name', function () {
     $this->geo->create(['40.7128', '-74.0060']);
+    expect(strval($this->geo))->toBe('geo:40.7128,-74.006');
+});
+
+it('should generate a valid geo Qr code with integer and float latitude and longitude', function () {
+    $this->geo->create([90, -180]);
+    expect(strval($this->geo))->toBe('geo:90,-180');
+    $this->geo->create([-90, 180]);
+    expect(strval($this->geo))->toBe('geo:-90,180');
+    $this->geo->create([40.7128, -74.0060]);
     expect(strval($this->geo))->toBe('geo:40.7128,-74.006');
 });
 
@@ -53,4 +64,9 @@ it('throws an exception when longitude is out of range', function () {
 
     expect(fn () => $this->geo->create(['0', '181']))
         ->toThrow(InvalidArgumentException::class, 'Longitude must be between -180 and 180 degrees');
+});
+
+it('throws an exception when name is not a string', function () {
+    expect(fn () => $this->geo->create(['40.7128', '-74.0060', ['foo' => 'bar']]))
+        ->toThrow(InvalidArgumentException::class, 'Invalid name value: must be a string');
 });

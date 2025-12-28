@@ -36,7 +36,7 @@ class BTC implements DataTypeInterface
      */
     protected function setProperties(array $arguments): void
     {
-        if (! isset($arguments[0]) || ! isset($arguments[1])) {
+        if (count($arguments) < 2) {
             throw new InvalidArgumentException('Bitcoin address and amount are required.');
         }
 
@@ -76,12 +76,12 @@ class BTC implements DataTypeInterface
 
     protected function buildBitCoinString(): string
     {
-        $params = array_filter([
+        $params = [
             'amount' => $this->amount,
             'label' => $this->label,
             'message' => $this->message,
             'r' => $this->returnAddress,
-        ]);
+        ];
 
         return $this->prefix.$this->address.'?'.http_build_query($params);
     }

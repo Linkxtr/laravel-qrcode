@@ -5,6 +5,8 @@ namespace Linkxtr\QrCode\Tests\DataTypes;
 use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\BTC;
 
+covers(BTC::class);
+
 beforeEach(function () {
     $this->btc = new BTC;
 });

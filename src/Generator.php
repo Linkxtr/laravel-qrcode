@@ -31,7 +31,7 @@ use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\DataTypeInterface;
 
-class Generator
+final class Generator
 {
     /**
      * The output format.
@@ -77,7 +77,7 @@ class Generator
      * The size of the selected style between 0 and 1.
      * Only applicable to 'dot' and 'round' styles.
      */
-    protected float $styleSize = 0.5;
+    protected float $styleSize;
 
     /**
      * The style to apply to the eyes of the QR code.
@@ -117,13 +117,12 @@ class Generator
     /**
      * The percentage that a merged image should take over the source image.
      */
-    protected float $imagePercentage = 0.2;
+    protected float $imagePercentage;
 
     /**
      * @param  array<int, mixed>  $arguments
-     * @return string|void|\Illuminate\Support\HtmlString
      */
-    public function __call(string $method, array $arguments)
+    public function __call(string $method, array $arguments): HtmlString
     {
         $dataType = $this->createClass($method);
         $dataType->create($arguments);
@@ -132,21 +131,25 @@ class Generator
     }
 
     /**
-     * @return string|void|\Illuminate\Support\HtmlString
+     * @return HtmlString
      */
     public function generate(string $text, ?string $filename = null)
     {
         $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrection);
 
-        if ($this->imageMerge !== null && $this->format === 'png') {
+        if ($this->imageMerge !== null) {
+            if ($this->format !== 'png') {
+                throw new InvalidArgumentException('Image merge is only supported for PNG format.');
+            }
+
             $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge));
             $qrCode = $merger->merge($this->imagePercentage);
         }
 
         if ($filename) {
-            file_put_contents($filename, $qrCode);
-
-            return;
+            if (file_put_contents($filename, $qrCode) === false) {
+                throw new \RuntimeException("Failed to write QR code to file: {$filename}");
+            }
         }
 
         return new HtmlString($qrCode);
@@ -252,7 +255,7 @@ class Generator
             throw new InvalidArgumentException("\$style must be square, dot, or round. {$style} is not a valid.");
         }
 
-        if ($size < 0 || $size >= 1) {
+        if ($size <= 0 || $size > 1) {
             throw new InvalidArgumentException("\$size must be between 0 and 1.  {$size} is not valid.");
         }
 
@@ -380,14 +383,18 @@ class Generator
             throw new BadMethodCallException;
         }
 
+        $reflection = new \ReflectionClass($class);
+
+        if ($reflection->getShortName() !== $method) {
+            throw new BadMethodCallException;
+        }
+
         return new $class;
     }
 
     /** @return class-string<DataTypeInterface> */
     protected function formatClass(string $method): string
     {
-        $method = ucfirst($method);
-
         /** @var class-string<DataTypeInterface> */
         $class = "Linkxtr\QrCode\DataTypes\\".$method;
 

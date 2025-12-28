@@ -24,4 +24,11 @@ class TestCase extends Orchestra
             'QrCode' => \Linkxtr\QrCode\Facades\QrCode::class,
         ];
     }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        global $mockFilePutContents;
+        $mockFilePutContents = false;
+    }
 }

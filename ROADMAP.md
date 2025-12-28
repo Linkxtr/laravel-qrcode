@@ -13,7 +13,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ---
 
-## 🔥 Version 2.x\*\* - Enhanced Data Types & Modern Formats
+## 🔥 Version 2.x - Enhanced Data Types & Modern Formats
 
 ### New Data Types
 
@@ -316,6 +316,6 @@ We particularly welcome ideas for:
 
 **This roadmap is a living document and may change based on community feedback and technological developments.**
 
-_Last updated: Oct 2025_
+_Last updated: Dec 2025_
 
 </div>

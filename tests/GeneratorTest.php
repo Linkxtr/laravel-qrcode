@@ -17,6 +17,8 @@ use Linkxtr\QrCode\Image;
 
 require_once __DIR__.'/Overrides.php';
 
+covers(Generator::class);
+
 test('chaining is working', function () {
     expect((new Generator)->size(100))->toBeInstanceOf(Generator::class);
     expect((new Generator)->format('png'))->toBeInstanceOf(Generator::class);
@@ -33,10 +35,47 @@ test('chaining is working', function () {
     expect((new Generator)->margin(10))->toBeInstanceOf(Generator::class);
 });
 
+test('error correction level supported', function () {
+    expect((new Generator)->errorCorrection('L'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->errorCorrection('l'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->errorCorrection('M'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->errorCorrection('m'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->errorCorrection('Q'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->errorCorrection('q'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->errorCorrection('H'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->errorCorrection('h'))->toBeInstanceOf(Generator::class);
+});
+
+test('gradient supported', function () {
+    expect((new Generator)->gradient(100, 100, 100, 100, 100, 100, 'vertical'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->gradient(100, 100, 100, 100, 100, 100, 'horizontal'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->gradient(100, 100, 100, 100, 100, 100, 'diagonal'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->gradient(100, 100, 100, 100, 100, 100, 'inverse_diagonal'))->toBeInstanceOf(Generator::class);
+    expect((new Generator)->gradient(100, 100, 100, 100, 100, 100, 'radial'))->toBeInstanceOf(Generator::class);
+});
+
 test('size is passed to renderer', function () {
     $qrCode = (new Generator)->size(200);
 
     expect($qrCode->getRendererStyle()->getSize())->toBe(200);
+});
+
+test('default size is 100', function () {
+    $qrCode = new Generator;
+
+    expect($qrCode->getRendererStyle()->getSize())->toBe(100);
+});
+
+test('margin is passed to renderer', function () {
+    $qrCode = (new Generator)->margin(20);
+
+    expect($qrCode->getRendererStyle()->getMargin())->toBe(20);
+});
+
+test('default margin is 0', function () {
+    $qrCode = new Generator;
+
+    expect($qrCode->getRendererStyle()->getMargin())->toBe(0);
 });
 
 test('format is passed to formatter', function () {
@@ -76,6 +115,16 @@ test('color is passed to formatter', function () {
     $backgroundColor = $qrCode->getFill()->getBackgroundColor();
     expect($backgroundColor)->toBeInstanceOf(Alpha::class);
     expect($backgroundColor->getAlpha())->toBe(75);
+});
+
+test('default background color is white and foreground color is black', function () {
+    $qrCode = new Generator;
+    expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(255);
+    expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getGreen())->toBe(255);
+    expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getBlue())->toBe(255);
+    expect($qrCode->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(0);
+    expect($qrCode->getFill()->getForegroundColor()->toRgb()->getGreen())->toBe(0);
+    expect($qrCode->getFill()->getForegroundColor()->toRgb()->getBlue())->toBe(0);
 });
 
 test('eye color is passed to renderer', function () {
@@ -134,7 +183,7 @@ it('throws exception if eye style is not supported', function () {
 })->throws(InvalidArgumentException::class);
 
 test('module style is passed to renderer', function () {
-    $qrCode = (new Generator)->style('dot');
+    $qrCode = (new Generator)->style('dot', 1);
     expect($qrCode->getModule())->toBeInstanceOf(DotsModule::class);
 
     $qrCode = (new Generator)->style('square');
@@ -156,8 +205,8 @@ it('throws exception if roundness module with more than 1 roundness is set', fun
     (new Generator)->style('round', 1.1);
 })->throws(InvalidArgumentException::class);
 
-it('throws exception if roundness module with 1 roundness is set', function () {
-    (new Generator)->style('round', 1);
+it('throws exception if roundness module with 0 roundness is set', function () {
+    (new Generator)->style('round', 0);
 })->throws(InvalidArgumentException::class);
 
 it('throws exception if dot module with negative roundness is set', function () {
@@ -168,8 +217,8 @@ it('throws exception if dot module with more than 1 roundness is set', function 
     (new Generator)->style('dot', 1.1);
 })->throws(InvalidArgumentException::class);
 
-it('throws exception if dot module with 1 roundness is set', function () {
-    (new Generator)->style('dot', 1);
+it('throws exception if dot module with 0 roundness is set', function () {
+    (new Generator)->style('dot', 0);
 })->throws(InvalidArgumentException::class);
 
 test('get renderer return a renderer instance', function () {
@@ -212,6 +261,10 @@ test('Data types magic call', function () {
     expect($qrCode->WiFi(['ssid' => 'SSID']))->toBeInstanceOf(HtmlString::class);
 });
 
+test('Data types magic call is case sensitive', function () {
+    (new Generator)->geo('40.7128', '-74.0060');
+})->throws(BadMethodCallException::class);
+
 it('merges image into qrcode', function () {
     $pngData = (new Generator)
         ->format('png')
@@ -245,6 +298,17 @@ it('can merge image with relative path', function () {
     expect($pngData)->not->toBeEmpty();
 });
 
+it('throws exception try to merge with format other than png', function () {
+    (new Generator)->format('svg')->merge(__DIR__.'/images/linkxtr.png', 0.2, true)->generate('test');
+})->throws(InvalidArgumentException::class);
+
 it('throws exception if error correction level is not supported', function () {
     (new Generator)->errorCorrection('foo');
 })->throws(InvalidArgumentException::class);
+
+it('throws exception if file_put_contents fails', function () {
+    global $mockFilePutContents;
+    $mockFilePutContents = true;
+
+    (new Generator)->generate('test file', 'fail_file.svg');
+})->throws(RuntimeException::class, 'Failed to write QR code to file');

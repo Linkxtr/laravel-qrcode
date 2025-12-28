@@ -10,13 +10,13 @@ class Email implements DataTypeInterface
 
     protected ?string $address = null;
 
-    protected ?string $subject = null;
+    protected string $subject;
 
-    protected ?string $body = null;
+    protected string $body;
 
-    protected ?string $cc = null;
+    protected string $cc;
 
-    protected ?string $bcc = null;
+    protected string $bcc;
 
     /**
      * @param  list<mixed>  $arguments
@@ -31,7 +31,7 @@ class Email implements DataTypeInterface
      */
     protected function setProperties(array $arguments): void
     {
-        if (isset($arguments[0]) && is_string($arguments[0])) {
+        if (isset($arguments[0])) {
             $this->address = $this->setAddress($arguments[0]);
         }
 
@@ -39,15 +39,18 @@ class Email implements DataTypeInterface
             $this->subject = $arguments[1];
         }
 
-        if (isset($arguments[2]) && is_string($arguments[2])) {
+        if (isset($arguments[2])) {
+            if (! is_string($arguments[2])) {
+                throw new InvalidArgumentException('Invalid body provided to Email.');
+            }
             $this->body = $arguments[2];
         }
 
-        if (isset($arguments[3]) && is_string($arguments[3])) {
+        if (isset($arguments[3])) {
             $this->cc = $this->setAddress($arguments[3]);
         }
 
-        if (isset($arguments[4]) && is_string($arguments[4])) {
+        if (isset($arguments[4])) {
             $this->bcc = $this->setAddress($arguments[4]);
         }
     }
@@ -59,12 +62,23 @@ class Email implements DataTypeInterface
 
     protected function buildEmailString(): string
     {
-        $params = array_filter([
-            'subject' => $this->subject,
-            'body' => $this->body,
-            'cc' => $this->cc,
-            'bcc' => $this->bcc,
-        ]);
+        $params = [];
+
+        if (! empty($this->subject)) {
+            $params['subject'] = $this->subject;
+        }
+
+        if (! empty($this->body)) {
+            $params['body'] = $this->body;
+        }
+
+        if (! empty($this->cc)) {
+            $params['cc'] = $this->cc;
+        }
+
+        if (! empty($this->bcc)) {
+            $params['bcc'] = $this->bcc;
+        }
 
         if (empty($params)) {
             return $this->prefix.$this->address;
@@ -73,12 +87,13 @@ class Email implements DataTypeInterface
         return $this->prefix.$this->address.'?'.http_build_query($params);
     }
 
-    protected function setAddress(string $address): string
+    protected function setAddress(mixed $address): string
     {
         if (! filter_var($address, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException('Invalid email address provided to Email.');
         }
 
+        /** @var string $address */
         return $address;
     }
 }
