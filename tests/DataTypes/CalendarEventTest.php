@@ -36,8 +36,8 @@ test('CalendarEvent class generates correct string', function () {
     expect($string)->toContain('SUMMARY:Team Meeting');
     expect($string)->toContain('DESCRIPTION:Weekly team sync');
     expect($string)->toContain('LOCATION:Conference Room A');
-    expect($string)->toContain('DTSTART:20240601T100000');
-    expect($string)->toContain('DTEND:20240601T110000');
+    expect($string)->toContain('DTSTART:20240601T100000Z');
+    expect($string)->toContain('DTEND:20240601T110000Z');
     expect($string)->toContain('END:VEVENT');
 });
 
@@ -72,8 +72,8 @@ test('CalendarEvent class generates correct string with minimal data', function 
     expect($string)->toContain('SUMMARY:Team Meeting');
     expect($string)->not->toContain('DESCRIPTION:');
     expect($string)->not->toContain('LOCATION:');
-    expect($string)->toContain('DTSTART:20240601T100000');
-    expect($string)->toContain('DTEND:20240601T110000');
+    expect($string)->toContain('DTSTART:20240601T100000Z');
+    expect($string)->toContain('DTEND:20240601T110000Z');
     expect($string)->toContain('END:VEVENT');
 });
 
@@ -162,6 +162,6 @@ test('it accepts DateTimeInterface and numeric dates', function () {
 
     $string = (string) $calendarEvent;
 
-    expect($string)->toContain('DTSTART:' . $now->format('Ymd\THis'));
-    expect($string)->toContain('DTEND:' . date('Ymd\THis', $tomorrow));
+    expect($string)->toContain('DTSTART:' . (clone $now)->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z'));
+    expect($string)->toContain('DTEND:' . (new DateTime('@' . $tomorrow))->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z'));
 });

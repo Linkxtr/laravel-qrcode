@@ -75,8 +75,8 @@ class CalendarEvent implements DataTypeInterface
             $event .= 'LOCATION:'.$this->formatProperty($this->location)."\n";
         }
 
-        $event .= 'DTSTART:'.$this->start->format('Ymd\THis')."\n";
-        $event .= 'DTEND:'.$this->end->format('Ymd\THis')."\n";
+        $event .= 'DTSTART:'.$this->start->utc()->format('Ymd\THis\Z')."\n";
+        $event .= 'DTEND:'.$this->end->utc()->format('Ymd\THis\Z')."\n";
         $event .= 'END:VEVENT';
 
         return $event;
