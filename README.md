@@ -16,7 +16,7 @@ A simple and easy-to-use QR Code generator for Laravel, based on the `bacon/baco
 
 - PHP 8.2 or higher
 - Laravel 11.0 or higher
-- `ext-imagick` extension (optional, but recommended for better performance)
+- `ext-imagick` extension (optional, but recommended for better performance). If `imagick` is not available, the package will automatically fallback to using `gd` for PNG and WebP generation.
 
 ## 📦 Installation
 
@@ -109,7 +109,6 @@ QrCode::btc(['btcaddress', 0.0034, ['label' => 'label', 'message' => 'message', 
 
 - 📅 Calendar events
 - 👤 vCard contacts
-- 🎬 WebP and animated formats
 - 🎯 More styling options
 
 ## 🔧 Advanced Usage
@@ -149,10 +148,17 @@ QrCode::errorCorrection('H')->generate('High error correction');
 
 ### Image Merging
 
+Image merging is supported for PNG, WebP, and SVG formats.
+
 ```php
 // Merge with logo
-QrCode::merge('path/to/logo.png', 0.3, true)->generate('With Logo');
+QrCode::format('png')->merge('path/to/logo.png', 0.3, true)->generate('With Logo');
+
+// Merge with SVG
+QrCode::format('svg')->merge('path/to/logo.png', 0.3, true)->generate('With Logo');
 ```
+
+**Note:** Image merge is not supported for EPS format.
 
 ## 💡 Common Examples
 

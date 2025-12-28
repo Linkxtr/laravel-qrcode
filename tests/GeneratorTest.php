@@ -303,9 +303,6 @@ it('can merge image with relative path', function () {
     expect($pngData)->not->toBeEmpty();
 });
 
-it('throws exception try to merge with format other than png', function () {
-    (new Generator)->format('svg')->merge(__DIR__.'/images/linkxtr.png', 0.2, true)->generate('test');
-})->throws(InvalidArgumentException::class);
 
 it('throws exception if error correction level is not supported', function () {
     (new Generator)->errorCorrection('foo');
@@ -322,24 +319,30 @@ it('throws exception if file_put_contents fails', function () {
     }
 })->throws(RuntimeException::class, 'Failed to write QR code to file');
 
-it('throws exception if imagick is not loaded and format is png', function () {
+it('throws exception if imagick and gd are not loaded and format is png', function () {
     global $mockImagickLoaded;
+    global $mockGdLoaded;
     $mockImagickLoaded = false;
+    $mockGdLoaded = false;
 
     try {
         (new Generator)->format('png')->getFormatter();
     } finally {
         $mockImagickLoaded = true;
+        $mockGdLoaded = true;
     }
-})->throws(RuntimeException::class, 'The imagick extension is required to generate PNG QR codes.');
+})->throws(RuntimeException::class, 'The imagick or gd extension is required to generate PNG QR codes.');
 
-it('throws exception if imagick is not loaded and format is webp', function () {
+it('throws exception if imagick and gd are not loaded and format is webp', function () {
     global $mockImagickLoaded;
+    global $mockGdLoaded;
     $mockImagickLoaded = false;
+    $mockGdLoaded = false;
 
     try {
         (new Generator)->format('webp')->getFormatter();
     } finally {
         $mockImagickLoaded = true;
+        $mockGdLoaded = true;
     }
-})->throws(RuntimeException::class, 'The imagick extension is required to generate WebP QR codes.');
+})->throws(RuntimeException::class, 'The imagick or gd extension is required to generate WebP QR codes.');

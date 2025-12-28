@@ -28,10 +28,13 @@ final class ImageMerge
 
     protected int $centerX;
 
-    public function __construct(Image $sourceImage, Image $mergeImage)
+    protected string $format = 'png';
+
+    public function __construct(Image $sourceImage, Image $mergeImage, string $format = 'png')
     {
         $this->sourceImage = $sourceImage;
         $this->mergeImage = $mergeImage;
+        $this->format = $format;
     }
 
     public function merge(float $percentage): string
@@ -75,6 +78,13 @@ final class ImageMerge
     protected function createImage(): string
     {
         ob_start();
+
+        if ($this->format === 'webp') {
+            imagewebp($this->sourceImage->getImageResource());
+
+            return ob_get_clean() ?: '';
+        }
+
         imagepng($this->sourceImage->getImageResource());
 
         return ob_get_clean() ?: '';
