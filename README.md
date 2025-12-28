@@ -1,44 +1,22 @@
 # Laravel QR Code Generator
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/linkxtr/laravel-qrcode/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/linkxtr/laravel-qrcode/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/linkxtr/laravel-qrcode/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/linkxtr/laravel-qrcode/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
-[![PHP Version](https://img.shields.io/packagist/php-v/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
-[![License](https://img.shields.io/packagist/l/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
 
-> **🚀 Maintained Alternative**: This package is a fully compatible, actively maintained alternative to [`simplesoftwareio/simple-qrcode`](https://github.com/simplesoftwareio/simple-qrcode) with additional features and better support.
+A simple and easy-to-use QR Code generator for Laravel, based on the `bacon/bacon-qr-code` library.
 
-A beautiful and simple QR code generator for Laravel. This package provides an expressive interface for generating QR codes in various formats with extensive customization options.
+**Note:** This is version `2.x`.
 
-## 🔄 Migration from [simplesoftwareio/simple-qrcode](https://github.com/simplesoftwareio/simple-qrcode)
+- If you need **Laravel 10** support, please use [version 1.x](https://github.com/Linkxtr/laravel-qrcode/tree/v1.x).
+- Version 2.x drops compatibility with `simplesoftwareio/simple-qrcode` to provide a more streamlined API.
 
-Switching from the original package is straightforward:
+## Requirements
 
-### Step 1: Update Composer
-
-```bash
-composer remove simplesoftwareio/simple-qrcode
-composer require linkxtr/laravel-qrcode
-```
-
-### Step 2: Update Imports (if using in classes)
-
-```php
-// Replace:
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-
-// With:
-use Linkxtr\LaravelQrCode\Facades\QrCode;
-```
-
-### ✅ That's it! All your existing code will work exactly the same.
-
-**Why migrate?**
-
-- ✅ **Active Maintenance**: Regular updates and bug fixes
-- ✅ **Better Performance**: Updated dependencies
-- ✅ **Enhanced Security**: Security patches applied
-- ✅ **Future Features**: Roadmap includes new formats and data types
-- ✅ **Community Support**: Active issue response and PR merging
+- PHP 8.2 or higher
+- Laravel 11.0 or higher
+- `ext-imagick` extension (optional, but recommended for better performance)
 
 ## 📦 Installation
 
@@ -79,12 +57,6 @@ public function generate()
 ```
 
 ## ✨ Features
-
-### 🔄 Full Compatibility
-
-- **Drop-in replacement** for `simplesoftwareio/simple-qrcode`
-- **Same API** - no code changes required
-- **All original methods supported**
 
 ### 🎨 Enhanced Customization
 
@@ -139,20 +111,6 @@ QrCode::btc(['btcaddress', 0.0034, ['label' => 'label', 'message' => 'message', 
 - 👤 vCard contacts
 - 🎬 WebP and animated formats
 - 🎯 More styling options
-
-## 📊 Comparison with simplesoftwareio/simple-qrcode
-
-| Feature            | simplesoftwareio/simple-qrcode | linkxtr/laravel-qrcode |
-| ------------------ | ------------------------------ | ---------------------- |
-| Active Maintenance | ❌                             | ✅                     |
-| Security Updates   | ❌                             | ✅                     |
-| Issue Response     | ❌                             | ✅                     |
-| PR Merging         | ❌                             | ✅                     |
-| API Compatibility  | ✅                             | ✅                     |
-| Performance        | Standard                       | Improved               |
-| Future Features    | None planned                   | Active roadmap         |
-
-> **Note**: This package maintains 100% API compatibility with the original.
 
 ## 🔧 Advanced Usage
 
