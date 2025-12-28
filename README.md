@@ -1,15 +1,15 @@
 # Laravel QR Code Generator
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/linkxtr/laravel-qrcode/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/linkxtr/laravel-qrcode/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/linkxtr/laravel-qrcode/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/linkxtr/laravel-qrcode/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
+[![PHP Version](https://img.shields.io/packagist/php-v/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
+[![License](https://img.shields.io/packagist/l/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
 
 A simple and easy-to-use QR Code generator for Laravel, based on the `bacon/bacon-qr-code` library.
 
 **Note:** This is version `2.x`.
 
-- If you need **Laravel 10** support, please use [version 1.x](https://github.com/Linkxtr/laravel-qrcode/tree/v1.x).
+- If you need **Laravel 10** support, please use [version 1.x](https://github.com/Linkxtr/laravel-qrcode/tree/1.x).
 - Version 2.x drops compatibility with `simplesoftwareio/simple-qrcode` to provide a more streamlined API.
 
 ## Requirements
