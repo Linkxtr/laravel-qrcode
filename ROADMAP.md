@@ -30,7 +30,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ]);
   ```
 
-- [ ] **Calendar Events**
+- [x] **Calendar Events**
 
   ```php
   QrCode::calendarEvent([
@@ -56,7 +56,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ### New Formats
 
-- [x] **WebP Format Support**
+- [ ] **WebP Format Support**
 
   ```php
   QrCode::format('webp')->generate('Content');

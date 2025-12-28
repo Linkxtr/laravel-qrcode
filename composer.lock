@@ -4,7 +4,7 @@
     "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
     "This file is @generated automatically"
   ],
-  "content-hash": "e0ef80239362e62314d72750b5e08d40",
+  "content-hash": "6ee4a3fe6ee4944513535abc931b447c",
   "packages": [
     {
       "name": "bacon/bacon-qr-code",
@@ -42,9 +42,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-2-Clause"
-      ],
+      "license": ["BSD-2-Clause"],
       "authors": [
         {
           "name": "Ben Scholzen 'DASPRiD'",
@@ -90,9 +88,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "Arbitrary-precision arithmetic library",
       "keywords": [
         "Arbitrary-precision",
@@ -153,9 +149,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "KyleKatarn",
@@ -163,13 +157,7 @@
         }
       ],
       "description": "Types to use Carbon in Doctrine",
-      "keywords": [
-        "carbon",
-        "date",
-        "datetime",
-        "doctrine",
-        "time"
-      ],
+      "keywords": ["carbon", "date", "datetime", "doctrine", "time"],
       "support": {
         "issues": "https://github.com/CarbonPHP/carbon-doctrine-types/issues",
         "source": "https://github.com/CarbonPHP/carbon-doctrine-types/tree/3.2.0"
@@ -218,9 +206,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-2-Clause"
-      ],
+      "license": ["BSD-2-Clause"],
       "authors": [
         {
           "name": "Ben Scholzen 'DASPRiD'",
@@ -230,10 +216,7 @@
         }
       ],
       "description": "PHP 7.1 enum implementation",
-      "keywords": [
-        "enum",
-        "map"
-      ],
+      "keywords": ["enum", "map"],
       "support": {
         "issues": "https://github.com/DASPRiD/Enum/issues",
         "source": "https://github.com/DASPRiD/Enum/tree/1.0.7"
@@ -276,9 +259,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Dragonfly Development Inc.",
@@ -303,12 +284,7 @@
       ],
       "description": "Given a deep data structure, access data by dot notation.",
       "homepage": "https://github.com/dflydev/dflydev-dot-access-data",
-      "keywords": [
-        "access",
-        "data",
-        "dot",
-        "notation"
-      ],
+      "keywords": ["access", "data", "dot", "notation"],
       "support": {
         "issues": "https://github.com/dflydev/dflydev-dot-access-data/issues",
         "source": "https://github.com/dflydev/dflydev-dot-access-data/tree/v3.0.3"
@@ -346,9 +322,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Guilherme Blanco",
@@ -436,9 +410,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Guilherme Blanco",
@@ -455,13 +427,7 @@
       ],
       "description": "PHP Doctrine Lexer parser library that can be used in Top-Down, Recursive Descent Parsers.",
       "homepage": "https://www.doctrine-project.org/projects/lexer.html",
-      "keywords": [
-        "annotations",
-        "docblock",
-        "lexer",
-        "parser",
-        "php"
-      ],
+      "keywords": ["annotations", "docblock", "lexer", "parser", "php"],
       "support": {
         "issues": "https://github.com/doctrine/lexer/issues",
         "source": "https://github.com/doctrine/lexer/tree/3.0.1"
@@ -519,9 +485,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Chris Tankersley",
@@ -530,10 +494,7 @@
         }
       ],
       "description": "CRON for PHP: Calculate the next or previous run date and determine if a CRON expression is due",
-      "keywords": [
-        "cron",
-        "schedule"
-      ],
+      "keywords": ["cron", "schedule"],
       "support": {
         "issues": "https://github.com/dragonmantank/cron-expression/issues",
         "source": "https://github.com/dragonmantank/cron-expression/tree/v3.6.0"
@@ -584,9 +545,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Eduardo Gulias Davis"
@@ -648,9 +607,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fruitcake",
@@ -663,11 +620,7 @@
       ],
       "description": "Cross-origin resource sharing library for the Symfony HttpFoundation",
       "homepage": "https://github.com/fruitcake/php-cors",
-      "keywords": [
-        "cors",
-        "laravel",
-        "symfony"
-      ],
+      "keywords": ["cors", "laravel", "symfony"],
       "support": {
         "issues": "https://github.com/fruitcake/php-cors/issues",
         "source": "https://github.com/fruitcake/php-cors/tree/v1.4.0"
@@ -686,24 +639,24 @@
     },
     {
       "name": "graham-campbell/result-type",
-      "version": "v1.1.4",
+      "version": "v1.1.3",
       "source": {
         "type": "git",
         "url": "https://github.com/GrahamCampbell/Result-Type.git",
-        "reference": "e01f4a821471308ba86aa202fed6698b6b695e3b"
+        "reference": "3ba905c11371512af9d9bdd27d99b782216b6945"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/e01f4a821471308ba86aa202fed6698b6b695e3b",
-        "reference": "e01f4a821471308ba86aa202fed6698b6b695e3b",
+        "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/3ba905c11371512af9d9bdd27d99b782216b6945",
+        "reference": "3ba905c11371512af9d9bdd27d99b782216b6945",
         "shasum": ""
       },
       "require": {
         "php": "^7.2.5 || ^8.0",
-        "phpoption/phpoption": "^1.9.5"
+        "phpoption/phpoption": "^1.9.3"
       },
       "require-dev": {
-        "phpunit/phpunit": "^8.5.41 || ^9.6.22 || ^10.5.45 || ^11.5.7"
+        "phpunit/phpunit": "^8.5.39 || ^9.6.20 || ^10.5.28"
       },
       "type": "library",
       "autoload": {
@@ -712,9 +665,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Graham Campbell",
@@ -732,7 +683,7 @@
       ],
       "support": {
         "issues": "https://github.com/GrahamCampbell/Result-Type/issues",
-        "source": "https://github.com/GrahamCampbell/Result-Type/tree/v1.1.4"
+        "source": "https://github.com/GrahamCampbell/Result-Type/tree/v1.1.3"
       },
       "funding": [
         {
@@ -744,7 +695,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2025-12-27T19:43:20+00:00"
+      "time": "2024-07-20T21:45:45+00:00"
     },
     {
       "name": "guzzlehttp/guzzle",
@@ -792,17 +743,13 @@
         }
       },
       "autoload": {
-        "files": [
-          "src/functions_include.php"
-        ],
+        "files": ["src/functions_include.php"],
         "psr-4": {
           "GuzzleHttp\\": "src/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Graham Campbell",
@@ -906,9 +853,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Graham Campbell",
@@ -932,9 +877,7 @@
         }
       ],
       "description": "Guzzle promises library",
-      "keywords": [
-        "promise"
-      ],
+      "keywords": ["promise"],
       "support": {
         "issues": "https://github.com/guzzle/promises/issues",
         "source": "https://github.com/guzzle/promises/tree/2.3.0"
@@ -1000,9 +943,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Graham Campbell",
@@ -1107,9 +1048,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Graham Campbell",
@@ -1133,10 +1072,7 @@
         }
       ],
       "description": "A polyfill class for uri_template of PHP",
-      "keywords": [
-        "guzzlehttp",
-        "uri-template"
-      ],
+      "keywords": ["guzzlehttp", "uri-template"],
       "support": {
         "issues": "https://github.com/guzzle/uri-template/issues",
         "source": "https://github.com/guzzle/uri-template/tree/v1.0.5"
@@ -1358,9 +1294,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Taylor Otwell",
@@ -1369,10 +1303,7 @@
       ],
       "description": "The Laravel Framework.",
       "homepage": "https://laravel.com",
-      "keywords": [
-        "framework",
-        "laravel"
-      ],
+      "keywords": ["framework", "laravel"],
       "support": {
         "issues": "https://github.com/laravel/framework/issues",
         "source": "https://github.com/laravel/framework"
@@ -1420,17 +1351,13 @@
         }
       },
       "autoload": {
-        "files": [
-          "src/helpers.php"
-        ],
+        "files": ["src/helpers.php"],
         "psr-4": {
           "Laravel\\Prompts\\": "src/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "Add beautiful and user-friendly forms to your command-line applications.",
       "support": {
         "issues": "https://github.com/laravel/prompts/issues",
@@ -1474,9 +1401,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Taylor Otwell",
@@ -1488,11 +1413,7 @@
         }
       ],
       "description": "Laravel Serializable Closure provides an easy and secure way to serialize closures in PHP.",
-      "keywords": [
-        "closure",
-        "laravel",
-        "serializable"
-      ],
+      "keywords": ["closure", "laravel", "serializable"],
       "support": {
         "issues": "https://github.com/laravel/serializable-closure/issues",
         "source": "https://github.com/laravel/serializable-closure"
@@ -1556,9 +1477,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Colin O'Dell",
@@ -1644,9 +1563,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Colin O'Dell",
@@ -1742,9 +1659,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Frank de Jonge",
@@ -1798,9 +1713,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Frank de Jonge",
@@ -1808,13 +1721,7 @@
         }
       ],
       "description": "Local filesystem adapter for Flysystem.",
-      "keywords": [
-        "Flysystem",
-        "file",
-        "files",
-        "filesystem",
-        "local"
-      ],
+      "keywords": ["Flysystem", "file", "files", "filesystem", "local"],
       "support": {
         "source": "https://github.com/thephpleague/flysystem-local/tree/3.30.2"
       },
@@ -1850,9 +1757,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Frank de Jonge",
@@ -1924,9 +1829,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Ignace Nyamagana Butera",
@@ -2013,9 +1916,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Ignace Nyamagana Butera",
@@ -2128,9 +2029,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Jordi Boggiano",
@@ -2140,11 +2039,7 @@
       ],
       "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
       "homepage": "https://github.com/Seldaek/monolog",
-      "keywords": [
-        "log",
-        "logging",
-        "psr-3"
-      ],
+      "keywords": ["log", "logging", "psr-3"],
       "support": {
         "issues": "https://github.com/Seldaek/monolog/issues",
         "source": "https://github.com/Seldaek/monolog/tree/3.9.0"
@@ -2198,20 +2093,14 @@
         "phpunit/phpunit": "^10.5.53",
         "squizlabs/php_codesniffer": "^3.13.4"
       },
-      "bin": [
-        "bin/carbon"
-      ],
+      "bin": ["bin/carbon"],
       "type": "library",
       "extra": {
         "laravel": {
-          "providers": [
-            "Carbon\\Laravel\\ServiceProvider"
-          ]
+          "providers": ["Carbon\\Laravel\\ServiceProvider"]
         },
         "phpstan": {
-          "includes": [
-            "extension.neon"
-          ]
+          "includes": ["extension.neon"]
         },
         "branch-alias": {
           "dev-2.x": "2.x-dev",
@@ -2224,9 +2113,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Brian Nesbitt",
@@ -2240,11 +2127,7 @@
       ],
       "description": "An API extension for DateTime that supports 281 different languages.",
       "homepage": "https://carbon.nesbot.com",
-      "keywords": [
-        "date",
-        "datetime",
-        "time"
-      ],
+      "keywords": ["date", "datetime", "time"],
       "support": {
         "docs": "https://carbon.nesbot.com/docs",
         "issues": "https://github.com/CarbonPHP/carbon/issues",
@@ -2299,16 +2182,10 @@
         "psr-4": {
           "Nette\\": "src"
         },
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause",
-        "GPL-2.0-only",
-        "GPL-3.0-only"
-      ],
+      "license": ["BSD-3-Clause", "GPL-2.0-only", "GPL-3.0-only"],
       "authors": [
         {
           "name": "David Grudl",
@@ -2321,10 +2198,7 @@
       ],
       "description": "📐 Nette Schema: validating data structures against a given Schema.",
       "homepage": "https://nette.org",
-      "keywords": [
-        "config",
-        "nette"
-      ],
+      "keywords": ["config", "nette"],
       "support": {
         "issues": "https://github.com/nette/schema/issues",
         "source": "https://github.com/nette/schema/tree/v1.3.3"
@@ -2376,16 +2250,10 @@
         "psr-4": {
           "Nette\\": "src"
         },
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause",
-        "GPL-2.0-only",
-        "GPL-3.0-only"
-      ],
+      "license": ["BSD-3-Clause", "GPL-2.0-only", "GPL-3.0-only"],
       "authors": [
         {
           "name": "David Grudl",
@@ -2452,26 +2320,20 @@
       "type": "library",
       "extra": {
         "laravel": {
-          "providers": [
-            "Termwind\\Laravel\\TermwindServiceProvider"
-          ]
+          "providers": ["Termwind\\Laravel\\TermwindServiceProvider"]
         },
         "branch-alias": {
           "dev-2.x": "2.x-dev"
         }
       },
       "autoload": {
-        "files": [
-          "src/Functions.php"
-        ],
+        "files": ["src/Functions.php"],
         "psr-4": {
           "Termwind\\": "src/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nuno Maduro",
@@ -2479,14 +2341,7 @@
         }
       ],
       "description": "Its like Tailwind CSS, but for the console.",
-      "keywords": [
-        "cli",
-        "console",
-        "css",
-        "package",
-        "php",
-        "style"
-      ],
+      "keywords": ["cli", "console", "css", "package", "php", "style"],
       "support": {
         "issues": "https://github.com/nunomaduro/termwind/issues",
         "source": "https://github.com/nunomaduro/termwind/tree/v2.3.3"
@@ -2509,16 +2364,16 @@
     },
     {
       "name": "phpoption/phpoption",
-      "version": "1.9.5",
+      "version": "1.9.4",
       "source": {
         "type": "git",
         "url": "https://github.com/schmittjoh/php-option.git",
-        "reference": "75365b91986c2405cf5e1e012c5595cd487a98be"
+        "reference": "638a154f8d4ee6a5cfa96d6a34dfbe0cffa9566d"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/75365b91986c2405cf5e1e012c5595cd487a98be",
-        "reference": "75365b91986c2405cf5e1e012c5595cd487a98be",
+        "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/638a154f8d4ee6a5cfa96d6a34dfbe0cffa9566d",
+        "reference": "638a154f8d4ee6a5cfa96d6a34dfbe0cffa9566d",
         "shasum": ""
       },
       "require": {
@@ -2544,9 +2399,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "Apache-2.0"
-      ],
+      "license": ["Apache-2.0"],
       "authors": [
         {
           "name": "Johannes M. Schmitt",
@@ -2560,15 +2413,10 @@
         }
       ],
       "description": "Option Type for PHP",
-      "keywords": [
-        "language",
-        "option",
-        "php",
-        "type"
-      ],
+      "keywords": ["language", "option", "php", "type"],
       "support": {
         "issues": "https://github.com/schmittjoh/php-option/issues",
-        "source": "https://github.com/schmittjoh/php-option/tree/1.9.5"
+        "source": "https://github.com/schmittjoh/php-option/tree/1.9.4"
       },
       "funding": [
         {
@@ -2580,7 +2428,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2025-12-27T19:41:33+00:00"
+      "time": "2025-08-21T11:53:16+00:00"
     },
     {
       "name": "psr/clock",
@@ -2606,9 +2454,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "PHP-FIG",
@@ -2617,13 +2463,7 @@
       ],
       "description": "Common interface for reading the clock.",
       "homepage": "https://github.com/php-fig/clock",
-      "keywords": [
-        "clock",
-        "now",
-        "psr",
-        "psr-20",
-        "time"
-      ],
+      "keywords": ["clock", "now", "psr", "psr-20", "time"],
       "support": {
         "issues": "https://github.com/php-fig/clock/issues",
         "source": "https://github.com/php-fig/clock/tree/1.0.0"
@@ -2659,9 +2499,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "PHP-FIG",
@@ -2712,9 +2550,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "PHP-FIG",
@@ -2722,11 +2558,7 @@
         }
       ],
       "description": "Standard interfaces for event handling.",
-      "keywords": [
-        "events",
-        "psr",
-        "psr-14"
-      ],
+      "keywords": ["events", "psr", "psr-14"],
       "support": {
         "issues": "https://github.com/php-fig/event-dispatcher/issues",
         "source": "https://github.com/php-fig/event-dispatcher/tree/1.0.0"
@@ -2763,9 +2595,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "PHP-FIG",
@@ -2774,12 +2604,7 @@
       ],
       "description": "Common interface for HTTP clients",
       "homepage": "https://github.com/php-fig/http-client",
-      "keywords": [
-        "http",
-        "http-client",
-        "psr",
-        "psr-18"
-      ],
+      "keywords": ["http", "http-client", "psr", "psr-18"],
       "support": {
         "source": "https://github.com/php-fig/http-client"
       },
@@ -2815,9 +2640,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "PHP-FIG",
@@ -2869,9 +2692,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "PHP-FIG",
@@ -2922,9 +2743,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "PHP-FIG",
@@ -2933,11 +2752,7 @@
       ],
       "description": "Common interface for logging libraries",
       "homepage": "https://github.com/php-fig/log",
-      "keywords": [
-        "log",
-        "psr",
-        "psr-3"
-      ],
+      "keywords": ["log", "psr", "psr-3"],
       "support": {
         "source": "https://github.com/php-fig/log/tree/3.0.2"
       },
@@ -2972,9 +2787,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "PHP-FIG",
@@ -2982,13 +2795,7 @@
         }
       ],
       "description": "Common interfaces for simple caching",
-      "keywords": [
-        "cache",
-        "caching",
-        "psr",
-        "psr-16",
-        "simple-cache"
-      ],
+      "keywords": ["cache", "caching", "psr", "psr-16", "simple-cache"],
       "support": {
         "source": "https://github.com/php-fig/simple-cache/tree/3.0.0"
       },
@@ -3017,14 +2824,10 @@
       },
       "type": "library",
       "autoload": {
-        "files": [
-          "src/getallheaders.php"
-        ]
+        "files": ["src/getallheaders.php"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Ralph Khattar",
@@ -3089,9 +2892,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Ben Ramsey",
@@ -3100,14 +2901,7 @@
         }
       ],
       "description": "A PHP library for representing and manipulating collections.",
-      "keywords": [
-        "array",
-        "collection",
-        "hash",
-        "map",
-        "queue",
-        "set"
-      ],
+      "keywords": ["array", "collection", "hash", "map", "queue", "set"],
       "support": {
         "issues": "https://github.com/ramsey/collection/issues",
         "source": "https://github.com/ramsey/collection/tree/2.1.1"
@@ -3169,23 +2963,15 @@
         }
       },
       "autoload": {
-        "files": [
-          "src/functions.php"
-        ],
+        "files": ["src/functions.php"],
         "psr-4": {
           "Ramsey\\Uuid\\": "src/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "A PHP library for generating and working with universally unique identifiers (UUIDs).",
-      "keywords": [
-        "guid",
-        "identifier",
-        "uuid"
-      ],
+      "keywords": ["guid", "identifier", "uuid"],
       "support": {
         "issues": "https://github.com/ramsey/uuid/issues",
         "source": "https://github.com/ramsey/uuid/tree/4.9.2"
@@ -3194,42 +2980,35 @@
     },
     {
       "name": "symfony/clock",
-      "version": "v7.4.0",
+      "version": "v8.0.0",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/clock.git",
-        "reference": "9169f24776edde469914c1e7a1442a50f7a4e110"
+        "reference": "832119f9b8dbc6c8e6f65f30c5969eca1e88764f"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/symfony/clock/zipball/9169f24776edde469914c1e7a1442a50f7a4e110",
-        "reference": "9169f24776edde469914c1e7a1442a50f7a4e110",
+        "url": "https://api.github.com/repos/symfony/clock/zipball/832119f9b8dbc6c8e6f65f30c5969eca1e88764f",
+        "reference": "832119f9b8dbc6c8e6f65f30c5969eca1e88764f",
         "shasum": ""
       },
       "require": {
-        "php": ">=8.2",
-        "psr/clock": "^1.0",
-        "symfony/polyfill-php83": "^1.28"
+        "php": ">=8.4",
+        "psr/clock": "^1.0"
       },
       "provide": {
         "psr/clock-implementation": "1.0"
       },
       "type": "library",
       "autoload": {
-        "files": [
-          "Resources/now.php"
-        ],
+        "files": ["Resources/now.php"],
         "psr-4": {
           "Symfony\\Component\\Clock\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -3242,13 +3021,9 @@
       ],
       "description": "Decouples applications from the system clock",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "clock",
-        "psr20",
-        "time"
-      ],
+      "keywords": ["clock", "psr20", "time"],
       "support": {
-        "source": "https://github.com/symfony/clock/tree/v7.4.0"
+        "source": "https://github.com/symfony/clock/tree/v8.0.0"
       },
       "funding": [
         {
@@ -3268,7 +3043,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2025-11-12T15:39:26+00:00"
+      "time": "2025-11-12T15:46:48+00:00"
     },
     {
       "name": "symfony/console",
@@ -3319,14 +3094,10 @@
         "psr-4": {
           "Symfony\\Component\\Console\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -3339,12 +3110,7 @@
       ],
       "description": "Eases the creation of beautiful and testable command line interfaces",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "cli",
-        "command-line",
-        "console",
-        "terminal"
-      ],
+      "keywords": ["cli", "command-line", "console", "terminal"],
       "support": {
         "source": "https://github.com/symfony/console/tree/v7.4.1"
       },
@@ -3370,34 +3136,30 @@
     },
     {
       "name": "symfony/css-selector",
-      "version": "v7.4.0",
+      "version": "v8.0.0",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/css-selector.git",
-        "reference": "ab862f478513e7ca2fe9ec117a6f01a8da6e1135"
+        "reference": "6225bd458c53ecdee056214cb4a2ffaf58bd592b"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/symfony/css-selector/zipball/ab862f478513e7ca2fe9ec117a6f01a8da6e1135",
-        "reference": "ab862f478513e7ca2fe9ec117a6f01a8da6e1135",
+        "url": "https://api.github.com/repos/symfony/css-selector/zipball/6225bd458c53ecdee056214cb4a2ffaf58bd592b",
+        "reference": "6225bd458c53ecdee056214cb4a2ffaf58bd592b",
         "shasum": ""
       },
       "require": {
-        "php": ">=8.2"
+        "php": ">=8.4"
       },
       "type": "library",
       "autoload": {
         "psr-4": {
           "Symfony\\Component\\CssSelector\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -3415,7 +3177,7 @@
       "description": "Converts CSS selectors to XPath expressions",
       "homepage": "https://symfony.com",
       "support": {
-        "source": "https://github.com/symfony/css-selector/tree/v7.4.0"
+        "source": "https://github.com/symfony/css-selector/tree/v8.0.0"
       },
       "funding": [
         {
@@ -3435,7 +3197,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2025-10-30T13:39:42+00:00"
+      "time": "2025-10-30T14:17:19+00:00"
     },
     {
       "name": "symfony/deprecation-contracts",
@@ -3465,14 +3227,10 @@
         }
       },
       "autoload": {
-        "files": [
-          "function.php"
-        ]
+        "files": ["function.php"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -3535,22 +3293,16 @@
         "symfony/serializer": "^6.4|^7.0|^8.0",
         "symfony/webpack-encore-bundle": "^1.0|^2.0"
       },
-      "bin": [
-        "Resources/bin/patch-type-declarations"
-      ],
+      "bin": ["Resources/bin/patch-type-declarations"],
       "type": "library",
       "autoload": {
         "psr-4": {
           "Symfony\\Component\\ErrorHandler\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -3588,24 +3340,24 @@
     },
     {
       "name": "symfony/event-dispatcher",
-      "version": "v7.4.0",
+      "version": "v8.0.0",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/event-dispatcher.git",
-        "reference": "9dddcddff1ef974ad87b3708e4b442dc38b2261d"
+        "reference": "573f95783a2ec6e38752979db139f09fec033f03"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/9dddcddff1ef974ad87b3708e4b442dc38b2261d",
-        "reference": "9dddcddff1ef974ad87b3708e4b442dc38b2261d",
+        "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/573f95783a2ec6e38752979db139f09fec033f03",
+        "reference": "573f95783a2ec6e38752979db139f09fec033f03",
         "shasum": ""
       },
       "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "symfony/event-dispatcher-contracts": "^2.5|^3"
       },
       "conflict": {
-        "symfony/dependency-injection": "<6.4",
+        "symfony/security-http": "<7.4",
         "symfony/service-contracts": "<2.5"
       },
       "provide": {
@@ -3614,28 +3366,24 @@
       },
       "require-dev": {
         "psr/log": "^1|^2|^3",
-        "symfony/config": "^6.4|^7.0|^8.0",
-        "symfony/dependency-injection": "^6.4|^7.0|^8.0",
-        "symfony/error-handler": "^6.4|^7.0|^8.0",
-        "symfony/expression-language": "^6.4|^7.0|^8.0",
-        "symfony/framework-bundle": "^6.4|^7.0|^8.0",
-        "symfony/http-foundation": "^6.4|^7.0|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/error-handler": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/framework-bundle": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/stopwatch": "^6.4|^7.0|^8.0"
+        "symfony/stopwatch": "^7.4|^8.0"
       },
       "type": "library",
       "autoload": {
         "psr-4": {
           "Symfony\\Component\\EventDispatcher\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -3649,7 +3397,7 @@
       "description": "Provides tools that allow your application components to communicate with each other by dispatching events and listening to them",
       "homepage": "https://symfony.com",
       "support": {
-        "source": "https://github.com/symfony/event-dispatcher/tree/v7.4.0"
+        "source": "https://github.com/symfony/event-dispatcher/tree/v8.0.0"
       },
       "funding": [
         {
@@ -3669,7 +3417,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2025-10-28T09:38:46+00:00"
+      "time": "2025-10-30T14:17:19+00:00"
     },
     {
       "name": "symfony/event-dispatcher-contracts",
@@ -3705,9 +3453,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -3772,14 +3518,10 @@
         "psr-4": {
           "Symfony\\Component\\Finder\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -3854,14 +3596,10 @@
         "psr-4": {
           "Symfony\\Component\\HttpFoundation\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -3973,14 +3711,10 @@
         "psr-4": {
           "Symfony\\Component\\HttpKernel\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -4057,14 +3791,10 @@
         "psr-4": {
           "Symfony\\Component\\Mailer\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -4142,14 +3872,10 @@
         "psr-4": {
           "Symfony\\Component\\Mime\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -4162,10 +3888,7 @@
       ],
       "description": "Allows manipulating MIME messages",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "mime",
-        "mime-type"
-      ],
+      "keywords": ["mime", "mime-type"],
       "support": {
         "source": "https://github.com/symfony/mime/tree/v7.4.0"
       },
@@ -4220,17 +3943,13 @@
         }
       },
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ],
+        "files": ["bootstrap.php"],
         "psr-4": {
           "Symfony\\Polyfill\\Ctype\\": ""
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Gert de Pagter",
@@ -4243,12 +3962,7 @@
       ],
       "description": "Symfony polyfill for ctype functions",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "compatibility",
-        "ctype",
-        "polyfill",
-        "portable"
-      ],
+      "keywords": ["compatibility", "ctype", "polyfill", "portable"],
       "support": {
         "source": "https://github.com/symfony/polyfill-ctype/tree/v1.33.0"
       },
@@ -4300,17 +4014,13 @@
         }
       },
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ],
+        "files": ["bootstrap.php"],
         "psr-4": {
           "Symfony\\Polyfill\\Intl\\Grapheme\\": ""
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -4383,17 +4093,13 @@
         }
       },
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ],
+        "files": ["bootstrap.php"],
         "psr-4": {
           "Symfony\\Polyfill\\Intl\\Idn\\": ""
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Laurent Bassin",
@@ -4469,20 +4175,14 @@
         }
       },
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ],
+        "files": ["bootstrap.php"],
         "psr-4": {
           "Symfony\\Polyfill\\Intl\\Normalizer\\": ""
         },
-        "classmap": [
-          "Resources/stubs"
-        ]
+        "classmap": ["Resources/stubs"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -4558,17 +4258,13 @@
         }
       },
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ],
+        "files": ["bootstrap.php"],
         "psr-4": {
           "Symfony\\Polyfill\\Mbstring\\": ""
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -4581,13 +4277,7 @@
       ],
       "description": "Symfony polyfill for the Mbstring extension",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "compatibility",
-        "mbstring",
-        "polyfill",
-        "portable",
-        "shim"
-      ],
+      "keywords": ["compatibility", "mbstring", "polyfill", "portable", "shim"],
       "support": {
         "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.33.0"
       },
@@ -4636,20 +4326,14 @@
         }
       },
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ],
+        "files": ["bootstrap.php"],
         "psr-4": {
           "Symfony\\Polyfill\\Php80\\": ""
         },
-        "classmap": [
-          "Resources/stubs"
-        ]
+        "classmap": ["Resources/stubs"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Ion Bazan",
@@ -4666,12 +4350,7 @@
       ],
       "description": "Symfony polyfill backporting some PHP 8.0+ features to lower PHP versions",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "compatibility",
-        "polyfill",
-        "portable",
-        "shim"
-      ],
+      "keywords": ["compatibility", "polyfill", "portable", "shim"],
       "support": {
         "source": "https://github.com/symfony/polyfill-php80/tree/v1.33.0"
       },
@@ -4720,20 +4399,14 @@
         }
       },
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ],
+        "files": ["bootstrap.php"],
         "psr-4": {
           "Symfony\\Polyfill\\Php83\\": ""
         },
-        "classmap": [
-          "Resources/stubs"
-        ]
+        "classmap": ["Resources/stubs"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -4746,12 +4419,7 @@
       ],
       "description": "Symfony polyfill backporting some PHP 8.3+ features to lower PHP versions",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "compatibility",
-        "polyfill",
-        "portable",
-        "shim"
-      ],
+      "keywords": ["compatibility", "polyfill", "portable", "shim"],
       "support": {
         "source": "https://github.com/symfony/polyfill-php83/tree/v1.33.0"
       },
@@ -4800,20 +4468,14 @@
         }
       },
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ],
+        "files": ["bootstrap.php"],
         "psr-4": {
           "Symfony\\Polyfill\\Php84\\": ""
         },
-        "classmap": [
-          "Resources/stubs"
-        ]
+        "classmap": ["Resources/stubs"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -4826,12 +4488,7 @@
       ],
       "description": "Symfony polyfill backporting some PHP 8.4+ features to lower PHP versions",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "compatibility",
-        "polyfill",
-        "portable",
-        "shim"
-      ],
+      "keywords": ["compatibility", "polyfill", "portable", "shim"],
       "support": {
         "source": "https://github.com/symfony/polyfill-php84/tree/v1.33.0"
       },
@@ -4880,20 +4537,14 @@
         }
       },
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ],
+        "files": ["bootstrap.php"],
         "psr-4": {
           "Symfony\\Polyfill\\Php85\\": ""
         },
-        "classmap": [
-          "Resources/stubs"
-        ]
+        "classmap": ["Resources/stubs"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -4906,12 +4557,7 @@
       ],
       "description": "Symfony polyfill backporting some PHP 8.5+ features to lower PHP versions",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "compatibility",
-        "polyfill",
-        "portable",
-        "shim"
-      ],
+      "keywords": ["compatibility", "polyfill", "portable", "shim"],
       "support": {
         "source": "https://github.com/symfony/polyfill-php85/tree/v1.33.0"
       },
@@ -4966,17 +4612,13 @@
         }
       },
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ],
+        "files": ["bootstrap.php"],
         "psr-4": {
           "Symfony\\Polyfill\\Uuid\\": ""
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Grégoire Pineau",
@@ -4989,12 +4631,7 @@
       ],
       "description": "Symfony polyfill for uuid functions",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "compatibility",
-        "polyfill",
-        "portable",
-        "uuid"
-      ],
+      "keywords": ["compatibility", "polyfill", "portable", "uuid"],
       "support": {
         "source": "https://github.com/symfony/polyfill-uuid/tree/v1.33.0"
       },
@@ -5040,14 +4677,10 @@
         "psr-4": {
           "Symfony\\Component\\Process\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -5119,14 +4752,10 @@
         "psr-4": {
           "Symfony\\Component\\Routing\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -5139,12 +4768,7 @@
       ],
       "description": "Maps an HTTP request to a set of configuration variables",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "router",
-        "routing",
-        "uri",
-        "url"
-      ],
+      "keywords": ["router", "routing", "uri", "url"],
       "support": {
         "source": "https://github.com/symfony/routing/tree/v7.4.0"
       },
@@ -5204,14 +4828,10 @@
         "psr-4": {
           "Symfony\\Contracts\\Service\\": ""
         },
-        "exclude-from-classmap": [
-          "/Test/"
-        ]
+        "exclude-from-classmap": ["/Test/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -5257,52 +4877,45 @@
     },
     {
       "name": "symfony/string",
-      "version": "v7.4.0",
+      "version": "v8.0.1",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/string.git",
-        "reference": "d50e862cb0a0e0886f73ca1f31b865efbb795003"
+        "reference": "ba65a969ac918ce0cc3edfac6cdde847eba231dc"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/symfony/string/zipball/d50e862cb0a0e0886f73ca1f31b865efbb795003",
-        "reference": "d50e862cb0a0e0886f73ca1f31b865efbb795003",
+        "url": "https://api.github.com/repos/symfony/string/zipball/ba65a969ac918ce0cc3edfac6cdde847eba231dc",
+        "reference": "ba65a969ac918ce0cc3edfac6cdde847eba231dc",
         "shasum": ""
       },
       "require": {
-        "php": ">=8.2",
-        "symfony/deprecation-contracts": "^2.5|^3.0",
-        "symfony/polyfill-ctype": "~1.8",
-        "symfony/polyfill-intl-grapheme": "~1.33",
-        "symfony/polyfill-intl-normalizer": "~1.0",
-        "symfony/polyfill-mbstring": "~1.0"
+        "php": ">=8.4",
+        "symfony/polyfill-ctype": "^1.8",
+        "symfony/polyfill-intl-grapheme": "^1.33",
+        "symfony/polyfill-intl-normalizer": "^1.0",
+        "symfony/polyfill-mbstring": "^1.0"
       },
       "conflict": {
         "symfony/translation-contracts": "<2.5"
       },
       "require-dev": {
-        "symfony/emoji": "^7.1|^8.0",
-        "symfony/http-client": "^6.4|^7.0|^8.0",
-        "symfony/intl": "^6.4|^7.0|^8.0",
+        "symfony/emoji": "^7.4|^8.0",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/intl": "^7.4|^8.0",
         "symfony/translation-contracts": "^2.5|^3.0",
-        "symfony/var-exporter": "^6.4|^7.0|^8.0"
+        "symfony/var-exporter": "^7.4|^8.0"
       },
       "type": "library",
       "autoload": {
-        "files": [
-          "Resources/functions.php"
-        ],
+        "files": ["Resources/functions.php"],
         "psr-4": {
           "Symfony\\Component\\String\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -5315,16 +4928,9 @@
       ],
       "description": "Provides an object-oriented API to strings and deals with bytes, UTF-8 code points and grapheme clusters in a unified way",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "grapheme",
-        "i18n",
-        "string",
-        "unicode",
-        "utf-8",
-        "utf8"
-      ],
+      "keywords": ["grapheme", "i18n", "string", "unicode", "utf-8", "utf8"],
       "support": {
-        "source": "https://github.com/symfony/string/tree/v7.4.0"
+        "source": "https://github.com/symfony/string/tree/v8.0.1"
       },
       "funding": [
         {
@@ -5344,38 +4950,31 @@
           "type": "tidelift"
         }
       ],
-      "time": "2025-11-27T13:27:24+00:00"
+      "time": "2025-12-01T09:13:36+00:00"
     },
     {
       "name": "symfony/translation",
-      "version": "v7.4.0",
+      "version": "v8.0.1",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/translation.git",
-        "reference": "2d01ca0da3f092f91eeedb46f24aa30d2fca8f68"
+        "reference": "770e3b8b0ba8360958abedcabacd4203467333ca"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/symfony/translation/zipball/2d01ca0da3f092f91eeedb46f24aa30d2fca8f68",
-        "reference": "2d01ca0da3f092f91eeedb46f24aa30d2fca8f68",
+        "url": "https://api.github.com/repos/symfony/translation/zipball/770e3b8b0ba8360958abedcabacd4203467333ca",
+        "reference": "770e3b8b0ba8360958abedcabacd4203467333ca",
         "shasum": ""
       },
       "require": {
-        "php": ">=8.2",
-        "symfony/deprecation-contracts": "^2.5|^3",
-        "symfony/polyfill-mbstring": "~1.0",
-        "symfony/translation-contracts": "^2.5.3|^3.3"
+        "php": ">=8.4",
+        "symfony/polyfill-mbstring": "^1.0",
+        "symfony/translation-contracts": "^3.6.1"
       },
       "conflict": {
         "nikic/php-parser": "<5.0",
-        "symfony/config": "<6.4",
-        "symfony/console": "<6.4",
-        "symfony/dependency-injection": "<6.4",
         "symfony/http-client-contracts": "<2.5",
-        "symfony/http-kernel": "<6.4",
-        "symfony/service-contracts": "<2.5",
-        "symfony/twig-bundle": "<6.4",
-        "symfony/yaml": "<6.4"
+        "symfony/service-contracts": "<2.5"
       },
       "provide": {
         "symfony/translation-implementation": "2.3|3.0"
@@ -5383,34 +4982,28 @@
       "require-dev": {
         "nikic/php-parser": "^5.0",
         "psr/log": "^1|^2|^3",
-        "symfony/config": "^6.4|^7.0|^8.0",
-        "symfony/console": "^6.4|^7.0|^8.0",
-        "symfony/dependency-injection": "^6.4|^7.0|^8.0",
-        "symfony/finder": "^6.4|^7.0|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/console": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/finder": "^7.4|^8.0",
         "symfony/http-client-contracts": "^2.5|^3.0",
-        "symfony/http-kernel": "^6.4|^7.0|^8.0",
-        "symfony/intl": "^6.4|^7.0|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/intl": "^7.4|^8.0",
         "symfony/polyfill-intl-icu": "^1.21",
-        "symfony/routing": "^6.4|^7.0|^8.0",
+        "symfony/routing": "^7.4|^8.0",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/yaml": "^6.4|^7.0|^8.0"
+        "symfony/yaml": "^7.4|^8.0"
       },
       "type": "library",
       "autoload": {
-        "files": [
-          "Resources/functions.php"
-        ],
+        "files": ["Resources/functions.php"],
         "psr-4": {
           "Symfony\\Component\\Translation\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -5424,7 +5017,7 @@
       "description": "Provides tools to internationalize your application",
       "homepage": "https://symfony.com",
       "support": {
-        "source": "https://github.com/symfony/translation/tree/v7.4.0"
+        "source": "https://github.com/symfony/translation/tree/v8.0.1"
       },
       "funding": [
         {
@@ -5444,7 +5037,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2025-11-27T13:27:24+00:00"
+      "time": "2025-12-01T09:13:36+00:00"
     },
     {
       "name": "symfony/translation-contracts",
@@ -5477,14 +5070,10 @@
         "psr-4": {
           "Symfony\\Contracts\\Translation\\": ""
         },
-        "exclude-from-classmap": [
-          "/Test/"
-        ]
+        "exclude-from-classmap": ["/Test/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -5554,14 +5143,10 @@
         "psr-4": {
           "Symfony\\Component\\Uid\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Grégoire Pineau",
@@ -5578,11 +5163,7 @@
       ],
       "description": "Provides an object-oriented API to generate and represent UIDs",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "UID",
-        "ulid",
-        "uuid"
-      ],
+      "keywords": ["UID", "ulid", "uuid"],
       "support": {
         "source": "https://github.com/symfony/uid/tree/v7.4.0"
       },
@@ -5635,25 +5216,17 @@
         "symfony/uid": "^6.4|^7.0|^8.0",
         "twig/twig": "^3.12"
       },
-      "bin": [
-        "Resources/bin/var-dump-server"
-      ],
+      "bin": ["Resources/bin/var-dump-server"],
       "type": "library",
       "autoload": {
-        "files": [
-          "Resources/functions/dump.php"
-        ],
+        "files": ["Resources/functions/dump.php"],
         "psr-4": {
           "Symfony\\Component\\VarDumper\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nicolas Grekas",
@@ -5666,10 +5239,7 @@
       ],
       "description": "Provides mechanisms for walking through any arbitrary PHP variable",
       "homepage": "https://symfony.com",
-      "keywords": [
-        "debug",
-        "dump"
-      ],
+      "keywords": ["debug", "dump"],
       "support": {
         "source": "https://github.com/symfony/var-dumper/tree/v7.4.0"
       },
@@ -5730,9 +5300,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Tijs Verkoyen",
@@ -5750,26 +5318,26 @@
     },
     {
       "name": "vlucas/phpdotenv",
-      "version": "v5.6.3",
+      "version": "v5.6.2",
       "source": {
         "type": "git",
         "url": "https://github.com/vlucas/phpdotenv.git",
-        "reference": "955e7815d677a3eaa7075231212f2110983adecc"
+        "reference": "24ac4c74f91ee2c193fa1aaa5c249cb0822809af"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/955e7815d677a3eaa7075231212f2110983adecc",
-        "reference": "955e7815d677a3eaa7075231212f2110983adecc",
+        "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/24ac4c74f91ee2c193fa1aaa5c249cb0822809af",
+        "reference": "24ac4c74f91ee2c193fa1aaa5c249cb0822809af",
         "shasum": ""
       },
       "require": {
         "ext-pcre": "*",
-        "graham-campbell/result-type": "^1.1.4",
+        "graham-campbell/result-type": "^1.1.3",
         "php": "^7.2.5 || ^8.0",
-        "phpoption/phpoption": "^1.9.5",
-        "symfony/polyfill-ctype": "^1.26",
-        "symfony/polyfill-mbstring": "^1.26",
-        "symfony/polyfill-php80": "^1.26"
+        "phpoption/phpoption": "^1.9.3",
+        "symfony/polyfill-ctype": "^1.24",
+        "symfony/polyfill-mbstring": "^1.24",
+        "symfony/polyfill-php80": "^1.24"
       },
       "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8.2",
@@ -5795,9 +5363,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Graham Campbell",
@@ -5811,14 +5377,10 @@
         }
       ],
       "description": "Loads environment variables from `.env` to `getenv()`, `$_ENV` and `$_SERVER` automagically.",
-      "keywords": [
-        "dotenv",
-        "env",
-        "environment"
-      ],
+      "keywords": ["dotenv", "env", "environment"],
       "support": {
         "issues": "https://github.com/vlucas/phpdotenv/issues",
-        "source": "https://github.com/vlucas/phpdotenv/tree/v5.6.3"
+        "source": "https://github.com/vlucas/phpdotenv/tree/v5.6.2"
       },
       "funding": [
         {
@@ -5830,7 +5392,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2025-12-27T19:49:13+00:00"
+      "time": "2025-04-30T23:37:27+00:00"
     },
     {
       "name": "voku/portable-ascii",
@@ -5862,9 +5424,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Lars Moelleken",
@@ -5873,11 +5433,7 @@
       ],
       "description": "Portable ASCII library - performance optimized (ascii) string functions for php.",
       "homepage": "https://github.com/voku/portable-ascii",
-      "keywords": [
-        "ascii",
-        "clean",
-        "php"
-      ],
+      "keywords": ["ascii", "clean", "php"],
       "support": {
         "issues": "https://github.com/voku/portable-ascii/issues",
         "source": "https://github.com/voku/portable-ascii/tree/2.0.3"
@@ -5949,22 +5505,15 @@
         "phpstan/phpstan-strict-rules": "^2.0.7",
         "symfony/filesystem": "^7.3.2 || ^8.0.0"
       },
-      "bin": [
-        "bin/paratest",
-        "bin/paratest_for_phpstorm"
-      ],
+      "bin": ["bin/paratest", "bin/paratest_for_phpstorm"],
       "type": "library",
       "autoload": {
         "psr-4": {
-          "ParaTest\\": [
-            "src/"
-          ]
+          "ParaTest\\": ["src/"]
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Brian Scaturro",
@@ -5979,12 +5528,7 @@
       ],
       "description": "Parallel testing for PHP",
       "homepage": "https://github.com/paratestphp/paratest",
-      "keywords": [
-        "concurrent",
-        "parallel",
-        "phpunit",
-        "testing"
-      ],
+      "keywords": ["concurrent", "parallel", "phpunit", "testing"],
       "support": {
         "issues": "https://github.com/paratestphp/paratest/issues",
         "source": "https://github.com/paratestphp/paratest/tree/v7.16.0"
@@ -6034,9 +5578,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nils Adermann",
@@ -6055,12 +5597,7 @@
         }
       ],
       "description": "Semver library that offers utilities, version constraint parsing and validation.",
-      "keywords": [
-        "semantic",
-        "semver",
-        "validation",
-        "versioning"
-      ],
+      "keywords": ["semantic", "semver", "validation", "versioning"],
       "support": {
         "irc": "ircs://irc.libera.chat:6697/composer",
         "issues": "https://github.com/composer/semver/issues",
@@ -6115,9 +5652,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "A small layer on top of trigger_error(E_USER_DEPRECATED) or PSR-3 logging with options to disable all deprecations or selectively for packages.",
       "homepage": "https://www.doctrine-project.org/",
       "support": {
@@ -6169,20 +5704,14 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "François Zaninotto"
         }
       ],
       "description": "Faker is a PHP library that generates fake data for you.",
-      "keywords": [
-        "data",
-        "faker",
-        "fixtures"
-      ],
+      "keywords": ["data", "faker", "fixtures"],
       "support": {
         "issues": "https://github.com/FakerPHP/Faker/issues",
         "source": "https://github.com/FakerPHP/Faker/tree/v1.24.1"
@@ -6224,9 +5753,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Théo FIDRY",
@@ -6234,10 +5761,7 @@
         }
       ],
       "description": "Tiny utility to get the number of CPU cores.",
-      "keywords": [
-        "CPU",
-        "core"
-      ],
+      "keywords": ["CPU", "core"],
       "support": {
         "issues": "https://github.com/theofidry/cpu-core-counter/issues",
         "source": "https://github.com/theofidry/cpu-core-counter/tree/1.3.0"
@@ -6289,9 +5813,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Filipe Dobreira",
@@ -6354,18 +5876,12 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "hamcrest"
-        ]
+        "classmap": ["hamcrest"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "description": "This is the PHP port of Hamcrest Matchers",
-      "keywords": [
-        "test"
-      ],
+      "keywords": ["test"],
       "support": {
         "issues": "https://github.com/hamcrest/hamcrest-php/issues",
         "source": "https://github.com/hamcrest/hamcrest-php/tree/v2.1.1"
@@ -6410,9 +5926,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Alessandro Lai",
@@ -6420,12 +5934,7 @@
         }
       ],
       "description": "A library to get pretty versions strings of installed dependencies",
-      "keywords": [
-        "composer",
-        "package",
-        "release",
-        "versions"
-      ],
+      "keywords": ["composer", "package", "release", "versions"],
       "support": {
         "issues": "https://github.com/Jean85/pretty-package-versions/issues",
         "source": "https://github.com/Jean85/pretty-package-versions/tree/2.1.1"
@@ -6469,9 +5978,7 @@
       "type": "library",
       "extra": {
         "laravel": {
-          "providers": [
-            "Laravel\\Pail\\PailServiceProvider"
-          ]
+          "providers": ["Laravel\\Pail\\PailServiceProvider"]
         },
         "branch-alias": {
           "dev-main": "1.x-dev"
@@ -6483,9 +5990,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Taylor Otwell",
@@ -6498,13 +6003,7 @@
       ],
       "description": "Easily delve into your Laravel application's log files directly from the command line.",
       "homepage": "https://github.com/laravel/pail",
-      "keywords": [
-        "dev",
-        "laravel",
-        "logs",
-        "php",
-        "tail"
-      ],
+      "keywords": ["dev", "laravel", "logs", "php", "tail"],
       "support": {
         "issues": "https://github.com/laravel/pail/issues",
         "source": "https://github.com/laravel/pail"
@@ -6541,9 +6040,7 @@
         "nunomaduro/termwind": "^2.3.3",
         "pestphp/pest": "^3.8.4"
       },
-      "bin": [
-        "builds/pint"
-      ],
+      "bin": ["builds/pint"],
       "type": "project",
       "autoload": {
         "psr-4": {
@@ -6553,9 +6050,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nuno Maduro",
@@ -6564,14 +6059,7 @@
       ],
       "description": "An opinionated code formatter for PHP.",
       "homepage": "https://laravel.com",
-      "keywords": [
-        "dev",
-        "format",
-        "formatter",
-        "lint",
-        "linter",
-        "php"
-      ],
+      "keywords": ["dev", "format", "formatter", "lint", "linter", "php"],
       "support": {
         "issues": "https://github.com/laravel/pint/issues",
         "source": "https://github.com/laravel/pint"
@@ -6611,9 +6099,7 @@
       "type": "library",
       "extra": {
         "laravel": {
-          "providers": [
-            "Laravel\\Tinker\\TinkerServiceProvider"
-          ]
+          "providers": ["Laravel\\Tinker\\TinkerServiceProvider"]
         }
       },
       "autoload": {
@@ -6622,9 +6108,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Taylor Otwell",
@@ -6632,12 +6116,7 @@
         }
       ],
       "description": "Powerful REPL for the Laravel framework.",
-      "keywords": [
-        "REPL",
-        "Tinker",
-        "laravel",
-        "psysh"
-      ],
+      "keywords": ["REPL", "Tinker", "laravel", "psysh"],
       "support": {
         "issues": "https://github.com/laravel/tinker/issues",
         "source": "https://github.com/laravel/tinker/tree/v2.10.2"
@@ -6672,18 +6151,13 @@
       },
       "type": "library",
       "autoload": {
-        "files": [
-          "library/helpers.php",
-          "library/Mockery.php"
-        ],
+        "files": ["library/helpers.php", "library/Mockery.php"],
         "psr-4": {
           "Mockery\\": "library/Mockery"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Pádraic Brady",
@@ -6756,25 +6230,15 @@
       },
       "type": "library",
       "autoload": {
-        "files": [
-          "src/DeepCopy/deep_copy.php"
-        ],
+        "files": ["src/DeepCopy/deep_copy.php"],
         "psr-4": {
           "DeepCopy\\": "src/DeepCopy/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "Create deep copies (clones) of your objects",
-      "keywords": [
-        "clone",
-        "copy",
-        "duplicate",
-        "object",
-        "object graph"
-      ],
+      "keywords": ["clone", "copy", "duplicate", "object", "object graph"],
       "support": {
         "issues": "https://github.com/myclabs/DeepCopy/issues",
         "source": "https://github.com/myclabs/DeepCopy/tree/1.13.4"
@@ -6811,9 +6275,7 @@
         "ircmaxell/php-yacc": "^0.0.7",
         "phpunit/phpunit": "^9.0"
       },
-      "bin": [
-        "bin/php-parse"
-      ],
+      "bin": ["bin/php-parse"],
       "type": "library",
       "extra": {
         "branch-alias": {
@@ -6826,19 +6288,14 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Nikita Popov"
         }
       ],
       "description": "A PHP parser written in PHP",
-      "keywords": [
-        "parser",
-        "php"
-      ],
+      "keywords": ["parser", "php"],
       "support": {
         "issues": "https://github.com/nikic/PHP-Parser/issues",
         "source": "https://github.com/nikic/PHP-Parser/tree/v5.7.0"
@@ -6893,17 +6350,13 @@
         }
       },
       "autoload": {
-        "files": [
-          "./src/Adapters/Phpunit/Autoload.php"
-        ],
+        "files": ["./src/Adapters/Phpunit/Autoload.php"],
         "psr-4": {
           "NunoMaduro\\Collision\\": "src/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nuno Maduro",
@@ -6983,15 +6436,11 @@
         "phpunit/phpunit": "^11.5.18|^12.0",
         "spatie/laravel-ray": "^1.42.0"
       },
-      "bin": [
-        "canvas"
-      ],
+      "bin": ["canvas"],
       "type": "library",
       "extra": {
         "laravel": {
-          "providers": [
-            "Orchestra\\Canvas\\LaravelServiceProvider"
-          ]
+          "providers": ["Orchestra\\Canvas\\LaravelServiceProvider"]
         }
       },
       "autoload": {
@@ -7000,9 +6449,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Taylor Otwell",
@@ -7056,9 +6503,7 @@
       "type": "library",
       "extra": {
         "laravel": {
-          "providers": [
-            "Orchestra\\Canvas\\Core\\LaravelServiceProvider"
-          ]
+          "providers": ["Orchestra\\Canvas\\Core\\LaravelServiceProvider"]
         }
       },
       "autoload": {
@@ -7067,9 +6512,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Taylor Otwell",
@@ -7129,9 +6572,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Mior Muhammad Zaki",
@@ -7174,9 +6615,7 @@
       },
       "type": "library",
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Mior Muhammad Zaki",
@@ -7254,22 +6693,16 @@
         "symfony/yaml": "Required for Testbench CLI (^7.2).",
         "vlucas/phpdotenv": "Required for Testbench CLI (^5.6.1)."
       },
-      "bin": [
-        "testbench"
-      ],
+      "bin": ["testbench"],
       "type": "library",
       "autoload": {
-        "files": [
-          "src/functions.php"
-        ],
+        "files": ["src/functions.php"],
         "psr-4": {
           "Orchestra\\Testbench\\": "src/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Mior Muhammad Zaki",
@@ -7339,9 +6772,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Mior Muhammad Zaki",
@@ -7349,12 +6780,7 @@
         }
       ],
       "description": "Workbench Companion for Laravel Packages Development",
-      "keywords": [
-        "dev",
-        "laravel",
-        "laravel-packages",
-        "testing"
-      ],
+      "keywords": ["dev", "laravel", "laravel-packages", "testing"],
       "support": {
         "issues": "https://github.com/orchestral/workbench/issues",
         "source": "https://github.com/orchestral/workbench/tree/v10.0.7"
@@ -7399,9 +6825,7 @@
         "pestphp/pest-plugin-type-coverage": "^4.0.3",
         "psy/psysh": "^0.12.17"
       },
-      "bin": [
-        "bin/pest"
-      ],
+      "bin": ["bin/pest"],
       "type": "library",
       "extra": {
         "pest": {
@@ -7428,24 +6852,17 @@
           ]
         },
         "phpstan": {
-          "includes": [
-            "extension.neon"
-          ]
+          "includes": ["extension.neon"]
         }
       },
       "autoload": {
-        "files": [
-          "src/Functions.php",
-          "src/Pest.php"
-        ],
+        "files": ["src/Functions.php", "src/Pest.php"],
         "psr-4": {
           "Pest\\": "src/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nuno Maduro",
@@ -7453,14 +6870,7 @@
         }
       ],
       "description": "The elegant PHP Testing Framework.",
-      "keywords": [
-        "framework",
-        "pest",
-        "php",
-        "test",
-        "testing",
-        "unit"
-      ],
+      "keywords": ["framework", "pest", "php", "test", "testing", "unit"],
       "support": {
         "issues": "https://github.com/pestphp/pest/issues",
         "source": "https://github.com/pestphp/pest/tree/v4.2.0"
@@ -7514,9 +6924,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "The Pest plugin manager",
       "keywords": [
         "framework",
@@ -7573,23 +6981,17 @@
       "type": "library",
       "extra": {
         "pest": {
-          "plugins": [
-            "Pest\\Arch\\Plugin"
-          ]
+          "plugins": ["Pest\\Arch\\Plugin"]
         }
       },
       "autoload": {
-        "files": [
-          "src/Autoload.php"
-        ],
+        "files": ["src/Autoload.php"],
         "psr-4": {
           "Pest\\Arch\\": "src/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "The Arch plugin for Pest PHP.",
       "keywords": [
         "arch",
@@ -7644,28 +7046,20 @@
       "type": "library",
       "extra": {
         "pest": {
-          "plugins": [
-            "Pest\\Laravel\\Plugin"
-          ]
+          "plugins": ["Pest\\Laravel\\Plugin"]
         },
         "laravel": {
-          "providers": [
-            "Pest\\Laravel\\PestServiceProvider"
-          ]
+          "providers": ["Pest\\Laravel\\PestServiceProvider"]
         }
       },
       "autoload": {
-        "files": [
-          "src/Autoload.php"
-        ],
+        "files": ["src/Autoload.php"],
         "psr-4": {
           "Pest\\Laravel\\": "src/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "The Pest Laravel Plugin",
       "keywords": [
         "framework",
@@ -7723,9 +7117,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Nuno Maduro",
@@ -7793,9 +7185,7 @@
       "type": "library",
       "extra": {
         "pest": {
-          "plugins": [
-            "Pest\\Profanity\\Plugin"
-          ]
+          "plugins": ["Pest\\Profanity\\Plugin"]
         }
       },
       "autoload": {
@@ -7804,9 +7194,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "The Pest Profanity Plugin",
       "keywords": [
         "framework",
@@ -7852,14 +7240,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Arne Blankerts",
@@ -7909,14 +7293,10 @@
       },
       "type": "library",
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Arne Blankerts",
@@ -7970,9 +7350,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Jaap van Otterdijk",
@@ -8038,9 +7416,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Mike van Riel",
@@ -8100,9 +7476,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Mike van Riel",
@@ -8147,15 +7521,11 @@
       "type": "library",
       "autoload": {
         "psr-4": {
-          "PHPStan\\PhpDocParser\\": [
-            "src/"
-          ]
+          "PHPStan\\PhpDocParser\\": ["src/"]
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "PHPDoc parser with support for nullable, intersection and generic types",
       "support": {
         "issues": "https://github.com/phpstan/phpdoc-parser/issues",
@@ -8178,25 +7548,15 @@
       "conflict": {
         "phpstan/phpstan-shim": "*"
       },
-      "bin": [
-        "phpstan",
-        "phpstan.phar"
-      ],
+      "bin": ["phpstan", "phpstan.phar"],
       "type": "library",
       "autoload": {
-        "files": [
-          "bootstrap.php"
-        ]
+        "files": ["bootstrap.php"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "PHPStan - PHP Static Analysis Tool",
-      "keywords": [
-        "dev",
-        "static analysis"
-      ],
+      "keywords": ["dev", "static analysis"],
       "support": {
         "docs": "https://phpstan.org/user-guide/getting-started",
         "forum": "https://github.com/phpstan/phpstan/discussions",
@@ -8258,14 +7618,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -8275,11 +7631,7 @@
       ],
       "description": "Library that provides collection, processing, and rendering functionality for PHP code coverage information.",
       "homepage": "https://github.com/sebastianbergmann/php-code-coverage",
-      "keywords": [
-        "coverage",
-        "testing",
-        "xunit"
-      ],
+      "keywords": ["coverage", "testing", "xunit"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
         "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
@@ -8332,14 +7684,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -8349,10 +7697,7 @@
       ],
       "description": "FilterIterator implementation that filters files based on a list of suffixes.",
       "homepage": "https://github.com/sebastianbergmann/php-file-iterator/",
-      "keywords": [
-        "filesystem",
-        "iterator"
-      ],
+      "keywords": ["filesystem", "iterator"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/php-file-iterator/issues",
         "security": "https://github.com/sebastianbergmann/php-file-iterator/security/policy",
@@ -8397,14 +7742,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -8414,9 +7755,7 @@
       ],
       "description": "Invoke callables with a timeout",
       "homepage": "https://github.com/sebastianbergmann/php-invoker/",
-      "keywords": [
-        "process"
-      ],
+      "keywords": ["process"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/php-invoker/issues",
         "security": "https://github.com/sebastianbergmann/php-invoker/security/policy",
@@ -8457,14 +7796,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -8474,9 +7809,7 @@
       ],
       "description": "Simple template engine.",
       "homepage": "https://github.com/sebastianbergmann/php-text-template/",
-      "keywords": [
-        "template"
-      ],
+      "keywords": ["template"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/php-text-template/issues",
         "security": "https://github.com/sebastianbergmann/php-text-template/security/policy",
@@ -8517,14 +7850,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -8534,9 +7863,7 @@
       ],
       "description": "Utility class for timing",
       "homepage": "https://github.com/sebastianbergmann/php-timer/",
-      "keywords": [
-        "timer"
-      ],
+      "keywords": ["timer"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/php-timer/issues",
         "security": "https://github.com/sebastianbergmann/php-timer/security/policy",
@@ -8591,9 +7918,7 @@
         "sebastian/version": "^6.0.0",
         "staabm/side-effects-detector": "^1.0.5"
       },
-      "bin": [
-        "phpunit"
-      ],
+      "bin": ["phpunit"],
       "type": "library",
       "extra": {
         "branch-alias": {
@@ -8601,17 +7926,11 @@
         }
       },
       "autoload": {
-        "files": [
-          "src/Framework/Assert/Functions.php"
-        ],
-        "classmap": [
-          "src/"
-        ]
+        "files": ["src/Framework/Assert/Functions.php"],
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -8621,11 +7940,7 @@
       ],
       "description": "The PHP Unit Testing framework.",
       "homepage": "https://phpunit.de/",
-      "keywords": [
-        "phpunit",
-        "testing",
-        "xunit"
-      ],
+      "keywords": ["phpunit", "testing", "xunit"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/phpunit/issues",
         "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
@@ -8689,9 +8004,7 @@
         "ext-pcntl": "Enabling the PCNTL extension makes PsySH a lot happier :)",
         "ext-posix": "If you have PCNTL, you'll want the POSIX extension as well."
       },
-      "bin": [
-        "bin/psysh"
-      ],
+      "bin": ["bin/psysh"],
       "type": "library",
       "extra": {
         "bamarni-bin": {
@@ -8703,17 +8016,13 @@
         }
       },
       "autoload": {
-        "files": [
-          "src/functions.php"
-        ],
+        "files": ["src/functions.php"],
         "psr-4": {
           "Psy\\": "src/"
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Justin Hileman",
@@ -8722,12 +8031,7 @@
       ],
       "description": "An interactive shell for modern PHP.",
       "homepage": "https://psysh.org",
-      "keywords": [
-        "REPL",
-        "console",
-        "interactive",
-        "shell"
-      ],
+      "keywords": ["REPL", "console", "interactive", "shell"],
       "support": {
         "issues": "https://github.com/bobthecow/psysh/issues",
         "source": "https://github.com/bobthecow/psysh/tree/v0.12.18"
@@ -8761,14 +8065,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -8837,14 +8137,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -8865,11 +8161,7 @@
       ],
       "description": "Provides the functionality to compare PHP values for equality",
       "homepage": "https://github.com/sebastianbergmann/comparator",
-      "keywords": [
-        "comparator",
-        "compare",
-        "equality"
-      ],
+      "keywords": ["comparator", "compare", "equality"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/comparator/issues",
         "security": "https://github.com/sebastianbergmann/comparator/security/policy",
@@ -8923,14 +8215,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -8981,14 +8269,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -9001,12 +8285,7 @@
       ],
       "description": "Diff implementation",
       "homepage": "https://github.com/sebastianbergmann/diff",
-      "keywords": [
-        "diff",
-        "udiff",
-        "unidiff",
-        "unified diff"
-      ],
+      "keywords": ["diff", "udiff", "unidiff", "unified diff"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/diff/issues",
         "security": "https://github.com/sebastianbergmann/diff/security/policy",
@@ -9050,14 +8329,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -9066,11 +8341,7 @@
       ],
       "description": "Provides functionality to handle HHVM/PHP environments",
       "homepage": "https://github.com/sebastianbergmann/environment",
-      "keywords": [
-        "Xdebug",
-        "environment",
-        "hhvm"
-      ],
+      "keywords": ["Xdebug", "environment", "hhvm"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/environment/issues",
         "security": "https://github.com/sebastianbergmann/environment/security/policy",
@@ -9125,14 +8396,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -9157,10 +8424,7 @@
       ],
       "description": "Provides the functionality to export PHP variables for visualization",
       "homepage": "https://www.github.com/sebastianbergmann/exporter",
-      "keywords": [
-        "export",
-        "exporter"
-      ],
+      "keywords": ["export", "exporter"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/exporter/issues",
         "security": "https://github.com/sebastianbergmann/exporter/security/policy",
@@ -9216,14 +8480,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -9232,9 +8492,7 @@
       ],
       "description": "Snapshotting of global state",
       "homepage": "https://www.github.com/sebastianbergmann/global-state",
-      "keywords": [
-        "global state"
-      ],
+      "keywords": ["global state"],
       "support": {
         "issues": "https://github.com/sebastianbergmann/global-state/issues",
         "security": "https://github.com/sebastianbergmann/global-state/security/policy",
@@ -9288,14 +8546,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -9347,14 +8601,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -9403,14 +8653,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -9459,14 +8705,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -9535,14 +8777,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -9601,14 +8839,10 @@
         }
       },
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Sebastian Bergmann",
@@ -9659,18 +8893,12 @@
       },
       "type": "library",
       "autoload": {
-        "classmap": [
-          "lib/"
-        ]
+        "classmap": ["lib/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "description": "A static analysis tool to detect side effects in PHP code",
-      "keywords": [
-        "static analysis"
-      ],
+      "keywords": ["static analysis"],
       "support": {
         "issues": "https://github.com/staabm/side-effects-detector/issues",
         "source": "https://github.com/staabm/side-effects-detector/tree/1.0.5"
@@ -9708,22 +8936,16 @@
       "require-dev": {
         "symfony/console": "^6.4|^7.0|^8.0"
       },
-      "bin": [
-        "Resources/bin/yaml-lint"
-      ],
+      "bin": ["Resources/bin/yaml-lint"],
       "type": "library",
       "autoload": {
         "psr-4": {
           "Symfony\\Component\\Yaml\\": ""
         },
-        "exclude-from-classmap": [
-          "/Tests/"
-        ]
+        "exclude-from-classmap": ["/Tests/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Fabien Potencier",
@@ -9791,9 +9013,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Ni Shi",
@@ -9805,13 +9025,7 @@
         }
       ],
       "description": "Methods for testing application architecture",
-      "keywords": [
-        "architecture",
-        "phpunit",
-        "stucture",
-        "test",
-        "testing"
-      ],
+      "keywords": ["architecture", "phpunit", "stucture", "test", "testing"],
       "support": {
         "issues": "https://github.com/ta-tikoma/phpunit-architecture-test/issues",
         "source": "https://github.com/ta-tikoma/phpunit-architecture-test/tree/0.8.5"
@@ -9840,14 +9054,10 @@
       },
       "type": "library",
       "autoload": {
-        "classmap": [
-          "src/"
-        ]
+        "classmap": ["src/"]
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "BSD-3-Clause"
-      ],
+      "license": ["BSD-3-Clause"],
       "authors": [
         {
           "name": "Arne Blankerts",
@@ -9905,9 +9115,7 @@
         }
       },
       "notification-url": "https://packagist.org/downloads/",
-      "license": [
-        "MIT"
-      ],
+      "license": ["MIT"],
       "authors": [
         {
           "name": "Bernhard Schussek",
@@ -9919,11 +9127,7 @@
         }
       ],
       "description": "Assertions to validate method input/output with nice error messages.",
-      "keywords": [
-        "assert",
-        "check",
-        "validate"
-      ],
+      "keywords": ["assert", "check", "validate"],
       "support": {
         "issues": "https://github.com/webmozarts/assert/issues",
         "source": "https://github.com/webmozarts/assert/tree/2.0.0"
@@ -9941,5 +9145,5 @@
     "ext-gd": "*"
   },
   "platform-dev": {},
-  "plugin-api-version": "2.9.0"
+  "plugin-api-version": "2.6.0"
 }

@@ -184,8 +184,8 @@ final class Generator
 
     public function format(string $format): self
     {
-        if (! in_array($format, ['svg', 'eps', 'png', 'webp'])) {
-            throw new InvalidArgumentException("\$format must be svg, eps, png, or webp. {$format} is not a valid.");
+        if (! in_array($format, ['svg', 'eps', 'png'])) {
+            throw new InvalidArgumentException("\$format must be svg, eps, or png. {$format} is not a valid.");
         }
 
         $this->format = $format;
@@ -316,10 +316,6 @@ final class Generator
     {
         if ($this->format === 'png') {
             return new ImagickImageBackEnd('png');
-        }
-
-        if ($this->format === 'webp') {
-            return new ImagickImageBackEnd('webp');
         }
 
         if ($this->format === 'eps') {
