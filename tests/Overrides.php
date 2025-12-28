@@ -25,14 +25,20 @@ if (! function_exists('Linkxtr\QrCode\file_put_contents')) {
 }
 
 $mockImagickLoaded = true;
+$mockGdLoaded = true;
 
 if (! function_exists('Linkxtr\QrCode\extension_loaded')) {
     function extension_loaded($extension)
     {
         global $mockImagickLoaded;
+        global $mockGdLoaded;
 
         if ($extension === 'imagick') {
             return $mockImagickLoaded;
+        }
+
+        if ($extension === 'gd') {
+            return $mockGdLoaded;
         }
 
         return \extension_loaded($extension);

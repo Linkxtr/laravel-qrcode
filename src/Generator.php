@@ -15,6 +15,7 @@ use BaconQrCode\Renderer\Image\EpsImageBackEnd;
 use BaconQrCode\Renderer\Image\ImageBackEndInterface;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use Linkxtr\QrCode\Renderer\Image\GdImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Module\DotsModule;
 use BaconQrCode\Renderer\Module\ModuleInterface;
@@ -135,12 +136,15 @@ final class Generator
         $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrection);
 
         if ($this->imageMerge !== null) {
-            if ($this->format !== 'png') {
-                throw new InvalidArgumentException('Image merge is only supported for PNG format.');
+            if ($this->format === 'png' || $this->format === 'webp') {
+                $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
+                $qrCode = $merger->merge($this->imagePercentage);
+            } elseif ($this->format === 'svg') {
+                $merger = new SvgImageMerge($qrCode, $this->imageMerge, $this->imagePercentage);
+                $qrCode = $merger->merge();
+            } else {
+                throw new InvalidArgumentException(sprintf('Image merge is not supported for %s format.', $this->format));
             }
-
-            $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge));
-            $qrCode = $merger->merge($this->imagePercentage);
         }
 
         if ($filename) {
@@ -312,19 +316,27 @@ final class Generator
     public function getFormatter(): ImageBackEndInterface
     {
         if ($this->format === 'png') {
-            if (! extension_loaded('imagick')) {
-                throw new \RuntimeException('The imagick extension is required to generate PNG QR codes.');
+            if (extension_loaded('imagick')) {
+                return new ImagickImageBackEnd('png');
             }
 
-            return new ImagickImageBackEnd('png');
+            if (extension_loaded('gd')) {
+                return new GdImageBackEnd('png');
+            }
+
+            throw new \RuntimeException('The imagick or gd extension is required to generate PNG QR codes.');
         }
 
         if ($this->format === 'webp') {
-            if (! extension_loaded('imagick')) {
-                throw new \RuntimeException('The imagick extension is required to generate WebP QR codes.');
+            if (extension_loaded('imagick')) {
+                return new ImagickImageBackEnd('webp');
             }
 
-            return new ImagickImageBackEnd('webp');
+            if (extension_loaded('gd')) {
+                return new GdImageBackEnd('webp');
+            }
+
+            throw new \RuntimeException('The imagick or gd extension is required to generate WebP QR codes.');
         }
 
         if ($this->format === 'eps') {
