@@ -53,11 +53,11 @@ final class SvgImageMerge
         if ($img !== false) {
             $mergeImageWidth = imagesx($img);
             $mergeImageHeight = imagesy($img);
-            imagedestroy($img);
+            unset($img);
         } else {
-             // Fallback or error? If we can't determine size, we might assume square or throw error.
-             // Given the requirements, we should probably throw an error if the image is invalid.
-             throw new InvalidArgumentException('Invalid image data provided for merge.');
+            // Fallback or error? If we can't determine size, we might assume square or throw error.
+            // Given the requirements, we should probably throw an error if the image is invalid.
+            throw new InvalidArgumentException('Invalid image data provided for merge.');
         }
 
         $mergeRatio = $mergeImageWidth / $mergeImageHeight;
@@ -81,10 +81,10 @@ final class SvgImageMerge
         // Inject before </svg>
         $pos = strrpos($this->svgContent, '</svg>');
         if ($pos === false) {
-             throw new InvalidArgumentException('Invalid SVG content.');
+            throw new InvalidArgumentException('Invalid SVG content.');
         }
 
-        return substr_replace($this->svgContent, $imageTag . '</svg>', $pos, strlen('</svg>'));
+        return substr_replace($this->svgContent, $imageTag.'</svg>', $pos, strlen('</svg>'));
     }
 
     protected function getMimeType(string $content): string

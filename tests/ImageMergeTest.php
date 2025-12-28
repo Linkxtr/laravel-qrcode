@@ -1,5 +1,6 @@
 <?php
 
+use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\Image;
 use Linkxtr\QrCode\ImageMerge;
 
