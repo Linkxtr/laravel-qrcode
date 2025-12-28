@@ -207,7 +207,7 @@ QrCode::size(250)
 
 We're actively working on Version 2 with these planned features:
 
-- [ ] vCard data type
+- [x] vCard data type
 - [ ] Calendar event data type
 - [ ] WebP format support
 - [ ] Animated QR codes
@@ -269,6 +269,7 @@ QrCode::size(400)
 - `geo($lat, $lng)` - Generate location QR
 - `wiFi($config)` - Generate WiFi QR
 - `btc($config)` - Generate BTC QR
+- `vCard($config)` - Generate vCard QR
 
 ## 📄 License
 

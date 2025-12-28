@@ -17,7 +17,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ### New Data Types
 
-- [ ] **vCard Support**
+- [x] **vCard Support**
 
   ```php
   QrCode::vCard([
