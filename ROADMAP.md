@@ -56,7 +56,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ### New Formats
 
-- [ ] **WebP Format Support**
+- [x] **WebP Format Support**
 
   ```php
   QrCode::format('webp')->generate('Content');
