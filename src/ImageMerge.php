@@ -81,9 +81,11 @@ final class ImageMerge
 
         if ($this->format === 'webp') {
             imagewebp($this->sourceImage->getImageResource());
-        } else {
-            imagepng($this->sourceImage->getImageResource());
+
+            return ob_get_clean() ?: '';
         }
+
+        imagepng($this->sourceImage->getImageResource());
 
         return ob_get_clean() ?: '';
     }

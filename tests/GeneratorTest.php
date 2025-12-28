@@ -303,9 +303,6 @@ it('can merge image with relative path', function () {
     expect($pngData)->not->toBeEmpty();
 });
 
-// it('throws exception try to merge with format other than png', function () {
-//     (new Generator)->format('svg')->merge(__DIR__.'/images/linkxtr.png', 0.2, true)->generate('test');
-// })->throws(InvalidArgumentException::class);
 
 it('throws exception if error correction level is not supported', function () {
     (new Generator)->errorCorrection('foo');

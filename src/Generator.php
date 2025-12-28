@@ -136,15 +136,7 @@ final class Generator
         $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrection);
 
         if ($this->imageMerge !== null) {
-            if ($this->format === 'png' || $this->format === 'webp') {
-                $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
-                $qrCode = $merger->merge($this->imagePercentage);
-            } elseif ($this->format === 'svg') {
-                $merger = new SvgImageMerge($qrCode, $this->imageMerge, $this->imagePercentage);
-                $qrCode = $merger->merge();
-            } else {
-                throw new InvalidArgumentException(sprintf('Image merge is not supported for %s format.', $this->format));
-            }
+            $qrCode = $this->mergeImage($qrCode);
         }
 
         if ($filename) {
@@ -154,6 +146,23 @@ final class Generator
         }
 
         return new HtmlString($qrCode);
+    }
+
+    protected function mergeImage(string $qrCode): string
+    {
+        if ($this->format === 'png' || $this->format === 'webp') {
+            $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
+
+            return $merger->merge($this->imagePercentage);
+        }
+
+        if ($this->format === 'svg') {
+            $merger = new SvgImageMerge($qrCode, $this->imageMerge, $this->imagePercentage);
+
+            return $merger->merge();
+        }
+
+        throw new InvalidArgumentException(sprintf('Image merge is not supported for %s format.', $this->format));
     }
 
     public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self

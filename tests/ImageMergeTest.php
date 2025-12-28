@@ -3,6 +3,21 @@
 use Linkxtr\QrCode\Image;
 use Linkxtr\QrCode\ImageMerge;
 
+it('it merges image into webp qrcode', function () {
+    if (! extension_loaded('gd')) {
+        $this->markTestSkipped('The GD extension is required for this test.');
+    }
+
+    $webpData = (new Generator)
+        ->format('webp')
+        ->size(300)
+        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
+        ->generate('test');
+
+    $image = new Image($webpData);
+    expect($image->getWidth())->toBe(300);
+});
+
 it('can merge 2 images into one and center them', function () {
     $src_image = imagecreatefrompng(__DIR__.'/images/linkxtr.png');
     $dst_image = imagecreatefrompng(__DIR__.'/images/300X200.png');
