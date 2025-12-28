@@ -44,6 +44,10 @@ class CalendarEvent implements DataTypeInterface
         }
         $this->end = $this->parseDate($attributes['end']);
 
+        if ($this->end <= $this->start) {
+            throw new InvalidArgumentException('End date must be after start date.');
+        }
+
         if (isset($attributes['description']) && is_string($attributes['description'])) {
             $this->description = $attributes['description'];
         }

@@ -151,7 +151,7 @@ test('it ignores non-string description and location', function () {
 
 test('it accepts DateTimeInterface and numeric dates', function () {
     $calendarEvent = new CalendarEvent;
-    $now = new DateTime();
+    $now = new DateTime;
     $tomorrow = time() + 86400;
 
     $calendarEvent->create([[
@@ -162,6 +162,15 @@ test('it accepts DateTimeInterface and numeric dates', function () {
 
     $string = (string) $calendarEvent;
 
-    expect($string)->toContain('DTSTART:' . (clone $now)->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z'));
-    expect($string)->toContain('DTEND:' . (new DateTime('@' . $tomorrow))->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z'));
+    expect($string)->toContain('DTSTART:'.(clone $now)->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z'));
+    expect($string)->toContain('DTEND:'.(new DateTime('@'.$tomorrow))->setTimezone(new DateTimeZone('UTC'))->format('Ymd\THis\Z'));
 });
+
+test('it throws exception when end date is before start date', function () {
+    $qrCode = new Generator;
+    $qrCode->CalendarEvent([
+        'summary' => 'Meeting',
+        'start' => '2024-06-01 12:00:00',
+        'end' => '2024-06-01 11:00:00',
+    ]);
+})->throws(InvalidArgumentException::class, 'End date must be after start date.');
