@@ -18,7 +18,7 @@ it('should generate a valid geo QR code without name', function () {
     expect(strval($this->geo))->toBe('geo:40.7128,-74.006');
 });
 
-it('should generate a valid geo Qr code with integer and float latitude and longitude', function () {
+it('should generate a valid geo QR code with integer and float latitude and longitude', function () {
     $this->geo->create([90, -180]);
     expect(strval($this->geo))->toBe('geo:90,-180');
     $this->geo->create([-90, 180]);

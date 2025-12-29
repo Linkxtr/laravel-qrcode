@@ -7,7 +7,7 @@ use GdImage;
 // Globals to control mocks are assumed to be defined in the test file scope or global scope
 // Note: We need to access them via global keyword
 
-function imagecreatetruecolor(int $width, int $height)
+function imagecreatetruecolor(int $width, int $height): GdImage|false
 {
     global $mockImageCreateTrueColor;
     if (isset($mockImageCreateTrueColor) && ! $mockImageCreateTrueColor) {
@@ -17,7 +17,7 @@ function imagecreatetruecolor(int $width, int $height)
     return \imagecreatetruecolor($width, $height);
 }
 
-function imagecolorallocate(GdImage $image, int $red, int $green, int $blue)
+function imagecolorallocate(GdImage $image, int $red, int $green, int $blue): int|false
 {
     global $mockImageColorAllocate;
     if (isset($mockImageColorAllocate) && ! $mockImageColorAllocate) {
@@ -27,7 +27,7 @@ function imagecolorallocate(GdImage $image, int $red, int $green, int $blue)
     return \imagecolorallocate($image, $red, $green, $blue);
 }
 
-function imagecolorallocatealpha(GdImage $image, int $red, int $green, int $blue, int $alpha)
+function imagecolorallocatealpha(GdImage $image, int $red, int $green, int $blue, int $alpha): int|false
 {
     global $mockImageColorAllocate;
     if (isset($mockImageColorAllocate) && ! $mockImageColorAllocate) {

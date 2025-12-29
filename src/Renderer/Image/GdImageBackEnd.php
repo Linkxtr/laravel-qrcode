@@ -54,7 +54,6 @@ final class GdImageBackEnd implements ImageBackEndInterface
         imagesavealpha($this->image, true);
 
         $rgb = $backgroundColor->toRgb();
-        $rgb = $backgroundColor->toRgb();
         $alpha = $this->resolveAlpha($backgroundColor);
 
         $color = imagecolorallocatealpha(
