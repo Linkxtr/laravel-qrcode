@@ -1,8 +1,5 @@
 <?php
 
-namespace Linkxtr\QrCode\Tests\DataTypes;
-
-use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\SMS;
 
 covers(SMS::class);

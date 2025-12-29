@@ -1,7 +1,5 @@
 <?php
 
-namespace Linkxtr\QrCode\Tests;
-
 use Linkxtr\QrCode\Generator;
 
 test('it merges image into svg qrcode', function () {

@@ -1,7 +1,5 @@
 <?php
 
-namespace Tests\DataTypes;
-
 use Linkxtr\QrCode\DataTypes\VCard;
 
 it('generates a vCard string from direct array', function () {

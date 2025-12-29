@@ -29,6 +29,9 @@ final class GdImageBackEnd implements ImageBackEndInterface
 
     public function __construct(string $format = 'png')
     {
+        if (! in_array($format, ['png', 'webp'], true)) {
+            throw new \InvalidArgumentException("GdImageBackEnd only supports 'png' or 'webp' formats. '{$format}' is not supported.");
+        }
         $this->format = $format;
     }
 
@@ -51,16 +54,8 @@ final class GdImageBackEnd implements ImageBackEndInterface
         imagesavealpha($this->image, true);
 
         $rgb = $backgroundColor->toRgb();
-        $alpha = 0;
-
-        if ($backgroundColor instanceof Alpha) {
-            // Convert 0-100 alpha to 0-127 GD alpha (0 is opaque, 127 is transparent in GD)
-            // BaconQrCode Alpha is 0 (transparent) to 100 (opaque) usually?
-            // Let's double check implementation of drawPathWithColor which uses:
-            // $alpha = max(0, min(127, (int) (127 - ($alphaValue / 100 * 127))));
-            // So Alpha->getAlpha() returns opacity percentage (0-100).
-            $alpha = max(0, min(127, (int) (127 - ($backgroundColor->getAlpha() / 100 * 127))));
-        }
+        $rgb = $backgroundColor->toRgb();
+        $alpha = $this->resolveAlpha($backgroundColor);
 
         $color = imagecolorallocatealpha(
             $this->image,
@@ -115,13 +110,7 @@ final class GdImageBackEnd implements ImageBackEndInterface
         }
 
         $rgb = $color->toRgb();
-        $alphaValue = 0;
-
-        if ($color instanceof Alpha) {
-            $alphaValue = $color->getAlpha();
-        }
-
-        $alpha = max(0, min(127, (int) (127 - ($alphaValue / 100 * 127))));
+        $alpha = $this->resolveAlpha($color);
         $gdColor = imagecolorallocatealpha(
             $this->image,
             max(0, min(255, (int) $rgb->getRed())),
@@ -239,5 +228,19 @@ final class GdImageBackEnd implements ImageBackEndInterface
             $m[0] * $x + $m[2] * $y + $m[4],
             $m[1] * $x + $m[3] * $y + $m[5],
         ];
+    }
+
+    /**
+     * Convert alpha (0-100) to GD alpha (0-127).
+     *
+     * @return int<0, 127>
+     */
+    private function resolveAlpha(ColorInterface $color): int
+    {
+        if ($color instanceof Alpha) {
+            return max(0, min(127, (int) (127 - ($color->getAlpha() / 100 * 127))));
+        }
+
+        return 0;
     }
 }

@@ -1,49 +1,19 @@
 <?php
 
-namespace Linkxtr\QrCode\Renderer\Image;
-
-// Globals to control mocks
-$mockImageCreateTrueColor = true;
-$mockImageColorAllocate = true;
-
-function imagecreatetruecolor(int $width, int $height)
-{
-    global $mockImageCreateTrueColor;
-    if (isset($mockImageCreateTrueColor) && ! $mockImageCreateTrueColor) {
-        return false;
-    }
-
-    return \imagecreatetruecolor($width, $height);
-}
-
-function imagecolorallocate(\GdImage $image, int $red, int $green, int $blue)
-{
-    global $mockImageColorAllocate;
-    if (isset($mockImageColorAllocate) && ! $mockImageColorAllocate) {
-        return false;
-    }
-
-    return \imagecolorallocate($image, $red, $green, $blue);
-}
-
-function imagecolorallocatealpha(\GdImage $image, int $red, int $green, int $blue, int $alpha)
-{
-    global $mockImageColorAllocate;
-    if (isset($mockImageColorAllocate) && ! $mockImageColorAllocate) {
-        return false;
-    }
-
-    return \imagecolorallocatealpha($image, $red, $green, $blue, $alpha);
-}
-
-namespace Tests\GdImageBackEnd;
+require_once __DIR__.'/../../Helpers/GdMocks.php';
+require_once __DIR__.'/../../Overrides.php';
 
 use BaconQrCode\Exception\RuntimeException;
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Rgb;
-use BaconQrCode\Renderer\Path\Move;
 use BaconQrCode\Renderer\Path\Path;
+use Illuminate\Support\HtmlString;
+use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\Renderer\Image\GdImageBackEnd;
+
+// Globals to control mocks
+global $mockImageCreateTrueColor;
+global $mockImageColorAllocate;
 
 test('GdImageBackEnd exceptions and edge cases', function () {
     $backend = new GdImageBackEnd;
@@ -160,10 +130,61 @@ test('GdImageBackEnd flushPolygon defensive check', function () {
 
     $reflection = new \ReflectionClass($backend);
     $method = $reflection->getMethod('flushPolygon');
-    $method->setAccessible(true);
 
     // Call with some points, should return early and not error
     $method->invoke($backend, [0, 0, 10, 10, 20, 20], 0);
 
     expect(true)->toBeTrue(); // Just assert we reached here without error
+});
+
+test('GdImageBackEnd constructor validates format', function () {
+    // Valid formats
+    new GdImageBackEnd('png');
+    new GdImageBackEnd('webp');
+
+    expect(true)->toBeTrue();
+});
+
+test('GdImageBackEnd constructor throws exception for invalid format', function () {
+    expect(fn () => new GdImageBackEnd('jpg'))
+        ->toThrow(InvalidArgumentException::class, "GdImageBackEnd only supports 'png' or 'webp' formats. 'jpg' is not supported.");
+
+    expect(fn () => new GdImageBackEnd('svg'))
+        ->toThrow(InvalidArgumentException::class, "GdImageBackEnd only supports 'png' or 'webp' formats. 'svg' is not supported.");
+});
+
+test('GD backend full coverage', function () {
+    if (! extension_loaded('gd')) {
+        $this->markTestSkipped('The GD extension is required for this test.');
+    }
+
+    global $mockImagickLoaded;
+    $mockImagickLoaded = false;
+
+    try {
+        // Standard generation (PNG)
+        $generator = new Generator;
+        $generator->format('png');
+        expect($generator->getFormatter())->toBeInstanceOf(GdImageBackEnd::class);
+        $result = $generator->generate('test content');
+        expect($result)->toBeInstanceOf(HtmlString::class);
+
+        // Standard generation (WebP)
+        $generator->format('webp');
+        expect($generator->getFormatter())->toBeInstanceOf(GdImageBackEnd::class);
+        $generator->generate('test content');
+
+        // Gradient generation (covers drawPathWithGradient)
+        $generator->format('png')
+            ->gradient(0, 0, 0, 255, 255, 255, 'vertical')
+            ->generate('gradient test');
+
+        // Alpha transparency (covers background color alpha logic)
+        $generator->format('png')
+            ->backgroundColor(255, 255, 255, 50)
+            ->generate('alpha test');
+
+    } finally {
+        $mockImagickLoaded = true;
+    }
 });

@@ -115,11 +115,18 @@ QrCode::vCard([
     'title' => 'Developer',
     'url' => 'https://example.com'
 ]);
+
+// Calendar Event
+QrCode::calendar([
+    'summary' => 'Laracon US',
+    'description' => 'The official Laravel conference.',
+    'location' => 'New York, NY',
+    'start' => Carbon::create(2024, 8, 27, 9, 0, 0),
+    'end' => Carbon::create(2024, 8, 28, 17, 0, 0),
+]);
 ```
 
 ### 🆕 Coming in Version 2
-
-- 📅 Calendar events
 
 - 🎯 More styling options
 
@@ -226,7 +233,7 @@ QrCode::size(250)
 We're actively working on Version 2 with these planned features:
 
 - [x] vCard data type
-- [ ] Calendar event data type
+- [x] Calendar event data type
 - [x] WebP format support
 - [ ] Animated QR codes
 - [ ] Bitcoin payment QR codes
@@ -274,10 +281,16 @@ QrCode::size(400)
 
 - `generate($text, $filename = null)` - Generate QR code
 - `size($size)` - Set size in pixels
-- `color($red, $green, $blue)` - Set QR color
-- `backgroundColor($red, $green, $blue)` - Set background color
+- `color($red, $green, $blue, $alpha = null)` - Set QR color (alpha 0-127)
+- `backgroundColor($red, $green, $blue, $alpha = null)` - Set background color (alpha 0-127)
+- `style($style)` - Set style (dot, square, round)
+- `eye($style)` - Set eye style (circle, square)
+- `gradient($startRed, $startGreen, $startBlue, $endRed, $endGreen, $endBlue, $type)` - Set gradient color
+- `format($format)` - Set format (svg, png, eps, webp)
 - `margin($margin)` - Set margin size
-- `format($format)` - Set format (svg, png, eps)
+- `errorCorrection($level)` - Set error correction level (L, M, Q, H)
+- `encoding($encoding)` - Set character encoding
+- `merge($image, $percentage, $absolute)` - Merge image/logo
 
 ### Data Type Methods
 
@@ -288,6 +301,7 @@ QrCode::size(400)
 - `wiFi($config)` - Generate WiFi QR
 - `btc($config)` - Generate BTC QR
 - `vCard($config)` - Generate vCard QR
+- `calendar($config)` - Generate Calendar Event QR
 
 ## 📄 License
 
