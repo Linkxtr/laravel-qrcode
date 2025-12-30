@@ -1,9 +1,8 @@
 <?php
 
-namespace Linkxtr\QrCode\Tests\DataTypes;
-
-use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\PhoneNumber;
+
+covers(PhoneNumber::class);
 
 beforeEach(function () {
     $this->phoneNumber = new PhoneNumber;

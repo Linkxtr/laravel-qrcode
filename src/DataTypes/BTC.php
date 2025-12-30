@@ -4,7 +4,7 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
 
-class BTC implements DataTypeInterface
+final class BTC implements DataTypeInterface
 {
     protected string $prefix = 'bitcoin:';
 
@@ -36,7 +36,7 @@ class BTC implements DataTypeInterface
      */
     protected function setProperties(array $arguments): void
     {
-        if (! isset($arguments[0]) || ! isset($arguments[1])) {
+        if (count($arguments) < 2) {
             throw new InvalidArgumentException('Bitcoin address and amount are required.');
         }
 
@@ -57,7 +57,7 @@ class BTC implements DataTypeInterface
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param  array<mixed>  $options
      */
     protected function setOptions(array $options): void
     {
@@ -76,12 +76,14 @@ class BTC implements DataTypeInterface
 
     protected function buildBitCoinString(): string
     {
-        $params = array_filter([
+        $params = [
             'amount' => $this->amount,
             'label' => $this->label,
             'message' => $this->message,
             'r' => $this->returnAddress,
-        ]);
+        ];
+
+        $params = array_filter($params, fn ($value) => $value !== null);
 
         return $this->prefix.$this->address.'?'.http_build_query($params);
     }

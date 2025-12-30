@@ -1,9 +1,8 @@
 <?php
 
-namespace Linkxtr\QrCode\Tests\DataTypes;
-
-use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\WiFi;
+
+covers(WiFi::class);
 
 beforeEach(function () {
     $this->wifi = new WiFi;
@@ -51,6 +50,12 @@ it('should generate a valid WiFi QR code for a hidden SSID and password', functi
 
 it('throws an exception when SSID is missing', function () {
     expect(fn () => $this->wifi->create([]))
+        ->toThrow(InvalidArgumentException::class);
+    expect(fn () => $this->wifi->create([
+        0 => [
+            'ssid' => '',
+        ],
+    ]))
         ->toThrow(InvalidArgumentException::class);
     expect(fn () => $this->wifi->create([
         0 => [

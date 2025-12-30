@@ -30,8 +30,9 @@ use BadMethodCallException;
 use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\DataTypeInterface;
+use Linkxtr\QrCode\Renderer\Image\GdImageBackEnd;
 
-class QrCode
+final class Generator
 {
     /**
      * The output format.
@@ -65,10 +66,10 @@ class QrCode
      * SHIFT-JIS, WINDOWS-1250, WINDOWS-1251, WINDOWS-1252, WINDOWS-1256,
      * UTF-16BE, UTF-8, ASCII, GBK, EUC-KR.
      */
-    protected string $encoding = Encoder::DEFAULT_BYTE_MODE_ECODING;
+    protected string $encoding = Encoder::DEFAULT_BYTE_MODE_ENCODING;
 
     /**
-     * The style of the blocks within the QrCode.
+     * The style of the blocks within the QR code.
      * Possible values are 'square', 'dot' and 'round'.
      */
     protected string $style = 'square';
@@ -103,27 +104,26 @@ class QrCode
     protected array $eyeColors = [];
 
     /**
-     * The gradient to apply to the QrCode.
+     * The gradient to apply to the QR code.
      *
      * @var ?Gradient
      */
     protected $gradient = null;
 
     /**
-     * Holds an image string that will be merged with the QrCode.
+     * Holds an image string that will be merged with the QR code.
      */
     protected ?string $imageMerge = null;
 
     /**
      * The percentage that a merged image should take over the source image.
      */
-    protected float $imagePercentage = 0.2;
+    protected float $imagePercentage = .2;
 
     /**
      * @param  array<int, mixed>  $arguments
-     * @return string|void|\Illuminate\Support\HtmlString
      */
-    public function __call(string $method, array $arguments)
+    public function __call(string $method, array $arguments): HtmlString
     {
         $dataType = $this->createClass($method);
         $dataType->create($arguments);
@@ -131,29 +131,40 @@ class QrCode
         return $this->generate(strval($dataType));
     }
 
-    /**
-     * @return string|void|\Illuminate\Support\HtmlString
-     */
-    public function generate(string $text, ?string $filename = null)
+    public function generate(string $text, ?string $filename = null): HtmlString
     {
         $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrection);
 
-        if ($this->imageMerge !== null && $this->format === 'png') {
-            $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge));
-            $qrCode = $merger->merge($this->imagePercentage);
+        if ($this->imageMerge !== null) {
+            $qrCode = $this->mergeImage($qrCode);
         }
 
         if ($filename) {
-            file_put_contents($filename, $qrCode);
-
-            return;
+            if (file_put_contents($filename, $qrCode) === false) {
+                throw new \RuntimeException("Failed to write QR code to file: {$filename}");
+            }
         }
 
-        if (class_exists(HtmlString::class)) {
-            return new HtmlString($qrCode);
+        return new HtmlString($qrCode);
+    }
+
+    protected function mergeImage(string $qrCode): string
+    {
+        assert($this->imageMerge !== null);
+
+        if ($this->format === 'png' || $this->format === 'webp') {
+            $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
+
+            return $merger->merge($this->imagePercentage);
         }
 
-        return $qrCode;
+        if ($this->format === 'svg') {
+            $merger = new SvgImageMerge($qrCode, $this->imageMerge, $this->imagePercentage);
+
+            return $merger->merge();
+        }
+
+        throw new InvalidArgumentException(sprintf('Image merge is not supported for %s format.', $this->format));
     }
 
     public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self
@@ -185,8 +196,8 @@ class QrCode
 
     public function format(string $format): self
     {
-        if (! in_array($format, ['svg', 'eps', 'png'])) {
-            throw new InvalidArgumentException("\$format must be svg, eps, or png. {$format} is not a valid.");
+        if (! in_array($format, ['svg', 'eps', 'png', 'webp'])) {
+            throw new InvalidArgumentException("\$format must be svg, eps, png, or webp. {$format} is not a valid format.");
         }
 
         $this->format = $format;
@@ -226,6 +237,10 @@ class QrCode
     {
         $type = strtoupper($type);
 
+        if (! in_array($type, ['VERTICAL', 'HORIZONTAL', 'DIAGONAL', 'INVERSE_DIAGONAL', 'RADIAL'])) {
+            throw new InvalidArgumentException("\$type must be VERTICAL or HORIZONTAL or DIAGONAL or INVERSE_DIAGONAL or RADIAL. {$type} is not a valid gradient type.");
+        }
+
         $this->gradient = new Gradient(
             $this->createColor($startRed, $startGreen, $startBlue),
             $this->createColor($endRed, $endGreen, $endBlue),
@@ -249,11 +264,11 @@ class QrCode
     public function style(string $style, float $size = 0.5): self
     {
         if (! in_array($style, ['square', 'dot', 'round'])) {
-            throw new InvalidArgumentException("\$style must be square, dot, or round. {$style} is not a valid.");
+            throw new InvalidArgumentException("\$style must be square, dot, or round. {$style} is not a valid style.");
         }
 
-        if ($size < 0 || $size >= 1) {
-            throw new InvalidArgumentException("\$size must be between 0 and 1.  {$size} is not valid.");
+        if ($size <= 0 || $size > 1) {
+            throw new InvalidArgumentException("\$size must be greater than 0 and less than or equal to 1. {$size} is not valid.");
         }
 
         $this->style = $style;
@@ -272,6 +287,11 @@ class QrCode
     public function errorCorrection(string $errorCorrection): self
     {
         $errorCorrection = strtoupper($errorCorrection);
+
+        if (! in_array($errorCorrection, ['L', 'M', 'Q', 'H'])) {
+            throw new InvalidArgumentException("\$errorCorrection must be L, M, Q, or H. {$errorCorrection} is not a valid error correction level.");
+        }
+
         $this->errorCorrection = ErrorCorrectionLevel::$errorCorrection();
 
         return $this;
@@ -307,7 +327,27 @@ class QrCode
     public function getFormatter(): ImageBackEndInterface
     {
         if ($this->format === 'png') {
-            return new ImagickImageBackEnd('png');
+            if (extension_loaded('imagick')) {
+                return new ImagickImageBackEnd('png');
+            }
+
+            if (extension_loaded('gd')) {
+                return new GdImageBackEnd('png');
+            }
+
+            throw new \RuntimeException('The imagick or gd extension is required to generate PNG QR codes.');
+        }
+
+        if ($this->format === 'webp') {
+            if (extension_loaded('imagick')) {
+                return new ImagickImageBackEnd('webp');
+            }
+
+            if (extension_loaded('gd')) {
+                return new GdImageBackEnd('webp');
+            }
+
+            throw new \RuntimeException('The imagick or gd extension is required to generate WebP QR codes.');
         }
 
         if ($this->format === 'eps') {
@@ -375,14 +415,18 @@ class QrCode
             throw new BadMethodCallException;
         }
 
+        $reflection = new \ReflectionClass($class);
+
+        if ($reflection->getShortName() !== $method) {
+            throw new BadMethodCallException;
+        }
+
         return new $class;
     }
 
     /** @return class-string<DataTypeInterface> */
     protected function formatClass(string $method): string
     {
-        $method = ucfirst($method);
-
         /** @var class-string<DataTypeInterface> */
         $class = "Linkxtr\QrCode\DataTypes\\".$method;
 

@@ -4,15 +4,15 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
 
-class WiFi implements DataTypeInterface
+final class WiFi implements DataTypeInterface
 {
     protected string $prefix = 'WIFI:';
 
-    protected string $ssid = '';
+    protected string $ssid;
 
-    protected string $password = '';
+    protected string $password;
 
-    protected bool $hidden = false;
+    protected bool $hidden;
 
     protected string $separator = ';';
 
@@ -59,16 +59,16 @@ class WiFi implements DataTypeInterface
     {
         $wifi = $this->prefix;
 
-        if ($this->password !== '') {
+        if (isset($this->password)) {
             $wifi .= 'T:WPA'.$this->separator;
         }
-        if ($this->ssid !== '') {
-            $wifi .= 'S:'.$this->ssid.$this->separator;
-        }
-        if ($this->password !== '') {
+
+        $wifi .= 'S:'.$this->ssid.$this->separator;
+
+        if (isset($this->password)) {
             $wifi .= 'P:'.$this->password.$this->separator;
         }
-        if ($this->hidden) {
+        if (isset($this->hidden) && $this->hidden) {
             $wifi .= 'H:true'.$this->separator;
         }
 
