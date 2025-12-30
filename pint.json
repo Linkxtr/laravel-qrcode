@@ -1,6 +1,6 @@
 {
-    "preset": "laravel",
-    "rules": {
-      "ordered_imports": true
-    }
+  "preset": "laravel",
+  "rules": {
+    "ordered_imports": true
+  }
 }
