@@ -123,11 +123,18 @@ Describe alternatives you've considered.
 Add any other context about the feature request.
 ```
 
+### Branching Strategy
+
+- **`main`**: Active development for Version 2.x. Target this branch for new features and non-critical bug fixes.
+- **`1.x`**: LTS/Maintenance for Version 1.x. Target this branch ONLY for critical bug fixes and security updates for V1.
+
 ### Pull Requests
 
 1. **Fork the Repository**
 2. **Commit Your Changes**
 3. **Open a Pull Request**
+   - If fixing a bug in V1, base your PR on `1.x`.
+   - If adding a feature or fixing V2, base your PR on `main`.
 
 ## 📝 Development Guidelines
 
@@ -163,10 +170,10 @@ use Linkxtr\QrCode\QrCode;
 it('generates basic qr code', function (){
     $result = (new QrCode)->->format('svg')->generate('Test Content');
 
-    expect($result)->toBeString()->toBeContins('<svg');
+    expect($result)->toBeString()->toContain('<svg');
 });
 
-it('handels size parameter correctly', function() {
+it('handles size parameter correctly', function() {
     // Test implementation
 });
 ```
@@ -245,7 +252,7 @@ composer update
 Before submitting a PR, ensure:
 
 - [ ] Tests are added/updated and all pass
-- [ ] PHPstan analysis is pass
+- [ ] PHPStan analysis passes
 - [ ] Documentation is updated
 - [ ] Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/)
 - [ ] PR description includes context and related issues

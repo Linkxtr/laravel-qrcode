@@ -60,7 +60,27 @@ composer require linkxtr/laravel-qrcode:^2.0
 
 ### 2. Update Your Code
 
-TODO
+#### A. Color Methods
+
+The `color` and `backgroundColor` methods now strictly require integer values (0-255). If you were passing strings or other types, please update them.
+
+```php
+// Old (if applicable) or Invalid
+QrCode::color('255', '0', '0');
+
+// New
+QrCode::color(255, 0, 0);
+```
+
+#### B. Handling Return Types
+
+Version 2.0 ensures stricter return types. Ensure your code expects `Linkxtr\LaravelQrCode\Generator` instances when chaining methods, and the correct string/response format when calling `generate()`.
+
+#### C. Review Custom Logic
+
+If you extended any classes from the package, check for namespace changes, specifically around `BaconQrCode` as the underlying library upgraded from v2 to v3.
+
+- `BaconQrCode\Writer` is now `BaconQrCode\Writer\Writer`.
 
 ## Support
 

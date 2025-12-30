@@ -9,8 +9,10 @@ A simple and easy-to-use QR Code generator for Laravel, based on the `bacon/baco
 
 **Note:** This is version `2.x`.
 
-- If you need **Laravel 10** support, please use [version 1.x](https://github.com/Linkxtr/laravel-qrcode/tree/1.x).
+- **Version 2.x** is the current stable release, requiring PHP 8.2+ and Laravel 11+.
+- **Version 1.x** is the LTS/Maintenance version. If you need **Laravel 10** support or PHP 8.1, please use [version 1.x](https://github.com/Linkxtr/laravel-qrcode/tree/1.x).
 - Version 2.x drops compatibility with `simplesoftwareio/simple-qrcode` to provide a more streamlined API.
+- 📚 **Upgrading?** Check out the [Upgrade Guide](docs/UPGRADE-2.0.md).
 
 ## Requirements
 
@@ -125,10 +127,6 @@ QrCode::calendar([
     'end' => Carbon::create(2024, 8, 28, 17, 0, 0),
 ]);
 ```
-
-### 🆕 Coming in Version 2
-
-- 🎯 More styling options
 
 ## 🔧 Advanced Usage
 

@@ -67,6 +67,9 @@
       ],
       "aliases": {
         "QrCode": "Linkxtr\\QrCode\\Facades\\QrCode"
+      },
+      "branch-alias": {
+        "dev-main": "2.x-dev"
       }
     }
   },
