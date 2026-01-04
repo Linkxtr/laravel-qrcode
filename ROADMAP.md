@@ -50,9 +50,61 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 - [ ] **MeCard Support**
+
   ```php
   QrCode::meCard('John Doe', '+1234567890', 'john@example.com');
   ```
+
+- [ ] **Messaging & Communication**
+
+  - **WhatsApp**
+    ```php
+    QrCode::whatsapp('1234567890', 'Hello World');
+    ```
+  - **Telegram**
+    ```php
+    QrCode::telegram('username');
+    ```
+  - **Skype**
+    ```php
+    QrCode::skype('username', 'call');
+    ```
+  - **Zoom**
+    ```php
+    QrCode::zoom('meeting-id', 'password');
+    ```
+  - **FaceTime**
+    ```php
+    QrCode::facetime('user@example.com');
+    ```
+
+- [ ] **Payments**
+
+  - **PayPal**
+    ```php
+    QrCode::paypal('user@example.com', 10.00, 'USD', 'Payment Description');
+    ```
+  - **UPI (Unified Payments Interface)**
+    ```php
+    QrCode::upi('payee@upi', 'Payee Name', 100.00, 'Note');
+    ```
+  - **EPC (SEPA Credit Transfer)**
+    ```php
+    QrCode::epc([
+        'iban' => 'DE1234...',
+        'bic' => 'GENO...',
+        'name' => 'Recipient Name',
+        'amount' => 50.00,
+        'purpose' => 'Invoice 123'
+    ]);
+    ```
+
+- [ ] **Utilities**
+  - **App Store / Google Play**
+    ```php
+    QrCode::appStore('https://apps.apple.com/app/id...');
+    QrCode::googlePlay('com.example.app');
+    ```
 
 ### New Formats
 
