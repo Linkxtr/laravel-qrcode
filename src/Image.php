@@ -57,6 +57,7 @@ final class Image
 
     public function setImageResource(GdImage $image): void
     {
+        $this->image = null;
         $this->image = $image;
     }
 }

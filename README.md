@@ -18,7 +18,7 @@ A simple and easy-to-use QR Code generator for Laravel, based on the `bacon/baco
 
 - PHP 8.2 or higher
 - Laravel 11.0 or higher
-- `ext-imagick` extension (optional, but recommended for better performance). If `imagick` is not available, the package will automatically fallback to using `gd` for PNG and WebP generation.
+- `ext-imagick` or `ext-gd` extension. The package automatically detects which extension is available, with `imagick` being preferred for better performance.
 
 ## 📦 Installation
 
@@ -119,6 +119,8 @@ QrCode::vCard([
 ]);
 
 // Calendar Event
+use Carbon\Carbon;
+
 QrCode::calendar([
     'summary' => 'Laracon US',
     'description' => 'The official Laravel conference.',

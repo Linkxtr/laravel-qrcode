@@ -32,6 +32,10 @@ final class ImageMerge
 
     public function __construct(Image $sourceImage, Image $mergeImage, string $format = 'png')
     {
+        if (! in_array($format, ['png', 'webp'], true)) {
+            throw new InvalidArgumentException("ImageMerge only supports 'png' or 'webp' formats.");
+        }
+
         $this->sourceImage = $sourceImage;
         $this->mergeImage = $mergeImage;
         $this->format = $format;
