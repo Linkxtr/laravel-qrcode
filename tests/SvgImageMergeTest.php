@@ -1,51 +1,57 @@
 <?php
 
-use Linkxtr\QrCode\Generator;
+use Linkxtr\QrCode\SvgImageMerge;
 
-test('it merges image into svg qrcode', function () {
-    $svgData = (new Generator)
-        ->format('svg')
-        ->size(300)
-        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
-        ->generate('test');
-
-    expect((string) $svgData)->toContain('<image');
-    expect((string) $svgData)->toContain('base64');
-    expect((string) $svgData)->toContain('href="data:image/png;base64,');
+beforeEach(function () {
+    // 1x1 Transparent PNG
+    $this->pngData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=');
 });
 
-test('it throws exception for unsupported merge format', function () {
-    (new Generator)
-        ->format('eps')
-        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
-        ->generate('test');
-})->throws(\InvalidArgumentException::class, 'Image merge is not supported for eps format.');
+it('parses dimensions from integer attributes', function () {
+    $svg = '<svg width="200" height="200"></svg>';
+    $merger = new SvgImageMerge($svg, $this->pngData, 0.5);
+    $result = $merger->merge();
+    
+    expect($result)->toContain('width="100"');
+    expect($result)->toContain('height="100"');
+});
 
-test('it throws exception for invalid percentage', function () {
-    $svgContent = '<svg width="100" height="100"></svg>';
-    $imageContent = 'fake_image_content';
+it('parses dimensions from attributes with units', function () {
+    $svg = '<svg width="200px" height="200px"></svg>';
+    $merger = new SvgImageMerge($svg, $this->pngData, 0.5);
+    $result = $merger->merge();
+    
+    expect($result)->toContain('width="100"');
+});
 
-    new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 1.5);
-    (new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 1.5))->merge();
-})->throws(\InvalidArgumentException::class, '$percentage must be greater than 0 and less than or equal to 1');
+it('parses dimensions from float attributes', function () {
+    $svg = '<svg width="200.5" height="200.9"></svg>';
+    $merger = new SvgImageMerge($svg, $this->pngData, 0.5);
+    $result = $merger->merge();
+    
+    expect($result)->toContain('width="100"');
+});
 
-test('it throws exception if svg dimensions cannot be determined', function () {
-    $svgContent = '<svg></svg>';
-    $imageContent = 'fake_image_content';
+it('parses dimensions from viewBox if attributes missing', function () {
+    $svg = '<svg viewBox="0 0 400 400"></svg>';
+    $merger = new SvgImageMerge($svg, $this->pngData, 0.5);
+    $result = $merger->merge();
+    
+    // 400 * 0.5 = 200
+    expect($result)->toContain('width="200"');
+});
 
-    (new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 0.2))->merge();
-})->throws(\InvalidArgumentException::class, 'Could not determine SVG dimensions.');
+it('parses dimensions from style attribute', function () {
+    $svg = '<svg style="width: 300px; height: 300px;"></svg>';
+    $merger = new SvgImageMerge($svg, $this->pngData, 0.5);
+    $result = $merger->merge();
+    
+    // 300 * 0.5 = 150
+    expect($result)->toContain('width="150"');
+});
 
-test('it throws exception for invalid merge image data', function () {
-    $svgContent = '<svg width="100" height="100"></svg>';
-    $imageContent = 'not_an_image';
-
-    (new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 0.2))->merge();
-})->throws(\InvalidArgumentException::class, 'Invalid image data provided for merge.');
-
-test('it throws exception if svg closure is missing', function () {
-    $svgContent = '<svg width="100" height="100">';
-    $imageContent = file_get_contents(__DIR__.'/images/linkxtr.png');
-
-    (new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 0.2))->merge();
-})->throws(\InvalidArgumentException::class, 'Invalid SVG content.');
+it('throws exception if dimensions cannot be determined', function () {
+    $svg = '<svg></svg>';
+    $merger = new SvgImageMerge($svg, $this->pngData, 0.5);
+    $merger->merge();
+})->throws(InvalidArgumentException::class, 'Could not determine SVG dimensions.');

@@ -2,6 +2,7 @@
 
 namespace Linkxtr\QrCode;
 
+use DOMDocument;
 use InvalidArgumentException;
 
 final class SvgImageMerge
@@ -25,16 +26,55 @@ final class SvgImageMerge
             throw new InvalidArgumentException('$percentage must be greater than 0 and less than or equal to 1');
         }
 
-        // Parse SVG to get width and height
-        preg_match('/width="(\d+)"/', $this->svgContent, $widthMatch);
-        preg_match('/height="(\d+)"/', $this->svgContent, $heightMatch);
+        $doc = new DOMDocument();
+        $internalErrors = libxml_use_internal_errors(true);
+        
+        // Load SVG with strict XML parser options if needed, but default is usually strict enough
+        // Handle empty or invalid content
+        if (! $this->svgContent || ! $doc->loadXML($this->svgContent)) {
+            libxml_clear_errors();
+            libxml_use_internal_errors($internalErrors);
+            throw new InvalidArgumentException('Invalid SVG content.');
+        }
+        libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
 
-        if (! isset($widthMatch[1]) || ! isset($heightMatch[1])) {
-            throw new InvalidArgumentException('Could not determine SVG dimensions.');
+        $svg = $doc->documentElement;
+        if (! $svg) {
+            throw new InvalidArgumentException('Invalid SVG content.');
         }
 
-        $svgWidth = (int) $widthMatch[1];
-        $svgHeight = (int) $heightMatch[1];
+        $svgWidth = $this->getDimension($svg->getAttribute('width'));
+        $svgHeight = $this->getDimension($svg->getAttribute('height'));
+
+        // Fallback to viewBox
+        if ($svgWidth === null || $svgHeight === null) {
+            $viewBox = $svg->getAttribute('viewBox');
+            if ($viewBox) {
+                $parts = preg_split('/[\s,]+/', trim($viewBox));
+                if ($parts !== false && count($parts) === 4) {
+                    $svgWidth = $svgWidth ?? (float) $parts[2];
+                    $svgHeight = $svgHeight ?? (float) $parts[3];
+                }
+            }
+        }
+
+        // Fallback to style attribute
+        if ($svgWidth === null || $svgHeight === null) {
+            $style = $svg->getAttribute('style');
+            if ($style) {
+                if ($svgWidth === null && preg_match('/width:\s*([\d.]+)(\w*)/', $style, $matches)) {
+                   $svgWidth = (float) $matches[1];
+                }
+                if ($svgHeight === null && preg_match('/height:\s*([\d.]+)(\w*)/', $style, $matches)) {
+                   $svgHeight = (float) $matches[1];
+                }
+            }
+        }
+
+        if ($svgWidth === null || $svgHeight === null) {
+            throw new InvalidArgumentException('Could not determine SVG dimensions.');
+        }
 
         // Prepare image data
         $base64Image = base64_encode($this->mergeImageContent);
@@ -42,28 +82,24 @@ final class SvgImageMerge
         $imageUri = "data:{$mimeType};base64,{$base64Image}";
 
         // Calculate dimensions for the merged image
-        // We need to know the aspect ratio of the merge image to calculate dimensions correctly
-        // Since we have the raw content, we can use getimagesizefromstring if available or create a gd resource
         $mergeImageWidth = 0;
         $mergeImageHeight = 0;
 
-        // Try to get dimensions using GD
         $img = false;
-        set_error_handler(function () {
-            return true;
-        });
-
-        $img = imagecreatefromstring($this->mergeImageContent);
-
-        restore_error_handler();
+        $internalErrors = libxml_use_internal_errors(true); // Suppress GD warnings too just in case
+        // Actually GD warning suppression is done via set_error_handler in previous code
+        
+        try {
+             $img = @imagecreatefromstring($this->mergeImageContent);
+        } catch (\Throwable $e) {
+            // ignore
+        }
 
         if ($img !== false) {
             $mergeImageWidth = imagesx($img);
             $mergeImageHeight = imagesy($img);
-            unset($img);
+            // Destroy not strictly needed in modern PHP as resources are objects
         } else {
-            // Fallback or error? If we can't determine size, we might assume square or throw error.
-            // Given the requirements, we should probably throw an error if the image is invalid.
             throw new InvalidArgumentException('Invalid image data provided for merge.');
         }
 
@@ -75,23 +111,37 @@ final class SvgImageMerge
         $x = intval(($svgWidth - $targetWidth) / 2);
         $y = intval(($svgHeight - $targetHeight) / 2);
 
-        // Create <image> tag
-        $imageTag = sprintf(
-            '<image x="%d" y="%d" width="%d" height="%d" href="%s" />',
-            $x,
-            $y,
-            $targetWidth,
-            $targetHeight,
-            $imageUri
-        );
+        // Inject image using DOM
+        $imageNode = $doc->createElement('image');
+        $imageNode->setAttribute('x', (string)$x);
+        $imageNode->setAttribute('y', (string)$y);
+        $imageNode->setAttribute('width', (string)$targetWidth);
+        $imageNode->setAttribute('height', (string)$targetHeight);
+        $imageNode->setAttribute('href', $imageUri);
 
-        // Inject before </svg>
-        $pos = strrpos($this->svgContent, '</svg>');
-        if ($pos === false) {
-            throw new InvalidArgumentException('Invalid SVG content.');
+        $svg->appendChild($imageNode);
+
+        $output = $doc->saveXML();
+        
+        if ($output === false) {
+             throw new \RuntimeException('Failed to save SVG XML.');
         }
 
-        return substr_replace($this->svgContent, $imageTag.'</svg>', $pos, strlen('</svg>'));
+        return $output;
+    }
+
+    protected function getDimension(string $value): ?float
+    {
+        if ($value === '') {
+            return null;
+        }
+        
+        // Strip units
+        if (preg_match('/^([\d.]+)/', $value, $matches)) {
+            return (float) $matches[1];
+        }
+
+        return null;
     }
 
     protected function getMimeType(string $content): string
