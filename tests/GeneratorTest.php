@@ -341,7 +341,7 @@ it('throws exception if imagick is not loaded and format is webp', function () {
     } finally {
         $mockImagickLoaded = true;
     }
-})->throws(RuntimeException::class, 'The gd extension is not support webp QR codes.');
+})->throws(RuntimeException::class, 'The gd extension does not support webp QR codes.');
 
 test('webp format is supported', function () {
     $qrCode = (new Generator)->format('webp');

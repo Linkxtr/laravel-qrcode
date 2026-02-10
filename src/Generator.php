@@ -36,6 +36,11 @@ use Linkxtr\QrCode\DataTypes\DataTypeInterface;
 final class Generator
 {
     /**
+     * The PNG compression level.
+     */
+    private const PNG_COMPRESSION_LEVEL = 9;
+
+    /**
      * The output format.
      */
     protected string $format = 'svg';
@@ -312,6 +317,13 @@ final class Generator
 
     public function getRenderer(): RendererInterface
     {
+        if ($this->format === 'svg' || $this->format === 'eps') {
+            return new ImageRenderer(
+                $this->getRendererStyle(),
+                $this->getFormatter()
+            );
+        }
+
         if (extension_loaded('imagick')) {
             return new ImageRenderer(
                 $this->getRendererStyle(),
@@ -321,14 +333,14 @@ final class Generator
 
         if (extension_loaded('gd')) {
             if ($this->format !== 'png') {
-                throw new \RuntimeException('The gd extension is not support '.$this->format.' QR codes.');
+                throw new \RuntimeException('The gd extension does not support '.$this->format.' QR codes.');
             }
 
             return new GDLibRenderer(
                 $this->size,
                 $this->margin,
                 $this->format,
-                9,
+                self::PNG_COMPRESSION_LEVEL,
                 $this->getFill()
             );
         }
