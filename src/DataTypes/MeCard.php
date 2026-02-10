@@ -6,7 +6,7 @@ use InvalidArgumentException;
 
 final class MeCard implements DataTypeInterface
 {
-    protected ?string $name = null;
+    protected string $name;
 
     protected ?string $reading = null;
 
@@ -44,9 +44,12 @@ final class MeCard implements DataTypeInterface
             }
         }
 
-        if (isset($properties['name']) && is_string($properties['name'])) {
-            $this->name = $properties['name'];
+        if (! isset($properties['name']) || ! is_string($properties['name'])) {
+            throw new InvalidArgumentException('MeCard Name is mandatory.');
         }
+
+        $this->name = $properties['name'];
+
         if (isset($properties['reading']) && is_string($properties['reading'])) {
             $this->reading = $properties['reading'];
         }
@@ -83,10 +86,6 @@ final class MeCard implements DataTypeInterface
     public function __toString(): string
     {
         $meCard = 'MECARD:';
-
-        if (! $this->name) {
-            throw new InvalidArgumentException('MeCard Name is mandatory.');
-        }
 
         $meCard .= 'N:'.$this->escapeValue($this->name).';';
 
