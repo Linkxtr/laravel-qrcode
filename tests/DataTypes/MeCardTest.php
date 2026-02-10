@@ -50,12 +50,5 @@ it('escapes special characters', function () {
         'note' => 'A;B:C',
     ]);
 
-    // MeCard escaping rules generally: backslash escapes specific chars or just colons/semicolons depending on parser implementation.
-    // Common practice: escape ; : \ with \
-    // Looking at VCard implementation it escapes multiple chars. MeCard is simpler but commonly ; and : are delimiters.
-    // Let's assume basic escaping for now similar to VCard but maybe adjusted if needed.
-    // Actually standard MeCard often just escapes special chars, let's see.
-    // For now let's expect standard escaping.
-
     expect((string) $meCard)->toBe('MECARD:N:Doe\, John;NOTE:A\;B\:C;;');
 });
