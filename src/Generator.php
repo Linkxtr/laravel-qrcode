@@ -176,7 +176,7 @@ final class Generator
     public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self
     {
         if (function_exists('base_path') && ! $absolute) {
-            $filepath = base_path().$filepath;
+            $filepath = base_path().DIRECTORY_SEPARATOR.$filepath;
         }
 
         $this->imageMerge = file_get_contents($filepath) ?: null;
