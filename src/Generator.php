@@ -11,6 +11,7 @@ use BaconQrCode\Renderer\Eye\EyeInterface;
 use BaconQrCode\Renderer\Eye\ModuleEye;
 use BaconQrCode\Renderer\Eye\SimpleCircleEye;
 use BaconQrCode\Renderer\Eye\SquareEye;
+use BaconQrCode\Renderer\GDLibRenderer;
 use BaconQrCode\Renderer\Image\EpsImageBackEnd;
 use BaconQrCode\Renderer\Image\ImageBackEndInterface;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
@@ -20,6 +21,7 @@ use BaconQrCode\Renderer\Module\DotsModule;
 use BaconQrCode\Renderer\Module\ModuleInterface;
 use BaconQrCode\Renderer\Module\RoundnessModule;
 use BaconQrCode\Renderer\Module\SquareModule;
+use BaconQrCode\Renderer\RendererInterface;
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Fill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
@@ -30,10 +32,14 @@ use BadMethodCallException;
 use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Linkxtr\QrCode\DataTypes\DataTypeInterface;
-use Linkxtr\QrCode\Renderer\Image\GdImageBackEnd;
 
 final class Generator
 {
+    /**
+     * The PNG compression level.
+     */
+    private const PNG_COMPRESSION_LEVEL = 9;
+
     /**
      * The output format.
      */
@@ -304,19 +310,42 @@ final class Generator
         return $this;
     }
 
-    public function getWriter(ImageRenderer $renderer): Writer
+    public function getWriter(RendererInterface $renderer): Writer
     {
         return new Writer($renderer);
     }
 
-    public function getRenderer(): ImageRenderer
+    public function getRenderer(): RendererInterface
     {
-        $renderer = new ImageRenderer(
-            $this->getRendererStyle(),
-            $this->getFormatter()
-        );
+        if ($this->format === 'svg' || $this->format === 'eps') {
+            return new ImageRenderer(
+                $this->getRendererStyle(),
+                $this->getFormatter()
+            );
+        }
 
-        return $renderer;
+        if (extension_loaded('imagick')) {
+            return new ImageRenderer(
+                $this->getRendererStyle(),
+                $this->getFormatter()
+            );
+        }
+
+        if (extension_loaded('gd')) {
+            if ($this->format !== 'png') {
+                throw new \RuntimeException('The gd extension does not support '.$this->format.' QR codes.');
+            }
+
+            return new GDLibRenderer(
+                $this->size,
+                $this->margin,
+                $this->format,
+                self::PNG_COMPRESSION_LEVEL,
+                $this->getFill()
+            );
+        }
+
+        throw new \RuntimeException('The imagick or gd extension is required to generate QR codes.');
     }
 
     public function getRendererStyle(): RendererStyle
@@ -327,27 +356,11 @@ final class Generator
     public function getFormatter(): ImageBackEndInterface
     {
         if ($this->format === 'png') {
-            if (extension_loaded('imagick')) {
-                return new ImagickImageBackEnd('png');
-            }
-
-            if (extension_loaded('gd')) {
-                return new GdImageBackEnd('png');
-            }
-
-            throw new \RuntimeException('The imagick or gd extension is required to generate PNG QR codes.');
+            return new ImagickImageBackEnd('png');
         }
 
         if ($this->format === 'webp') {
-            if (extension_loaded('imagick')) {
-                return new ImagickImageBackEnd('webp');
-            }
-
-            if (extension_loaded('gd')) {
-                return new GdImageBackEnd('webp');
-            }
-
-            throw new \RuntimeException('The imagick or gd extension is required to generate WebP QR codes.');
+            return new ImagickImageBackEnd('webp');
         }
 
         if ($this->format === 'eps') {

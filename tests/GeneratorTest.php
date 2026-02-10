@@ -325,26 +325,23 @@ it('throws exception if imagick and gd are not loaded and format is png', functi
     $mockGdLoaded = false;
 
     try {
-        (new Generator)->format('png')->getFormatter();
+        (new Generator)->format('png')->generate('test');
     } finally {
         $mockImagickLoaded = true;
         $mockGdLoaded = true;
     }
-})->throws(RuntimeException::class, 'The imagick or gd extension is required to generate PNG QR codes.');
+})->throws(RuntimeException::class, 'The imagick or gd extension is required to generate QR codes.');
 
-it('throws exception if imagick and gd are not loaded and format is webp', function () {
+it('throws exception if imagick is not loaded and format is webp', function () {
     global $mockImagickLoaded;
-    global $mockGdLoaded;
     $mockImagickLoaded = false;
-    $mockGdLoaded = false;
 
     try {
-        (new Generator)->format('webp')->getFormatter();
+        (new Generator)->format('webp')->generate('test');
     } finally {
         $mockImagickLoaded = true;
-        $mockGdLoaded = true;
     }
-})->throws(RuntimeException::class, 'The imagick or gd extension is required to generate WebP QR codes.');
+})->throws(RuntimeException::class, 'The gd extension does not support webp QR codes.');
 
 test('webp format is supported', function () {
     $qrCode = (new Generator)->format('webp');
