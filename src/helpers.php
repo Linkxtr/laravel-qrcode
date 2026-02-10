@@ -5,7 +5,7 @@ use Linkxtr\QrCode\Facades\QrCode as QrCodeFacade;
 use Linkxtr\QrCode\Generator;
 
 if (! function_exists('qrcode')) {
-    function qrcode(?string $text = null): Generator|HtmlString|null
+    function qrcode(?string $text = null): Generator|HtmlString
     {
         if ($text === null) {
             return app(Generator::class);
