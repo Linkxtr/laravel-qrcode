@@ -320,6 +320,10 @@ final class Generator
         }
 
         if (extension_loaded('gd')) {
+            if ($this->format !== 'png') {
+                throw new \RuntimeException('The gd extension is not support ' . $this->format . ' QR codes.');
+            }
+
             return new GDLibRenderer(
                 $this->size,
                 $this->margin,
@@ -340,15 +344,11 @@ final class Generator
     public function getFormatter(): ImageBackEndInterface
     {
         if ($this->format === 'png') {
-                return new ImagickImageBackEnd('png');
+            return new ImagickImageBackEnd('png');
         }
 
         if ($this->format === 'webp') {
-            if (extension_loaded('imagick')) {
-                return new ImagickImageBackEnd('webp');
-            }
-
-            throw new \RuntimeException('The imagick extension is required to generate WebP QR codes.');
+            return new ImagickImageBackEnd('webp');
         }
 
         if ($this->format === 'eps') {

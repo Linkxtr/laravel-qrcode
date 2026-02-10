@@ -10,12 +10,10 @@ final class Image
 
     public function __construct(string $image)
     {
-        set_error_handler(null);
-        $img = imagecreatefromstring($image);
-        restore_error_handler();
-
-        if ($img === false) {
-            throw new \InvalidArgumentException('Invalid image data provided to Image.');
+        try {
+            $img = imagecreatefromstring($image);
+        } catch (\ErrorException $e) {
+            throw new \InvalidArgumentException('Invalid image data provided to Image.', previous: $e);
         }
 
         $this->image = $img;
