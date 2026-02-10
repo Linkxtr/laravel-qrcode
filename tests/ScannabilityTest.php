@@ -7,15 +7,25 @@ require_once __DIR__.'/Overrides.php';
 beforeEach(function () {
     QrCode::setFacadeApplication(app());
     global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = true;
-    $mockGdLoaded = true;
+    $mockImagickLoaded = extension_loaded('imagick');
+    $mockGdLoaded = extension_loaded('gd');
 });
 
-dataset('drivers', [
-    'imagick_enabled' => [true, false],
-    'gd_enabled' => [false, true],
-    'both_enabled' => [true, true],
-]);
+$drivers = [];
+
+if (extension_loaded('imagick')) {
+    $drivers['imagick_enabled'] = [true, false];
+}
+
+if (extension_loaded('gd')) {
+    $drivers['gd_enabled'] = [false, true];
+}
+
+if (extension_loaded('imagick') && extension_loaded('gd')) {
+    $drivers['both_enabled'] = [true, true];
+}
+
+dataset('drivers', $drivers);
 
 function setDriver(bool $imagick, bool $gd)
 {
