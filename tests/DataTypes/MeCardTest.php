@@ -56,6 +56,6 @@ it('escapes special characters', function () {
     // Let's assume basic escaping for now similar to VCard but maybe adjusted if needed.
     // Actually standard MeCard often just escapes special chars, let's see.
     // For now let's expect standard escaping.
-    
+
     expect((string) $meCard)->toBe('MECARD:N:Doe\, John;NOTE:A\;B\:C;;');
 });
