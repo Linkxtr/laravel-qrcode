@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Tests\TestCase;
 use chillerlan\QRCode\QRCode as QRCodeDecoder;
+use Tests\TestCase;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +43,6 @@ expect()->extend('toBeOne', function () {
 */
 
 function read_qr_code(string $imageContent): string
-{    
+{
     return (string) (new QRCodeDecoder)->readFromBlob($imageContent);
 }

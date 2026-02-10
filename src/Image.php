@@ -16,7 +16,7 @@ final class Image
             throw new \InvalidArgumentException('Invalid image data provided to Image.', previous: $e);
         }
 
-        $this->image = $img;
+        $this->image = $img ?: null;
     }
 
     public function __destruct()
