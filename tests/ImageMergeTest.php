@@ -20,6 +20,10 @@ it('it merges image into webp qrcode', function () {
 });
 
 it('can merge 2 images into one and center them', function () {
+    if (! extension_loaded('gd')) {
+        $this->markTestSkipped('The GD extension is required for this test.');
+    }
+
     $src_image = imagecreatefrompng(__DIR__.'/images/linkxtr.png');
     $dst_image = imagecreatefrompng(__DIR__.'/images/300X200.png');
 
