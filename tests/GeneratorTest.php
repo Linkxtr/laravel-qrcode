@@ -318,6 +318,17 @@ it('throws exception if file_put_contents fails', function () {
     }
 })->throws(RuntimeException::class, 'Failed to write QR code to file');
 
+it('throws exception if file_get_contents fails', function () {
+    global $mockFileGetContents;
+    $mockFileGetContents = false;
+
+    try {
+        (new Generator)->merge('some_image.png');
+    } finally {
+        $mockFileGetContents = null;
+    }
+})->throws(InvalidArgumentException::class, 'Failed to read image file');
+
 it('throws exception if imagick and gd are not loaded and format is png', function () {
     global $mockImagickLoaded;
     global $mockGdLoaded;

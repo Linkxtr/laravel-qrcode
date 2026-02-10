@@ -39,3 +39,28 @@ if (! function_exists('Linkxtr\QrCode\extension_loaded')) {
         return \extension_loaded($extension);
     }
 }
+
+$GLOBALS['mockFileGetContents'] = null;
+
+if (! function_exists('Linkxtr\QrCode\file_get_contents')) {
+    function file_get_contents($filename, $use_include_path = false, $context = null, $offset = 0, $length = null)
+    {
+        if (isset($GLOBALS['mockFileGetContents']) && $GLOBALS['mockFileGetContents'] === false) {
+            return false;
+        }
+
+        if (func_num_args() >= 5) {
+            return \file_get_contents($filename, $use_include_path, $context, $offset, $length);
+        }
+
+        if (func_num_args() >= 4) {
+            return \file_get_contents($filename, $use_include_path, $context, $offset);
+        }
+
+        if (func_num_args() >= 3) {
+            return \file_get_contents($filename, $use_include_path, $context);
+        }
+
+        return \file_get_contents($filename, $use_include_path);
+    }
+}
