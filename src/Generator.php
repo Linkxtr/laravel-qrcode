@@ -2,35 +2,36 @@
 
 namespace Linkxtr\QrCode;
 
-use BaconQrCode\Common\ErrorCorrectionLevel;
-use BaconQrCode\Encoder\Encoder;
-use BaconQrCode\Renderer\Color\Alpha;
-use BaconQrCode\Renderer\Color\ColorInterface;
-use BaconQrCode\Renderer\Color\Rgb;
-use BaconQrCode\Renderer\Eye\EyeInterface;
-use BaconQrCode\Renderer\Eye\ModuleEye;
-use BaconQrCode\Renderer\Eye\SimpleCircleEye;
-use BaconQrCode\Renderer\Eye\SquareEye;
-use BaconQrCode\Renderer\Image\EpsImageBackEnd;
-use BaconQrCode\Renderer\Image\ImageBackEndInterface;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Module\DotsModule;
-use BaconQrCode\Renderer\Module\ModuleInterface;
-use BaconQrCode\Renderer\Module\RoundnessModule;
-use BaconQrCode\Renderer\Module\SquareModule;
-use BaconQrCode\Renderer\RendererStyle\EyeFill;
-use BaconQrCode\Renderer\RendererStyle\Fill;
-use BaconQrCode\Renderer\RendererStyle\Gradient;
-use BaconQrCode\Renderer\RendererStyle\GradientType;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use BadMethodCallException;
-use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
+use BaconQrCode\Encoder\Encoder;
+use Illuminate\Support\HtmlString;
+use BaconQrCode\Renderer\Color\Rgb;
+use BaconQrCode\Renderer\Color\Alpha;
+use BaconQrCode\Renderer\Eye\ModuleEye;
+use BaconQrCode\Renderer\Eye\SquareEye;
+use BaconQrCode\Renderer\GDLibRenderer;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Eye\EyeInterface;
+use BaconQrCode\Renderer\Module\DotsModule;
+use BaconQrCode\Renderer\RendererInterface;
+use BaconQrCode\Common\ErrorCorrectionLevel;
+use BaconQrCode\Renderer\RendererStyle\Fill;
+use BaconQrCode\Renderer\Eye\SimpleCircleEye;
+use BaconQrCode\Renderer\Module\SquareModule;
+use BaconQrCode\Renderer\Color\ColorInterface;
+use BaconQrCode\Renderer\Image\EpsImageBackEnd;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use Linkxtr\QrCode\DataTypes\DataTypeInterface;
-use Linkxtr\QrCode\Renderer\Image\GdImageBackEnd;
+use BaconQrCode\Renderer\Module\ModuleInterface;
+use BaconQrCode\Renderer\Module\RoundnessModule;
+use BaconQrCode\Renderer\RendererStyle\Gradient;
+use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\GradientType;
+use BaconQrCode\Renderer\Image\ImageBackEndInterface;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 
 final class Generator
 {
@@ -304,19 +305,31 @@ final class Generator
         return $this;
     }
 
-    public function getWriter(ImageRenderer $renderer): Writer
+    public function getWriter(RendererInterface $renderer): Writer
     {
         return new Writer($renderer);
     }
 
-    public function getRenderer(): ImageRenderer
+    public function getRenderer(): RendererInterface
     {
-        $renderer = new ImageRenderer(
-            $this->getRendererStyle(),
-            $this->getFormatter()
-        );
+        if (extension_loaded('imagick')) {
+            return new ImageRenderer(
+                $this->getRendererStyle(),
+                $this->getFormatter()
+            );
+        }
 
-        return $renderer;
+        if (extension_loaded('gd')) {
+            return new GDLibRenderer(
+                $this->size,
+                $this->margin,
+                $this->format,
+                9,
+                $this->getFill()
+            );
+        }
+
+        throw new \RuntimeException('The imagick or gd extension is required to generate QR codes.');
     }
 
     public function getRendererStyle(): RendererStyle
@@ -327,15 +340,7 @@ final class Generator
     public function getFormatter(): ImageBackEndInterface
     {
         if ($this->format === 'png') {
-            if (extension_loaded('imagick')) {
                 return new ImagickImageBackEnd('png');
-            }
-
-            if (extension_loaded('gd')) {
-                return new GdImageBackEnd('png');
-            }
-
-            throw new \RuntimeException('The imagick or gd extension is required to generate PNG QR codes.');
         }
 
         if ($this->format === 'webp') {
@@ -343,11 +348,7 @@ final class Generator
                 return new ImagickImageBackEnd('webp');
             }
 
-            if (extension_loaded('gd')) {
-                return new GdImageBackEnd('webp');
-            }
-
-            throw new \RuntimeException('The imagick or gd extension is required to generate WebP QR codes.');
+            throw new \RuntimeException('The imagick extension is required to generate WebP QR codes.');
         }
 
         if ($this->format === 'eps') {
