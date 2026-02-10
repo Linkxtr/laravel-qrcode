@@ -12,7 +12,7 @@ final class Geo implements DataTypeInterface
 
     protected float $longitude;
 
-    protected string $name;
+    protected string $name = '';
 
     /**
      * @param  list<mixed>  $arguments
