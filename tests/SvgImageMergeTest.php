@@ -25,7 +25,6 @@ test('it throws exception for invalid percentage', function () {
     $svgContent = '<svg width="100" height="100"></svg>';
     $imageContent = 'fake_image_content';
 
-    new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 1.5);
     (new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 1.5))->merge();
 })->throws(\InvalidArgumentException::class, '$percentage must be greater than 0 and less than or equal to 1');
 
