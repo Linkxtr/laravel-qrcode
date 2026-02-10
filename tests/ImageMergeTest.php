@@ -62,3 +62,10 @@ it('throw exception if percentage is greater than 1', function () {
     $test = new ImageMerge($merge, $source);
     $test->merge(2.1);
 })->throws(InvalidArgumentException::class);
+
+it('throws exception if format is not png or webp', function () {
+    $source = new Image(file_get_contents(__DIR__.'/images/linkxtr.png'));
+    $merge = new Image(file_get_contents(__DIR__.'/images/300X200.png'));
+
+    new ImageMerge($source, $merge, 'jpg');
+})->throws(InvalidArgumentException::class, "ImageMerge only supports 'png' or 'webp' formats.");
