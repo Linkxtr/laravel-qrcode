@@ -49,14 +49,13 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   QrCode::ethereum('0x742d35Cc6634C0532925a3b8D...');
   ```
 
-- [ ] **MeCard Support**
+- [x] **MeCard Support**
 
   ```php
   QrCode::meCard('John Doe', '+1234567890', 'john@example.com');
   ```
 
 - [ ] **Messaging & Communication**
-
   - **WhatsApp**
     ```php
     QrCode::whatsapp('1234567890', 'Hello World');
@@ -79,7 +78,6 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
     ```
 
 - [ ] **Payments**
-
   - **PayPal**
     ```php
     QrCode::paypal('user@example.com', 10.00, 'USD', 'Payment Description');
@@ -214,7 +212,6 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 ### Developer Experience
 
 - [ ] **Better IDE Support**
-
   - Enhanced PHPDoc annotations
   - IDE helper file generation
   - Laravel Idea compatibility
