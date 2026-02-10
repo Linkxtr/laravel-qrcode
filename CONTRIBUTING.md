@@ -168,7 +168,7 @@ composer lint
 use Linkxtr\QrCode\QrCode;
 
 it('generates basic qr code', function (){
-    $result = (new QrCode)->->format('svg')->generate('Test Content');
+    $result = (new QrCode)->format('svg')->generate('Test Content');
 
     expect($result)->toBeString()->toContain('<svg');
 });
