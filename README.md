@@ -119,6 +119,8 @@ QrCode::vCard([
 ]);
 
 // Calendar Event
+use Carbon\Carbon;
+
 QrCode::calendar([
     'summary' => 'Laracon US',
     'description' => 'The official Laravel conference.',
