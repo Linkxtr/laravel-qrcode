@@ -177,8 +177,6 @@ QrCode::format('png')->merge('path/to/logo.png', 0.3, true)->generate('With Logo
 QrCode::format('svg')->merge('path/to/logo.png', 0.3, true)->generate('With Logo');
 ```
 
-**Note:** Image merge is not supported for EPS format.
-
 ## 💡 Common Examples
 
 ### Generate QR for Website

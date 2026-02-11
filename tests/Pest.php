@@ -62,7 +62,9 @@ function read_qr_code(string $imageContent): string
         $imagick->setImageFormat('png');
         $imageContent = $imagick->getImageBlob();
     } catch (Throwable $e) {
-        return 'ERROR: Could not rasterize SVG. '.$e->getMessage();
+        $format = $isSvg ? 'SVG' : 'EPS';
+
+        return "ERROR: Could not rasterize {$format}. ".$e->getMessage();
     }
 
     return (string) (new QRCodeDecoder)->readFromBlob($imageContent);

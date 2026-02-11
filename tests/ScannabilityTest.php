@@ -88,6 +88,10 @@ it('can scan a generated eps QR code with merged image', function ($imagick, $gd
     if (! $imagick) {
         $this->markTestSkipped('eps convert to png to scan requires imagick.');
     }
+    // Ghostscript is required by Imagick to rasterize EPS
+    if (empty(shell_exec('which gs 2>/dev/null'))) {
+        $this->markTestSkipped('ghostscript is required by imagick to rasterize eps.');
+    }
 
     setDriver($imagick, $gd);
     $qrCode = QrCode::format('eps')->merge(__DIR__.'/images/linkxtr.png', .2, true)->generate('https://example.com/merged');

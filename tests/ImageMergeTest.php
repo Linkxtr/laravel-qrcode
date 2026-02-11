@@ -42,3 +42,18 @@ it('throws exception if transparent color cannot be created', function () {
         $mockImageColorAllocateAlpha = null;
     }
 })->throws(RuntimeException::class, 'Failed to create transparent color.');
+
+it('throws exception if image canvas cannot be created', function () {
+    global $mockImageCreateTrueColor;
+    $mockImageCreateTrueColor = false;
+
+    $source = new Image(file_get_contents(__DIR__.'/images/linkxtr.png'));
+    $merge = new Image(file_get_contents(__DIR__.'/images/300X200.png'));
+
+    try {
+        $test = new ImageMerge($merge, $source);
+        $test->merge(0.2);
+    } finally {
+        $mockImageCreateTrueColor = null;
+    }
+})->throws(RuntimeException::class, 'Failed to create image canvas.');

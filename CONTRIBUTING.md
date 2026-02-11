@@ -165,10 +165,10 @@ composer lint
 ```php
 <?php
 
-use Linkxtr\QrCode\QrCode;
+use Linkxtr\QrCode\Generator;
 
 it('generates basic qr code', function (){
-    $result = (new QrCode)->format('svg')->generate('Test Content');
+    $result = (new Generator)->format('svg')->generate('Test Content');
 
     expect($result)->toBeString()->toContain('<svg');
 });

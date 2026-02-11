@@ -35,6 +35,11 @@ final class ImageMerge
         $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
 
         $canvas = imagecreatetruecolor($sourceWidth, $sourceHeight);
+
+        if (! $canvas) {
+            throw new \RuntimeException('Failed to create image canvas.');
+        }
+
         imagealphablending($canvas, true);
         $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
 

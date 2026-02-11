@@ -22,11 +22,13 @@ final class EpsImageMerge
             throw new InvalidArgumentException('Could not determine EPS dimensions (Missing %%BoundingBox).');
         }
 
+        $llx = (int) $matches[1];
+        $lly = (int) $matches[2];
         $urx = (int) $matches[3];
         $ury = (int) $matches[4];
 
-        $qrWidth = $urx;
-        $qrHeight = $ury;
+        $qrWidth = $urx - $llx;
+        $qrHeight = $ury - $lly;
 
         $logo = @imagecreatefromstring($this->mergeImageContent);
 
@@ -43,8 +45,8 @@ final class EpsImageMerge
         /** @var int<1, max> $targetH */
         $targetH = (int) ($targetW / $ratio);
 
-        $posX = (int) (($qrWidth - $targetW) / 2);
-        $posY = (int) (($qrHeight - $targetH) / 2);
+        $posX = (int) (($qrWidth - $targetW) / 2) + $llx;
+        $posY = (int) (($qrHeight - $targetH) / 2) + $lly;
 
         $resizedLogo = imagecreatetruecolor($targetW, $targetH);
 
@@ -91,8 +93,9 @@ grestore
 % MERGED LOGO END
 PS;
 
-        if (str_contains($this->epsContent, 'showpage')) {
-            return str_replace('showpage', $psBlock."\nshowpage", $this->epsContent);
+        $lastShowpage = strrpos($this->epsContent, 'showpage');
+        if ($lastShowpage !== false) {
+            return substr_replace($this->epsContent, $psBlock."\nshowpage", $lastShowpage, strlen('showpage'));
         }
 
         return $this->epsContent."\n".$psBlock;

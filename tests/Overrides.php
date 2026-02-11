@@ -90,3 +90,17 @@ if (! function_exists('Linkxtr\QrCode\imagecolorallocate')) {
         return \imagecolorallocate($image, $red, $green, $blue);
     }
 }
+
+$GLOBALS['mockImageCreateTrueColor'] = null;
+
+if (! function_exists('Linkxtr\QrCode\imagecreatetruecolor')) {
+    function imagecreatetruecolor($width, $height)
+    {
+        if (isset($GLOBALS['mockImageCreateTrueColor']) && $GLOBALS['mockImageCreateTrueColor'] === false) {
+            return false;
+        }
+
+        return \imagecreatetruecolor($width, $height);
+    }
+}
+
