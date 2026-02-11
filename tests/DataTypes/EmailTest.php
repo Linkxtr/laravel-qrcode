@@ -65,3 +65,8 @@ it('throws an exception when body is invalid', function () {
     expect(fn () => $this->email->create(['email@example.com', 'subject', ['foo' => 'bar']]))
         ->toThrow(InvalidArgumentException::class);
 });
+
+it('throws an exception when subject is invalid', function () {
+    expect(fn () => $this->email->create(['email@example.com', 1234]))
+        ->toThrow(InvalidArgumentException::class, 'Invalid subject provided to Email.');
+});

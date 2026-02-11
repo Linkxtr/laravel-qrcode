@@ -6,7 +6,7 @@ use InvalidArgumentException;
 
 final class VCard implements DataTypeInterface
 {
-    protected ?string $name = null;
+    protected string $name;
 
     protected ?string $firstName = null;
 
@@ -33,9 +33,11 @@ final class VCard implements DataTypeInterface
             $properties = $arguments[0];
         }
 
-        if (isset($properties['name']) && is_string($properties['name'])) {
-            $this->name = $properties['name'];
+        if (! isset($properties['name']) || ! is_string($properties['name'])) {
+            throw new InvalidArgumentException('vCard FN (Formatted Name) is mandatory.');
         }
+
+        $this->name = $properties['name'];
 
         if (isset($properties['first_name']) && is_string($properties['first_name'])) {
             $this->firstName = $properties['first_name'];
@@ -87,10 +89,6 @@ final class VCard implements DataTypeInterface
     public function __toString(): string
     {
         $vCard = "BEGIN:VCARD\r\nVERSION:3.0\r\n";
-
-        if (! $this->name) {
-            throw new InvalidArgumentException('vCard FN (Formatted Name) is mandatory.');
-        }
 
         $vCard .= "FN:{$this->escapeValue($this->name)}\r\n";
         $vCard .= "N:{$this->escapeValue($this->lastName ?? '')};{$this->escapeValue($this->firstName ?? '')};;;\r\n";

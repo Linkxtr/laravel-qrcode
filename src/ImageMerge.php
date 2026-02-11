@@ -2,120 +2,88 @@
 
 namespace Linkxtr\QrCode;
 
+use GdImage;
 use InvalidArgumentException;
 
 final class ImageMerge
 {
-    protected Image $sourceImage;
-
-    protected Image $mergeImage;
-
-    protected int $sourceImageHeight;
-
-    protected int $sourceImageWidth;
-
-    protected int $mergeImageHeight;
-
-    protected int $mergeImageWidth;
-
-    protected float $mergeRatio;
-
-    protected int $postMergeImageHeight;
-
-    protected int $postMergeImageWidth;
-
-    protected int $centerY;
-
-    protected int $centerX;
-
-    protected string $format = 'png';
-
-    public function __construct(Image $sourceImage, Image $mergeImage, string $format = 'png')
-    {
-        $this->sourceImage = $sourceImage;
-        $this->mergeImage = $mergeImage;
-        $this->format = $format;
+    public function __construct(
+        protected Image $sourceImage,
+        protected Image $mergeImage,
+        protected string $format = 'png'
+    ) {
+        if (! in_array($this->format, ['png', 'webp'])) {
+            throw new InvalidArgumentException('ImageMerge only supports "png" or "webp" formats.');
+        }
     }
 
     public function merge(float $percentage): string
     {
-        $this->setProperties($percentage);
+        if ($percentage <= 0 || $percentage > 1) {
+            throw new InvalidArgumentException('$percentage must be between 0 and 1');
+        }
 
-        $img = imagecreatetruecolor($this->sourceImage->getWidth(), $this->sourceImage->getHeight());
-        imagealphablending($img, true);
-        $transparent = imagecolorallocatealpha($img, 0, 0, 0, 127) ?: 1;
-        imagefill($img, 0, 0, $transparent);
+        $sourceWidth = $this->sourceImage->getWidth();
+        $sourceHeight = $this->sourceImage->getHeight();
+        $mergeWidth = $this->mergeImage->getWidth();
+        $mergeHeight = $this->mergeImage->getHeight();
+        $mergeRatio = $mergeWidth / $mergeHeight;
 
+        $targetLogoWidth = (int) ($sourceWidth * $percentage);
+        $targetLogoHeight = (int) ($targetLogoWidth / $mergeRatio);
+        $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
+        $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
+
+        $canvas = imagecreatetruecolor($sourceWidth, $sourceHeight);
+
+        if (! $canvas) {
+            throw new \RuntimeException('Failed to create image canvas.');
+        }
+
+        imagealphablending($canvas, true);
+        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+
+        if (! $transparent) {
+            throw new \RuntimeException('Failed to create transparent color.');
+        }
+
+        imagefill($canvas, 0, 0, $transparent);
         imagecopy(
-            $img,
+            $canvas,
             $this->sourceImage->getImageResource(),
-            0,
-            0,
-            0,
-            0,
-            $this->sourceImage->getWidth(),
-            $this->sourceImage->getHeight()
+            0, 0, 0, 0,
+            $sourceWidth,
+            $sourceHeight
         );
 
         imagecopyresampled(
-            $img,
+            $canvas,
             $this->mergeImage->getImageResource(),
-            $this->centerX,
-            $this->centerY,
-            0,
-            0,
-            $this->postMergeImageWidth,
-            $this->postMergeImageHeight,
-            $this->mergeImageWidth,
-            $this->mergeImageHeight
+            $centerX, $centerY,
+            0, 0,
+            $targetLogoWidth, $targetLogoHeight,
+            $mergeWidth, $mergeHeight
         );
 
-        $this->sourceImage->setImageResource($img);
+        imagesavealpha($canvas, true);
 
-        return $this->createImage();
+        return $this->createOutput($canvas);
     }
 
-    protected function createImage(): string
+    protected function createOutput(GdImage $canvas): string
     {
         ob_start();
 
         if ($this->format === 'webp') {
-            imagewebp($this->sourceImage->getImageResource());
-
-            return ob_get_clean() ?: '';
+            imagewebp($canvas, null, 90);
+        } else {
+            imagepng($canvas);
         }
 
-        imagepng($this->sourceImage->getImageResource());
+        $content = ob_get_clean();
 
-        return ob_get_clean() ?: '';
-    }
+        unset($canvas);
 
-    protected function setProperties(float $percentage): void
-    {
-        if ($percentage > 1) {
-            throw new InvalidArgumentException('$percentage must be less than 1');
-        }
-
-        $this->sourceImageHeight = $this->sourceImage->getHeight();
-        $this->sourceImageWidth = $this->sourceImage->getWidth();
-
-        $this->mergeImageHeight = $this->mergeImage->getHeight();
-        $this->mergeImageWidth = $this->mergeImage->getWidth();
-
-        $this->calculateOverlap($percentage);
-        $this->calculateCenter();
-    }
-
-    protected function calculateCenter(): void
-    {
-        $this->centerX = intval(($this->sourceImageWidth / 2) - ($this->postMergeImageWidth / 2));
-        $this->centerY = intval(($this->sourceImageHeight / 2) - ($this->postMergeImageHeight / 2));
-    }
-
-    protected function calculateOverlap(float $percentage): void
-    {
-        $this->mergeRatio = round($this->mergeImageWidth / $this->mergeImageHeight, 2);
-        $this->postMergeImageWidth = intval($this->sourceImageWidth * $percentage);
-        $this->postMergeImageHeight = intval($this->postMergeImageWidth / $this->mergeRatio);
+        return $content ?: '';
     }
 }
