@@ -42,6 +42,7 @@ final class Generator
 
     /**
      * The output format.
+     * ['svg', 'eps', 'png', 'webp']
      */
     protected string $format = 'svg';
 
@@ -119,7 +120,7 @@ final class Generator
     /**
      * Holds an image string that will be merged with the QR code.
      */
-    protected ?string $imageMerge = null;
+    protected string $imageMerge = '';
 
     /**
      * The percentage that a merged image should take over the source image.
@@ -141,7 +142,7 @@ final class Generator
     {
         $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrection);
 
-        if ($this->imageMerge !== null) {
+        if ($this->imageMerge !== '') {
             $qrCode = $this->mergeImage($qrCode);
         }
 
@@ -156,12 +157,10 @@ final class Generator
 
     protected function mergeImage(string $qrCode): string
     {
-        assert($this->imageMerge !== null);
+        if ($this->format === 'eps') {
+            $merger = new EpsImageMerge($qrCode, $this->imageMerge, $this->imagePercentage);
 
-        if ($this->format === 'png' || $this->format === 'webp') {
-            $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
-
-            return $merger->merge($this->imagePercentage);
+            return $merger->merge();
         }
 
         if ($this->format === 'svg') {
@@ -170,16 +169,24 @@ final class Generator
             return $merger->merge();
         }
 
-        throw new InvalidArgumentException(sprintf('Image merge is not supported for %s format.', $this->format));
+        $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
+
+        return $merger->merge($this->imagePercentage);
     }
 
     public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self
     {
         if (function_exists('base_path') && ! $absolute) {
-            $filepath = base_path().$filepath;
+            $filepath = base_path().DIRECTORY_SEPARATOR.$filepath;
         }
 
-        $this->imageMerge = file_get_contents($filepath) ?: null;
+        $content = file_get_contents($filepath);
+
+        if ($content === false) {
+            throw new \InvalidArgumentException("Failed to read image file: {$filepath}");
+        }
+
+        $this->imageMerge = $content;
         $this->imagePercentage = $percentage;
 
         return $this;

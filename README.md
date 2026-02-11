@@ -119,6 +119,8 @@ QrCode::vCard([
 ]);
 
 // Calendar Event
+use Carbon\Carbon;
+
 QrCode::calendar([
     'summary' => 'Laracon US',
     'description' => 'The official Laravel conference.',
@@ -174,8 +176,6 @@ QrCode::format('png')->merge('path/to/logo.png', 0.3, true)->generate('With Logo
 // Merge with SVG
 QrCode::format('svg')->merge('path/to/logo.png', 0.3, true)->generate('With Logo');
 ```
-
-**Note:** Image merge is not supported for EPS format.
 
 ## 💡 Common Examples
 

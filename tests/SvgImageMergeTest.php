@@ -1,51 +1,50 @@
 <?php
 
 use Linkxtr\QrCode\Generator;
+use Linkxtr\QrCode\SvgImageMerge;
 
-test('it merges image into svg qrcode', function () {
-    $svgData = (new Generator)
-        ->format('svg')
+it('injects an image tag into the svg', function () {
+    $qr = new Generator;
+
+    $svg = $qr->format('svg')
         ->size(300)
-        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
+        ->mergeString(file_get_contents(__DIR__.'/images/linkxtr.png'), 0.2)
         ->generate('test');
 
-    expect((string) $svgData)->toContain('<image');
-    expect((string) $svgData)->toContain('base64');
-    expect((string) $svgData)->toContain('href="data:image/png;base64,');
+    expect((string) $svg)->toContain('<image x="');
+    expect((string) $svg)->toContain('href="data:image/png;base64,');
 });
 
-test('it throws exception for unsupported merge format', function () {
-    (new Generator)
-        ->format('eps')
-        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
+it('throw exception if percentage is greater than 1', function () {
+    $qr = new Generator;
+
+    $qr->format('svg')
+        ->size(300)
+        ->mergeString(file_get_contents(__DIR__.'/images/linkxtr.png'), 1.2)
         ->generate('test');
-})->throws(\InvalidArgumentException::class, 'Image merge is not supported for eps format.');
+})->throws(InvalidArgumentException::class);
 
-test('it throws exception for invalid percentage', function () {
-    $svgContent = '<svg width="100" height="100"></svg>';
-    $imageContent = 'fake_image_content';
+it('throw exception if percentage is less than 0', function () {
+    $qr = new Generator;
 
-    new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 1.5);
-    (new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 1.5))->merge();
-})->throws(\InvalidArgumentException::class, '$percentage must be greater than 0 and less than or equal to 1');
+    $qr->format('svg')
+        ->size(300)
+        ->mergeString(file_get_contents(__DIR__.'/images/linkxtr.png'), -0.2)
+        ->generate('test');
+})->throws(InvalidArgumentException::class);
 
-test('it throws exception if svg dimensions cannot be determined', function () {
-    $svgContent = '<svg></svg>';
-    $imageContent = 'fake_image_content';
+it('throws exception if svg dimensions are missing', function () {
+    $merger = new SvgImageMerge('<svg>content</svg>', 'image data', 0.2);
+    $merger->merge();
+})->throws(InvalidArgumentException::class, 'Could not determine SVG dimensions. Ensure the SVG has width and height attributes.');
 
-    (new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 0.2))->merge();
-})->throws(\InvalidArgumentException::class, 'Could not determine SVG dimensions.');
+it('throws exception if merged image data is invalid', function () {
+    $merger = new SvgImageMerge('<svg width="100" height="100"></svg>', 'invalid image data', 0.2);
+    $merger->merge();
+})->throws(InvalidArgumentException::class, 'Invalid image data provided for merge. Could not determine image type/size.');
 
-test('it throws exception for invalid merge image data', function () {
-    $svgContent = '<svg width="100" height="100"></svg>';
-    $imageContent = 'not_an_image';
-
-    (new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 0.2))->merge();
-})->throws(\InvalidArgumentException::class, 'Invalid image data provided for merge.');
-
-test('it throws exception if svg closure is missing', function () {
-    $svgContent = '<svg width="100" height="100">';
-    $imageContent = file_get_contents(__DIR__.'/images/linkxtr.png');
-
-    (new \Linkxtr\QrCode\SvgImageMerge($svgContent, $imageContent, 0.2))->merge();
-})->throws(\InvalidArgumentException::class, 'Invalid SVG content.');
+it('throws exception if svg closing tag is missing', function () {
+    $validImage = file_get_contents(__DIR__.'/images/linkxtr.png');
+    $merger = new SvgImageMerge('<svg width="100" height="100">', $validImage, 0.2);
+    $merger->merge();
+})->throws(InvalidArgumentException::class, 'Invalid SVG content: closing tag not found.');

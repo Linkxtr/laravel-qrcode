@@ -55,9 +55,46 @@ it('can scan a generated QR code with email', function ($imagick, $gd) {
     expect(read_qr_code($qrCode))->toBe('mailto:mail@example.tld?subject=Subject&body=Body');
 })->with('drivers');
 
-it('can scan a generated QR code with merged image', function ($imagick, $gd) {
+it('can scan a generated png QR code with merged image', function ($imagick, $gd) {
     setDriver($imagick, $gd);
     $qrCode = QrCode::format('png')->merge(__DIR__.'/images/linkxtr.png', .2, true)->generate('https://example.com/merged');
+
+    expect(read_qr_code($qrCode))->toBe('https://example.com/merged');
+})->with('drivers');
+
+it('can scan a generated svg QR code with merged image', function ($imagick, $gd) {
+    if (! $imagick) {
+        $this->markTestSkipped('svg convert to png to scan requires imagick.');
+    }
+
+    setDriver($imagick, $gd);
+    $qrCode = QrCode::format('svg')->merge(__DIR__.'/images/linkxtr.png', .2, true)->generate('https://example.com/merged');
+
+    expect(read_qr_code($qrCode))->toBe('https://example.com/merged');
+})->with('drivers');
+
+it('can scan a generated webp QR code with merged image', function ($imagick, $gd) {
+    if (! $imagick) {
+        $this->markTestSkipped('webp merge requires imagick.');
+    }
+
+    setDriver($imagick, $gd);
+    $qrCode = QrCode::format('webp')->merge(__DIR__.'/images/linkxtr.png', .2, true)->generate('https://example.com/merged');
+
+    expect(read_qr_code($qrCode))->toBe('https://example.com/merged');
+})->with('drivers');
+
+it('can scan a generated eps QR code with merged image', function ($imagick, $gd) {
+    if (! $imagick) {
+        $this->markTestSkipped('eps convert to png to scan requires imagick.');
+    }
+    // Ghostscript is required by Imagick to rasterize EPS
+    if (empty(shell_exec('which gs 2>/dev/null'))) {
+        $this->markTestSkipped('ghostscript is required by imagick to rasterize eps.');
+    }
+
+    setDriver($imagick, $gd);
+    $qrCode = QrCode::format('eps')->merge(__DIR__.'/images/linkxtr.png', .2, true)->generate('https://example.com/merged');
 
     expect(read_qr_code($qrCode))->toBe('https://example.com/merged');
 })->with('drivers');
