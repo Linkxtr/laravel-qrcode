@@ -68,25 +68,26 @@ class CalendarEvent implements DataTypeInterface
 
     public function __toString(): string
     {
-        $event = "BEGIN:VCALENDAR\n";
-        $event .= "VERSION:2.0\n";
-        $event .= "BEGIN:VEVENT\n";
-        $event .= 'UID:'.uniqid('event-', true)."\n";
-        $event .= 'DTSTAMP:'.Carbon::now()->utc()->format('Ymd\THis\Z')."\n";
-        $event .= 'SUMMARY:'.$this->formatProperty($this->summary)."\n";
+        $event = "BEGIN:VCALENDAR\r\n";
+        $event .= "VERSION:2.0\r\n";
+        $event .= "PRODID:-//Linkxtr//LaravelQrCode//EN\r\n";
+        $event .= "BEGIN:VEVENT\r\n";
+        $event .= 'UID:'.uniqid('', true).'@linkxtr-qrcode'."\r\n";
+        $event .= 'DTSTAMP:'.Carbon::now()->utc()->format('Ymd\THis\Z')."\r\n";
+        $event .= 'SUMMARY:'.$this->formatProperty($this->summary)."\r\n";
 
         if ($this->description) {
-            $event .= 'DESCRIPTION:'.$this->formatProperty($this->description)."\n";
+            $event .= 'DESCRIPTION:'.$this->formatProperty($this->description)."\r\n";
         }
 
         if ($this->location) {
-            $event .= 'LOCATION:'.$this->formatProperty($this->location)."\n";
+            $event .= 'LOCATION:'.$this->formatProperty($this->location)."\r\n";
         }
 
-        $event .= 'DTSTART:'.$this->start->utc()->format('Ymd\THis\Z')."\n";
-        $event .= 'DTEND:'.$this->end->utc()->format('Ymd\THis\Z')."\n";
-        $event .= "END:VEVENT\n";
-        $event .= 'END:VCALENDAR';
+        $event .= 'DTSTART:'.$this->start->utc()->format('Ymd\THis\Z')."\r\n";
+        $event .= 'DTEND:'.$this->end->utc()->format('Ymd\THis\Z')."\r\n";
+        $event .= "END:VEVENT\r\n";
+        $event .= "END:VCALENDAR\r\n";
 
         return $event;
     }
