@@ -336,13 +336,15 @@ it('can merge image with relative path with webp format', function () {
     expect($webpData)->not->toBeEmpty();
 });
 
-it('throws exception if merge image with eps format', function () {
-    (new Generator)
+it('can merge image with eps format', function () {
+    $epsData = (new Generator)
         ->format('eps')
         ->size(300)
         ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
         ->generate('test');
-})->throws(InvalidArgumentException::class);
+
+    expect($epsData)->not->toBeEmpty();
+});
 
 it('throws exception if error correction level is not supported', function () {
     (new Generator)->errorCorrection('foo');

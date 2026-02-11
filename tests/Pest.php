@@ -44,12 +44,19 @@ expect()->extend('toBeOne', function () {
 
 function read_qr_code(string $imageContent): string
 {
-    if (! str_contains($imageContent, '<svg') && ! str_contains($imageContent, '<?xml')) {
+    $isSvg = str_contains($imageContent, '<svg') || str_contains($imageContent, '<?xml');
+    $isEps = str_starts_with($imageContent, '%!PS-Adobe');
+    if (! $isSvg && ! $isEps) {
         return (string) (new QRCodeDecoder)->readFromBlob($imageContent);
     }
 
     try {
         $imagick = new Imagick;
+
+        if ($isEps) {
+            $imagick->setResolution(144, 144);
+        }
+
         $imagick->setBackgroundColor(new ImagickPixel('white'));
         $imagick->readImageBlob($imageContent);
         $imagick->setImageFormat('png');

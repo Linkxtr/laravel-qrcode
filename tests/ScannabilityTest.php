@@ -83,3 +83,14 @@ it('can scan a generated webp QR code with merged image', function ($imagick, $g
 
     expect(read_qr_code($qrCode))->toBe('https://example.com/merged');
 })->with('drivers');
+
+it('can scan a generated eps QR code with merged image', function ($imagick, $gd) {
+    if (! $imagick) {
+        $this->markTestSkipped('eps convert to png to scan requires imagick.');
+    }
+
+    setDriver($imagick, $gd);
+    $qrCode = QrCode::format('eps')->merge(__DIR__.'/images/linkxtr.png', .2, true)->generate('https://example.com/merged');
+
+    expect(read_qr_code($qrCode))->toBe('https://example.com/merged');
+})->with('drivers');

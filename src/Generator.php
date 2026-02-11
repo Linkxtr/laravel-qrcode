@@ -158,7 +158,9 @@ final class Generator
     protected function mergeImage(string $qrCode): string
     {
         if ($this->format === 'eps') {
-            throw new InvalidArgumentException('Image merge is not supported for eps format.');
+            $merger = new EpsImageMerge($qrCode, $this->imageMerge, $this->imagePercentage);
+
+            return $merger->merge();
         }
 
         if ($this->format === 'svg') {

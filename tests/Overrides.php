@@ -77,3 +77,16 @@ if (! function_exists('Linkxtr\QrCode\imagecolorallocatealpha')) {
         return \imagecolorallocatealpha($image, $red, $green, $blue, $alpha);
     }
 }
+
+$GLOBALS['mockImageColorAllocate'] = null;
+
+if (! function_exists('Linkxtr\QrCode\imagecolorallocate')) {
+    function imagecolorallocate($image, $red, $green, $blue)
+    {
+        if (isset($GLOBALS['mockImageColorAllocate']) && $GLOBALS['mockImageColorAllocate'] === false) {
+            return false;
+        }
+
+        return \imagecolorallocate($image, $red, $green, $blue);
+    }
+}
