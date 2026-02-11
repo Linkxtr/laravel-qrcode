@@ -35,7 +35,11 @@ final class Email implements DataTypeInterface
             $this->address = $this->setAddress($arguments[0]);
         }
 
-        if (isset($arguments[1]) && is_string($arguments[1])) {
+        if (isset($arguments[1])) {
+            if (! is_string($arguments[1])) {
+                throw new InvalidArgumentException('Invalid subject provided to Email.');
+            }
+
             $this->subject = $arguments[1];
         }
 

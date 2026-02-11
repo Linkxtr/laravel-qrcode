@@ -74,7 +74,7 @@ QrCode::color(255, 0, 0);
 
 #### B. Handling Return Types
 
-Version 2.0 ensures stricter return types. Ensure your code expects `Linkxtr\LaravelQrCode\Generator` instances when chaining methods, and the correct string/response format when calling `generate()`.
+Version 2.0 ensures stricter return types. Ensure your code expects `Linkxtr\QrCode\Generator` instances when chaining methods, and the correct string/response format when calling `generate()`.
 
 #### C. Review Custom Logic
 

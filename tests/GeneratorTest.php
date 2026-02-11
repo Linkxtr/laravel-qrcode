@@ -270,7 +270,7 @@ test('Data types magic call is case sensitive', function () {
     (new Generator)->geo('40.7128', '-74.0060');
 })->throws(BadMethodCallException::class);
 
-it('merges image into qrcode', function () {
+it('merges image into qrcode with png format', function () {
     $pngData = (new Generator)
         ->format('png')
         ->size(300)
@@ -281,7 +281,18 @@ it('merges image into qrcode', function () {
     expect($image->getWidth())->toBe(300);
 });
 
-it('merges string content', function () {
+it('merges image into qrcode with webp format', function () {
+    $webpData = (new Generator)
+        ->format('webp')
+        ->size(300)
+        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
+        ->generate('test');
+
+    $image = new Image($webpData);
+    expect($image->getWidth())->toBe(300);
+});
+
+it('merges string content with png format', function () {
     $content = file_get_contents(__DIR__.'/images/linkxtr.png');
     $pngData = (new Generator)
         ->format('png')
@@ -291,7 +302,17 @@ it('merges string content', function () {
     expect($pngData)->not->toBeEmpty();
 });
 
-it('can merge image with relative path', function () {
+it('merges string content with webp format', function () {
+    $content = file_get_contents(__DIR__.'/images/linkxtr.png');
+    $webpData = (new Generator)
+        ->format('webp')
+        ->mergeString($content, 0.2)
+        ->generate('test');
+
+    expect($webpData)->not->toBeEmpty();
+});
+
+it('can merge image with relative path with png format', function () {
     // base_path() is mocked in Overrides.php to return __DIR__ (tests/)
     $path = 'images/linkxtr.png';
 
@@ -301,6 +322,28 @@ it('can merge image with relative path', function () {
         ->generate('test');
 
     expect($pngData)->not->toBeEmpty();
+});
+
+it('can merge image with relative path with webp format', function () {
+    // base_path() is mocked in Overrides.php to return __DIR__ (tests/)
+    $path = 'images/linkxtr.png';
+
+    $webpData = (new Generator)
+        ->format('webp')
+        ->merge($path, 0.2, false)
+        ->generate('test');
+
+    expect($webpData)->not->toBeEmpty();
+});
+
+it('can merge image with eps format', function () {
+    $epsData = (new Generator)
+        ->format('eps')
+        ->size(300)
+        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
+        ->generate('test');
+
+    expect($epsData)->not->toBeEmpty();
 });
 
 it('throws exception if error correction level is not supported', function () {
@@ -318,6 +361,17 @@ it('throws exception if file_put_contents fails', function () {
     }
 })->throws(RuntimeException::class, 'Failed to write QR code to file');
 
+it('throws exception if file_get_contents fails', function () {
+    global $mockFileGetContents;
+    $mockFileGetContents = false;
+
+    try {
+        (new Generator)->merge('some_image.png');
+    } finally {
+        $mockFileGetContents = null;
+    }
+})->throws(InvalidArgumentException::class, 'Failed to read image file');
+
 it('throws exception if imagick and gd are not loaded and format is png', function () {
     global $mockImagickLoaded;
     global $mockGdLoaded;
@@ -325,26 +379,23 @@ it('throws exception if imagick and gd are not loaded and format is png', functi
     $mockGdLoaded = false;
 
     try {
-        (new Generator)->format('png')->getFormatter();
+        (new Generator)->format('png')->generate('test');
     } finally {
         $mockImagickLoaded = true;
         $mockGdLoaded = true;
     }
-})->throws(RuntimeException::class, 'The imagick or gd extension is required to generate PNG QR codes.');
+})->throws(RuntimeException::class, 'The imagick or gd extension is required to generate QR codes.');
 
-it('throws exception if imagick and gd are not loaded and format is webp', function () {
+it('throws exception if imagick is not loaded and format is webp', function () {
     global $mockImagickLoaded;
-    global $mockGdLoaded;
     $mockImagickLoaded = false;
-    $mockGdLoaded = false;
 
     try {
-        (new Generator)->format('webp')->getFormatter();
+        (new Generator)->format('webp')->generate('test');
     } finally {
         $mockImagickLoaded = true;
-        $mockGdLoaded = true;
     }
-})->throws(RuntimeException::class, 'The imagick or gd extension is required to generate WebP QR codes.');
+})->throws(RuntimeException::class, 'The gd extension does not support webp QR codes.');
 
 test('webp format is supported', function () {
     $qrCode = (new Generator)->format('webp');
