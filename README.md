@@ -128,6 +128,9 @@ QrCode::calendar([
     'start' => Carbon::create(2024, 8, 27, 9, 0, 0),
     'end' => Carbon::create(2024, 8, 28, 17, 0, 0),
 ]);
+
+// WhatsApp
+QrCode::WhatsApp('+1234567890', 'Hello from Laravel!');
 ```
 
 ## 🔧 Advanced Usage
