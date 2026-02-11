@@ -336,14 +336,6 @@ it('can merge image with relative path with webp format', function () {
     expect($webpData)->not->toBeEmpty();
 });
 
-it('throws exception if merge image with svg format', function () {
-    (new Generator)
-        ->format('svg')
-        ->size(300)
-        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
-        ->generate('test');
-})->throws(InvalidArgumentException::class);
-
 it('throws exception if merge image with eps format', function () {
     (new Generator)
         ->format('eps')

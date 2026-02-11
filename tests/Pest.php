@@ -44,5 +44,19 @@ expect()->extend('toBeOne', function () {
 
 function read_qr_code(string $imageContent): string
 {
+    if (! str_contains($imageContent, '<svg') && ! str_contains($imageContent, '<?xml')) {
+        return (string) (new QRCodeDecoder)->readFromBlob($imageContent);
+    }
+
+    try {
+        $imagick = new Imagick;
+        $imagick->setBackgroundColor(new ImagickPixel('white'));
+        $imagick->readImageBlob($imageContent);
+        $imagick->setImageFormat('png');
+        $imageContent = $imagick->getImageBlob();
+    } catch (Throwable $e) {
+        return 'ERROR: Could not rasterize SVG. '.$e->getMessage();
+    }
+
     return (string) (new QRCodeDecoder)->readFromBlob($imageContent);
 }

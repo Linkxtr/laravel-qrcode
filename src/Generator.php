@@ -42,6 +42,7 @@ final class Generator
 
     /**
      * The output format.
+     * ['svg', 'eps', 'png', 'webp']
      */
     protected string $format = 'svg';
 
@@ -156,8 +157,14 @@ final class Generator
 
     protected function mergeImage(string $qrCode): string
     {
-        if ($this->format !== 'png' && $this->format !== 'webp') {
-            throw new InvalidArgumentException(sprintf('Image merge is not supported for %s format.', $this->format));
+        if ($this->format === 'eps') {
+            throw new InvalidArgumentException('Image merge is not supported for eps format.');
+        }
+
+        if ($this->format === 'svg') {
+            $merger = new SvgImageMerge($qrCode, $this->imageMerge, $this->imagePercentage);
+
+            return $merger->merge();
         }
 
         $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
