@@ -10,8 +10,8 @@ test('it should generate a valid calendar event QR code', function () {
         'summary' => 'Team Meeting',
         'description' => 'Weekly team sync',
         'location' => 'Conference Room A',
-        'start' => '2024-06-01 10:00:00',
-        'end' => '2024-06-01 11:00:00',
+        'start' => '2024-06-01 10:00:00 UTC',
+        'end' => '2024-06-01 11:00:00 UTC',
     ];
 
     // Using PascalCase to match class name as per current Generator implementation
@@ -26,12 +26,14 @@ test('CalendarEvent class generates correct string', function () {
         'summary' => 'Team Meeting',
         'description' => 'Weekly team sync',
         'location' => 'Conference Room A',
-        'start' => '2024-06-01 10:00:00',
-        'end' => '2024-06-01 11:00:00',
+        'start' => '2024-06-01 10:00:00 UTC',
+        'end' => '2024-06-01 11:00:00 UTC',
     ]]);
 
     $string = (string) $calendarEvent;
 
+    expect($string)->toContain('BEGIN:VCALENDAR');
+    expect($string)->toContain('VERSION:2.0');
     expect($string)->toContain('BEGIN:VEVENT');
     expect($string)->toContain('SUMMARY:Team Meeting');
     expect($string)->toContain('DESCRIPTION:Weekly team sync');
@@ -39,6 +41,7 @@ test('CalendarEvent class generates correct string', function () {
     expect($string)->toContain('DTSTART:20240601T100000Z');
     expect($string)->toContain('DTEND:20240601T110000Z');
     expect($string)->toContain('END:VEVENT');
+    expect($string)->toContain('END:VCALENDAR');
 });
 
 test('CalendarEvent class escapes special characters', function () {
@@ -47,8 +50,8 @@ test('CalendarEvent class escapes special characters', function () {
         'summary' => 'Team, Meeting; (Internal) \\',
         'description' => "Line 1\nLine 2",
         'location' => 'Room A, B',
-        'start' => '2024-06-01 10:00:00',
-        'end' => '2024-06-01 11:00:00',
+        'start' => '2024-06-01 10:00:00 UTC',
+        'end' => '2024-06-01 11:00:00 UTC',
     ]]);
 
     $string = (string) $calendarEvent;
@@ -62,12 +65,14 @@ test('CalendarEvent class generates correct string with minimal data', function 
     $calendarEvent = new CalendarEvent;
     $calendarEvent->create([[
         'summary' => 'Team Meeting',
-        'start' => '2024-06-01 10:00:00',
-        'end' => '2024-06-01 11:00:00',
+        'start' => '2024-06-01 10:00:00 UTC',
+        'end' => '2024-06-01 11:00:00 UTC',
     ]]);
 
     $string = (string) $calendarEvent;
 
+    expect($string)->toContain('BEGIN:VCALENDAR');
+    expect($string)->toContain('VERSION:2.0');
     expect($string)->toContain('BEGIN:VEVENT');
     expect($string)->toContain('SUMMARY:Team Meeting');
     expect($string)->not->toContain('DESCRIPTION:');
@@ -75,6 +80,7 @@ test('CalendarEvent class generates correct string with minimal data', function 
     expect($string)->toContain('DTSTART:20240601T100000Z');
     expect($string)->toContain('DTEND:20240601T110000Z');
     expect($string)->toContain('END:VEVENT');
+    expect($string)->toContain('END:VCALENDAR');
 });
 
 test('it throws exception when attributes are not an array', function () {
@@ -85,8 +91,8 @@ test('it throws exception when attributes are not an array', function () {
 test('it throws exception when summary is missing', function () {
     $qrCode = new Generator;
     $qrCode->CalendarEvent([
-        'start' => '2024-06-01 10:00:00',
-        'end' => '2024-06-01 11:00:00',
+        'start' => '2024-06-01 10:00:00 UTC',
+        'end' => '2024-06-01 11:00:00 UTC',
     ]);
 })->throws(InvalidArgumentException::class, 'Summary is required and must be a string.');
 
@@ -94,8 +100,8 @@ test('it throws exception when summary is empty', function () {
     $qrCode = new Generator;
     $qrCode->CalendarEvent([
         'summary' => '',
-        'start' => '2024-06-01 10:00:00',
-        'end' => '2024-06-01 11:00:00',
+        'start' => '2024-06-01 10:00:00 UTC',
+        'end' => '2024-06-01 11:00:00 UTC',
     ]);
 })->throws(InvalidArgumentException::class, 'Summary is required and must be a string.');
 
@@ -103,7 +109,7 @@ test('it throws exception when start date is missing', function () {
     $qrCode = new Generator;
     $qrCode->CalendarEvent([
         'summary' => 'Meeting',
-        'end' => '2024-06-01 11:00:00',
+        'end' => '2024-06-01 11:00:00 UTC',
     ]);
 })->throws(InvalidArgumentException::class, 'Start date is required.');
 
@@ -111,7 +117,7 @@ test('it throws exception when end date is missing', function () {
     $qrCode = new Generator;
     $qrCode->CalendarEvent([
         'summary' => 'Meeting',
-        'start' => '2024-06-01 10:00:00',
+        'start' => '2024-06-01 10:00:00 UTC',
     ]);
 })->throws(InvalidArgumentException::class, 'End date is required.');
 
@@ -120,7 +126,7 @@ test('it throws exception when start date is invalid', function () {
     $qrCode->CalendarEvent([
         'summary' => 'Meeting',
         'start' => new stdClass,
-        'end' => '2024-06-01 11:00:00',
+        'end' => '2024-06-01 11:00:00 UTC',
     ]);
 })->throws(InvalidArgumentException::class, 'Date must be a string, numeric or DateTimeInterface.');
 
@@ -128,7 +134,7 @@ test('it throws exception when end date is invalid', function () {
     $qrCode = new Generator;
     $qrCode->CalendarEvent([
         'summary' => 'Meeting',
-        'start' => '2024-06-01 10:00:00',
+        'start' => '2024-06-01 10:00:00 UTC',
         'end' => new stdClass,
     ]);
 })->throws(InvalidArgumentException::class, 'Date must be a string, numeric or DateTimeInterface.');
@@ -137,8 +143,8 @@ test('it ignores non-string description and location', function () {
     $calendarEvent = new CalendarEvent;
     $calendarEvent->create([[
         'summary' => 'Meeting',
-        'start' => '2024-06-01 10:00:00',
-        'end' => '2024-06-01 11:00:00',
+        'start' => '2024-06-01 10:00:00 UTC',
+        'end' => '2024-06-01 11:00:00 UTC',
         'description' => 123,
         'location' => ['array'],
     ]]);
@@ -170,7 +176,7 @@ test('it throws exception when end date is before start date', function () {
     $qrCode = new Generator;
     $qrCode->CalendarEvent([
         'summary' => 'Meeting',
-        'start' => '2024-06-01 12:00:00',
-        'end' => '2024-06-01 11:00:00',
+        'start' => '2024-06-01 12:00:00 UTC',
+        'end' => '2024-06-01 11:00:00 UTC',
     ]);
 })->throws(InvalidArgumentException::class, 'End date must be after start date.');
