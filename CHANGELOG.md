@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Telegram data type support.
 - WhatsApp data type support.
 - CalendarEvent data type support.
 - MeCard and vCard data type support.
