@@ -70,6 +70,7 @@ class CalendarEvent implements DataTypeInterface
     {
         $event = "BEGIN:VCALENDAR\r\n";
         $event .= "VERSION:2.0\r\n";
+        $event .= "PRODID:-//Linkxtr//LaravelQrCode//EN\r\n";
         $event .= "BEGIN:VEVENT\r\n";
         $event .= 'UID:'.uniqid('', true).'@linkxtr-qrcode'."\r\n";
         $event .= 'DTSTAMP:'.Carbon::now()->utc()->format('Ymd\THis\Z')."\r\n";
@@ -86,7 +87,7 @@ class CalendarEvent implements DataTypeInterface
         $event .= 'DTSTART:'.$this->start->utc()->format('Ymd\THis\Z')."\r\n";
         $event .= 'DTEND:'.$this->end->utc()->format('Ymd\THis\Z')."\r\n";
         $event .= "END:VEVENT\r\n";
-        $event .= 'END:VCALENDAR';
+        $event .= "END:VCALENDAR\r\n";
 
         return $event;
     }
