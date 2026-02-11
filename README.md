@@ -238,6 +238,8 @@ We're actively working on Version 2 with these planned features:
 - [x] vCard data type
 - [x] Calendar event data type
 - [x] WebP format support
+- [x] Telegram data type support
+- [x] WhatsApp data type support
 - [ ] Animated QR codes
 - [ ] Bitcoin payment QR codes
 - [ ] Extended customization options
