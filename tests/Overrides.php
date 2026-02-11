@@ -103,4 +103,3 @@ if (! function_exists('Linkxtr\QrCode\imagecreatetruecolor')) {
         return \imagecreatetruecolor($width, $height);
     }
 }
-

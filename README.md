@@ -128,6 +128,9 @@ QrCode::calendar([
     'start' => Carbon::create(2024, 8, 27, 9, 0, 0),
     'end' => Carbon::create(2024, 8, 28, 17, 0, 0),
 ]);
+
+// WhatsApp
+QrCode::WhatsApp('+1234567890', 'Hello from Laravel!');
 ```
 
 ## 🔧 Advanced Usage
@@ -176,6 +179,8 @@ QrCode::format('png')->merge('path/to/logo.png', 0.3, true)->generate('With Logo
 // Merge with SVG
 QrCode::format('svg')->merge('path/to/logo.png', 0.3, true)->generate('With Logo');
 ```
+
+**Note:** Image merge is not supported for EPS format.
 
 ## 💡 Common Examples
 
@@ -300,6 +305,7 @@ QrCode::size(400)
 - `btc($config)` - Generate BTC QR
 - `vCard($config)` - Generate vCard QR
 - `calendar($config)` - Generate Calendar Event QR
+- `whatsapp($phone, $message)` - Generate WhatsApp QR
 
 ## 📄 License
 

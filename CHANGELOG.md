@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- WhatsApp data type support.
+- CalendarEvent data type support.
 - MeCard and vCard data type support.
 - Image merge support for WebP, SVG and EPS image formats.
 - GD Backend support for PNG and WebP generation (useful when Imagick is not available).

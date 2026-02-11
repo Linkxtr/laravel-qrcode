@@ -68,7 +68,11 @@ class CalendarEvent implements DataTypeInterface
 
     public function __toString(): string
     {
-        $event = "BEGIN:VEVENT\n";
+        $event = "BEGIN:VCALENDAR\n";
+        $event .= "VERSION:2.0\n";
+        $event .= "BEGIN:VEVENT\n";
+        $event .= 'UID:'.uniqid('event-', true)."\n";
+        $event .= 'DTSTAMP:'.Carbon::now()->utc()->format('Ymd\THis\Z')."\n";
         $event .= 'SUMMARY:'.$this->formatProperty($this->summary)."\n";
 
         if ($this->description) {
@@ -81,7 +85,8 @@ class CalendarEvent implements DataTypeInterface
 
         $event .= 'DTSTART:'.$this->start->utc()->format('Ymd\THis\Z')."\n";
         $event .= 'DTEND:'.$this->end->utc()->format('Ymd\THis\Z')."\n";
-        $event .= 'END:VEVENT';
+        $event .= "END:VEVENT\n";
+        $event .= 'END:VCALENDAR';
 
         return $event;
     }
