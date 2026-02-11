@@ -119,7 +119,7 @@ final class Generator
     /**
      * Holds an image string that will be merged with the QR code.
      */
-    protected ?string $imageMerge = null;
+    protected string $imageMerge = '';
 
     /**
      * The percentage that a merged image should take over the source image.
@@ -141,7 +141,7 @@ final class Generator
     {
         $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrection);
 
-        if ($this->imageMerge !== null) {
+        if ($this->imageMerge !== '') {
             $qrCode = $this->mergeImage($qrCode);
         }
 
@@ -156,18 +156,10 @@ final class Generator
 
     protected function mergeImage(string $qrCode): string
     {
-        assert($this->imageMerge !== null);
-
         if ($this->format === 'png' || $this->format === 'webp') {
             $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
 
             return $merger->merge($this->imagePercentage);
-        }
-
-        if ($this->format === 'svg') {
-            $merger = new SvgImageMerge($qrCode, $this->imageMerge, $this->imagePercentage);
-
-            return $merger->merge();
         }
 
         throw new InvalidArgumentException(sprintf('Image merge is not supported for %s format.', $this->format));

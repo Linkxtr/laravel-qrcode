@@ -270,7 +270,7 @@ test('Data types magic call is case sensitive', function () {
     (new Generator)->geo('40.7128', '-74.0060');
 })->throws(BadMethodCallException::class);
 
-it('merges image into qrcode', function () {
+it('merges image into qrcode with png format', function () {
     $pngData = (new Generator)
         ->format('png')
         ->size(300)
@@ -281,7 +281,18 @@ it('merges image into qrcode', function () {
     expect($image->getWidth())->toBe(300);
 });
 
-it('merges string content', function () {
+it('merges image into qrcode with webp format', function () {
+    $webpData = (new Generator)
+        ->format('webp')
+        ->size(300)
+        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
+        ->generate('test');
+
+    $image = new Image($webpData);
+    expect($image->getWidth())->toBe(300);
+});
+
+it('merges string content with png format', function () {
     $content = file_get_contents(__DIR__.'/images/linkxtr.png');
     $pngData = (new Generator)
         ->format('png')
@@ -291,7 +302,17 @@ it('merges string content', function () {
     expect($pngData)->not->toBeEmpty();
 });
 
-it('can merge image with relative path', function () {
+it('merges string content with webp format', function () {
+    $content = file_get_contents(__DIR__.'/images/linkxtr.png');
+    $webpData = (new Generator)
+        ->format('webp')
+        ->mergeString($content, 0.2)
+        ->generate('test');
+
+    expect($webpData)->not->toBeEmpty();
+});
+
+it('can merge image with relative path with png format', function () {
     // base_path() is mocked in Overrides.php to return __DIR__ (tests/)
     $path = 'images/linkxtr.png';
 
@@ -302,6 +323,34 @@ it('can merge image with relative path', function () {
 
     expect($pngData)->not->toBeEmpty();
 });
+
+it('can merge image with relative path with webp format', function () {
+    // base_path() is mocked in Overrides.php to return __DIR__ (tests/)
+    $path = 'images/linkxtr.png';
+
+    $webpData = (new Generator)
+        ->format('webp')
+        ->merge($path, 0.2, false)
+        ->generate('test');
+
+    expect($webpData)->not->toBeEmpty();
+});
+
+it('throws exception if merge image with svg format', function () {
+    (new Generator)
+        ->format('svg')
+        ->size(300)
+        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
+        ->generate('test');
+})->throws(InvalidArgumentException::class);
+
+it('throws exception if merge image with eps format', function () {
+    (new Generator)
+        ->format('eps')
+        ->size(300)
+        ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
+        ->generate('test');
+})->throws(InvalidArgumentException::class);
 
 it('throws exception if error correction level is not supported', function () {
     (new Generator)->errorCorrection('foo');
