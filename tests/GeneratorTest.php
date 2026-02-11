@@ -264,6 +264,12 @@ test('Data types magic call', function () {
     expect($qrCode->PhoneNumber('1234567890'))->toBeInstanceOf(HtmlString::class);
     expect($qrCode->SMS('1234567890'))->toBeInstanceOf(HtmlString::class);
     expect($qrCode->WiFi(['ssid' => 'SSID']))->toBeInstanceOf(HtmlString::class);
+    expect($qrCode->WhatsApp('+1234567890', 'Hello'))->toBeInstanceOf(HtmlString::class);
+    expect($qrCode->CalendarEvent([
+        'summary' => 'Team Meeting',
+        'start' => '2024-06-01 10:00:00 UTC',
+        'end' => '2024-06-01 11:00:00 UTC',
+    ]))->toBeInstanceOf(HtmlString::class);
 });
 
 test('Data types magic call is case sensitive', function () {
