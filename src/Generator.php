@@ -156,13 +156,13 @@ final class Generator
 
     protected function mergeImage(string $qrCode): string
     {
-        if ($this->format === 'png' || $this->format === 'webp') {
-            $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
-
-            return $merger->merge($this->imagePercentage);
+        if ($this->format !== 'png' && $this->format !== 'webp') {
+            throw new InvalidArgumentException(sprintf('Image merge is not supported for %s format.', $this->format));
         }
 
-        throw new InvalidArgumentException(sprintf('Image merge is not supported for %s format.', $this->format));
+        $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
+
+        return $merger->merge($this->imagePercentage);
     }
 
     public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self

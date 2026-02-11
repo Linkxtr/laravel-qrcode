@@ -64,3 +64,16 @@ if (! function_exists('Linkxtr\QrCode\file_get_contents')) {
         return \file_get_contents($filename, $use_include_path);
     }
 }
+
+$GLOBALS['mockImageColorAllocateAlpha'] = null;
+
+if (! function_exists('Linkxtr\QrCode\imagecolorallocatealpha')) {
+    function imagecolorallocatealpha($image, $red, $green, $blue, $alpha)
+    {
+        if (isset($GLOBALS['mockImageColorAllocateAlpha']) && $GLOBALS['mockImageColorAllocateAlpha'] === false) {
+            return false;
+        }
+
+        return \imagecolorallocatealpha($image, $red, $green, $blue, $alpha);
+    }
+}
