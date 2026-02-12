@@ -1,6 +1,6 @@
 <?php
 
-namespace Linkxtr\QrCode;
+namespace Linkxtr\QrCode\Support;
 
 use GdImage;
 

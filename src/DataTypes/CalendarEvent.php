@@ -5,6 +5,7 @@ namespace Linkxtr\QrCode\DataTypes;
 use Carbon\Carbon;
 use DateTimeInterface;
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 class CalendarEvent implements DataTypeInterface
 {

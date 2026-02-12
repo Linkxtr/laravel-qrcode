@@ -1,10 +1,11 @@
 <?php
 
-namespace Linkxtr\QrCode;
+namespace Linkxtr\QrCode\Mergers;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\MergerInterface;
 
-final class EpsImageMerge
+final class EpsMerger implements MergerInterface
 {
     public function __construct(
         protected string $epsContent,

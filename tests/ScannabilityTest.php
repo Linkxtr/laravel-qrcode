@@ -2,13 +2,18 @@
 
 use Linkxtr\QrCode\Facades\QrCode;
 
-require_once __DIR__.'/Overrides.php';
+require_once __DIR__.'/Support/Overrides.php';
 
 beforeEach(function () {
     QrCode::setFacadeApplication(app());
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = extension_loaded('imagick');
     $mockGdLoaded = extension_loaded('gd');
+
+    // Reset Override mocks to ensure clean state
+    $GLOBALS['mockImageColorAllocate'] = null;
+    $GLOBALS['mockImageCreateTrueColor'] = null;
+    $GLOBALS['mockImageColorAllocateAlpha'] = null;
 });
 
 $drivers = [];

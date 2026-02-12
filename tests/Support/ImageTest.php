@@ -1,10 +1,10 @@
 <?php
 
-use Linkxtr\QrCode\Image;
+use Linkxtr\QrCode\Support\Image;
 
 function getImageTestAssetPath(): string
 {
-    $path = __DIR__.'/images/linkxtr.png';
+    $path = __DIR__.'/../images/linkxtr.png';
 
     if (! file_exists($path)) {
         throw new \RuntimeException('Image not found at '.$path);

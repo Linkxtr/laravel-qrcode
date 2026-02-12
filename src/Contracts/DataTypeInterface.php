@@ -1,6 +1,6 @@
 <?php
 
-namespace Linkxtr\QrCode\DataTypes;
+namespace Linkxtr\QrCode\Contracts;
 
 interface DataTypeInterface
 {

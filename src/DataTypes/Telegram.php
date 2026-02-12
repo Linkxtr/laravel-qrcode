@@ -3,6 +3,7 @@
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class Telegram implements DataTypeInterface
 {

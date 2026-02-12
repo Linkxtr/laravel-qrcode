@@ -13,9 +13,9 @@ use BaconQrCode\Renderer\RendererStyle\Gradient;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Generator;
-use Linkxtr\QrCode\Image;
+use Linkxtr\QrCode\Support\Image;
 
-require_once __DIR__.'/Overrides.php';
+require_once __DIR__.'/Support/Overrides.php';
 
 covers(Generator::class);
 
@@ -361,7 +361,7 @@ it('throws exception if file_put_contents fails', function () {
     $mockFilePutContents = true;
 
     try {
-        (new Generator)->generate('test file', 'fail_file.svg');
+        (new Generator)->generate('test file', __DIR__.'fail_file.svg');
     } finally {
         $mockFilePutContents = false;
     }

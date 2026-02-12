@@ -1,27 +1,31 @@
 <?php
 
-namespace Linkxtr\QrCode;
+namespace Linkxtr\QrCode\Mergers;
 
 use GdImage;
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\MergerInterface;
+use Linkxtr\QrCode\Support\Image;
 
-final class ImageMerge
+final class RasterMerger implements MergerInterface
 {
     public function __construct(
         protected Image $sourceImage,
         protected Image $mergeImage,
-        protected string $format = 'png'
+        protected string $format = 'png',
+        protected float $percentage = 0.2
     ) {
         if (! in_array($this->format, ['png', 'webp'])) {
             throw new InvalidArgumentException('ImageMerge only supports "png" or "webp" formats.');
         }
-    }
 
-    public function merge(float $percentage): string
-    {
-        if ($percentage <= 0 || $percentage > 1) {
+        if ($this->percentage <= 0 || $this->percentage > 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
+    }
+
+    public function merge(): string
+    {
 
         $sourceWidth = $this->sourceImage->getWidth();
         $sourceHeight = $this->sourceImage->getHeight();
@@ -29,7 +33,7 @@ final class ImageMerge
         $mergeHeight = $this->mergeImage->getHeight();
         $mergeRatio = $mergeWidth / $mergeHeight;
 
-        $targetLogoWidth = (int) ($sourceWidth * $percentage);
+        $targetLogoWidth = (int) ($sourceWidth * $this->percentage);
         $targetLogoHeight = (int) ($targetLogoWidth / $mergeRatio);
         $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
         $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);

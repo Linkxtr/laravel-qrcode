@@ -2,7 +2,6 @@
 
 namespace Linkxtr\QrCode;
 
-use BaconQrCode\Common\ErrorCorrectionLevel;
 use BaconQrCode\Encoder\Encoder;
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\ColorInterface;
@@ -25,13 +24,21 @@ use BaconQrCode\Renderer\RendererInterface;
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Fill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
-use BaconQrCode\Renderer\RendererStyle\GradientType;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use BadMethodCallException;
 use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
-use Linkxtr\QrCode\DataTypes\DataTypeInterface;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
+use Linkxtr\QrCode\Enums\EyeStyle;
+use Linkxtr\QrCode\Enums\Format;
+use Linkxtr\QrCode\Enums\GradientType;
+use Linkxtr\QrCode\Enums\Style;
+use Linkxtr\QrCode\Mergers\EpsMerger;
+use Linkxtr\QrCode\Mergers\RasterMerger;
+use Linkxtr\QrCode\Mergers\SvgMerger;
+use Linkxtr\QrCode\Support\Image;
 
 final class Generator
 {
@@ -44,7 +51,7 @@ final class Generator
      * The output format.
      * ['svg', 'eps', 'png', 'webp']
      */
-    protected string $format = 'svg';
+    protected Format $format = Format::SVG;
 
     /**
      * The size of the QR code in pixels.
@@ -63,7 +70,7 @@ final class Generator
      * Q: 25% loss.
      * H: 30% loss.
      */
-    protected ?ErrorCorrectionLevel $errorCorrection = null;
+    protected ErrorCorrectionLevel $errorCorrection = ErrorCorrectionLevel::L;
 
     /**
      * The encoding mode. Possible values are
@@ -79,7 +86,7 @@ final class Generator
      * The style of the blocks within the QR code.
      * Possible values are 'square', 'dot' and 'round'.
      */
-    protected string $style = 'square';
+    protected Style $style = Style::SQUARE;
 
     /**
      * The size of the selected style between 0 and 1.
@@ -91,7 +98,7 @@ final class Generator
      * The style to apply to the eyes of the QR code.
      * Possible values are circle and square.
      */
-    protected ?string $eyeStyle = null;
+    protected ?EyeStyle $eyeStyle = null;
 
     /**
      * The foreground color of the QR code.
@@ -112,10 +119,8 @@ final class Generator
 
     /**
      * The gradient to apply to the QR code.
-     *
-     * @var ?Gradient
      */
-    protected $gradient = null;
+    protected ?Gradient $gradient = null;
 
     /**
      * Holds an image string that will be merged with the QR code.
@@ -140,7 +145,7 @@ final class Generator
 
     public function generate(string $text, ?string $filename = null): HtmlString
     {
-        $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrection);
+        $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrection->toBaconErrorCorrectionLevel());
 
         if ($this->imageMerge !== '') {
             $qrCode = $this->mergeImage($qrCode);
@@ -157,21 +162,21 @@ final class Generator
 
     protected function mergeImage(string $qrCode): string
     {
-        if ($this->format === 'eps') {
-            $merger = new EpsImageMerge($qrCode, $this->imageMerge, $this->imagePercentage);
+        if ($this->format === Format::EPS) {
+            $merger = new EpsMerger($qrCode, $this->imageMerge, $this->imagePercentage);
 
             return $merger->merge();
         }
 
-        if ($this->format === 'svg') {
-            $merger = new SvgImageMerge($qrCode, $this->imageMerge, $this->imagePercentage);
+        if ($this->format === Format::SVG) {
+            $merger = new SvgMerger($qrCode, $this->imageMerge, $this->imagePercentage);
 
             return $merger->merge();
         }
 
-        $merger = new ImageMerge(new Image($qrCode), new Image($this->imageMerge), $this->format);
+        $merger = new RasterMerger(new Image($qrCode), new Image($this->imageMerge), $this->format->value, $this->imagePercentage);
 
-        return $merger->merge($this->imagePercentage);
+        return $merger->merge();
     }
 
     public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self
@@ -207,10 +212,14 @@ final class Generator
         return $this;
     }
 
-    public function format(string $format): self
+    public function format(string|Format $format): self
     {
-        if (! in_array($format, ['svg', 'eps', 'png', 'webp'])) {
-            throw new InvalidArgumentException("\$format must be svg, eps, png, or webp. {$format} is not a valid format.");
+        if (is_string($format)) {
+            $format = Format::tryFrom($format);
+        }
+
+        if (! $format) {
+            throw new InvalidArgumentException('$format must be one of the following values: '.implode(', ', Format::toArray()));
         }
 
         $this->format = $format;
@@ -246,27 +255,33 @@ final class Generator
         return $this;
     }
 
-    public function gradient(int $startRed, int $startGreen, int $startBlue, int $endRed, int $endGreen, int $endBlue, string $type): self
+    public function gradient(int $startRed, int $startGreen, int $startBlue, int $endRed, int $endGreen, int $endBlue, string|GradientType $type): self
     {
-        $type = strtoupper($type);
+        if (is_string($type)) {
+            $type = GradientType::tryFrom($type);
+        }
 
-        if (! in_array($type, ['VERTICAL', 'HORIZONTAL', 'DIAGONAL', 'INVERSE_DIAGONAL', 'RADIAL'])) {
-            throw new InvalidArgumentException("\$type must be VERTICAL or HORIZONTAL or DIAGONAL or INVERSE_DIAGONAL or RADIAL. {$type} is not a valid gradient type.");
+        if (! $type) {
+            throw new InvalidArgumentException('$type must be one of the following values: '.implode(', ', GradientType::toArray()));
         }
 
         $this->gradient = new Gradient(
             $this->createColor($startRed, $startGreen, $startBlue),
             $this->createColor($endRed, $endGreen, $endBlue),
-            GradientType::$type()
+            $type->toBaconGradientType()
         );
 
         return $this;
     }
 
-    public function eye(string $style): self
+    public function eye(string|EyeStyle $style): self
     {
-        if (! in_array($style, ['square', 'circle'])) {
-            throw new InvalidArgumentException("\$style must be square or circle. {$style} is not a valid eye style.");
+        if (is_string($style)) {
+            $style = EyeStyle::tryFrom($style);
+        }
+
+        if (! $style) {
+            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', EyeStyle::toArray()));
         }
 
         $this->eyeStyle = $style;
@@ -274,10 +289,14 @@ final class Generator
         return $this;
     }
 
-    public function style(string $style, float $size = 0.5): self
+    public function style(string|Style $style, float $size = 0.5): self
     {
-        if (! in_array($style, ['square', 'dot', 'round'])) {
-            throw new InvalidArgumentException("\$style must be square, dot, or round. {$style} is not a valid style.");
+        if (is_string($style)) {
+            $style = Style::tryFrom($style);
+        }
+
+        if (! $style) {
+            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', Style::toArray()));
         }
 
         if ($size <= 0 || $size > 1) {
@@ -297,15 +316,17 @@ final class Generator
         return $this;
     }
 
-    public function errorCorrection(string $errorCorrection): self
+    public function errorCorrection(string|ErrorCorrectionLevel $errorCorrection): self
     {
-        $errorCorrection = strtoupper($errorCorrection);
-
-        if (! in_array($errorCorrection, ['L', 'M', 'Q', 'H'])) {
-            throw new InvalidArgumentException("\$errorCorrection must be L, M, Q, or H. {$errorCorrection} is not a valid error correction level.");
+        if (is_string($errorCorrection)) {
+            $errorCorrection = ErrorCorrectionLevel::tryFrom(strtoupper($errorCorrection));
         }
 
-        $this->errorCorrection = ErrorCorrectionLevel::$errorCorrection();
+        if (! $errorCorrection) {
+            throw new InvalidArgumentException('$errorCorrection must be one of the following values: '.implode(', ', ErrorCorrectionLevel::toArray()));
+        }
+
+        $this->errorCorrection = $errorCorrection;
 
         return $this;
     }
@@ -324,7 +345,7 @@ final class Generator
 
     public function getRenderer(): RendererInterface
     {
-        if ($this->format === 'svg' || $this->format === 'eps') {
+        if ($this->format === Format::SVG || $this->format === Format::EPS) {
             return new ImageRenderer(
                 $this->getRendererStyle(),
                 $this->getFormatter()
@@ -339,14 +360,14 @@ final class Generator
         }
 
         if (extension_loaded('gd')) {
-            if ($this->format !== 'png') {
-                throw new \RuntimeException('The gd extension does not support '.$this->format.' QR codes.');
+            if ($this->format !== Format::PNG) {
+                throw new \RuntimeException('The gd extension does not support '.$this->format->value.' QR codes.');
             }
 
             return new GDLibRenderer(
                 $this->size,
                 $this->margin,
-                $this->format,
+                $this->format->value,
                 self::PNG_COMPRESSION_LEVEL,
                 $this->getFill()
             );
@@ -362,15 +383,15 @@ final class Generator
 
     public function getFormatter(): ImageBackEndInterface
     {
-        if ($this->format === 'png') {
+        if ($this->format === Format::PNG) {
             return new ImagickImageBackEnd('png');
         }
 
-        if ($this->format === 'webp') {
+        if ($this->format === Format::WEBP) {
             return new ImagickImageBackEnd('webp');
         }
 
-        if ($this->format === 'eps') {
+        if ($this->format === Format::EPS) {
             return new EpsImageBackEnd;
         }
 
@@ -379,11 +400,11 @@ final class Generator
 
     public function getModule(): ModuleInterface
     {
-        if ($this->style === 'dot') {
+        if ($this->style === Style::DOT) {
             return new DotsModule($this->styleSize);
         }
 
-        if ($this->style === 'round') {
+        if ($this->style === Style::ROUND) {
             return new RoundnessModule($this->styleSize);
         }
 
@@ -392,11 +413,11 @@ final class Generator
 
     public function getEye(): EyeInterface
     {
-        if ($this->eyeStyle === 'square') {
+        if ($this->eyeStyle === EyeStyle::SQUARE) {
             return SquareEye::instance();
         }
 
-        if ($this->eyeStyle === 'circle') {
+        if ($this->eyeStyle === EyeStyle::CIRCLE) {
             return SimpleCircleEye::instance();
         }
 
