@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Linkxtr\QrCode\DataTypes\Telegram;
 
 it('generates a Telegram string', function () {

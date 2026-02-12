@@ -23,9 +23,9 @@ use Linkxtr\QrCode\Generator;
  * @method static \Linkxtr\QrCode\Generator mergeString(string $content, float $percentage = 0.2)
  * @method static \Illuminate\Support\HtmlString generate(string $text, ?string $filename = null)
  *
- * @see \Linkxtr\QrCode\Generator
+ * @see Generator
  */
-class QrCode extends Facade
+final class QrCode extends Facade
 {
     /**
      * Get the registered name of the component.

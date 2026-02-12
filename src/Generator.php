@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode;
 
 use BaconQrCode\Encoder\Encoder;
@@ -39,6 +41,8 @@ use Linkxtr\QrCode\Mergers\EpsMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Support\Image;
+use ReflectionClass;
+use RuntimeException;
 
 final class Generator
 {
@@ -51,17 +55,17 @@ final class Generator
      * The output format.
      * ['svg', 'eps', 'png', 'webp']
      */
-    protected Format $format = Format::SVG;
+    private Format $format = Format::SVG;
 
     /**
      * The size of the QR code in pixels.
      */
-    protected int $size = 100;
+    private int $size = 100;
 
     /**
      * The margin around the QR code.
      */
-    protected int $margin = 0;
+    private int $margin = 0;
 
     /**
      * The error correction level.
@@ -70,7 +74,7 @@ final class Generator
      * Q: 25% loss.
      * H: 30% loss.
      */
-    protected ErrorCorrectionLevel $errorCorrection = ErrorCorrectionLevel::L;
+    private ErrorCorrectionLevel $errorCorrection = ErrorCorrectionLevel::L;
 
     /**
      * The encoding mode. Possible values are
@@ -80,57 +84,57 @@ final class Generator
      * SHIFT-JIS, WINDOWS-1250, WINDOWS-1251, WINDOWS-1252, WINDOWS-1256,
      * UTF-16BE, UTF-8, ASCII, GBK, EUC-KR.
      */
-    protected string $encoding = Encoder::DEFAULT_BYTE_MODE_ENCODING;
+    private string $encoding = Encoder::DEFAULT_BYTE_MODE_ENCODING;
 
     /**
      * The style of the blocks within the QR code.
      * Possible values are 'square', 'dot' and 'round'.
      */
-    protected Style $style = Style::SQUARE;
+    private Style $style = Style::SQUARE;
 
     /**
      * The size of the selected style between 0 and 1.
      * Only applicable to 'dot' and 'round' styles.
      */
-    protected float $styleSize = 0.5;
+    private float $styleSize = 0.5;
 
     /**
      * The style to apply to the eyes of the QR code.
      * Possible values are circle and square.
      */
-    protected ?EyeStyle $eyeStyle = null;
+    private ?EyeStyle $eyeStyle = null;
 
     /**
      * The foreground color of the QR code.
      */
-    protected ?ColorInterface $color = null;
+    private ?ColorInterface $color = null;
 
     /**
      * The background color of the QR code.
      */
-    protected ?ColorInterface $backgroundColor = null;
+    private ?ColorInterface $backgroundColor = null;
 
     /**
      * An array that holds EyeFills of the color of the eyes.
      *
      * @var array<int, EyeFill>
      */
-    protected array $eyeColors = [];
+    private array $eyeColors = [];
 
     /**
      * The gradient to apply to the QR code.
      */
-    protected ?Gradient $gradient = null;
+    private ?Gradient $gradient = null;
 
     /**
      * Holds an image string that will be merged with the QR code.
      */
-    protected string $imageMerge = '';
+    private string $imageMerge = '';
 
     /**
      * The percentage that a merged image should take over the source image.
      */
-    protected float $imagePercentage = .2;
+    private float $imagePercentage = .2;
 
     /**
      * @param  array<int, mixed>  $arguments
@@ -153,30 +157,11 @@ final class Generator
 
         if ($filename) {
             if (file_put_contents($filename, $qrCode) === false) {
-                throw new \RuntimeException("Failed to write QR code to file: {$filename}");
+                throw new RuntimeException("Failed to write QR code to file: {$filename}");
             }
         }
 
         return new HtmlString($qrCode);
-    }
-
-    protected function mergeImage(string $qrCode): string
-    {
-        if ($this->format === Format::EPS) {
-            $merger = new EpsMerger($qrCode, $this->imageMerge, $this->imagePercentage);
-
-            return $merger->merge();
-        }
-
-        if ($this->format === Format::SVG) {
-            $merger = new SvgMerger($qrCode, $this->imageMerge, $this->imagePercentage);
-
-            return $merger->merge();
-        }
-
-        $merger = new RasterMerger(new Image($qrCode), new Image($this->imageMerge), $this->format->value, $this->imagePercentage);
-
-        return $merger->merge();
     }
 
     public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self
@@ -188,7 +173,7 @@ final class Generator
         $content = file_get_contents($filepath);
 
         if ($content === false) {
-            throw new \InvalidArgumentException("Failed to read image file: {$filepath}");
+            throw new InvalidArgumentException("Failed to read image file: {$filepath}");
         }
 
         $this->imageMerge = $content;
@@ -361,7 +346,7 @@ final class Generator
 
         if (extension_loaded('gd')) {
             if ($this->format !== Format::PNG) {
-                throw new \RuntimeException('The gd extension does not support '.$this->format->value.' QR codes.');
+                throw new RuntimeException('The gd extension does not support '.$this->format->value.' QR codes.');
             }
 
             return new GDLibRenderer(
@@ -373,7 +358,7 @@ final class Generator
             );
         }
 
-        throw new \RuntimeException('The imagick or gd extension is required to generate QR codes.');
+        throw new RuntimeException('The imagick or gd extension is required to generate QR codes.');
     }
 
     public function getRendererStyle(): RendererStyle
@@ -448,7 +433,26 @@ final class Generator
         return new Alpha($alpha, new Rgb($red, $green, $blue));
     }
 
-    protected function createClass(string $method): DataTypeInterface
+    private function mergeImage(string $qrCode): string
+    {
+        if ($this->format === Format::EPS) {
+            $merger = new EpsMerger($qrCode, $this->imageMerge, $this->imagePercentage);
+
+            return $merger->merge();
+        }
+
+        if ($this->format === Format::SVG) {
+            $merger = new SvgMerger($qrCode, $this->imageMerge, $this->imagePercentage);
+
+            return $merger->merge();
+        }
+
+        $merger = new RasterMerger(new Image($qrCode), new Image($this->imageMerge), $this->format->value, $this->imagePercentage);
+
+        return $merger->merge();
+    }
+
+    private function createClass(string $method): DataTypeInterface
     {
         $class = $this->formatClass($method);
 
@@ -456,7 +460,7 @@ final class Generator
             throw new BadMethodCallException;
         }
 
-        $reflection = new \ReflectionClass($class);
+        $reflection = new ReflectionClass($class);
 
         if ($reflection->getShortName() !== $method) {
             throw new BadMethodCallException;
@@ -466,7 +470,7 @@ final class Generator
     }
 
     /** @return class-string<DataTypeInterface> */
-    protected function formatClass(string $method): string
+    private function formatClass(string $method): string
     {
         /** @var class-string<DataTypeInterface> */
         $class = "Linkxtr\QrCode\DataTypes\\".$method;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Support\Image;
 

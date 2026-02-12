@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Linkxtr\QrCode\Facades\QrCode;
 
 require_once __DIR__.'/Support/Overrides.php';

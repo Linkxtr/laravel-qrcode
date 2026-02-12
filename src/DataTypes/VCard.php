@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
@@ -7,21 +9,53 @@ use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class VCard implements DataTypeInterface
 {
-    protected string $name;
+    private string $name;
 
-    protected ?string $firstName = null;
+    private ?string $firstName = null;
 
-    protected ?string $lastName = null;
+    private ?string $lastName = null;
 
-    protected ?string $email = null;
+    private ?string $email = null;
 
-    protected ?string $phone = null;
+    private ?string $phone = null;
 
-    protected ?string $company = null;
+    private ?string $company = null;
 
-    protected ?string $title = null;
+    private ?string $title = null;
 
-    protected ?string $url = null;
+    private ?string $url = null;
+
+    public function __toString(): string
+    {
+        $vCard = "BEGIN:VCARD\r\nVERSION:3.0\r\n";
+
+        $vCard .= "FN:{$this->escapeValue($this->name)}\r\n";
+        $vCard .= "N:{$this->escapeValue($this->lastName ?? '')};{$this->escapeValue($this->firstName ?? '')};;;\r\n";
+
+        if ($this->email) {
+            $vCard .= "EMAIL:{$this->escapeValue($this->email)}\r\n";
+        }
+
+        if ($this->phone) {
+            $vCard .= "TEL:{$this->escapeValue($this->phone)}\r\n";
+        }
+
+        if ($this->company) {
+            $vCard .= "ORG:{$this->escapeValue($this->company)}\r\n";
+        }
+
+        if ($this->title) {
+            $vCard .= "TITLE:{$this->escapeValue($this->title)}\r\n";
+        }
+
+        if ($this->url) {
+            $vCard .= "URL:{$this->escapeValue($this->url)}\r\n";
+        }
+
+        $vCard .= 'END:VCARD';
+
+        return $vCard;
+    }
 
     /**
      * @param  array<int, mixed>  $arguments
@@ -76,7 +110,7 @@ final class VCard implements DataTypeInterface
         }
     }
 
-    protected function escapeValue(string $value): string
+    private function escapeValue(string $value): string
     {
         return strtr($value, [
             '\\' => '\\\\',
@@ -85,37 +119,5 @@ final class VCard implements DataTypeInterface
             "\n" => '\\n',
             "\r" => '',
         ]);
-    }
-
-    public function __toString(): string
-    {
-        $vCard = "BEGIN:VCARD\r\nVERSION:3.0\r\n";
-
-        $vCard .= "FN:{$this->escapeValue($this->name)}\r\n";
-        $vCard .= "N:{$this->escapeValue($this->lastName ?? '')};{$this->escapeValue($this->firstName ?? '')};;;\r\n";
-
-        if ($this->email) {
-            $vCard .= "EMAIL:{$this->escapeValue($this->email)}\r\n";
-        }
-
-        if ($this->phone) {
-            $vCard .= "TEL:{$this->escapeValue($this->phone)}\r\n";
-        }
-
-        if ($this->company) {
-            $vCard .= "ORG:{$this->escapeValue($this->company)}\r\n";
-        }
-
-        if ($this->title) {
-            $vCard .= "TITLE:{$this->escapeValue($this->title)}\r\n";
-        }
-
-        if ($this->url) {
-            $vCard .= "URL:{$this->escapeValue($this->url)}\r\n";
-        }
-
-        $vCard .= 'END:VCARD';
-
-        return $vCard;
     }
 }

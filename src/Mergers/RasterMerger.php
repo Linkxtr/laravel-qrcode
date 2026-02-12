@@ -1,19 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\Mergers;
 
 use GdImage;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
 use Linkxtr\QrCode\Support\Image;
+use RuntimeException;
 
 final class RasterMerger implements MergerInterface
 {
     public function __construct(
-        protected Image $sourceImage,
-        protected Image $mergeImage,
-        protected string $format = 'png',
-        protected float $percentage = 0.2
+        private Image $sourceImage,
+        private Image $mergeImage,
+        private string $format = 'png',
+        private float $percentage = 0.2
     ) {
         if (! in_array($this->format, ['png', 'webp'])) {
             throw new InvalidArgumentException('ImageMerge only supports "png" or "webp" formats.');
@@ -41,14 +44,14 @@ final class RasterMerger implements MergerInterface
         $canvas = imagecreatetruecolor($sourceWidth, $sourceHeight);
 
         if (! $canvas) {
-            throw new \RuntimeException('Failed to create image canvas.');
+            throw new RuntimeException('Failed to create image canvas.');
         }
 
         imagealphablending($canvas, true);
         $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
 
         if (! $transparent) {
-            throw new \RuntimeException('Failed to create transparent color.');
+            throw new RuntimeException('Failed to create transparent color.');
         }
 
         imagefill($canvas, 0, 0, $transparent);
@@ -74,7 +77,7 @@ final class RasterMerger implements MergerInterface
         return $this->createOutput($canvas);
     }
 
-    protected function createOutput(GdImage $canvas): string
+    private function createOutput(GdImage $canvas): string
     {
         ob_start();
 

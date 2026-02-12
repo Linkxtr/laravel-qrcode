@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\Mergers;
 
 use InvalidArgumentException;
@@ -8,9 +10,9 @@ use Linkxtr\QrCode\Contracts\MergerInterface;
 final class SvgMerger implements MergerInterface
 {
     public function __construct(
-        protected string $svgContent,
-        protected string $mergeImageContent,
-        protected float $percentage
+        private string $svgContent,
+        private string $mergeImageContent,
+        private float $percentage
     ) {}
 
     public function merge(): string

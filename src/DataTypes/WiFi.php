@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
@@ -7,15 +9,20 @@ use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class WiFi implements DataTypeInterface
 {
-    protected string $prefix = 'WIFI:';
+    private string $prefix = 'WIFI:';
 
-    protected string $ssid;
+    private string $ssid;
 
-    protected string $password;
+    private string $password;
 
-    protected bool $hidden;
+    private bool $hidden;
 
-    protected string $separator = ';';
+    private string $separator = ';';
+
+    public function __toString(): string
+    {
+        return $this->buildWiFiString();
+    }
 
     /**
      * @param  list<mixed>  $arguments
@@ -28,7 +35,7 @@ final class WiFi implements DataTypeInterface
     /**
      * @param  list<mixed>  $arguments
      */
-    protected function setProperties(array $arguments): void
+    private function setProperties(array $arguments): void
     {
         if (! isset($arguments[0]) || ! is_array($arguments[0])) {
             throw new InvalidArgumentException('Invalid WiFi arguments.');
@@ -51,12 +58,7 @@ final class WiFi implements DataTypeInterface
         }
     }
 
-    public function __toString(): string
-    {
-        return $this->buildWiFiString();
-    }
-
-    protected function buildWiFiString(): string
+    private function buildWiFiString(): string
     {
         $wifi = $this->prefix;
 

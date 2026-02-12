@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Linkxtr\QrCode\DataTypes\WhatsApp;
 
 it('generates a WhatsApp string', function () {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
@@ -7,17 +9,22 @@ use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class Email implements DataTypeInterface
 {
-    protected string $prefix = 'mailto:';
+    private string $prefix = 'mailto:';
 
-    protected ?string $address = null;
+    private ?string $address = null;
 
-    protected string $subject;
+    private string $subject;
 
-    protected string $body;
+    private string $body;
 
-    protected string $cc;
+    private string $cc;
 
-    protected string $bcc;
+    private string $bcc;
+
+    public function __toString(): string
+    {
+        return $this->buildEmailString();
+    }
 
     /**
      * @param  list<mixed>  $arguments
@@ -30,7 +37,7 @@ final class Email implements DataTypeInterface
     /**
      * @param  list<mixed>  $arguments
      */
-    protected function setProperties(array $arguments): void
+    private function setProperties(array $arguments): void
     {
         if (isset($arguments[0])) {
             $this->address = $this->setAddress($arguments[0]);
@@ -60,12 +67,7 @@ final class Email implements DataTypeInterface
         }
     }
 
-    public function __toString(): string
-    {
-        return $this->buildEmailString();
-    }
-
-    protected function buildEmailString(): string
+    private function buildEmailString(): string
     {
         $params = [];
 
@@ -92,7 +94,7 @@ final class Email implements DataTypeInterface
         return $this->prefix.$this->address.'?'.http_build_query($params);
     }
 
-    protected function setAddress(mixed $address): string
+    private function setAddress(mixed $address): string
     {
         if (! filter_var($address, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException('Invalid email address provided to Email.');

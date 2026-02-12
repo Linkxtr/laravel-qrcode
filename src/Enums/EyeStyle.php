@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\Enums;
 
 use Linkxtr\QrCode\Enums\Concerns\EnumHelper;

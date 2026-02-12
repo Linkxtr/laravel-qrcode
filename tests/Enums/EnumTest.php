@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use BaconQrCode\Common\ErrorCorrectionLevel as BaconErrorCorrectionLevel;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
 use BaconQrCode\Renderer\RendererStyle\GradientType as BaconGradientType;

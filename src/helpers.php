@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Facades\QrCode as QrCodeFacade;
 use Linkxtr\QrCode\Generator;

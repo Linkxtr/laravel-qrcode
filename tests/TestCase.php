@@ -1,14 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use Orchestra\Testbench\TestCase as Orchestra;
 
-class TestCase extends Orchestra
+final class TestCase extends Orchestra
 {
     protected function setUp(): void
     {
         parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        global $mockFilePutContents;
+        $mockFilePutContents = false;
     }
 
     protected function getPackageProviders($app)
@@ -23,12 +32,5 @@ class TestCase extends Orchestra
         return [
             'QrCode' => \Linkxtr\QrCode\Facades\QrCode::class,
         ];
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        global $mockFilePutContents;
-        $mockFilePutContents = false;
     }
 }

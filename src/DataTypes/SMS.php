@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
@@ -17,6 +19,11 @@ final class SMS implements DataTypeInterface
     protected ?string $smsAddress = null;
 
     protected ?string $message = null;
+
+    public function __toString(): string
+    {
+        return $this->buildSMSString();
+    }
 
     /**
      * @param  list<mixed>  $arguments
@@ -51,11 +58,6 @@ final class SMS implements DataTypeInterface
         if (isset($arguments[1]) && is_string($arguments[1])) {
             $this->message = $arguments[1];
         }
-    }
-
-    public function __toString(): string
-    {
-        return $this->buildSMSString();
     }
 
     protected function buildSMSString(): string
