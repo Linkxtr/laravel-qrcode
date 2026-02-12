@@ -119,6 +119,8 @@ QrCode::vCard([
 ]);
 
 // Calendar Event
+use Carbon\Carbon;
+
 QrCode::calendar([
     'summary' => 'Laracon US',
     'description' => 'The official Laravel conference.',
@@ -126,6 +128,12 @@ QrCode::calendar([
     'start' => Carbon::create(2024, 8, 27, 9, 0, 0),
     'end' => Carbon::create(2024, 8, 28, 17, 0, 0),
 ]);
+
+// WhatsApp
+QrCode::WhatsApp('+1234567890', 'Hello from Laravel!');
+
+// Telegram
+QrCode::telegram('username');
 ```
 
 ## 🔧 Advanced Usage
@@ -233,6 +241,11 @@ We're actively working on Version 2 with these planned features:
 - [x] vCard data type
 - [x] Calendar event data type
 - [x] WebP format support
+      <<<<<<< HEAD
+      =======
+- [x] Telegram data type support
+- [x] WhatsApp data type support
+  > > > > > > > main
 - [ ] Animated QR codes
 - [ ] Bitcoin payment QR codes
 - [ ] Extended customization options
@@ -300,6 +313,8 @@ QrCode::size(400)
 - `btc($config)` - Generate BTC QR
 - `vCard($config)` - Generate vCard QR
 - `calendar($config)` - Generate Calendar Event QR
+- `whatsapp($phone, $message)` - Generate WhatsApp QR
+- `telegram($username)` - Generate Telegram QR
 
 ## 📄 License
 

@@ -6,76 +6,46 @@ use InvalidArgumentException;
 
 final class SvgImageMerge
 {
-    protected string $svgContent;
-
-    protected string $mergeImageContent;
-
-    protected float $percentage;
-
-    public function __construct(string $svgContent, string $mergeImageContent, float $percentage)
-    {
-        $this->svgContent = $svgContent;
-        $this->mergeImageContent = $mergeImageContent;
-        $this->percentage = $percentage;
-    }
+    public function __construct(
+        protected string $svgContent,
+        protected string $mergeImageContent,
+        protected float $percentage
+    ) {}
 
     public function merge(): string
     {
-        if ($this->percentage > 1 || $this->percentage <= 0) {
+        if ($this->percentage <= 0 || $this->percentage > 1) {
             throw new InvalidArgumentException('$percentage must be greater than 0 and less than or equal to 1');
         }
+        $widthFound = preg_match('/width=["\'](\d+)["\']/i', $this->svgContent, $widthMatch);
+        $heightFound = preg_match('/height=["\'](\d+)["\']/i', $this->svgContent, $heightMatch);
 
-        // Parse SVG to get width and height
-        preg_match('/width="(\d+)"/', $this->svgContent, $widthMatch);
-        preg_match('/height="(\d+)"/', $this->svgContent, $heightMatch);
-
-        if (! isset($widthMatch[1]) || ! isset($heightMatch[1])) {
-            throw new InvalidArgumentException('Could not determine SVG dimensions.');
+        if (! $widthFound || ! $heightFound) {
+            throw new InvalidArgumentException('Could not determine SVG dimensions. Ensure the SVG has width and height attributes.');
         }
 
         $svgWidth = (int) $widthMatch[1];
         $svgHeight = (int) $heightMatch[1];
 
-        // Prepare image data
-        $base64Image = base64_encode($this->mergeImageContent);
-        $mimeType = $this->getMimeType($this->mergeImageContent);
-        $imageUri = "data:{$mimeType};base64,{$base64Image}";
+        $imageInfo = getimagesizefromstring($this->mergeImageContent);
 
-        // Calculate dimensions for the merged image
-        // We need to know the aspect ratio of the merge image to calculate dimensions correctly
-        // Since we have the raw content, we can use getimagesizefromstring if available or create a gd resource
-        $mergeImageWidth = 0;
-        $mergeImageHeight = 0;
-
-        // Try to get dimensions using GD
-        $img = false;
-        set_error_handler(function () {
-            return true;
-        });
-
-        $img = imagecreatefromstring($this->mergeImageContent);
-
-        restore_error_handler();
-
-        if ($img !== false) {
-            $mergeImageWidth = imagesx($img);
-            $mergeImageHeight = imagesy($img);
-            unset($img);
-        } else {
-            // Fallback or error? If we can't determine size, we might assume square or throw error.
-            // Given the requirements, we should probably throw an error if the image is invalid.
-            throw new InvalidArgumentException('Invalid image data provided for merge.');
+        if ($imageInfo === false) {
+            throw new InvalidArgumentException('Invalid image data provided for merge. Could not determine image type/size.');
         }
 
-        $mergeRatio = $mergeImageWidth / $mergeImageHeight;
+        [$logoWidth, $logoHeight] = $imageInfo;
+        $mimeType = $imageInfo['mime'];
 
-        $targetWidth = intval($svgWidth * $this->percentage);
-        $targetHeight = intval($targetWidth / $mergeRatio);
+        $logoRatio = $logoWidth / $logoHeight;
+        $targetWidth = (int) ($svgWidth * $this->percentage);
+        $targetHeight = (int) ($targetWidth / $logoRatio);
 
-        $x = intval(($svgWidth - $targetWidth) / 2);
-        $y = intval(($svgHeight - $targetHeight) / 2);
+        $x = (int) (($svgWidth - $targetWidth) / 2);
+        $y = (int) (($svgHeight - $targetHeight) / 2);
 
-        // Create <image> tag
+        $base64Image = base64_encode($this->mergeImageContent);
+        $imageUri = "data:{$mimeType};base64,{$base64Image}";
+
         $imageTag = sprintf(
             '<image x="%d" y="%d" width="%d" height="%d" href="%s" />',
             $x,
@@ -85,20 +55,12 @@ final class SvgImageMerge
             $imageUri
         );
 
-        // Inject before </svg>
-        $pos = strrpos($this->svgContent, '</svg>');
-        if ($pos === false) {
-            throw new InvalidArgumentException('Invalid SVG content.');
+        $closingTagPos = strrpos($this->svgContent, '</svg>');
+
+        if ($closingTagPos === false) {
+            throw new InvalidArgumentException('Invalid SVG content: closing tag not found.');
         }
 
-        return substr_replace($this->svgContent, $imageTag.'</svg>', $pos, strlen('</svg>'));
-    }
-
-    protected function getMimeType(string $content): string
-    {
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->buffer($content);
-
-        return $mime ?: 'application/octet-stream';
+        return substr_replace($this->svgContent, $imageTag.'</svg>', $closingTagPos, strlen('</svg>'));
     }
 }

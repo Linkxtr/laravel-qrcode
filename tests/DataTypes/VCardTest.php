@@ -73,6 +73,7 @@ it('throws exception if name is missing', function () {
 it('validation fails for invalid email', function () {
     $vCard = new VCard;
     $vCard->create([
+        'name' => 'John Doe',
         'email' => 'invalid-email',
     ]);
 })->throws(\InvalidArgumentException::class, 'Invalid email address provided to vCard.');
@@ -80,6 +81,7 @@ it('validation fails for invalid email', function () {
 it('validation fails for invalid url', function () {
     $vCard = new VCard;
     $vCard->create([
+        'name' => 'John Doe',
         'url' => 'invalid-url',
     ]);
 })->throws(\InvalidArgumentException::class, 'Invalid URL provided to vCard.');
