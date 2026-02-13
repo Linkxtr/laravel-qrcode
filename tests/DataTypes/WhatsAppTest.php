@@ -38,3 +38,15 @@ it('supports positional arguments', function () {
 
     expect((string) $whatsapp)->toBe('https://wa.me/1234567890?text=Hello+World');
 });
+
+it('throws exception if number is not a string (named)', function () {
+    $whatsapp = new WhatsApp;
+    expect(fn () => $whatsapp->create(['number' => 1234567890]))
+        ->toThrow(InvalidArgumentException::class, 'WhatsApp number must be a string.');
+});
+
+it('throws exception if number is not a string (positional)', function () {
+    $whatsapp = new WhatsApp;
+    expect(fn () => $whatsapp->create([1234567890]))
+        ->toThrow(InvalidArgumentException::class, 'WhatsApp number must be a string.');
+});

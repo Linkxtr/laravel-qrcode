@@ -11,16 +11,14 @@ it('throw exception if percentage is greater than 1', function () {
     $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
     $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
 
-    $test = new RasterMerger($source, $merge, 'png', 2.1);
-    $test->merge();
+    new RasterMerger($source, $merge, 'png', 2.1);
 })->throws(InvalidArgumentException::class);
 
 it('throw exception if percentage is less than 0', function () {
     $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
     $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
 
-    $test = new RasterMerger($source, $merge, 'png', -0.1);
-    $test->merge();
+    new RasterMerger($source, $merge, 'png', -0.1);
 })->throws(InvalidArgumentException::class);
 
 it('throws exception if format is not png or webp', function () {
@@ -28,7 +26,7 @@ it('throws exception if format is not png or webp', function () {
     $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
 
     new RasterMerger($source, $merge, 'jpg');
-})->throws(InvalidArgumentException::class, 'ImageMerge only supports "png" or "webp" formats.');
+})->throws(InvalidArgumentException::class, 'RasterMerger only supports "png" or "webp" formats.');
 
 it('throws exception if transparent color cannot be created', function () {
     global $mockImageColorAllocateAlpha;

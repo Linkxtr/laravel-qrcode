@@ -328,11 +328,8 @@ final class Generator
 
     public function getRenderer(): RendererInterface
     {
-        if ($this->format === Format::SVG || $this->format === Format::EPS) {
-            return new ImageRenderer(
-                $this->getRendererStyle(),
-                $this->getFormatter()
-            );
+        if (! extension_loaded('imagick') && ! extension_loaded('gd')) {
+            throw new RuntimeException('The imagick or gd extension is required to generate QR codes.');
         }
 
         if (extension_loaded('imagick')) {
@@ -342,21 +339,17 @@ final class Generator
             );
         }
 
-        if (extension_loaded('gd')) {
-            if ($this->format !== Format::PNG) {
-                throw new RuntimeException('The gd extension does not support '.$this->format->value.' QR codes.');
-            }
-
-            return new GDLibRenderer(
-                $this->size,
-                $this->margin,
-                $this->format->value,
-                self::PNG_COMPRESSION_LEVEL,
-                $this->getFill()
-            );
+        if ($this->format !== Format::PNG) {
+            throw new RuntimeException('The imagick extension is required to generate QR codes in '.$this->format->value.' format.');
         }
 
-        throw new RuntimeException('The imagick or gd extension is required to generate QR codes.');
+        return new GDLibRenderer(
+            $this->size,
+            $this->margin,
+            $this->format->value,
+            self::PNG_COMPRESSION_LEVEL,
+            $this->getFill()
+        );
     }
 
     public function getRendererStyle(): RendererStyle
@@ -366,19 +359,12 @@ final class Generator
 
     public function getFormatter(): ImageBackEndInterface
     {
-        if ($this->format === Format::PNG) {
-            return new ImagickImageBackEnd('png');
-        }
-
-        if ($this->format === Format::WEBP) {
-            return new ImagickImageBackEnd('webp');
-        }
-
-        if ($this->format === Format::EPS) {
-            return new EpsImageBackEnd;
-        }
-
-        return new SvgImageBackEnd;
+        return match ($this->format) {
+            Format::PNG => new ImagickImageBackEnd('png'),
+            Format::WEBP => new ImagickImageBackEnd('webp'),
+            Format::EPS => new EpsImageBackEnd,
+            Format::SVG => new SvgImageBackEnd,
+        };
     }
 
     public function getModule(): ModuleInterface
@@ -464,15 +450,17 @@ final class Generator
             throw new BadMethodCallException;
         }
 
-        return new $class;
+        $instance = new $class;
+
+        if (! $instance instanceof DataTypeInterface) {
+            throw new BadMethodCallException;
+        }
+
+        return $instance;
     }
 
-    /** @return class-string<DataTypeInterface> */
     private function formatClass(string $method): string
     {
-        /** @var class-string<DataTypeInterface> */
-        $class = "Linkxtr\QrCode\DataTypes\\".$method;
-
-        return $class;
+        return "Linkxtr\QrCode\DataTypes\\".$method;
     }
 }

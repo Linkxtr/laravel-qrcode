@@ -46,6 +46,10 @@ final class WhatsApp implements DataTypeInterface
             }
         }
 
+        if (isset($properties['number']) && ! is_string($properties['number'])) {
+            throw new InvalidArgumentException('WhatsApp number must be a string.');
+        }
+
         if (isset($properties['number']) && is_string($properties['number'])) {
             $this->number = $properties['number'];
         }

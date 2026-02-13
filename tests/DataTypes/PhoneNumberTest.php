@@ -29,3 +29,8 @@ it('throws an exception when phone number is not a valid phone number', function
     expect(fn () => $this->phoneNumber->create(['invalid']))
         ->toThrow(InvalidArgumentException::class, 'Invalid phone number format. Must be 1-15 digits, optionally starting with +');
 });
+
+it('throws an exception when not initialized', function () {
+    expect(fn () => (string) $this->phoneNumber)
+        ->toThrow(LogicException::class, 'Phone number is required. Call create() before using this object.');
+});

@@ -114,4 +114,33 @@ namespace Linkxtr\QrCode\Mergers {
             return \imagecreatetruecolor($width, $height);
         }
     }
+
+    if (! isset($GLOBALS['mockObGetClean'])) {
+        $GLOBALS['mockObGetClean'] = null;
+    }
+
+    if (! function_exists('Linkxtr\QrCode\Mergers\ob_get_clean')) {
+        function ob_get_clean()
+        {
+            if (isset($GLOBALS['mockObGetClean']) && $GLOBALS['mockObGetClean'] === false) {
+                return false;
+            }
+
+            return \ob_get_clean();
+        }
+    }
+}
+
+namespace Linkxtr\QrCode\DataTypes {
+    final class InvalidDataType
+    {
+        public function __construct() {}
+
+        public function __toString(): string
+        {
+            return '';
+        }
+
+        public function create(array $arguments): void {}
+    }
 }

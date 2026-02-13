@@ -19,7 +19,7 @@ final readonly class RasterMerger implements MergerInterface
         private float $percentage = 0.2
     ) {
         if (! in_array($this->format, ['png', 'webp'])) {
-            throw new InvalidArgumentException('ImageMerge only supports "png" or "webp" formats.');
+            throw new InvalidArgumentException('RasterMerger only supports "png" or "webp" formats.');
         }
 
         if ($this->percentage <= 0 || $this->percentage > 1) {
@@ -36,8 +36,8 @@ final readonly class RasterMerger implements MergerInterface
         $mergeHeight = $this->mergeImage->getHeight();
         $mergeRatio = $mergeWidth / $mergeHeight;
 
-        $targetLogoWidth = (int) ($sourceWidth * $this->percentage);
-        $targetLogoHeight = (int) ($targetLogoWidth / $mergeRatio);
+        $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage));
+        $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio));
         $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
         $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
 

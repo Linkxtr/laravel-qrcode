@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use DateTimeInterface;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use LogicException;
 
 final class CalendarEvent implements DataTypeInterface
 {
@@ -21,13 +22,19 @@ final class CalendarEvent implements DataTypeInterface
 
     private Carbon $end;
 
+    private string $uid = '';
+
     public function __toString(): string
     {
+        if ($this->uid === '') {
+            throw new LogicException('CalendarEvent must be initialized via create() before rendering.');
+        }
+
         $event = "BEGIN:VCALENDAR\r\n";
         $event .= "VERSION:2.0\r\n";
         $event .= "PRODID:-//Linkxtr//LaravelQrCode//EN\r\n";
         $event .= "BEGIN:VEVENT\r\n";
-        $event .= 'UID:'.uniqid('', true).'@linkxtr-qrcode'."\r\n";
+        $event .= 'UID:'.$this->uid."\r\n";
         $event .= 'DTSTAMP:'.Carbon::now()->utc()->format('Ymd\THis\Z')."\r\n";
         $event .= 'SUMMARY:'.$this->formatProperty($this->summary)."\r\n";
 
@@ -51,6 +58,8 @@ final class CalendarEvent implements DataTypeInterface
      */
     public function create(array $arguments): void
     {
+        $this->uid = uniqid('', true).'@linkxtr-qrcode';
+
         $attributes = $arguments[0] ?? [];
 
         if (! is_array($attributes)) {

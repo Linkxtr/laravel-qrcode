@@ -363,7 +363,7 @@ it('throws exception if file_put_contents fails', function () {
     $mockFilePutContents = true;
 
     try {
-        (new Generator)->generate('test file', __DIR__.'fail_file.svg');
+        (new Generator)->generate('test file', __DIR__.'/fail_file.svg');
     } finally {
         $mockFilePutContents = false;
     }
@@ -403,7 +403,7 @@ it('throws exception if imagick is not loaded and format is webp', function () {
     } finally {
         $mockImagickLoaded = true;
     }
-})->throws(RuntimeException::class, 'The gd extension does not support webp QR codes.');
+})->throws(RuntimeException::class, 'The imagick extension is required to generate QR codes in webp format.');
 
 test('webp format is supported', function () {
     $qrCode = (new Generator)->format('webp');
@@ -420,3 +420,7 @@ test('can generate webp', function () {
     expect(substr($data, 0, 4))->toBe('RIFF');
     expect(substr($data, 8, 4))->toBe('WEBP');
 });
+
+it('throws exception if data type class does not implement interface', function () {
+    (new Generator)->InvalidDataType();
+})->throws(BadMethodCallException::class);

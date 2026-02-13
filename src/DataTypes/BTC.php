@@ -47,12 +47,16 @@ final class BTC implements DataTypeInterface
             throw new InvalidArgumentException('Bitcoin address must be a string.');
         }
 
-        if (! is_float($arguments[1])) {
-            throw new InvalidArgumentException('Bitcoin amount must be a float.');
+        if (! is_numeric($arguments[1])) {
+            throw new InvalidArgumentException('Bitcoin amount must be a numeric value.');
+        }
+
+        if ((float) $arguments[1] < 0) {
+            throw new InvalidArgumentException('Bitcoin amount must be non-negative.');
         }
 
         $this->address = $arguments[0];
-        $this->amount = $arguments[1];
+        $this->amount = (float) $arguments[1];
 
         if (isset($arguments[2]) && is_array($arguments[2])) {
             $this->setOptions($arguments[2]);

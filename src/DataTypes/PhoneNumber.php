@@ -7,6 +7,7 @@ namespace Linkxtr\QrCode\DataTypes;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
+use LogicException;
 
 final class PhoneNumber implements DataTypeInterface
 {
@@ -48,6 +49,10 @@ final class PhoneNumber implements DataTypeInterface
 
     protected function buildPhoneNumberString(): string
     {
+        if ($this->phoneNumber === null) {
+            throw new LogicException('Phone number is required. Call create() before using this object.');
+        }
+
         return $this->prefix.$this->phoneNumber;
     }
 }

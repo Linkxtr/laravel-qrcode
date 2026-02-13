@@ -6,6 +6,7 @@ namespace Linkxtr\QrCode\Mergers;
 
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
+use RuntimeException;
 
 final readonly class EpsMerger implements MergerInterface
 {
@@ -43,10 +44,8 @@ final readonly class EpsMerger implements MergerInterface
         $logoH = imagesy($logo);
         $ratio = $logoW / $logoH;
 
-        /** @var int<1, max> $targetW */
-        $targetW = (int) ($qrWidth * $this->percentage);
-        /** @var int<1, max> $targetH */
-        $targetH = (int) ($targetW / $ratio);
+        $targetW = max(1, (int) ($qrWidth * $this->percentage));
+        $targetH = max(1, (int) ($targetW / $ratio));
 
         $posX = (int) (($qrWidth - $targetW) / 2) + $llx;
         $posY = (int) (($qrHeight - $targetH) / 2) + $lly;
@@ -79,6 +78,11 @@ final readonly class EpsMerger implements MergerInterface
             }
         }
         $hexData = ob_get_clean();
+
+        if ($hexData === false) {
+            throw new RuntimeException('Failed to capture hex data from output buffer.');
+        }
+
         unset($logo);
         unset($resizedLogo);
 

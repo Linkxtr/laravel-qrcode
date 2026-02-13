@@ -62,3 +62,21 @@ it('replaces showpage with merged logo', function () {
     expect($result)->toContain('showpage');
     expect($result)->not->toBe($eps);
 });
+
+it('throws exception if ob_get_clean fails', function () {
+    global $mockObGetClean;
+    $mockObGetClean = false;
+
+    $eps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 100 100";
+    $validImage = file_get_contents(__DIR__.'/../images/linkxtr.png');
+
+    try {
+        $merger = new EpsMerger($eps, $validImage, 0.2);
+        $merger->merge();
+    } finally {
+        $mockObGetClean = null;
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+    }
+})->throws(RuntimeException::class, 'Failed to capture hex data from output buffer.');
