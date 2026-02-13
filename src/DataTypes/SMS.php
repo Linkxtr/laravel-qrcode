@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
 
 final class SMS implements DataTypeInterface
@@ -16,6 +19,11 @@ final class SMS implements DataTypeInterface
     protected ?string $smsAddress = null;
 
     protected ?string $message = null;
+
+    public function __toString(): string
+    {
+        return $this->buildSMSString();
+    }
 
     /**
      * @param  list<mixed>  $arguments
@@ -52,16 +60,11 @@ final class SMS implements DataTypeInterface
         }
     }
 
-    public function __toString(): string
-    {
-        return $this->buildSMSString();
-    }
-
     protected function buildSMSString(): string
     {
         $sms = $this->prefix.($this->smsAddress ?? '');
 
-        if (isset($this->message)) {
+        if ($this->message !== null) {
             $sms .= $this->separator.rawurlencode($this->message);
         }
 

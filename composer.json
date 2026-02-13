@@ -30,11 +30,12 @@
   "require-dev": {
     "chillerlan/php-qrcode": "^5.0",
     "laravel/pint": "^1.0",
-    "nunomaduro/collision": "^8.0",
     "orchestra/testbench": "^9.0|^10.0",
     "pestphp/pest": "^2.0|^3.0|^4.0",
     "pestphp/pest-plugin-laravel": "^2.0|^3.0|^4.0",
-    "phpstan/phpstan": "^2.0"
+    "pestphp/pest-plugin-type-coverage": "^2.0|^3.0",
+    "phpstan/phpstan": "^2.0",
+    "rector/rector": "^2.0"
   },
   "autoload": {
     "psr-4": {
@@ -50,11 +51,19 @@
     }
   },
   "scripts": {
-    "test": "vendor/bin/pest --coverage --min=100",
-    "lint": "vendor/bin/pint --parallel",
-    "analyse": "vendor/bin/phpstan analyse",
-    "post-autoload-dump": [
-      "@php ./vendor/bin/testbench package:discover --ansi"
+    "refactor": "rector",
+    "lint": "pint --parallel",
+    "test:refactor": "rector --dry-run",
+    "test:lint": "pint --parallel --test",
+    "test:types": "phpstan analyse --ansi",
+    "test:type-coverage": "pest --type-coverage --compact --coverage --min=100",
+    "test:unit": "pest --parallel --colors=always --coverage --min=100",
+    "test": [
+      "@test:refactor",
+      "@test:lint",
+      "@test:types",
+      "@test:type-coverage",
+      "@test:unit"
     ]
   },
   "config": {

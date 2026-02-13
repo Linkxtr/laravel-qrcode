@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
+use LogicException;
 
 final class PhoneNumber implements DataTypeInterface
 {
@@ -12,6 +16,11 @@ final class PhoneNumber implements DataTypeInterface
     protected string $prefix = 'tel:';
 
     protected ?string $phoneNumber = null;
+
+    public function __toString(): string
+    {
+        return $this->buildPhoneNumberString();
+    }
 
     /**
      * @param  list<mixed>  $arguments
@@ -38,13 +47,12 @@ final class PhoneNumber implements DataTypeInterface
         $this->phoneNumber = $arguments[0];
     }
 
-    public function __toString(): string
-    {
-        return $this->buildPhoneNumberString();
-    }
-
     protected function buildPhoneNumberString(): string
     {
+        if ($this->phoneNumber === null) {
+            throw new LogicException('Phone number is required. Call create() before using this object.');
+        }
+
         return $this->prefix.$this->phoneNumber;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Linkxtr\QrCode\DataTypes\BTC;
 
 covers(BTC::class);
@@ -48,7 +50,12 @@ it('throws an exception when Bitcoin amount is missing', function () {
         ->toThrow(InvalidArgumentException::class, 'Bitcoin address and amount are required.');
 });
 
-it('throws an exception when Bitcoin amount is not a float', function () {
+it('throws an exception when Bitcoin amount is not numeric', function () {
     expect(fn () => $this->btc->create(['btcaddress', 'invalid']))
-        ->toThrow(InvalidArgumentException::class, 'Bitcoin amount must be a float.');
+        ->toThrow(InvalidArgumentException::class, 'Bitcoin amount must be a numeric value.');
+});
+
+it('throws an exception when Bitcoin amount is negative', function () {
+    expect(fn () => $this->btc->create(['btcaddress', -0.0034]))
+        ->toThrow(InvalidArgumentException::class, 'Bitcoin amount must be non-negative.');
 });

@@ -1,14 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class WhatsApp implements DataTypeInterface
 {
-    protected ?string $number = null;
+    private ?string $number = null;
 
-    protected ?string $message = null;
+    private ?string $message = null;
+
+    public function __toString(): string
+    {
+        if (! $this->number) {
+            throw new InvalidArgumentException('WhatsApp number is mandatory.');
+        }
+
+        $url = 'https://wa.me/'.$this->number;
+
+        if ($this->message) {
+            $url .= '?text='.urlencode($this->message);
+        }
+
+        return $url;
+    }
 
     /**
      * @param  list<mixed>|array<string, mixed>  $arguments
@@ -28,6 +46,10 @@ final class WhatsApp implements DataTypeInterface
             }
         }
 
+        if (isset($properties['number']) && ! is_string($properties['number'])) {
+            throw new InvalidArgumentException('WhatsApp number must be a string.');
+        }
+
         if (isset($properties['number']) && is_string($properties['number'])) {
             $this->number = $properties['number'];
         }
@@ -35,20 +57,5 @@ final class WhatsApp implements DataTypeInterface
         if (isset($properties['message']) && is_string($properties['message'])) {
             $this->message = $properties['message'];
         }
-    }
-
-    public function __toString(): string
-    {
-        if (! $this->number) {
-            throw new InvalidArgumentException('WhatsApp number is mandatory.');
-        }
-
-        $url = 'https://wa.me/'.$this->number;
-
-        if ($this->message) {
-            $url .= '?text='.urlencode($this->message);
-        }
-
-        return $url;
     }
 }

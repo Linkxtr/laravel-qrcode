@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Linkxtr\QrCode\DataTypes\VCard;
 
 it('generates a vCard string from direct array', function () {
@@ -68,7 +70,7 @@ it('throws exception if name is missing', function () {
         'email' => 'john@example.com',
     ]);
     (string) $vCard;
-})->throws(\InvalidArgumentException::class, 'vCard FN (Formatted Name) is mandatory.');
+})->throws(InvalidArgumentException::class, 'vCard FN (Formatted Name) is mandatory.');
 
 it('validation fails for invalid email', function () {
     $vCard = new VCard;
@@ -76,7 +78,7 @@ it('validation fails for invalid email', function () {
         'name' => 'John Doe',
         'email' => 'invalid-email',
     ]);
-})->throws(\InvalidArgumentException::class, 'Invalid email address provided to vCard.');
+})->throws(InvalidArgumentException::class, 'Invalid email address provided to vCard.');
 
 it('validation fails for invalid url', function () {
     $vCard = new VCard;
@@ -84,4 +86,4 @@ it('validation fails for invalid url', function () {
         'name' => 'John Doe',
         'url' => 'invalid-url',
     ]);
-})->throws(\InvalidArgumentException::class, 'Invalid URL provided to vCard.');
+})->throws(InvalidArgumentException::class, 'Invalid URL provided to vCard.');

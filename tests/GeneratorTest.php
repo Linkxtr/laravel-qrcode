@@ -1,11 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Eye\SimpleCircleEye;
 use BaconQrCode\Renderer\Eye\SquareEye;
-use BaconQrCode\Renderer\Image\EpsImageBackEnd;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\Module\DotsModule;
 use BaconQrCode\Renderer\Module\RoundnessModule;
 use BaconQrCode\Renderer\Module\SquareModule;
@@ -13,9 +12,9 @@ use BaconQrCode\Renderer\RendererStyle\Gradient;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Generator;
-use Linkxtr\QrCode\Image;
+use Linkxtr\QrCode\Support\Image;
 
-require_once __DIR__.'/Overrides.php';
+require_once __DIR__.'/Support/Overrides.php';
 
 covers(Generator::class);
 
@@ -81,17 +80,6 @@ test('default margin is 0', function () {
     $qrCode = new Generator;
 
     expect($qrCode->getRendererStyle()->getMargin())->toBe(0);
-});
-
-test('format is passed to formatter', function () {
-    $qrCode = (new Generator)->format('png');
-    expect($qrCode->getFormatter())->toBeInstanceOf(ImagickImageBackEnd::class);
-
-    $qrCode = (new Generator)->format('svg');
-    expect($qrCode->getFormatter())->toBeInstanceOf(SvgImageBackEnd::class);
-
-    $qrCode = (new Generator)->format('eps');
-    expect($qrCode->getFormatter())->toBeInstanceOf(EpsImageBackEnd::class);
 });
 
 it('throws exception if format is not supported', function () {
@@ -283,7 +271,7 @@ it('merges image into qrcode with png format', function () {
         ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
         ->generate('test');
 
-    $image = new Image($pngData);
+    $image = new Image($pngData->__toString());
     expect($image->getWidth())->toBe(300);
 });
 
@@ -294,7 +282,7 @@ it('merges image into qrcode with webp format', function () {
         ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
         ->generate('test');
 
-    $image = new Image($webpData);
+    $image = new Image($webpData->__toString());
     expect($image->getWidth())->toBe(300);
 });
 
@@ -361,7 +349,7 @@ it('throws exception if file_put_contents fails', function () {
     $mockFilePutContents = true;
 
     try {
-        (new Generator)->generate('test file', 'fail_file.svg');
+        (new Generator)->generate('test file', __DIR__.'/fail_file.svg');
     } finally {
         $mockFilePutContents = false;
     }
@@ -401,11 +389,11 @@ it('throws exception if imagick is not loaded and format is webp', function () {
     } finally {
         $mockImagickLoaded = true;
     }
-})->throws(RuntimeException::class, 'The gd extension does not support webp QR codes.');
+})->throws(RuntimeException::class, 'The imagick extension is required to generate QR codes in webp format.');
 
 test('webp format is supported', function () {
     $qrCode = (new Generator)->format('webp');
-    expect($qrCode->getFormatter())->toBeInstanceOf(ImagickImageBackEnd::class);
+    expect($qrCode->generate('test'))->toBeInstanceOf(HtmlString::class);
 });
 
 test('can generate webp', function () {
@@ -418,3 +406,7 @@ test('can generate webp', function () {
     expect(substr($data, 0, 4))->toBe('RIFF');
     expect(substr($data, 8, 4))->toBe('WEBP');
 });
+
+it('throws exception if data type class does not implement interface', function () {
+    (new Generator)->InvalidDataType();
+})->throws(BadMethodCallException::class);
