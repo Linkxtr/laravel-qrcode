@@ -155,10 +155,8 @@ final class Generator
             $qrCode = $this->mergeImage($qrCode);
         }
 
-        if ($filename) {
-            if (file_put_contents($filename, $qrCode) === false) {
-                throw new RuntimeException("Failed to write QR code to file: {$filename}");
-            }
+        if ($filename && file_put_contents($filename, $qrCode) === false) {
+            throw new RuntimeException("Failed to write QR code to file: {$filename}");
         }
 
         return new HtmlString($qrCode);
@@ -417,7 +415,7 @@ final class Generator
         $eye1 = $this->eyeColors[1] ?? EyeFill::inherit();
         $eye2 = $this->eyeColors[2] ?? EyeFill::inherit();
 
-        if ($this->gradient) {
+        if ($this->gradient instanceof \BaconQrCode\Renderer\RendererStyle\Gradient) {
             return Fill::withForegroundGradient($backgroundColor, $this->gradient, $eye0, $eye1, $eye2);
         }
 

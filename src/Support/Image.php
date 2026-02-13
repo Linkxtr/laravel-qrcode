@@ -18,7 +18,7 @@ final class Image
         try {
             $img = imagecreatefromstring($image);
         } catch (ErrorException $e) {
-            throw new InvalidArgumentException('Invalid image data provided to Image.', previous: $e);
+            throw new InvalidArgumentException('Invalid image data provided to Image.', $e->getCode(), previous: $e);
         }
 
         $this->image = $img ?: null;
@@ -32,7 +32,7 @@ final class Image
     /** @return int<1, max> */
     public function getWidth(): int
     {
-        if ($this->image === null) {
+        if (!$this->image instanceof \GdImage) {
             throw new RuntimeException('Image resource has been released.');
         }
 
@@ -42,7 +42,7 @@ final class Image
     /** @return int<1, max> */
     public function getHeight(): int
     {
-        if ($this->image === null) {
+        if (!$this->image instanceof \GdImage) {
             throw new RuntimeException('Image resource has been released.');
         }
 
@@ -51,7 +51,7 @@ final class Image
 
     public function getImageResource(): GdImage
     {
-        if ($this->image === null) {
+        if (!$this->image instanceof \GdImage) {
             throw new RuntimeException('Image resource has been released.');
         }
 

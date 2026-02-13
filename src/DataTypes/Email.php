@@ -87,7 +87,7 @@ final class Email implements DataTypeInterface
             $params['bcc'] = $this->bcc;
         }
 
-        if (empty($params)) {
+        if ($params === []) {
             return $this->prefix.$this->address;
         }
 

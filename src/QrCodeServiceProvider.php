@@ -10,9 +10,7 @@ final class QrCodeServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind('qrcode', function () {
-            return new Generator;
-        });
+        $this->app->bind('qrcode', fn(): \Linkxtr\QrCode\Generator => new Generator);
     }
 
     /**

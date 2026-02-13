@@ -7,7 +7,7 @@ namespace Linkxtr\QrCode\Mergers;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
 
-final class EpsMerger implements MergerInterface
+final readonly class EpsMerger implements MergerInterface
 {
     public function __construct(
         private string $epsContent,

@@ -64,7 +64,7 @@ final class SMS implements DataTypeInterface
     {
         $sms = $this->prefix.($this->smsAddress ?? '');
 
-        if (isset($this->message)) {
+        if ($this->message !== null) {
             $sms .= $this->separator.rawurlencode($this->message);
         }
 

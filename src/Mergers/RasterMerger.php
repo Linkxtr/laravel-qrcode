@@ -10,7 +10,7 @@ use Linkxtr\QrCode\Contracts\MergerInterface;
 use Linkxtr\QrCode\Support\Image;
 use RuntimeException;
 
-final class RasterMerger implements MergerInterface
+final readonly class RasterMerger implements MergerInterface
 {
     public function __construct(
         private Image $sourceImage,

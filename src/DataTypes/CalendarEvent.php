@@ -42,9 +42,8 @@ final class CalendarEvent implements DataTypeInterface
         $event .= 'DTSTART:'.$this->start->utc()->format('Ymd\THis\Z')."\r\n";
         $event .= 'DTEND:'.$this->end->utc()->format('Ymd\THis\Z')."\r\n";
         $event .= "END:VEVENT\r\n";
-        $event .= "END:VCALENDAR\r\n";
 
-        return $event;
+        return $event . "END:VCALENDAR\r\n";
     }
 
     /**
@@ -100,8 +99,7 @@ final class CalendarEvent implements DataTypeInterface
         $value = str_replace('\\', '\\\\', $value);
         $value = str_replace(';', '\;', $value);
         $value = str_replace(',', '\,', $value);
-        $value = str_replace(["\r\n", "\r", "\n"], '\\n', $value);
 
-        return $value;
+        return str_replace(["\r\n", "\r", "\n"], '\\n', $value);
     }
 }

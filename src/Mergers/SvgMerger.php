@@ -7,7 +7,7 @@ namespace Linkxtr\QrCode\Mergers;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
 
-final class SvgMerger implements MergerInterface
+final readonly class SvgMerger implements MergerInterface
 {
     public function __construct(
         private string $svgContent,
