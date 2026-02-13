@@ -67,7 +67,7 @@ jobs:
       - name: Run Tests
         run: |
           mkdir -p build/logs
-          composer test
+          composer test:unit
 
   lint:
     name: Lint
@@ -109,4 +109,4 @@ jobs:
           composer install --prefer-dist --no-progress --no-suggest --no-interaction
 
       - name: Run PHPStan
-        run: composer analyse
+        run: composer test:types
