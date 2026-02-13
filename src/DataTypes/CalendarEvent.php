@@ -43,7 +43,7 @@ final class CalendarEvent implements DataTypeInterface
         $event .= 'DTEND:'.$this->end->utc()->format('Ymd\THis\Z')."\r\n";
         $event .= "END:VEVENT\r\n";
 
-        return $event . "END:VCALENDAR\r\n";
+        return $event."END:VCALENDAR\r\n";
     }
 
     /**

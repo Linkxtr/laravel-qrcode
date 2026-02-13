@@ -52,7 +52,7 @@ final class VCard implements DataTypeInterface
             $vCard .= "URL:{$this->escapeValue($this->url)}\r\n";
         }
 
-        return $vCard . 'END:VCARD';
+        return $vCard.'END:VCARD';
     }
 
     /**

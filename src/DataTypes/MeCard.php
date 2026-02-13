@@ -59,7 +59,7 @@ final class MeCard implements DataTypeInterface
             $meCard .= 'URL:'.$this->escapeValue($this->url).';';
         }
 
-        return $meCard . ';';
+        return $meCard.';';
     }
 
     /**

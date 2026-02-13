@@ -415,7 +415,7 @@ final class Generator
         $eye1 = $this->eyeColors[1] ?? EyeFill::inherit();
         $eye2 = $this->eyeColors[2] ?? EyeFill::inherit();
 
-        if ($this->gradient instanceof \BaconQrCode\Renderer\RendererStyle\Gradient) {
+        if ($this->gradient instanceof Gradient) {
             return Fill::withForegroundGradient($backgroundColor, $this->gradient, $eye0, $eye1, $eye2);
         }
 
