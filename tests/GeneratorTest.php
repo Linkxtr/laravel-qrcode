@@ -285,7 +285,7 @@ it('merges image into qrcode with png format', function () {
         ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
         ->generate('test');
 
-    $image = new Image($pngData);
+    $image = new Image($pngData->__toString());
     expect($image->getWidth())->toBe(300);
 });
 
@@ -296,7 +296,7 @@ it('merges image into qrcode with webp format', function () {
         ->merge(__DIR__.'/images/linkxtr.png', 0.2, true)
         ->generate('test');
 
-    $image = new Image($webpData);
+    $image = new Image($webpData->__toString());
     expect($image->getWidth())->toBe(300);
 });
 
