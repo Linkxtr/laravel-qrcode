@@ -357,16 +357,6 @@ final class Generator
         return new RendererStyle($this->size, $this->margin, $this->getModule(), $this->getEye(), $this->getFill());
     }
 
-    public function getFormatter(): ImageBackEndInterface
-    {
-        return match ($this->format) {
-            Format::PNG => new ImagickImageBackEnd('png'),
-            Format::WEBP => new ImagickImageBackEnd('webp'),
-            Format::EPS => new EpsImageBackEnd,
-            Format::SVG => new SvgImageBackEnd,
-        };
-    }
-
     public function getModule(): ModuleInterface
     {
         if ($this->style === Style::DOT) {
@@ -417,6 +407,16 @@ final class Generator
         return new Alpha($alpha, new Rgb($red, $green, $blue));
     }
 
+    private function getFormatter(): ImageBackEndInterface
+    {
+        return match ($this->format) {
+            Format::PNG => new ImagickImageBackEnd('png'),
+            Format::WEBP => new ImagickImageBackEnd('webp'),
+            Format::EPS => new EpsImageBackEnd,
+            Format::SVG => new SvgImageBackEnd,
+        };
+    }
+
     private function mergeImage(string $qrCode): string
     {
         if ($this->format === Format::EPS) {
@@ -461,6 +461,6 @@ final class Generator
 
     private function formatClass(string $method): string
     {
-        return "Linkxtr\QrCode\DataTypes\\".$method;
+        return 'Linkxtr\\QrCode\\DataTypes\\'.$method;
     }
 }

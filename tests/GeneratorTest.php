@@ -5,9 +5,6 @@ declare(strict_types=1);
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Eye\SimpleCircleEye;
 use BaconQrCode\Renderer\Eye\SquareEye;
-use BaconQrCode\Renderer\Image\EpsImageBackEnd;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\Module\DotsModule;
 use BaconQrCode\Renderer\Module\RoundnessModule;
 use BaconQrCode\Renderer\Module\SquareModule;
@@ -83,17 +80,6 @@ test('default margin is 0', function () {
     $qrCode = new Generator;
 
     expect($qrCode->getRendererStyle()->getMargin())->toBe(0);
-});
-
-test('format is passed to formatter', function () {
-    $qrCode = (new Generator)->format('png');
-    expect($qrCode->getFormatter())->toBeInstanceOf(ImagickImageBackEnd::class);
-
-    $qrCode = (new Generator)->format('svg');
-    expect($qrCode->getFormatter())->toBeInstanceOf(SvgImageBackEnd::class);
-
-    $qrCode = (new Generator)->format('eps');
-    expect($qrCode->getFormatter())->toBeInstanceOf(EpsImageBackEnd::class);
 });
 
 it('throws exception if format is not supported', function () {
@@ -407,7 +393,7 @@ it('throws exception if imagick is not loaded and format is webp', function () {
 
 test('webp format is supported', function () {
     $qrCode = (new Generator)->format('webp');
-    expect($qrCode->getFormatter())->toBeInstanceOf(ImagickImageBackEnd::class);
+    expect($qrCode->generate('test'))->toBeInstanceOf(HtmlString::class);
 });
 
 test('can generate webp', function () {

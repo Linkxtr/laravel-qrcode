@@ -50,7 +50,7 @@ it('throws an exception when Bitcoin amount is missing', function () {
         ->toThrow(InvalidArgumentException::class, 'Bitcoin address and amount are required.');
 });
 
-it('throws an exception when Bitcoin amount is not a float', function () {
+it('throws an exception when Bitcoin amount is not numeric', function () {
     expect(fn () => $this->btc->create(['btcaddress', 'invalid']))
         ->toThrow(InvalidArgumentException::class, 'Bitcoin amount must be a numeric value.');
 });
