@@ -29,7 +29,7 @@ final class Image
         $this->image = null;
     }
 
-    /** @return int<1, max> */
+    /** @return int<0, max> */
     public function getWidth(): int
     {
         if (! $this->image instanceof GdImage) {
@@ -39,7 +39,7 @@ final class Image
         return imagesx($this->image);
     }
 
-    /** @return int<1, max> */
+    /** @return int<0, max> */
     public function getHeight(): int
     {
         if (! $this->image instanceof GdImage) {

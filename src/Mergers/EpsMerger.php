@@ -52,6 +52,10 @@ final readonly class EpsMerger implements MergerInterface
 
         $resizedLogo = imagecreatetruecolor($targetW, $targetH);
 
+        if (! $resizedLogo) {
+            throw new RuntimeException('Failed to create resized logo canvas.');
+        }
+
         $white = imagecolorallocate($resizedLogo, 255, 255, 255);
 
         if (! $white) {

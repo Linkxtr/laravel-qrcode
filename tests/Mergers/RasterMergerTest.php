@@ -57,3 +57,43 @@ it('throws exception if image canvas cannot be created', function () {
         $mockImageCreateTrueColor = null;
     }
 })->throws(RuntimeException::class, 'Failed to create image canvas.');
+
+it('throws exception if source image has zero width or height', function () {
+    global $mockImagesx;
+    $mockImagesx = 0;
+
+    $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
+    $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
+
+    try {
+        $test = new RasterMerger($source, $merge, 'png', 0.2);
+        $test->merge();
+    } finally {
+        $mockImagesx = null;
+    }
+})->throws(InvalidArgumentException::class, 'Source image has zero width or height.');
+
+it('throws exception if merge image has zero width or height', function () {
+    global $mockImagesx;
+
+    $callCount = 0;
+    // Return 0 on second call (merge image check), real value on first call (source image check)
+    $mockImagesx = function ($image) use (&$callCount) {
+        $callCount++;
+        if ($callCount === 2) {
+            return 0;
+        }
+
+        return \imagesx($image);
+    };
+
+    $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
+    $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
+
+    try {
+        $test = new RasterMerger($source, $merge, 'png', 0.2);
+        $test->merge();
+    } finally {
+        $mockImagesx = null;
+    }
+})->throws(InvalidArgumentException::class, 'Merge image has zero width or height.');

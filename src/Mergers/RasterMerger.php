@@ -32,8 +32,18 @@ final readonly class RasterMerger implements MergerInterface
 
         $sourceWidth = $this->sourceImage->getWidth();
         $sourceHeight = $this->sourceImage->getHeight();
+
+        if ($sourceWidth === 0 || $sourceHeight === 0) {
+            throw new InvalidArgumentException('Source image has zero width or height.');
+        }
+
         $mergeWidth = $this->mergeImage->getWidth();
         $mergeHeight = $this->mergeImage->getHeight();
+
+        if ($mergeWidth === 0 || $mergeHeight === 0) {
+            throw new InvalidArgumentException('Merge image has zero width or height.');
+        }
+
         $mergeRatio = $mergeWidth / $mergeHeight;
 
         $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage));

@@ -144,3 +144,48 @@ namespace Linkxtr\QrCode\DataTypes {
         public function create(array $arguments): void {}
     }
 }
+
+namespace Linkxtr\QrCode\Support {
+    if (! isset($GLOBALS['mockImagesx'])) {
+        $GLOBALS['mockImagesx'] = null;
+    }
+
+    if (! function_exists('Linkxtr\QrCode\Support\imagesx')) {
+        function imagesx($image)
+        {
+            if (isset($GLOBALS['mockImagesx'])) {
+                if ($GLOBALS['mockImagesx'] === false) {
+                    return false;
+                }
+                if (is_callable($GLOBALS['mockImagesx'])) {
+                    return ($GLOBALS['mockImagesx'])($image);
+                }
+                if (is_int($GLOBALS['mockImagesx'])) {
+                    return $GLOBALS['mockImagesx'];
+                }
+            }
+
+            return \imagesx($image);
+        }
+    }
+
+    if (! isset($GLOBALS['mockImagesy'])) {
+        $GLOBALS['mockImagesy'] = null;
+    }
+
+    if (! function_exists('Linkxtr\QrCode\Support\imagesy')) {
+        function imagesy($image)
+        {
+            if (isset($GLOBALS['mockImagesy'])) {
+                if (is_callable($GLOBALS['mockImagesy'])) {
+                    return ($GLOBALS['mockImagesy'])($image);
+                }
+                if (is_int($GLOBALS['mockImagesy'])) {
+                    return $GLOBALS['mockImagesy'];
+                }
+            }
+
+            return \imagesy($image);
+        }
+    }
+}

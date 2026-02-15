@@ -51,6 +51,21 @@ it('throws exception if color allocation fails', function () {
     }
 })->throws(InvalidArgumentException::class, 'Could not allocate white color for the logo.');
 
+it('throws exception if imagecreatetruecolor fails', function () {
+    global $mockImageCreateTrueColor;
+    $mockImageCreateTrueColor = false;
+
+    $eps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 100 100";
+    $validImage = file_get_contents(__DIR__.'/../images/linkxtr.png');
+
+    try {
+        $merger = new EpsMerger($eps, $validImage, 0.2);
+        $merger->merge();
+    } finally {
+        $mockImageCreateTrueColor = null;
+    }
+})->throws(RuntimeException::class, 'Failed to create resized logo canvas.');
+
 it('replaces showpage with merged logo', function () {
     $eps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 100 100\nshowpage";
     $validImage = file_get_contents(__DIR__.'/../images/linkxtr.png');
