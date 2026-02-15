@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Linkxtr\QrCode\Support\Image;
 
+require_once __DIR__.'/Overrides.php';
+
 function getImageTestAssetPath(): string
 {
     $path = __DIR__.'/../images/linkxtr.png';
@@ -86,3 +88,14 @@ it('throws exception when accessing methods after destruction', function () {
     expect(fn () => $image->getHeight())->toThrow(RuntimeException::class);
     expect(fn () => $image->getImageResource())->toThrow(RuntimeException::class);
 });
+
+it('throws exception if image creation fails returning false', function () {
+    global $mockImageCreateFromString;
+    $mockImageCreateFromString = false;
+
+    try {
+        new Image('valid string but mock fails');
+    } finally {
+        $mockImageCreateFromString = null;
+    }
+})->throws(InvalidArgumentException::class, 'Invalid image data provided to Image.');

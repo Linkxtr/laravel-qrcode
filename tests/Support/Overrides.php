@@ -169,6 +169,21 @@ namespace Linkxtr\QrCode\Support {
         }
     }
 
+    if (! isset($GLOBALS['mockImageCreateFromString'])) {
+        $GLOBALS['mockImageCreateFromString'] = null;
+    }
+
+    if (! function_exists('Linkxtr\QrCode\Support\imagecreatefromstring')) {
+        function imagecreatefromstring($data)
+        {
+            if (isset($GLOBALS['mockImageCreateFromString']) && $GLOBALS['mockImageCreateFromString'] === false) {
+                return false;
+            }
+
+            return \imagecreatefromstring($data);
+        }
+    }
+
     if (! isset($GLOBALS['mockImagesy'])) {
         $GLOBALS['mockImagesy'] = null;
     }
@@ -177,6 +192,9 @@ namespace Linkxtr\QrCode\Support {
         function imagesy($image)
         {
             if (isset($GLOBALS['mockImagesy'])) {
+                if ($GLOBALS['mockImagesy'] === false) {
+                    return false;
+                }
                 if (is_callable($GLOBALS['mockImagesy'])) {
                     return ($GLOBALS['mockImagesy'])($image);
                 }

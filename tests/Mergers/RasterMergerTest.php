@@ -97,3 +97,21 @@ it('throws exception if merge image has zero width or height', function () {
         $mockImagesx = null;
     }
 })->throws(InvalidArgumentException::class, 'Merge image has zero width or height.');
+
+it('throws exception if output buffer capture fails', function () {
+    global $mockObGetClean;
+    $mockObGetClean = false;
+
+    $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
+    $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
+
+    try {
+        $test = new RasterMerger($source, $merge, 'png', 0.2);
+        $test->merge();
+    } finally {
+        $mockObGetClean = null;
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+    }
+})->throws(RuntimeException::class, 'Failed to capture image output from buffer.');

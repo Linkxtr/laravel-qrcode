@@ -101,6 +101,10 @@ final readonly class RasterMerger implements MergerInterface
 
         unset($canvas);
 
-        return $content ?: '';
+        if ($content === false) {
+            throw new RuntimeException('Failed to capture image output from buffer.');
+        }
+
+        return $content;
     }
 }

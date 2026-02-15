@@ -130,7 +130,7 @@ QrCode::calendar([
 ]);
 
 // WhatsApp
-QrCode::WhatsApp(['+1234567890', 'Hello from Laravel!']);
+QrCode::WhatsApp(['number' => '+1234567890', 'message' => 'Hello from Laravel!']);
 
 // Telegram
 QrCode::telegram('username');

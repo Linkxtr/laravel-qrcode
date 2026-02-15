@@ -42,6 +42,7 @@ final readonly class EpsMerger implements MergerInterface
 
         $logoW = imagesx($logo);
         $logoH = imagesy($logo);
+
         $ratio = $logoW / $logoH;
 
         $targetW = max(1, (int) ($qrWidth * $this->percentage));
