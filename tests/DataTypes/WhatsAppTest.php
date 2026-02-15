@@ -50,3 +50,9 @@ it('throws exception if number is not a string (positional)', function () {
     expect(fn () => $whatsapp->create([1234567890]))
         ->toThrow(InvalidArgumentException::class, 'WhatsApp number must be a string.');
 });
+
+it('throws exception if render is called before initialization', function () {
+    $whatsapp = new WhatsApp;
+    expect(fn () => (string) $whatsapp)
+        ->toThrow(InvalidArgumentException::class, 'WhatsApp must be initialized via create() before rendering.');
+});

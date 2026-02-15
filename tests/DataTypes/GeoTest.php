@@ -69,3 +69,8 @@ it('throws an exception when name is not a string', function () {
     expect(fn () => $this->geo->create(['40.7128', '-74.0060', ['foo' => 'bar']]))
         ->toThrow(InvalidArgumentException::class, 'Invalid name value: must be a string');
 });
+
+it('throws an exception when render is called before initialization', function () {
+    expect(fn () => (string) new Geo)
+        ->toThrow(InvalidArgumentException::class, 'Geo must be initialized via create() before rendering.');
+});

@@ -22,7 +22,7 @@ final readonly class RasterMerger implements MergerInterface
             throw new InvalidArgumentException('RasterMerger only supports "png" or "webp" formats.');
         }
 
-        if ($this->percentage <= 0 || $this->percentage > 1) {
+        if ($this->percentage <= 0 || $this->percentage >= 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
     }

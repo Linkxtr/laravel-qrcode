@@ -18,7 +18,7 @@ final readonly class EpsMerger implements MergerInterface
 
     public function merge(): string
     {
-        if ($this->percentage <= 0 || $this->percentage > 1) {
+        if ($this->percentage <= 0 || $this->percentage >= 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
 

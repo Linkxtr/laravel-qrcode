@@ -74,6 +74,10 @@ final class Geo implements DataTypeInterface
 
     private function buildGeoString(): string
     {
+        if (! isset($this->latitude) || ! isset($this->longitude)) {
+            throw new InvalidArgumentException('Geo must be initialized via create() before rendering.');
+        }
+
         if ($this->name === '') {
             return $this->prefix.$this->latitude.','.$this->longitude;
         }

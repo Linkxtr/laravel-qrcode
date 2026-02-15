@@ -16,7 +16,7 @@ final class WhatsApp implements DataTypeInterface
     public function __toString(): string
     {
         if (! $this->number) {
-            throw new InvalidArgumentException('WhatsApp number is mandatory.');
+            throw new InvalidArgumentException('WhatsApp must be initialized via create() before rendering.');
         }
 
         $url = 'https://wa.me/'.$this->number;
@@ -33,29 +33,25 @@ final class WhatsApp implements DataTypeInterface
      */
     public function create(array $arguments): void
     {
-        $properties = $arguments;
-
-        // Support positional arguments
         if (array_is_list($arguments)) {
-            $properties = [];
-            if (isset($arguments[0])) {
-                $properties['number'] = $arguments[0];
+            $arguments = [
+                'number' => $arguments[0] ?? null,
+                'message' => $arguments[1] ?? null,
+            ];
+        }
+
+        if (! isset($arguments['number'])) {
+            throw new InvalidArgumentException('WhatsApp number is mandatory.');
+        }
+
+        foreach (['number', 'message'] as $key) {
+            if (isset($arguments[$key])) {
+                if (! is_string($arguments[$key])) {
+                    throw new InvalidArgumentException("WhatsApp {$key} must be a string.");
+                }
+
+                $this->{$key} = $arguments[$key];
             }
-            if (isset($arguments[1])) {
-                $properties['message'] = $arguments[1];
-            }
-        }
-
-        if (isset($properties['number']) && ! is_string($properties['number'])) {
-            throw new InvalidArgumentException('WhatsApp number must be a string.');
-        }
-
-        if (isset($properties['number']) && is_string($properties['number'])) {
-            $this->number = $properties['number'];
-        }
-
-        if (isset($properties['message']) && is_string($properties['message'])) {
-            $this->message = $properties['message'];
         }
     }
 }
