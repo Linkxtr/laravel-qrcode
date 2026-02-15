@@ -1,50 +1,67 @@
 <?php
 
-namespace Linkxtr\QrCode;
+declare(strict_types=1);
+
+namespace Linkxtr\QrCode\Mergers;
 
 use GdImage;
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\MergerInterface;
+use Linkxtr\QrCode\Support\Image;
+use RuntimeException;
 
-final class ImageMerge
+final readonly class RasterMerger implements MergerInterface
 {
     public function __construct(
-        protected Image $sourceImage,
-        protected Image $mergeImage,
-        protected string $format = 'png'
+        private Image $sourceImage,
+        private Image $mergeImage,
+        private string $format = 'png',
+        private float $percentage = 0.2
     ) {
         if (! in_array($this->format, ['png', 'webp'])) {
-            throw new InvalidArgumentException('ImageMerge only supports "png" or "webp" formats.');
+            throw new InvalidArgumentException('RasterMerger only supports "png" or "webp" formats.');
+        }
+
+        if ($this->percentage <= 0 || $this->percentage >= 1) {
+            throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
     }
 
-    public function merge(float $percentage): string
+    public function merge(): string
     {
-        if ($percentage <= 0 || $percentage > 1) {
-            throw new InvalidArgumentException('$percentage must be between 0 and 1');
-        }
 
         $sourceWidth = $this->sourceImage->getWidth();
         $sourceHeight = $this->sourceImage->getHeight();
+
+        if ($sourceWidth === 0 || $sourceHeight === 0) {
+            throw new InvalidArgumentException('Source image has zero width or height.');
+        }
+
         $mergeWidth = $this->mergeImage->getWidth();
         $mergeHeight = $this->mergeImage->getHeight();
+
+        if ($mergeWidth === 0 || $mergeHeight === 0) {
+            throw new InvalidArgumentException('Merge image has zero width or height.');
+        }
+
         $mergeRatio = $mergeWidth / $mergeHeight;
 
-        $targetLogoWidth = (int) ($sourceWidth * $percentage);
-        $targetLogoHeight = (int) ($targetLogoWidth / $mergeRatio);
+        $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage));
+        $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio));
         $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
         $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
 
         $canvas = imagecreatetruecolor($sourceWidth, $sourceHeight);
 
         if (! $canvas) {
-            throw new \RuntimeException('Failed to create image canvas.');
+            throw new RuntimeException('Failed to create image canvas.');
         }
 
         imagealphablending($canvas, true);
         $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
 
         if (! $transparent) {
-            throw new \RuntimeException('Failed to create transparent color.');
+            throw new RuntimeException('Failed to create transparent color.');
         }
 
         imagefill($canvas, 0, 0, $transparent);
@@ -70,7 +87,7 @@ final class ImageMerge
         return $this->createOutput($canvas);
     }
 
-    protected function createOutput(GdImage $canvas): string
+    private function createOutput(GdImage $canvas): string
     {
         ob_start();
 
@@ -84,6 +101,10 @@ final class ImageMerge
 
         unset($canvas);
 
-        return $content ?: '';
+        if ($content === false) {
+            throw new RuntimeException('Failed to capture image output from buffer.');
+        }
+
+        return $content;
     }
 }

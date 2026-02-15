@@ -1,18 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class Geo implements DataTypeInterface
 {
-    protected string $prefix = 'geo:';
+    private string $prefix = 'geo:';
 
-    protected float $latitude;
+    private float $latitude;
 
-    protected float $longitude;
+    private float $longitude;
 
-    protected string $name = '';
+    private string $name = '';
+
+    public function __toString(): string
+    {
+        return $this->buildGeoString();
+    }
 
     /**
      * @param  list<mixed>  $arguments
@@ -25,7 +33,7 @@ final class Geo implements DataTypeInterface
     /**
      * @param  list<mixed>  $arguments
      */
-    protected function setProperties(array $arguments): void
+    private function setProperties(array $arguments): void
     {
         if (! isset($arguments[0]) || ! isset($arguments[1])) {
             throw new InvalidArgumentException('Both latitude and longitude are required.');
@@ -45,12 +53,7 @@ final class Geo implements DataTypeInterface
         $this->name = $arguments[2];
     }
 
-    public function __toString(): string
-    {
-        return $this->buildGeoString();
-    }
-
-    protected function validateCoordinate(mixed $value, string $type): float
+    private function validateCoordinate(mixed $value, string $type): float
     {
         if (! is_numeric($value)) {
             throw new InvalidArgumentException("Invalid {$type} value: must be a number");
@@ -69,9 +72,13 @@ final class Geo implements DataTypeInterface
         return $value;
     }
 
-    protected function buildGeoString(): string
+    private function buildGeoString(): string
     {
-        if (! isset($this->name) || empty($this->name)) {
+        if (! isset($this->latitude) || ! isset($this->longitude)) {
+            throw new InvalidArgumentException('Geo must be initialized via create() before rendering.');
+        }
+
+        if ($this->name === '') {
             return $this->prefix.$this->latitude.','.$this->longitude;
         }
 

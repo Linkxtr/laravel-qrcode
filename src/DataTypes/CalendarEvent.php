@@ -1,28 +1,65 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use Carbon\Carbon;
 use DateTimeInterface;
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use LogicException;
 
-class CalendarEvent implements DataTypeInterface
+final class CalendarEvent implements DataTypeInterface
 {
-    protected string $summary;
+    private string $summary;
 
-    protected ?string $description = null;
+    private ?string $description = null;
 
-    protected ?string $location = null;
+    private ?string $location = null;
 
-    protected Carbon $start;
+    private Carbon $start;
 
-    protected Carbon $end;
+    private Carbon $end;
+
+    private string $uid = '';
+
+    public function __toString(): string
+    {
+        if ($this->uid === '') {
+            throw new LogicException('CalendarEvent must be initialized via create() before rendering.');
+        }
+
+        $event = "BEGIN:VCALENDAR\r\n";
+        $event .= "VERSION:2.0\r\n";
+        $event .= "PRODID:-//Linkxtr//LaravelQrCode//EN\r\n";
+        $event .= "BEGIN:VEVENT\r\n";
+        $event .= 'UID:'.$this->uid."\r\n";
+        $event .= 'DTSTAMP:'.Carbon::now()->utc()->format('Ymd\THis\Z')."\r\n";
+        $event .= 'SUMMARY:'.$this->formatProperty($this->summary)."\r\n";
+
+        if ($this->description) {
+            $event .= 'DESCRIPTION:'.$this->formatProperty($this->description)."\r\n";
+        }
+
+        if ($this->location) {
+            $event .= 'LOCATION:'.$this->formatProperty($this->location)."\r\n";
+        }
+
+        $event .= 'DTSTART:'.$this->start->utc()->format('Ymd\THis\Z')."\r\n";
+        $event .= 'DTEND:'.$this->end->utc()->format('Ymd\THis\Z')."\r\n";
+        $event .= "END:VEVENT\r\n";
+
+        return $event."END:VCALENDAR\r\n";
+    }
 
     /**
      * @param  array<int, mixed>  $arguments
      */
     public function create(array $arguments): void
     {
+        $this->uid = uniqid('', true).'@linkxtr-qrcode';
+
         $attributes = $arguments[0] ?? [];
 
         if (! is_array($attributes)) {
@@ -57,7 +94,7 @@ class CalendarEvent implements DataTypeInterface
         }
     }
 
-    protected function parseDate(mixed $date): Carbon
+    private function parseDate(mixed $date): Carbon
     {
         if (is_string($date) || is_numeric($date) || $date instanceof DateTimeInterface) {
             return Carbon::parse($date);
@@ -66,39 +103,12 @@ class CalendarEvent implements DataTypeInterface
         throw new InvalidArgumentException('Date must be a string, numeric or DateTimeInterface.');
     }
 
-    public function __toString(): string
-    {
-        $event = "BEGIN:VCALENDAR\r\n";
-        $event .= "VERSION:2.0\r\n";
-        $event .= "PRODID:-//Linkxtr//LaravelQrCode//EN\r\n";
-        $event .= "BEGIN:VEVENT\r\n";
-        $event .= 'UID:'.uniqid('', true).'@linkxtr-qrcode'."\r\n";
-        $event .= 'DTSTAMP:'.Carbon::now()->utc()->format('Ymd\THis\Z')."\r\n";
-        $event .= 'SUMMARY:'.$this->formatProperty($this->summary)."\r\n";
-
-        if ($this->description) {
-            $event .= 'DESCRIPTION:'.$this->formatProperty($this->description)."\r\n";
-        }
-
-        if ($this->location) {
-            $event .= 'LOCATION:'.$this->formatProperty($this->location)."\r\n";
-        }
-
-        $event .= 'DTSTART:'.$this->start->utc()->format('Ymd\THis\Z')."\r\n";
-        $event .= 'DTEND:'.$this->end->utc()->format('Ymd\THis\Z')."\r\n";
-        $event .= "END:VEVENT\r\n";
-        $event .= "END:VCALENDAR\r\n";
-
-        return $event;
-    }
-
-    protected function formatProperty(string $value): string
+    private function formatProperty(string $value): string
     {
         $value = str_replace('\\', '\\\\', $value);
         $value = str_replace(';', '\;', $value);
         $value = str_replace(',', '\,', $value);
-        $value = str_replace(["\r\n", "\r", "\n"], '\\n', $value);
 
-        return $value;
+        return str_replace(["\r\n", "\r", "\n"], '\\n', $value);
     }
 }

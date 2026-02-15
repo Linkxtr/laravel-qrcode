@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode;
 
 use Illuminate\Support\ServiceProvider;
 
-class QrCodeServiceProvider extends ServiceProvider
+final class QrCodeServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind('qrcode', function () {
-            return new Generator;
-        });
+        $this->app->bind('qrcode', fn (): Generator => new Generator);
     }
 
     /**

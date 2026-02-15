@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Linkxtr\QrCode\DataTypes\WhatsApp;
 
 it('generates a WhatsApp string', function () {
@@ -35,4 +37,22 @@ it('supports positional arguments', function () {
     $whatsapp->create(['1234567890', 'Hello World']);
 
     expect((string) $whatsapp)->toBe('https://wa.me/1234567890?text=Hello+World');
+});
+
+it('throws exception if number is not a string (named)', function () {
+    $whatsapp = new WhatsApp;
+    expect(fn () => $whatsapp->create(['number' => 1234567890]))
+        ->toThrow(InvalidArgumentException::class, 'WhatsApp number must be a string.');
+});
+
+it('throws exception if number is not a string (positional)', function () {
+    $whatsapp = new WhatsApp;
+    expect(fn () => $whatsapp->create([1234567890]))
+        ->toThrow(InvalidArgumentException::class, 'WhatsApp number must be a string.');
+});
+
+it('throws exception if render is called before initialization', function () {
+    $whatsapp = new WhatsApp;
+    expect(fn () => (string) $whatsapp)
+        ->toThrow(InvalidArgumentException::class, 'WhatsApp must be initialized via create() before rendering.');
 });

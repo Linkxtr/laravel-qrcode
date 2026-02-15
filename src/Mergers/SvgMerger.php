@@ -1,21 +1,24 @@
 <?php
 
-namespace Linkxtr\QrCode;
+declare(strict_types=1);
+
+namespace Linkxtr\QrCode\Mergers;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\MergerInterface;
 
-final class SvgImageMerge
+final readonly class SvgMerger implements MergerInterface
 {
     public function __construct(
-        protected string $svgContent,
-        protected string $mergeImageContent,
-        protected float $percentage
+        private string $svgContent,
+        private string $mergeImageContent,
+        private float $percentage
     ) {}
 
     public function merge(): string
     {
-        if ($this->percentage <= 0 || $this->percentage > 1) {
-            throw new InvalidArgumentException('$percentage must be greater than 0 and less than or equal to 1');
+        if ($this->percentage <= 0 || $this->percentage >= 1) {
+            throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
         $widthFound = preg_match('/width=["\'](\d+)["\']/i', $this->svgContent, $widthMatch);
         $heightFound = preg_match('/height=["\'](\d+)["\']/i', $this->svgContent, $heightMatch);

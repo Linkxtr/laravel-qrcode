@@ -1,26 +1,66 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class MeCard implements DataTypeInterface
 {
-    protected string $name;
+    private string $name;
 
-    protected ?string $reading = null;
+    private ?string $reading = null;
 
-    protected ?string $phone = null;
+    private ?string $phone = null;
 
-    protected ?string $email = null;
+    private ?string $email = null;
 
-    protected ?string $note = null;
+    private ?string $note = null;
 
-    protected ?string $birthday = null;
+    private ?string $birthday = null;
 
-    protected ?string $address = null;
+    private ?string $address = null;
 
-    protected ?string $url = null;
+    private ?string $url = null;
+
+    public function __toString(): string
+    {
+        $meCard = 'MECARD:';
+
+        $meCard .= 'N:'.$this->escapeValue($this->name).';';
+
+        if ($this->reading) {
+            $meCard .= 'SOUND:'.$this->escapeValue($this->reading).';';
+        }
+
+        if ($this->phone) {
+            $meCard .= 'TEL:'.$this->escapeValue($this->phone).';';
+        }
+
+        if ($this->email) {
+            $meCard .= 'EMAIL:'.$this->escapeValue($this->email).';';
+        }
+
+        if ($this->note) {
+            $meCard .= 'NOTE:'.$this->escapeValue($this->note).';';
+        }
+
+        if ($this->birthday) {
+            $meCard .= 'BDAY:'.$this->escapeValue($this->birthday).';';
+        }
+
+        if ($this->address) {
+            $meCard .= 'ADR:'.$this->escapeValue($this->address).';';
+        }
+
+        if ($this->url) {
+            $meCard .= 'URL:'.$this->escapeValue($this->url).';';
+        }
+
+        return $meCard.';';
+    }
 
     /**
      * @param  list<mixed>|array<string, mixed>  $arguments
@@ -73,7 +113,7 @@ final class MeCard implements DataTypeInterface
         }
     }
 
-    protected function escapeValue(string $value): string
+    private function escapeValue(string $value): string
     {
         return strtr($value, [
             '\\' => '\\\\',
@@ -81,44 +121,5 @@ final class MeCard implements DataTypeInterface
             ':' => '\\:',
             ',' => '\\,', // Sometimes needed for list values, but safer to escape
         ]);
-    }
-
-    public function __toString(): string
-    {
-        $meCard = 'MECARD:';
-
-        $meCard .= 'N:'.$this->escapeValue($this->name).';';
-
-        if ($this->reading) {
-            $meCard .= 'SOUND:'.$this->escapeValue($this->reading).';';
-        }
-
-        if ($this->phone) {
-            $meCard .= 'TEL:'.$this->escapeValue($this->phone).';';
-        }
-
-        if ($this->email) {
-            $meCard .= 'EMAIL:'.$this->escapeValue($this->email).';';
-        }
-
-        if ($this->note) {
-            $meCard .= 'NOTE:'.$this->escapeValue($this->note).';';
-        }
-
-        if ($this->birthday) {
-            $meCard .= 'BDAY:'.$this->escapeValue($this->birthday).';';
-        }
-
-        if ($this->address) {
-            $meCard .= 'ADR:'.$this->escapeValue($this->address).';';
-        }
-
-        if ($this->url) {
-            $meCard .= 'URL:'.$this->escapeValue($this->url).';';
-        }
-
-        $meCard .= ';';
-
-        return $meCard;
     }
 }

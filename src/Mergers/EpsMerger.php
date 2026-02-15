@@ -1,20 +1,24 @@
 <?php
 
-namespace Linkxtr\QrCode;
+declare(strict_types=1);
+
+namespace Linkxtr\QrCode\Mergers;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\MergerInterface;
+use RuntimeException;
 
-final class EpsImageMerge
+final readonly class EpsMerger implements MergerInterface
 {
     public function __construct(
-        protected string $epsContent,
-        protected string $mergeImageContent,
-        protected float $percentage
+        private string $epsContent,
+        private string $mergeImageContent,
+        private float $percentage
     ) {}
 
     public function merge(): string
     {
-        if ($this->percentage <= 0 || $this->percentage > 1) {
+        if ($this->percentage <= 0 || $this->percentage >= 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
 
@@ -38,17 +42,20 @@ final class EpsImageMerge
 
         $logoW = imagesx($logo);
         $logoH = imagesy($logo);
+
         $ratio = $logoW / $logoH;
 
-        /** @var int<1, max> $targetW */
-        $targetW = (int) ($qrWidth * $this->percentage);
-        /** @var int<1, max> $targetH */
-        $targetH = (int) ($targetW / $ratio);
+        $targetW = max(1, (int) ($qrWidth * $this->percentage));
+        $targetH = max(1, (int) ($targetW / $ratio));
 
         $posX = (int) (($qrWidth - $targetW) / 2) + $llx;
         $posY = (int) (($qrHeight - $targetH) / 2) + $lly;
 
         $resizedLogo = imagecreatetruecolor($targetW, $targetH);
+
+        if (! $resizedLogo) {
+            throw new RuntimeException('Failed to create resized logo canvas.');
+        }
 
         $white = imagecolorallocate($resizedLogo, 255, 255, 255);
 
@@ -76,6 +83,11 @@ final class EpsImageMerge
             }
         }
         $hexData = ob_get_clean();
+
+        if ($hexData === false) {
+            throw new RuntimeException('Failed to capture hex data from output buffer.');
+        }
+
         unset($logo);
         unset($resizedLogo);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\DataTypes\CalendarEvent;
 use Linkxtr\QrCode\Generator;
@@ -180,3 +182,8 @@ test('it throws exception when end date is before start date', function () {
         'end' => '2024-06-01 11:00:00 UTC',
     ]);
 })->throws(InvalidArgumentException::class, 'End date must be after start date.');
+
+test('it throws exception when not initialized', function () {
+    $calendarEvent = new CalendarEvent;
+    (string) $calendarEvent;
+})->throws(LogicException::class, 'CalendarEvent must be initialized via create() before rendering.');

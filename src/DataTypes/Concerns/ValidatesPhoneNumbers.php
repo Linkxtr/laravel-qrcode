@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes\Concerns;
 
 use InvalidArgumentException;
@@ -10,7 +12,7 @@ trait ValidatesPhoneNumbers
     {
         $cleaned = preg_replace('/[^\d+]/', '', $phoneNumber);
 
-        if (empty($cleaned) || ! preg_match('/^\+?[0-9]{1,15}$/', $cleaned)) {
+        if (empty($cleaned) || ! preg_match('/^\+?\d{1,15}$/', $cleaned)) {
             throw new InvalidArgumentException('Invalid phone number format. Must be 1-15 digits, optionally starting with +');
         }
     }

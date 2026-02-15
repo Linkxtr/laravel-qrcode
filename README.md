@@ -130,7 +130,7 @@ QrCode::calendar([
 ]);
 
 // WhatsApp
-QrCode::WhatsApp('+1234567890', 'Hello from Laravel!');
+QrCode::WhatsApp(['number' => '+1234567890', 'message' => 'Hello from Laravel!']);
 
 // Telegram
 QrCode::telegram('username');
@@ -310,7 +310,7 @@ QrCode::size(400)
 - `btc($config)` - Generate BTC QR
 - `vCard($config)` - Generate vCard QR
 - `calendar($config)` - Generate Calendar Event QR
-- `whatsapp($phone, $message)` - Generate WhatsApp QR
+- `WhatsApp($params)` - Generate WhatsApp QR (array with phone and optional message)
 - `telegram($username)` - Generate Telegram QR
 
 ## 📄 License
