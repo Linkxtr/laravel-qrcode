@@ -15,13 +15,13 @@ final class WhatsApp implements DataTypeInterface
 
     public function __toString(): string
     {
-        if (! $this->number) {
+        if ($this->number === null) {
             throw new InvalidArgumentException('WhatsApp must be initialized via create() before rendering.');
         }
 
         $url = 'https://wa.me/'.$this->number;
 
-        if ($this->message) {
+        if ($this->message !== null) {
             $url .= '?text='.urlencode($this->message);
         }
 

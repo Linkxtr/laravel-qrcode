@@ -43,6 +43,7 @@ final readonly class EpsMerger implements MergerInterface
         $logoW = imagesx($logo);
         $logoH = imagesy($logo);
 
+        /** @phpstan-ignore-next-line */
         if ($logoW === 0 || $logoH === 0) {
             throw new InvalidArgumentException('Merge image has invalid dimensions.');
         }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Enums\Concerns;
 
+use BackedEnum;
+
 trait EnumHelper
 {
     /**
@@ -13,6 +15,7 @@ trait EnumHelper
      */
     public static function toArray(): array
     {
-        return array_column(self::cases(), 'value');
+        /** @phpstan-ignore-next-line */
+        return array_map(fn ($c) => $c instanceof BackedEnum ? $c->value : $c->name, self::cases());
     }
 }

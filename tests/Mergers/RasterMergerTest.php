@@ -175,3 +175,19 @@ it('throws exception if output buffer capture fails', function () {
         }
     }
 })->throws(RuntimeException::class, 'Failed to capture image output from buffer.');
+
+it('constrains merge image if it exceeds vertical bounds', function () {
+    $tallCanvas = imagecreatetruecolor(10, 200);
+    ob_start();
+    imagepng($tallCanvas);
+    $tallImageData = ob_get_clean();
+    unset($tallCanvas);
+
+    $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
+    $merge = new Image((string) $tallImageData);
+
+    $merger = new RasterMerger($source, $merge, 'png', 0.2);
+    $output = $merger->merge();
+
+    expect($output)->toBeString();
+});

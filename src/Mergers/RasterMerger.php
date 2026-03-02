@@ -48,6 +48,13 @@ final readonly class RasterMerger implements MergerInterface
 
         $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage));
         $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio));
+
+        // Constrain to canvas if logo exceeds vertical bounds
+        if ($targetLogoHeight > $sourceHeight * $this->percentage) {
+            $targetLogoHeight = max(1, (int) ($sourceHeight * $this->percentage));
+            $targetLogoWidth = max(1, (int) ($targetLogoHeight * $mergeRatio));
+        }
+
         $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
         $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
 
@@ -57,7 +64,7 @@ final readonly class RasterMerger implements MergerInterface
             throw new RuntimeException('Failed to create image canvas.');
         }
 
-        imagealphablending($canvas, true);
+        imagealphablending($canvas, false);
         $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
 
         if (! $transparent) {
@@ -67,6 +74,8 @@ final readonly class RasterMerger implements MergerInterface
         if (! imagefill($canvas, 0, 0, $transparent)) {
             throw new RuntimeException('Failed to fill image with transparent color.');
         }
+
+        imagealphablending($canvas, true);
 
         if (! imagecopy(
             $canvas,
