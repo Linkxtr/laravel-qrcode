@@ -9,7 +9,7 @@ use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class MeCard implements DataTypeInterface
 {
-    private string $name;
+    private string $name = '';
 
     private ?string $reading = null;
 
@@ -27,6 +27,10 @@ final class MeCard implements DataTypeInterface
 
     public function __toString(): string
     {
+        if ($this->name === '') {
+            throw new InvalidArgumentException('MeCard must be initialized via create() before rendering.');
+        }
+
         $meCard = 'MECARD:';
 
         $meCard .= 'N:'.$this->escapeValue($this->name).';';

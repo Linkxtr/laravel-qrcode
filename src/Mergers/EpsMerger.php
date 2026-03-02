@@ -43,6 +43,10 @@ final readonly class EpsMerger implements MergerInterface
         $logoW = imagesx($logo);
         $logoH = imagesy($logo);
 
+        if ($logoW === 0 || $logoH === 0) {
+            throw new InvalidArgumentException('Merge image has invalid dimensions.');
+        }
+
         $ratio = $logoW / $logoH;
 
         $targetW = max(1, (int) ($qrWidth * $this->percentage));
@@ -60,7 +64,7 @@ final readonly class EpsMerger implements MergerInterface
         $white = imagecolorallocate($resizedLogo, 255, 255, 255);
 
         if (! $white) {
-            throw new InvalidArgumentException('Could not allocate white color for the logo.');
+            throw new RuntimeException('Could not allocate white color for the logo.');
         }
 
         imagefill($resizedLogo, 0, 0, $white);

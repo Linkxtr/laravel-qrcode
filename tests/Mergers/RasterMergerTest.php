@@ -98,6 +98,66 @@ it('throws exception if merge image has zero width or height', function () {
     }
 })->throws(InvalidArgumentException::class, 'Merge image has zero width or height.');
 
+it('throws exception if imagefill fails', function () {
+    global $mockImageFill;
+    $mockImageFill = false;
+
+    $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
+    $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
+
+    try {
+        $test = new RasterMerger($source, $merge, 'png', 0.2);
+        $test->merge();
+    } finally {
+        $mockImageFill = null;
+    }
+})->throws(RuntimeException::class, 'Failed to fill image with transparent color.');
+
+it('throws exception if imagecopy fails', function () {
+    global $mockImageCopy;
+    $mockImageCopy = false;
+
+    $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
+    $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
+
+    try {
+        $test = new RasterMerger($source, $merge, 'png', 0.2);
+        $test->merge();
+    } finally {
+        $mockImageCopy = null;
+    }
+})->throws(RuntimeException::class, 'Failed to copy source image to canvas');
+
+it('throws exception if imagecopyresampled fails', function () {
+    global $mockImageCopyResampled;
+    $mockImageCopyResampled = false;
+
+    $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
+    $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
+
+    try {
+        $test = new RasterMerger($source, $merge, 'png', 0.2);
+        $test->merge();
+    } finally {
+        $mockImageCopyResampled = null;
+    }
+})->throws(RuntimeException::class, 'Failed to copy/resample merge image');
+
+it('throws exception if imagesavealpha fails', function () {
+    global $mockImageSaveAlpha;
+    $mockImageSaveAlpha = false;
+
+    $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
+    $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
+
+    try {
+        $test = new RasterMerger($source, $merge, 'png', 0.2);
+        $test->merge();
+    } finally {
+        $mockImageSaveAlpha = null;
+    }
+})->throws(RuntimeException::class, 'Failed to save alpha channel information.');
+
 it('throws exception if output buffer capture fails', function () {
     global $mockObGetClean;
     $mockObGetClean = false;

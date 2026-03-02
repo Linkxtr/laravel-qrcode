@@ -49,7 +49,7 @@ it('throws exception if color allocation fails', function () {
     } finally {
         $mockImageColorAllocate = null;
     }
-})->throws(InvalidArgumentException::class, 'Could not allocate white color for the logo.');
+})->throws(RuntimeException::class, 'Could not allocate white color for the logo.');
 
 it('throws exception if imagecreatetruecolor fails', function () {
     global $mockImageCreateTrueColor;
@@ -65,6 +65,21 @@ it('throws exception if imagecreatetruecolor fails', function () {
         $mockImageCreateTrueColor = null;
     }
 })->throws(RuntimeException::class, 'Failed to create resized logo canvas.');
+
+it('throws exception if logo has invalid dimensions', function () {
+    global $mockImagesx;
+    $mockImagesx = 0;
+
+    $eps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 100 100";
+    $validImage = file_get_contents(__DIR__.'/../images/linkxtr.png');
+
+    try {
+        $merger = new EpsMerger($eps, $validImage, 0.2);
+        $merger->merge();
+    } finally {
+        $mockImagesx = null;
+    }
+})->throws(InvalidArgumentException::class, 'Merge image has invalid dimensions.');
 
 it('replaces showpage with merged logo', function () {
     $eps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 100 100\nshowpage";

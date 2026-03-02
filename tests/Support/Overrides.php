@@ -129,6 +129,112 @@ namespace Linkxtr\QrCode\Mergers {
             return \ob_get_clean();
         }
     }
+
+    if (! isset($GLOBALS['mockImageFill'])) {
+        $GLOBALS['mockImageFill'] = null;
+    }
+
+    if (! function_exists('Linkxtr\QrCode\Mergers\imagefill')) {
+        function imagefill($image, $x, $y, $color)
+        {
+            if (isset($GLOBALS['mockImageFill']) && $GLOBALS['mockImageFill'] === false) {
+                return false;
+            }
+
+            return \imagefill($image, $x, $y, $color);
+        }
+    }
+
+    if (! isset($GLOBALS['mockImageCopy'])) {
+        $GLOBALS['mockImageCopy'] = null;
+    }
+
+    if (! function_exists('Linkxtr\QrCode\Mergers\imagecopy')) {
+        function imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h)
+        {
+            if (isset($GLOBALS['mockImageCopy']) && $GLOBALS['mockImageCopy'] === false) {
+                return false;
+            }
+
+            return \imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
+        }
+    }
+
+    if (! isset($GLOBALS['mockImageCopyResampled'])) {
+        $GLOBALS['mockImageCopyResampled'] = null;
+    }
+
+    if (! function_exists('Linkxtr\QrCode\Mergers\imagecopyresampled')) {
+        function imagecopyresampled($dst_image, $src_image, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h)
+        {
+            if (isset($GLOBALS['mockImageCopyResampled']) && $GLOBALS['mockImageCopyResampled'] === false) {
+                return false;
+            }
+
+            return \imagecopyresampled($dst_image, $src_image, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h);
+        }
+    }
+
+    if (! isset($GLOBALS['mockImageSaveAlpha'])) {
+        $GLOBALS['mockImageSaveAlpha'] = null;
+    }
+
+    if (! function_exists('Linkxtr\QrCode\Mergers\imagesavealpha')) {
+        function imagesavealpha($image, $enable)
+        {
+            if (isset($GLOBALS['mockImageSaveAlpha']) && $GLOBALS['mockImageSaveAlpha'] === false) {
+                return false;
+            }
+
+            return \imagesavealpha($image, $enable);
+        }
+    }
+
+    if (! isset($GLOBALS['mockImagesx'])) {
+        $GLOBALS['mockImagesx'] = null;
+    }
+
+    if (! function_exists('Linkxtr\QrCode\Mergers\imagesx')) {
+        function imagesx($image)
+        {
+            if (isset($GLOBALS['mockImagesx'])) {
+                if ($GLOBALS['mockImagesx'] === false) {
+                    return false;
+                }
+                if (is_callable($GLOBALS['mockImagesx'])) {
+                    return ($GLOBALS['mockImagesx'])($image);
+                }
+                if (is_int($GLOBALS['mockImagesx'])) {
+                    return $GLOBALS['mockImagesx'];
+                }
+            }
+
+            return \imagesx($image);
+        }
+    }
+
+    if (! isset($GLOBALS['mockImagesy'])) {
+        $GLOBALS['mockImagesy'] = null;
+    }
+
+    if (! function_exists('Linkxtr\QrCode\Mergers\imagesy')) {
+        function imagesy($image)
+        {
+            if (isset($GLOBALS['mockImagesy'])) {
+                if ($GLOBALS['mockImagesy'] === false) {
+                    return false;
+                }
+                if (is_callable($GLOBALS['mockImagesy'])) {
+                    return ($GLOBALS['mockImagesy'])($image);
+                }
+                if (is_int($GLOBALS['mockImagesy'])) {
+                    return $GLOBALS['mockImagesy'];
+                }
+            }
+
+            return \imagesy($image);
+        }
+    }
 }
 
 namespace Linkxtr\QrCode\DataTypes {

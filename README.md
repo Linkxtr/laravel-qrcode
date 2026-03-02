@@ -310,7 +310,7 @@ QrCode::size(400)
 - `btc($config)` - Generate BTC QR
 - `vCard($config)` - Generate vCard QR
 - `calendar($config)` - Generate Calendar Event QR
-- `WhatsApp($params)` - Generate WhatsApp QR (array with phone and optional message)
+- `WhatsApp($params)` - Generate WhatsApp QR (array with `number` and optional `message`)
 - `telegram($username)` - Generate Telegram QR
 
 ## 📄 License

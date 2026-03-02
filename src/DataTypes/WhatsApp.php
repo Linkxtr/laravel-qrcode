@@ -40,7 +40,7 @@ final class WhatsApp implements DataTypeInterface
             ];
         }
 
-        if (! isset($arguments['number'])) {
+        if (! isset($arguments['number']) || $arguments['number'] === '') {
             throw new InvalidArgumentException('WhatsApp number is mandatory.');
         }
 

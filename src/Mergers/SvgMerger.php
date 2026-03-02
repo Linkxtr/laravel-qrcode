@@ -20,8 +20,8 @@ final readonly class SvgMerger implements MergerInterface
         if ($this->percentage <= 0 || $this->percentage >= 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
-        $widthFound = preg_match('/width=["\'](\d+)["\']/i', $this->svgContent, $widthMatch);
-        $heightFound = preg_match('/height=["\'](\d+)["\']/i', $this->svgContent, $heightMatch);
+        $widthFound = preg_match('/width=["\'](\d+(?:\.\d+)?)\s*(?:px)?["\']/i', $this->svgContent, $widthMatch);
+        $heightFound = preg_match('/height=["\'](\d+(?:\.\d+)?)\s*(?:px)?["\']/i', $this->svgContent, $heightMatch);
 
         if (! $widthFound || ! $heightFound) {
             throw new InvalidArgumentException('Could not determine SVG dimensions. Ensure the SVG has width and height attributes.');
@@ -39,7 +39,7 @@ final readonly class SvgMerger implements MergerInterface
         [$logoWidth, $logoHeight] = $imageInfo;
         $mimeType = $imageInfo['mime'];
 
-        $logoRatio = $logoWidth / $logoHeight;
+        $logoRatio = $logoHeight > 0 ? $logoWidth / $logoHeight : 1;
         $targetWidth = (int) ($svgWidth * $this->percentage);
         $targetHeight = (int) ($targetWidth / $logoRatio);
 

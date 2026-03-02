@@ -19,6 +19,10 @@ it('should generate a valid WiFi QR code with just the SSID', function () {
     expect(strval($this->wifi))->toBe('WIFI:S:SSID;');
 });
 
+it('throws exception if not initialized before string conversion', function () {
+    expect(fn () => strval($this->wifi))->toThrow(InvalidArgumentException::class, 'WiFi SSID is required.');
+});
+
 it('should generate a valid WiFi QR code with SSID and password', function () {
     $this->wifi->create([
         0 => [

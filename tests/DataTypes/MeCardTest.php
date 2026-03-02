@@ -45,6 +45,11 @@ it('supports positional arguments', function () {
     expect((string) $meCard)->toBe('MECARD:N:John Doe;TEL:+1234567890;EMAIL:john@example.com;;');
 });
 
+it('throws exception if not initialized before string conversion', function () {
+    $meCard = new MeCard;
+    expect(fn () => (string) $meCard)->toThrow(InvalidArgumentException::class, 'MeCard must be initialized via create() before rendering.');
+});
+
 it('escapes special characters', function () {
     $meCard = new MeCard;
     $meCard->create([

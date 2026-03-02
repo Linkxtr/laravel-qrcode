@@ -19,7 +19,7 @@ it('generates a vCard string from direct array', function () {
 
     $content = (string) $vCard;
 
-    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:Doe;John;;;\r\nEMAIL:john@example.com\r\nTEL:+1234567890\r\nORG:ACME Inc.\r\nTITLE:Developer\r\nURL:https://example.com\r\nEND:VCARD");
+    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:Doe;John;;;\r\nEMAIL:john@example.com\r\nTEL:+1234567890\r\nORG:ACME Inc.\r\nTITLE:Developer\r\nURL:https://example.com\r\nEND:VCARD\r\n");
 });
 
 it('generates a vCard string from wrapped array (Generator style)', function () {
@@ -33,7 +33,7 @@ it('generates a vCard string from wrapped array (Generator style)', function () 
 
     $content = (string) $vCard;
 
-    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:Doe;John;;;\r\nEMAIL:john@example.com\r\nEND:VCARD");
+    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:Doe;John;;;\r\nEMAIL:john@example.com\r\nEND:VCARD\r\n");
 });
 
 it('generates a vCard string with empty N field if components are missing', function () {
@@ -45,7 +45,7 @@ it('generates a vCard string with empty N field if components are missing', func
 
     $content = (string) $vCard;
 
-    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:;;;;\r\nEMAIL:john@example.com\r\nEND:VCARD");
+    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:;;;;\r\nEMAIL:john@example.com\r\nEND:VCARD\r\n");
 });
 
 it('ignores non-string values for optional fields', function () {
@@ -61,7 +61,7 @@ it('ignores non-string values for optional fields', function () {
 
     $content = (string) $vCard;
 
-    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:;;;;\r\nEND:VCARD");
+    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:;;;;\r\nEND:VCARD\r\n");
 });
 
 it('throws exception if name is missing', function () {

@@ -69,6 +69,10 @@ final class Email implements DataTypeInterface
 
     private function buildEmailString(): string
     {
+        if ($this->address === null) {
+            throw new InvalidArgumentException('Email address is required.');
+        }
+
         $params = [];
 
         if (isset($this->subject) && $this->subject !== '') {

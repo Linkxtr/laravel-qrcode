@@ -25,9 +25,9 @@ it('should generate a valid email QR code with subject and body', function () {
     expect(strval($this->email))->toBe('mailto:email@example.com?subject=subject&body=body');
 });
 
-it('should generate a valid email QR code with subject only', function () {
+it('throws exception if address is missing', function () {
     $this->email->create([null, 'subject']);
-    expect(strval($this->email))->toBe('mailto:?subject=subject');
+    expect(fn () => strval($this->email))->toThrow(InvalidArgumentException::class, 'Email address is required.');
 });
 
 it('throws an exception when the email is invalid', function () {

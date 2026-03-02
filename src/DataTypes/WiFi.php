@@ -11,7 +11,7 @@ final class WiFi implements DataTypeInterface
 {
     private string $prefix = 'WIFI:';
 
-    private string $ssid;
+    private string $ssid = '';
 
     private string $password;
 
@@ -21,6 +21,10 @@ final class WiFi implements DataTypeInterface
 
     public function __toString(): string
     {
+        if ($this->ssid === '') {
+            throw new InvalidArgumentException('WiFi SSID is required.');
+        }
+
         return $this->buildWiFiString();
     }
 

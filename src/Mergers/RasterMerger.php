@@ -64,25 +64,34 @@ final readonly class RasterMerger implements MergerInterface
             throw new RuntimeException('Failed to create transparent color.');
         }
 
-        imagefill($canvas, 0, 0, $transparent);
-        imagecopy(
+        if (! imagefill($canvas, 0, 0, $transparent)) {
+            throw new RuntimeException('Failed to fill image with transparent color.');
+        }
+
+        if (! imagecopy(
             $canvas,
             $this->sourceImage->getImageResource(),
             0, 0, 0, 0,
             $sourceWidth,
             $sourceHeight
-        );
+        )) {
+            throw new RuntimeException("Failed to copy source image to canvas (Source: {$sourceWidth}x{$sourceHeight}).");
+        }
 
-        imagecopyresampled(
+        if (! imagecopyresampled(
             $canvas,
             $this->mergeImage->getImageResource(),
             $centerX, $centerY,
             0, 0,
             $targetLogoWidth, $targetLogoHeight,
             $mergeWidth, $mergeHeight
-        );
+        )) {
+            throw new RuntimeException("Failed to copy/resample merge image (Target: {$targetLogoWidth}x{$targetLogoHeight}, Source: {$mergeWidth}x{$mergeHeight}).");
+        }
 
-        imagesavealpha($canvas, true);
+        if (! imagesavealpha($canvas, true)) {
+            throw new RuntimeException('Failed to save alpha channel information.');
+        }
 
         return $this->createOutput($canvas);
     }
