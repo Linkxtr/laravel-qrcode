@@ -396,6 +396,20 @@ test('webp format is supported', function () {
     expect($qrCode->generate('test'))->toBeInstanceOf(HtmlString::class);
 });
 
+it('uses GDLibRenderer when imagick is not loaded and format is png', function () {
+    global $mockImagickLoaded;
+    $mockImagickLoaded = false;
+
+    try {
+        $qrCode = (new Generator)->format('png')->generate('test');
+        expect($qrCode)->toBeInstanceOf(HtmlString::class);
+        $data = $qrCode->toHtml();
+        expect(substr($data, 1, 3))->toBe('PNG');
+    } finally {
+        $mockImagickLoaded = true;
+    }
+});
+
 test('can generate webp', function () {
     $qrCode = (new Generator)->format('webp')->generate('test');
     expect($qrCode)->toBeInstanceOf(HtmlString::class);
