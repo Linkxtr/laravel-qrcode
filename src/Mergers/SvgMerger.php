@@ -1,24 +1,27 @@
 <?php
 
-namespace Linkxtr\QrCode;
+declare(strict_types=1);
+
+namespace Linkxtr\QrCode\Mergers;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\MergerInterface;
 
-final class SvgImageMerge
+final readonly class SvgMerger implements MergerInterface
 {
     public function __construct(
-        protected string $svgContent,
-        protected string $mergeImageContent,
-        protected float $percentage
+        private string $svgContent,
+        private string $mergeImageContent,
+        private float $percentage
     ) {}
 
     public function merge(): string
     {
-        if ($this->percentage <= 0 || $this->percentage > 1) {
-            throw new InvalidArgumentException('$percentage must be greater than 0 and less than or equal to 1');
+        if ($this->percentage <= 0 || $this->percentage >= 1) {
+            throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
-        $widthFound = preg_match('/width=["\'](\d+)["\']/i', $this->svgContent, $widthMatch);
-        $heightFound = preg_match('/height=["\'](\d+)["\']/i', $this->svgContent, $heightMatch);
+        $widthFound = preg_match('/width=["\'](\d+(?:\.\d+)?)\s*(?:px)?["\']/i', $this->svgContent, $widthMatch);
+        $heightFound = preg_match('/height=["\'](\d+(?:\.\d+)?)\s*(?:px)?["\']/i', $this->svgContent, $heightMatch);
 
         if (! $widthFound || ! $heightFound) {
             throw new InvalidArgumentException('Could not determine SVG dimensions. Ensure the SVG has width and height attributes.');
@@ -36,7 +39,7 @@ final class SvgImageMerge
         [$logoWidth, $logoHeight] = $imageInfo;
         $mimeType = $imageInfo['mime'];
 
-        $logoRatio = $logoWidth / $logoHeight;
+        $logoRatio = $logoHeight > 0 ? $logoWidth / $logoHeight : 1;
         $targetWidth = (int) ($svgWidth * $this->percentage);
         $targetHeight = (int) ($targetWidth / $logoRatio);
 

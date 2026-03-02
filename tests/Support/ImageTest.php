@@ -1,13 +1,17 @@
 <?php
 
-use Linkxtr\QrCode\Image;
+declare(strict_types=1);
+
+use Linkxtr\QrCode\Support\Image;
+
+require_once __DIR__.'/Overrides.php';
 
 function getImageTestAssetPath(): string
 {
-    $path = __DIR__.'/images/linkxtr.png';
+    $path = __DIR__.'/../images/linkxtr.png';
 
     if (! file_exists($path)) {
-        throw new \RuntimeException('Image not found at '.$path);
+        throw new RuntimeException('Image not found at '.$path);
     }
 
     return $path;
@@ -62,7 +66,7 @@ it('gets the height of the image', function () {
 
 it('throws exception for invalid image data', function () {
     expect(fn () => new Image('invalid data'))
-        ->toThrow(\InvalidArgumentException::class, 'Invalid image data provided to Image.');
+        ->toThrow(InvalidArgumentException::class, 'Invalid image data provided to Image.');
 });
 
 it('can replace the image resource', function () {
@@ -80,7 +84,18 @@ it('throws exception when accessing methods after destruction', function () {
     $image = new Image(file_get_contents(getImageTestAssetPath()));
     $image->__destruct();
 
-    expect(fn () => $image->getWidth())->toThrow(\RuntimeException::class);
-    expect(fn () => $image->getHeight())->toThrow(\RuntimeException::class);
-    expect(fn () => $image->getImageResource())->toThrow(\RuntimeException::class);
+    expect(fn () => $image->getWidth())->toThrow(RuntimeException::class);
+    expect(fn () => $image->getHeight())->toThrow(RuntimeException::class);
+    expect(fn () => $image->getImageResource())->toThrow(RuntimeException::class);
 });
+
+it('throws exception if image creation fails returning false', function () {
+    global $mockImageCreateFromString;
+    $mockImageCreateFromString = false;
+
+    try {
+        new Image('valid string but mock fails');
+    } finally {
+        $mockImageCreateFromString = null;
+    }
+})->throws(InvalidArgumentException::class, 'Invalid image data provided to Image.');

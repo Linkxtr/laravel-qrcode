@@ -1,54 +1,57 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class WhatsApp implements DataTypeInterface
 {
-    protected ?string $number = null;
+    private ?string $number = null;
 
-    protected ?string $message = null;
+    private ?string $message = null;
+
+    public function __toString(): string
+    {
+        if ($this->number === null) {
+            throw new InvalidArgumentException('WhatsApp must be initialized via create() before rendering.');
+        }
+
+        $url = 'https://wa.me/'.$this->number;
+
+        if ($this->message !== null) {
+            $url .= '?text='.urlencode($this->message);
+        }
+
+        return $url;
+    }
 
     /**
      * @param  list<mixed>|array<string, mixed>  $arguments
      */
     public function create(array $arguments): void
     {
-        $properties = $arguments;
-
-        // Support positional arguments
         if (array_is_list($arguments)) {
-            $properties = [];
-            if (isset($arguments[0])) {
-                $properties['number'] = $arguments[0];
-            }
-            if (isset($arguments[1])) {
-                $properties['message'] = $arguments[1];
-            }
+            $arguments = [
+                'number' => $arguments[0] ?? null,
+                'message' => $arguments[1] ?? null,
+            ];
         }
 
-        if (isset($properties['number']) && is_string($properties['number'])) {
-            $this->number = $properties['number'];
-        }
-
-        if (isset($properties['message']) && is_string($properties['message'])) {
-            $this->message = $properties['message'];
-        }
-    }
-
-    public function __toString(): string
-    {
-        if (! $this->number) {
+        if (! isset($arguments['number']) || $arguments['number'] === '') {
             throw new InvalidArgumentException('WhatsApp number is mandatory.');
         }
 
-        $url = 'https://wa.me/'.$this->number;
+        foreach (['number', 'message'] as $key) {
+            if (isset($arguments[$key])) {
+                if (! is_string($arguments[$key])) {
+                    throw new InvalidArgumentException("WhatsApp {$key} must be a string.");
+                }
 
-        if ($this->message) {
-            $url .= '?text='.urlencode($this->message);
+                $this->{$key} = $arguments[$key];
+            }
         }
-
-        return $url;
     }
 }

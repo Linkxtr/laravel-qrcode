@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Linkxtr\QrCode\DataTypes\VCard;
 
 it('generates a vCard string from direct array', function () {
@@ -17,7 +19,7 @@ it('generates a vCard string from direct array', function () {
 
     $content = (string) $vCard;
 
-    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:Doe;John;;;\r\nEMAIL:john@example.com\r\nTEL:+1234567890\r\nORG:ACME Inc.\r\nTITLE:Developer\r\nURL:https://example.com\r\nEND:VCARD");
+    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:Doe;John;;;\r\nEMAIL:john@example.com\r\nTEL:+1234567890\r\nORG:ACME Inc.\r\nTITLE:Developer\r\nURL:https://example.com\r\nEND:VCARD\r\n");
 });
 
 it('generates a vCard string from wrapped array (Generator style)', function () {
@@ -31,7 +33,7 @@ it('generates a vCard string from wrapped array (Generator style)', function () 
 
     $content = (string) $vCard;
 
-    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:Doe;John;;;\r\nEMAIL:john@example.com\r\nEND:VCARD");
+    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:Doe;John;;;\r\nEMAIL:john@example.com\r\nEND:VCARD\r\n");
 });
 
 it('generates a vCard string with empty N field if components are missing', function () {
@@ -43,7 +45,7 @@ it('generates a vCard string with empty N field if components are missing', func
 
     $content = (string) $vCard;
 
-    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:;;;;\r\nEMAIL:john@example.com\r\nEND:VCARD");
+    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:;;;;\r\nEMAIL:john@example.com\r\nEND:VCARD\r\n");
 });
 
 it('ignores non-string values for optional fields', function () {
@@ -59,7 +61,7 @@ it('ignores non-string values for optional fields', function () {
 
     $content = (string) $vCard;
 
-    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:;;;;\r\nEND:VCARD");
+    expect($content)->toBe("BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nN:;;;;\r\nEND:VCARD\r\n");
 });
 
 it('throws exception if name is missing', function () {
@@ -68,7 +70,7 @@ it('throws exception if name is missing', function () {
         'email' => 'john@example.com',
     ]);
     (string) $vCard;
-})->throws(\InvalidArgumentException::class, 'vCard FN (Formatted Name) is mandatory.');
+})->throws(InvalidArgumentException::class, 'vCard FN (Formatted Name) is mandatory.');
 
 it('validation fails for invalid email', function () {
     $vCard = new VCard;
@@ -76,7 +78,7 @@ it('validation fails for invalid email', function () {
         'name' => 'John Doe',
         'email' => 'invalid-email',
     ]);
-})->throws(\InvalidArgumentException::class, 'Invalid email address provided to vCard.');
+})->throws(InvalidArgumentException::class, 'Invalid email address provided to vCard.');
 
 it('validation fails for invalid url', function () {
     $vCard = new VCard;
@@ -84,4 +86,4 @@ it('validation fails for invalid url', function () {
         'name' => 'John Doe',
         'url' => 'invalid-url',
     ]);
-})->throws(\InvalidArgumentException::class, 'Invalid URL provided to vCard.');
+})->throws(InvalidArgumentException::class, 'Invalid URL provided to vCard.');

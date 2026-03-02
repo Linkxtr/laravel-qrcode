@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\QrCodeServiceProvider;
@@ -25,7 +27,7 @@ it('can call methods via the facade', function () {
 });
 
 it('resolves alias correctly', function () {
-    $provider = new \Linkxtr\QrCode\QrCodeServiceProvider(app());
+    $provider = new QrCodeServiceProvider(app());
     $provider->register();
 
     expect(app()->bound('qrcode'))->toBeTrue();
@@ -33,6 +35,6 @@ it('resolves alias correctly', function () {
 });
 
 it('provides generator class', function () {
-    $provider = new \Linkxtr\QrCode\QrCodeServiceProvider(app());
+    $provider = new QrCodeServiceProvider(app());
     expect($provider->provides())->toContain(Generator::class);
 });

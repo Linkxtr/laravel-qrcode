@@ -1,30 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class BTC implements DataTypeInterface
 {
-    protected string $prefix = 'bitcoin:';
+    private string $prefix = 'bitcoin:';
 
-    protected string $address;
+    private string $address;
 
-    protected float $amount;
+    private float $amount;
 
-    protected ?string $label = null;
+    private ?string $label = null;
 
-    protected ?string $message = null;
+    private ?string $message = null;
 
-    protected ?string $returnAddress = null;
-
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    public function create(array $arguments): void
-    {
-        $this->setProperties($arguments);
-    }
+    private ?string $returnAddress = null;
 
     public function __toString(): string
     {
@@ -34,7 +29,15 @@ final class BTC implements DataTypeInterface
     /**
      * @param  list<mixed>  $arguments
      */
-    protected function setProperties(array $arguments): void
+    public function create(array $arguments): void
+    {
+        $this->setProperties($arguments);
+    }
+
+    /**
+     * @param  list<mixed>  $arguments
+     */
+    private function setProperties(array $arguments): void
     {
         if (count($arguments) < 2) {
             throw new InvalidArgumentException('Bitcoin address and amount are required.');
@@ -44,12 +47,16 @@ final class BTC implements DataTypeInterface
             throw new InvalidArgumentException('Bitcoin address must be a string.');
         }
 
-        if (! is_float($arguments[1])) {
-            throw new InvalidArgumentException('Bitcoin amount must be a float.');
+        if (! is_numeric($arguments[1])) {
+            throw new InvalidArgumentException('Bitcoin amount must be a numeric value.');
+        }
+
+        if ((float) $arguments[1] < 0) {
+            throw new InvalidArgumentException('Bitcoin amount must be non-negative.');
         }
 
         $this->address = $arguments[0];
-        $this->amount = $arguments[1];
+        $this->amount = (float) $arguments[1];
 
         if (isset($arguments[2]) && is_array($arguments[2])) {
             $this->setOptions($arguments[2]);
@@ -59,7 +66,7 @@ final class BTC implements DataTypeInterface
     /**
      * @param  array<mixed>  $options
      */
-    protected function setOptions(array $options): void
+    private function setOptions(array $options): void
     {
         if (isset($options['label']) && is_string($options['label'])) {
             $this->label = $options['label'];
@@ -74,7 +81,7 @@ final class BTC implements DataTypeInterface
         }
     }
 
-    protected function buildBitCoinString(): string
+    private function buildBitCoinString(): string
     {
         $params = [
             'amount' => $this->amount,
@@ -83,7 +90,7 @@ final class BTC implements DataTypeInterface
             'r' => $this->returnAddress,
         ];
 
-        $params = array_filter($params, fn ($value) => $value !== null);
+        $params = array_filter($params, fn (null|string|float $value): bool => $value !== null);
 
         return $this->prefix.$this->address.'?'.http_build_query($params);
     }

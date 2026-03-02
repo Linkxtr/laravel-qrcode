@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Linkxtr\QrCode\DataTypes\MeCard;
 
 it('generates a MeCard string', function () {
@@ -41,6 +43,11 @@ it('supports positional arguments', function () {
     $meCard->create(['John Doe', '+1234567890', 'john@example.com']);
 
     expect((string) $meCard)->toBe('MECARD:N:John Doe;TEL:+1234567890;EMAIL:john@example.com;;');
+});
+
+it('throws exception if not initialized before string conversion', function () {
+    $meCard = new MeCard;
+    expect(fn () => (string) $meCard)->toThrow(InvalidArgumentException::class, 'MeCard must be initialized via create() before rendering.');
 });
 
 it('escapes special characters', function () {
