@@ -39,3 +39,9 @@ it('throws an exception when Ethereum amount is negative', function () {
     expect(fn () => $this->ethereum->create(['0x123', -1.5]))
         ->toThrow(InvalidArgumentException::class, 'Ethereum amount must be non-negative.');
 });
+
+it('clears amount when recreating with address only', function () {
+    $this->ethereum->create(['0x742d35Cc6634C0532925a3b8D2b2CE1e5bfb043d', 1.5]);
+    $this->ethereum->create(['0x1111111111111111111111111111111111111111']);
+    expect(strval($this->ethereum))->toBe('ethereum:0x1111111111111111111111111111111111111111');
+});

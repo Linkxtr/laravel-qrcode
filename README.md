@@ -311,7 +311,7 @@ QrCode::size(400)
 - `geo($lat, $lng)` - Generate location QR
 - `wiFi($config)` - Generate WiFi QR
 - `btc($config)` - Generate BTC QR
-- `ethereum($address, $amount)` - Generate Ethereum QR
+- `ethereum($address, $amount = null)` - Generate Ethereum QR
 - `vCard($config)` - Generate vCard QR
 - `calendar($config)` - Generate Calendar Event QR
 - `WhatsApp($params)` - Generate WhatsApp QR (array with `number` and optional `message`)

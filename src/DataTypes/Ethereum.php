@@ -42,6 +42,7 @@ final class Ethereum implements DataTypeInterface
         }
 
         $this->address = $arguments[0];
+        $this->amount = null;
 
         if (isset($arguments[1])) {
             if (! is_numeric($arguments[1])) {
