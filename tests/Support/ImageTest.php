@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 use Linkxtr\QrCode\Support\Image;
 
-require_once __DIR__.'/Overrides.php';
-
 function getImageTestAssetPath(): string
 {
     $path = __DIR__.'/../images/linkxtr.png';

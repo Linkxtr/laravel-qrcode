@@ -14,8 +14,6 @@ use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\Support\Image;
 
-require_once __DIR__.'/Support/Overrides.php';
-
 covers(Generator::class);
 
 beforeEach(function () {

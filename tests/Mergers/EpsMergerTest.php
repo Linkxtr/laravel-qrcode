@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\Mergers\EpsMerger;
 
-require_once __DIR__.'/../Support/Overrides.php';
-
 it('throw exception if percentage is greater than 1', function () {
     $qr = new Generator;
 
