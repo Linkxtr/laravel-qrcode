@@ -106,6 +106,9 @@ QrCode::geo(37.7749, -122.4194);
 // BTC
 QrCode::btc(['btcaddress', 0.0034, ['label' => 'label', 'message' => 'message', 'returnAddress' => 'https://www.returnaddress.com']]);
 
+// Ethereum
+QrCode::ethereum('0x742d35Cc6634C0532925a3b8D2b2CE1e5bfb043d', 1.5);
+
 // vCard
 QrCode::vCard([
     'name' => 'John Doe',
@@ -308,6 +311,7 @@ QrCode::size(400)
 - `geo($lat, $lng)` - Generate location QR
 - `wiFi($config)` - Generate WiFi QR
 - `btc($config)` - Generate BTC QR
+- `ethereum($address, $amount)` - Generate Ethereum QR
 - `vCard($config)` - Generate vCard QR
 - `calendar($config)` - Generate Calendar Event QR
 - `WhatsApp($params)` - Generate WhatsApp QR (array with `number` and optional `message`)
