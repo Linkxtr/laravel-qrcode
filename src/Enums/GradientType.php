@@ -10,6 +10,7 @@ use Linkxtr\QrCode\Enums\Concerns\EnumHelper;
 enum GradientType: string
 {
     use EnumHelper;
+
     case VERTICAL = 'vertical';
     case HORIZONTAL = 'horizontal';
     case DIAGONAL = 'diagonal';

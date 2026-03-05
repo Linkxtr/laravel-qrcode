@@ -9,7 +9,25 @@ return RectorConfig::configure()
         __DIR__.'/config',
         __DIR__.'/src',
     ])
-    ->withPhpSets(php82: true)
-    ->withTypeCoverageLevel(0)
-    ->withDeadCodeLevel(0)
-    ->withCodeQualityLevel(0);
+    ->withPreparedSets(
+        deadCode: true,
+        codeQuality: true,
+        codingStyle: true,
+        typeDeclarations: true,
+        typeDeclarationDocblocks: true,
+        privatization: true,
+        naming: true,
+        instanceOf: true,
+        earlyReturn: true,
+        carbon: true,
+        rectorPreset: true,
+        phpunitCodeQuality: true,
+        doctrineCodeQuality: true,
+        symfonyCodeQuality: true,
+        symfonyConfigs: true
+    )
+    ->withPhpSets(php85: true)
+    ->withAttributesSets()
+    ->withImportNames(removeUnusedImports: true)
+    ->withTreatClassesAsFinal()
+    ->withFluentCallNewLine();

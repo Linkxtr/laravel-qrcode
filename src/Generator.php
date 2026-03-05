@@ -74,7 +74,7 @@ final class Generator
      * Q: 25% loss.
      * H: 30% loss.
      */
-    private ErrorCorrectionLevel $errorCorrection = ErrorCorrectionLevel::L;
+    private ErrorCorrectionLevel $errorCorrectionLevel = ErrorCorrectionLevel::L;
 
     /**
      * The encoding mode. Possible values are
@@ -149,14 +149,14 @@ final class Generator
 
     public function generate(string $text, ?string $filename = null): HtmlString
     {
-        $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrection->toBaconErrorCorrectionLevel());
+        $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrectionLevel->toBaconErrorCorrectionLevel());
 
         if ($this->imageMerge !== '') {
             $qrCode = $this->mergeImage($qrCode);
         }
 
         if ($filename && file_put_contents($filename, $qrCode) === false) {
-            throw new RuntimeException("Failed to write QR code to file: {$filename}");
+            throw new RuntimeException('Failed to write QR code to file: '.$filename);
         }
 
         return new HtmlString($qrCode);
@@ -171,7 +171,7 @@ final class Generator
         $content = file_get_contents($filepath);
 
         if ($content === false) {
-            throw new InvalidArgumentException("Failed to read image file: {$filepath}");
+            throw new InvalidArgumentException('Failed to read image file: '.$filepath);
         }
 
         $this->imageMerge = $content;
@@ -224,15 +224,15 @@ final class Generator
         return $this;
     }
 
-    public function eyeColor(int $eyeNumber, int $innerRed, int $innerGreen, int $innerBlue, int $outterRed = 0, int $outterGreen = 0, int $outterBlue = 0): self
+    public function eyeColor(int $eyeNumber, int $innerRed, int $innerGreen, int $innerBlue, int $outerRed = 0, int $outerGreen = 0, int $outerBlue = 0): self
     {
         if ($eyeNumber < 0 || $eyeNumber > 2) {
-            throw new InvalidArgumentException("\$eyeNumber must be 0, 1, or 2.  {$eyeNumber} is not valid.");
+            throw new InvalidArgumentException(sprintf('$eyeNumber must be 0, 1, or 2.  %s is not valid.', $eyeNumber));
         }
 
         $this->eyeColors[$eyeNumber] = new EyeFill(
             $this->createColor($innerRed, $innerGreen, $innerBlue),
-            $this->createColor($outterRed, $outterGreen, $outterBlue)
+            $this->createColor($outerRed, $outerGreen, $outerBlue)
         );
 
         return $this;
@@ -283,7 +283,7 @@ final class Generator
         }
 
         if ($size <= 0 || $size > 1) {
-            throw new InvalidArgumentException("\$size must be greater than 0 and less than or equal to 1. {$size} is not valid.");
+            throw new InvalidArgumentException(sprintf('$size must be greater than 0 and less than or equal to 1. %s is not valid.', $size));
         }
 
         $this->style = $style;
@@ -309,7 +309,7 @@ final class Generator
             throw new InvalidArgumentException('$errorCorrection must be one of the following values: '.implode(', ', ErrorCorrectionLevel::toArray()));
         }
 
-        $this->errorCorrection = $errorCorrection;
+        $this->errorCorrectionLevel = $errorCorrection;
 
         return $this;
     }
@@ -444,9 +444,9 @@ final class Generator
             throw new BadMethodCallException;
         }
 
-        $reflection = new ReflectionClass($class);
+        $reflectionClass = new ReflectionClass($class);
 
-        if ($reflection->getShortName() !== $method) {
+        if ($reflectionClass->getShortName() !== $method) {
             throw new BadMethodCallException;
         }
 

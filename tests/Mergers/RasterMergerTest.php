@@ -79,7 +79,7 @@ it('throws exception if merge image has zero width or height', function () {
     $callCount = 0;
     // Return 0 on second call (merge image check), real value on first call (source image check)
     $mockImagesx = function ($image) use (&$callCount) {
-        $callCount++;
+        ++$callCount;
         if ($callCount === 2) {
             return 0;
         }

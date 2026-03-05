@@ -98,13 +98,11 @@ test('color is passed to formatter', function () {
     expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getBlue())->toBe(100);
 
     $qrCode = (new Generator)->color(100, 150, 200, 100);
-    /** @var Alpha $foregroundColor */
     $foregroundColor = $qrCode->getFill()->getForegroundColor();
     expect($foregroundColor)->toBeInstanceOf(Alpha::class);
     expect($foregroundColor->getAlpha())->toBe(100);
 
     $qrCode = (new Generator)->backgroundColor(50, 75, 100, 75);
-    /** @var Alpha $backgroundColor */
     $backgroundColor = $qrCode->getFill()->getBackgroundColor();
     expect($backgroundColor)->toBeInstanceOf(Alpha::class);
     expect($backgroundColor->getAlpha())->toBe(75);

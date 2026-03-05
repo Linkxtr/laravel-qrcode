@@ -55,6 +55,7 @@ final class Email implements DataTypeInterface
             if (! is_string($arguments[2])) {
                 throw new InvalidArgumentException('Invalid body provided to Email.');
             }
+
             $this->body = $arguments[2];
         }
 

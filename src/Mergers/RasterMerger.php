@@ -84,7 +84,7 @@ final readonly class RasterMerger implements MergerInterface
             $sourceWidth,
             $sourceHeight
         )) {
-            throw new RuntimeException("Failed to copy source image to canvas (Source: {$sourceWidth}x{$sourceHeight}).");
+            throw new RuntimeException(sprintf('Failed to copy source image to canvas (Source: %dx%d).', $sourceWidth, $sourceHeight));
         }
 
         if (! imagecopyresampled(
@@ -95,7 +95,7 @@ final readonly class RasterMerger implements MergerInterface
             $targetLogoWidth, $targetLogoHeight,
             $mergeWidth, $mergeHeight
         )) {
-            throw new RuntimeException("Failed to copy/resample merge image (Target: {$targetLogoWidth}x{$targetLogoHeight}, Source: {$mergeWidth}x{$mergeHeight}).");
+            throw new RuntimeException(sprintf('Failed to copy/resample merge image (Target: %dx%d, Source: %dx%d).', $targetLogoWidth, $targetLogoHeight, $mergeWidth, $mergeHeight));
         }
 
         if (! imagesavealpha($canvas, true)) {
@@ -105,19 +105,19 @@ final readonly class RasterMerger implements MergerInterface
         return $this->createOutput($canvas);
     }
 
-    private function createOutput(GdImage $canvas): string
+    private function createOutput(GdImage $gdImage): string
     {
         ob_start();
 
         if ($this->format === 'webp') {
-            imagewebp($canvas, null, 90);
+            imagewebp($gdImage, null, 90);
         } else {
-            imagepng($canvas);
+            imagepng($gdImage);
         }
 
         $content = ob_get_clean();
 
-        unset($canvas);
+        unset($gdImage);
 
         if ($content === false) {
             throw new RuntimeException('Failed to capture image output from buffer.');

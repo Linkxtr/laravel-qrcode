@@ -47,7 +47,7 @@ it('accepts ErrorCorrectionLevel enum', function () {
     $generator->errorCorrection(ErrorCorrectionLevel::H);
 
     $reflection = new ReflectionClass($generator);
-    $property = $reflection->getProperty('errorCorrection');
+    $property = $reflection->getProperty('errorCorrectionLevel');
 
     expect($property->getValue($generator))->toEqual(ErrorCorrectionLevel::H);
 });
@@ -57,7 +57,7 @@ it('accepts ErrorCorrectionLevel string', function () {
     $generator->errorCorrection('M');
 
     $reflection = new ReflectionClass($generator);
-    $property = $reflection->getProperty('errorCorrection');
+    $property = $reflection->getProperty('errorCorrectionLevel');
 
     expect($property->getValue($generator))->toEqual(ErrorCorrectionLevel::M);
 });

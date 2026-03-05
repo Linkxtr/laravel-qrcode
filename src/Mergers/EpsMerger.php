@@ -43,11 +43,6 @@ final readonly class EpsMerger implements MergerInterface
         $logoW = imagesx($logo);
         $logoH = imagesy($logo);
 
-        /** @phpstan-ignore-next-line */
-        if ($logoW === 0 || $logoH === 0) {
-            throw new InvalidArgumentException('Merge image has invalid dimensions.');
-        }
-
         $ratio = $logoW / $logoH;
 
         $targetW = max(1, (int) ($qrWidth * $this->percentage));
@@ -78,8 +73,8 @@ final readonly class EpsMerger implements MergerInterface
         );
 
         ob_start();
-        for ($y = 0; $y < $targetH; $y++) {
-            for ($x = 0; $x < $targetW; $x++) {
+        for ($y = 0; $y < $targetH; ++$y) {
+            for ($x = 0; $x < $targetW; ++$x) {
                 $rgb = imagecolorat($resizedLogo, $x, $y);
                 $r = ($rgb >> 16) & 0xFF;
                 $g = ($rgb >> 8) & 0xFF;
@@ -87,6 +82,7 @@ final readonly class EpsMerger implements MergerInterface
                 printf('%02x%02x%02x', $r, $g, $b);
             }
         }
+
         $hexData = ob_get_clean();
 
         if ($hexData === false) {

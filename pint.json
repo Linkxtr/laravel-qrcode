@@ -40,6 +40,7 @@
     "ordered_interfaces": true,
     "ordered_traits": true,
     "protected_to_private": true,
-    "strict_comparison": true
+    "strict_comparison": true,
+    "increment_style": true
   }
 }

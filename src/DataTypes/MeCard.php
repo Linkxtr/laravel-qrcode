@@ -80,9 +80,11 @@ final class MeCard implements DataTypeInterface
             if (isset($arguments[0])) {
                 $properties['name'] = $arguments[0];
             }
+
             if (isset($arguments[1])) {
                 $properties['phone'] = $arguments[1];
             }
+
             if (isset($arguments[2])) {
                 $properties['email'] = $arguments[2];
             }
@@ -97,21 +99,27 @@ final class MeCard implements DataTypeInterface
         if (isset($properties['reading']) && is_string($properties['reading'])) {
             $this->reading = $properties['reading'];
         }
+
         if (isset($properties['phone']) && is_string($properties['phone'])) {
             $this->phone = $properties['phone'];
         }
+
         if (isset($properties['email']) && is_string($properties['email'])) {
             $this->email = $properties['email'];
         }
+
         if (isset($properties['note']) && is_string($properties['note'])) {
             $this->note = $properties['note'];
         }
+
         if (isset($properties['birthday']) && is_string($properties['birthday'])) {
             $this->birthday = $properties['birthday'];
         }
+
         if (isset($properties['address']) && is_string($properties['address'])) {
             $this->address = $properties['address'];
         }
+
         if (isset($properties['url']) && is_string($properties['url'])) {
             $this->url = $properties['url'];
         }

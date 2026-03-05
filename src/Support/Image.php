@@ -11,59 +11,59 @@ use RuntimeException;
 
 final class Image
 {
-    private ?GdImage $image = null;
+    private ?GdImage $gdImage = null;
 
     public function __construct(string $image)
     {
         try {
             $img = imagecreatefromstring($image);
-        } catch (ErrorException $e) {
-            throw new InvalidArgumentException('Invalid image data provided to Image.', $e->getCode(), previous: $e);
+        } catch (ErrorException $errorException) {
+            throw new InvalidArgumentException('Invalid image data provided to Image.', $errorException->getCode(), previous: $errorException);
         }
 
         if ($img === false) {
             throw new InvalidArgumentException('Invalid image data provided to Image.');
         }
 
-        $this->image = $img;
+        $this->gdImage = $img;
     }
 
     public function __destruct()
     {
-        $this->image = null;
+        $this->gdImage = null;
     }
 
     /** @return int<0, max> */
     public function getWidth(): int
     {
-        if (! $this->image instanceof GdImage) {
+        if (! $this->gdImage instanceof GdImage) {
             throw new RuntimeException('Image resource has been released.');
         }
 
-        return imagesx($this->image);
+        return imagesx($this->gdImage);
     }
 
     /** @return int<0, max> */
     public function getHeight(): int
     {
-        if (! $this->image instanceof GdImage) {
+        if (! $this->gdImage instanceof GdImage) {
             throw new RuntimeException('Image resource has been released.');
         }
 
-        return imagesy($this->image);
+        return imagesy($this->gdImage);
     }
 
     public function getImageResource(): GdImage
     {
-        if (! $this->image instanceof GdImage) {
+        if (! $this->gdImage instanceof GdImage) {
             throw new RuntimeException('Image resource has been released.');
         }
 
-        return $this->image;
+        return $this->gdImage;
     }
 
-    public function setImageResource(GdImage $image): void
+    public function setImageResource(GdImage $gdImage): void
     {
-        $this->image = $image;
+        $this->gdImage = $gdImage;
     }
 }

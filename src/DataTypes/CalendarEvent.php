@@ -69,16 +69,19 @@ final class CalendarEvent implements DataTypeInterface
         if (! isset($attributes['summary']) || ! is_string($attributes['summary']) || $attributes['summary'] === '') {
             throw new InvalidArgumentException('Summary is required and must be a string.');
         }
+
         $this->summary = $attributes['summary'];
 
         if (! isset($attributes['start'])) {
             throw new InvalidArgumentException('Start date is required.');
         }
+
         $this->start = $this->parseDate($attributes['start']);
 
         if (! isset($attributes['end'])) {
             throw new InvalidArgumentException('End date is required.');
         }
+
         $this->end = $this->parseDate($attributes['end']);
 
         if ($this->end <= $this->start) {

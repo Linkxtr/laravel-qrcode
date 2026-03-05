@@ -9,6 +9,7 @@ use Linkxtr\QrCode\Enums\Concerns\EnumHelper;
 enum Format: string
 {
     use EnumHelper;
+
     case PNG = 'png';
     case SVG = 'svg';
     case EPS = 'eps';

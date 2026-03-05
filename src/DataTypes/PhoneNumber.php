@@ -13,9 +13,9 @@ final class PhoneNumber implements DataTypeInterface
 {
     use ValidatesPhoneNumbers;
 
-    protected string $prefix = 'tel:';
+    private string $prefix = 'tel:';
 
-    protected ?string $phoneNumber = null;
+    private ?string $phoneNumber = null;
 
     public function __toString(): string
     {
@@ -33,7 +33,7 @@ final class PhoneNumber implements DataTypeInterface
     /**
      * @param  list<mixed>  $arguments
      */
-    protected function setProperties(array $arguments): void
+    private function setProperties(array $arguments): void
     {
         if (! isset($arguments[0])) {
             throw new InvalidArgumentException('Phone number is required.');
@@ -47,7 +47,7 @@ final class PhoneNumber implements DataTypeInterface
         $this->phoneNumber = $arguments[0];
     }
 
-    protected function buildPhoneNumberString(): string
+    private function buildPhoneNumberString(): string
     {
         if ($this->phoneNumber === null) {
             throw new LogicException('Phone number is required. Call create() before using this object.');

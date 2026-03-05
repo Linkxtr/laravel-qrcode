@@ -47,7 +47,7 @@ final class WhatsApp implements DataTypeInterface
         foreach (['number', 'message'] as $key) {
             if (isset($arguments[$key])) {
                 if (! is_string($arguments[$key])) {
-                    throw new InvalidArgumentException("WhatsApp {$key} must be a string.");
+                    throw new InvalidArgumentException(sprintf('WhatsApp %s must be a string.', $key));
                 }
 
                 $this->{$key} = $arguments[$key];

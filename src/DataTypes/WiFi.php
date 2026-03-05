@@ -75,6 +75,7 @@ final class WiFi implements DataTypeInterface
         if (isset($this->password)) {
             $wifi .= 'P:'.$this->password.$this->separator;
         }
+
         if (isset($this->hidden) && $this->hidden) {
             $wifi .= 'H:true'.$this->separator;
         }

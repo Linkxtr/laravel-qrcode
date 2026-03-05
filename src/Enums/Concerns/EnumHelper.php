@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Enums\Concerns;
 
-use BackedEnum;
-
+/**
+ * Used to get all values of the enum. support only Backed Enums.
+ */
 trait EnumHelper
 {
     /**
@@ -15,7 +16,6 @@ trait EnumHelper
      */
     public static function toArray(): array
     {
-        /** @phpstan-ignore-next-line */
-        return array_map(fn ($c) => $c instanceof BackedEnum ? $c->value : $c->name, self::cases());
+        return array_map(fn (self $c): string => $c->value, self::cases());
     }
 }

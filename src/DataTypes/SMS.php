@@ -12,13 +12,13 @@ final class SMS implements DataTypeInterface
 {
     use ValidatesPhoneNumbers;
 
-    protected string $prefix = 'SMSTO:';
+    private string $prefix = 'SMSTO:';
 
-    protected string $separator = ':';
+    private string $separator = ':';
 
-    protected ?string $smsAddress = null;
+    private ?string $smsAddress = null;
 
-    protected ?string $message = null;
+    private ?string $message = null;
 
     public function __toString(): string
     {
@@ -36,7 +36,7 @@ final class SMS implements DataTypeInterface
     /**
      * @param  list<mixed>  $arguments
      */
-    protected function setProperties(array $arguments): void
+    private function setProperties(array $arguments): void
     {
         if (! isset($arguments[0]) && ! isset($arguments[1])) {
             throw new InvalidArgumentException('Either SMS address or message is required.');
@@ -60,7 +60,7 @@ final class SMS implements DataTypeInterface
         }
     }
 
-    protected function buildSMSString(): string
+    private function buildSMSString(): string
     {
         $sms = $this->prefix.($this->smsAddress ?? '');
 

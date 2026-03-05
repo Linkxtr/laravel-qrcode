@@ -84,6 +84,7 @@ final class VCard implements DataTypeInterface
             if (! filter_var($properties['email'], FILTER_VALIDATE_EMAIL)) {
                 throw new InvalidArgumentException('Invalid email address provided to vCard.');
             }
+
             $this->email = $properties['email'];
         }
 

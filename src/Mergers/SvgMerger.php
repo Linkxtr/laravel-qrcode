@@ -20,6 +20,7 @@ final readonly class SvgMerger implements MergerInterface
         if ($this->percentage <= 0 || $this->percentage >= 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
+
         $widthFound = preg_match('/width=["\'](\d+(?:\.\d+)?)\s*(?:px)?["\']/i', $this->svgContent, $widthMatch);
         $heightFound = preg_match('/height=["\'](\d+(?:\.\d+)?)\s*(?:px)?["\']/i', $this->svgContent, $heightMatch);
 
@@ -47,7 +48,7 @@ final readonly class SvgMerger implements MergerInterface
         $y = (int) (($svgHeight - $targetHeight) / 2);
 
         $base64Image = base64_encode($this->mergeImageContent);
-        $imageUri = "data:{$mimeType};base64,{$base64Image}";
+        $imageUri = sprintf('data:%s;base64,%s', $mimeType, $base64Image);
 
         $imageTag = sprintf(
             '<image x="%d" y="%d" width="%d" height="%d" href="%s" />',

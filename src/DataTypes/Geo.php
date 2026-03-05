@@ -56,7 +56,7 @@ final class Geo implements DataTypeInterface
     private function validateCoordinate(mixed $value, string $type): float
     {
         if (! is_numeric($value)) {
-            throw new InvalidArgumentException("Invalid {$type} value: must be a number");
+            throw new InvalidArgumentException(sprintf('Invalid %s value: must be a number', $type));
         }
 
         $value = (float) $value; // @pest-mutate-ignore
