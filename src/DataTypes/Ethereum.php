@@ -41,7 +41,11 @@ final class Ethereum implements DataTypeInterface
             throw new InvalidArgumentException('Ethereum address must be a string.');
         }
 
-        $this->address = $arguments[0];
+        if (trim($arguments[0]) === '') {
+            throw new InvalidArgumentException('Ethereum address cannot be empty.');
+        }
+
+        $this->address = trim($arguments[0]);
         $this->amount = null;
 
         if (isset($arguments[1])) {

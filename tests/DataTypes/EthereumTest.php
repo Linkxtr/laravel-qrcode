@@ -30,6 +30,11 @@ it('throws an exception when Ethereum address is not a string', function () {
         ->toThrow(InvalidArgumentException::class, 'Ethereum address must be a string.');
 });
 
+it('throws an exception when Ethereum address is an empty string', function () {
+    expect(fn () => $this->ethereum->create(['']))
+        ->toThrow(InvalidArgumentException::class, 'Ethereum address cannot be empty.');
+});
+
 it('throws an exception when Ethereum amount is not numeric', function () {
     expect(fn () => $this->ethereum->create(['0x123', 'invalid']))
         ->toThrow(InvalidArgumentException::class, 'Ethereum amount must be a numeric value.');
