@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Minimum Laravel version is now 11.0.
 - Minimum PHP version is now 8.2.
+- Renamed the parameter in `Image::setImageResource` from `$image` to `$gdImage` (breaking change for named arguments).
+- Fixed spelling of `outerRed`, `outerGreen`, `outerBlue` in `Generator::eyeColor` (breaking change for named arguments).
 
 ### Removed
 

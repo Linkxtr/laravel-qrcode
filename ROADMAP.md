@@ -43,11 +43,14 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 - [ ] **Cryptocurrency Payments**
-
-  ```php
-  QrCode::bitcoin('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', 0.001);
-  QrCode::ethereum('0x742d35Cc6634C0532925a3b8D...');
-  ```
+  - [x] **Bitcoin**
+    ```php
+    QrCode::btc('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', 0.001);
+    ```
+  - [ ] **Ethereum**
+    ```php
+    QrCode::ethereum('0x742d35Cc6634C0532925a3b8D...');
+    ```
 
 - [x] **MeCard Support**
 
@@ -56,11 +59,11 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ```
 
 - [ ] **Messaging & Communication**
-  - **WhatsApp**
+  - [x] **WhatsApp**
     ```php
     QrCode::whatsapp('1234567890', 'Hello World');
     ```
-  - **Telegram**
+  - [x] **Telegram**
     ```php
     QrCode::telegram('username');
     ```
@@ -135,10 +138,10 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ### Advanced Styling Options
 
-- [ ] **Gradient Backgrounds**
+- [x] **Gradient Backgrounds**
 
   ```php
-  QrCode::gradientBackground('#FF0000', '#0000FF', 'diagonal')
+  QrCode::gradient(255, 0, 0, 0, 0, 255, 'diagonal')
       ->generate('Content');
   ```
 
@@ -158,9 +161,9 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
       ->generate('Content');
   ```
 
-- [ ] **Transparent Backgrounds**
+- [x] **Transparent Backgrounds**
   ```php
-  QrCode::backgroundColor(null) // Transparent
+  QrCode::backgroundColor(255, 255, 255, 0) // Transparent
       ->generate('Content');
   ```
 
@@ -246,11 +249,11 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 ### Modern PHP Features
 
 - [ ] **PHP 8.2+ Minimum Requirement**
-- [ ] **Native Enums**
+- [x] **Native Enums**
 
   ```php
-  QrCode::format(Format::WebP);
-  QrCode::errorCorrection(ErrorCorrection::High);
+  QrCode::format(Format::WEBP);
+  QrCode::errorCorrection(ErrorCorrectionLevel::H);
   ```
 
 - [ ] **Constructor Property Promotion**
@@ -328,9 +331,9 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ### Priority Areas for Contribution
 
-- 🔴 **High Priority**: vCard and calendar event support
-- 🟡 **Medium Priority**: WebP format and styling improvements
-- 🟢 **Low Priority**: Artisan commands and developer tools
+- 🔴 **High Priority**: Payments integration (PayPal, EPC, UPI) and Cryptocurrency (Ethereum)
+- 🟡 **Medium Priority**: Developer tools (Commands, Configs) and architectural improvements (Renderer Abstraction, Event System)
+- 🟢 **Low Priority**: Advanced styling (Templates, Custom Dot Shapes) and animated QR codes
 
 ### Recognition
 
