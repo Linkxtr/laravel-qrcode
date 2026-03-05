@@ -13,7 +13,7 @@ final class Ethereum implements DataTypeInterface
 
     private string $address;
 
-    private ?float $amount = null;
+    private ?string $amount = null;
 
     public function __toString(): string
     {
@@ -52,7 +52,7 @@ final class Ethereum implements DataTypeInterface
                 throw new InvalidArgumentException('Ethereum amount must be non-negative.');
             }
 
-            $this->amount = (float) $arguments[1];
+            $this->amount = (string) $arguments[1];
         }
     }
 
@@ -62,7 +62,7 @@ final class Ethereum implements DataTypeInterface
             'value' => $this->amount,
         ];
 
-        $params = array_filter($params, fn (?float $value): bool => $value !== null);
+        $params = array_filter($params, fn (?string $value): bool => $value !== null);
 
         $queryString = $params === [] ? '' : '?'.http_build_query($params);
 
