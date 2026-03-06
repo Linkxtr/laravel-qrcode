@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Support\Image;
 
-require_once __DIR__.'/../Support/Overrides.php';
-
 it('throw exception if percentage is greater than 1', function () {
     $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
     $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));

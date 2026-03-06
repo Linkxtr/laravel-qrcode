@@ -47,7 +47,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
     ```php
     QrCode::btc('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', 0.001);
     ```
-  - [ ] **Ethereum**
+  - [x] **Ethereum**
     ```php
     QrCode::ethereum('0x742d35Cc6634C0532925a3b8D...');
     ```

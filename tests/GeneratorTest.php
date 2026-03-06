@@ -14,8 +14,6 @@ use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\Support\Image;
 
-require_once __DIR__.'/Support/Overrides.php';
-
 covers(Generator::class);
 
 beforeEach(function () {
@@ -245,6 +243,7 @@ it('saves generated qrcode to file', function () {
 test('Data types magic call', function () {
     $qrCode = new Generator;
     expect($qrCode->BTC('btcaddress', 0.0034))->toBeInstanceOf(HtmlString::class);
+    expect($qrCode->Ethereum('0x742d35Cc6634C0532925a3b8D2b2CE1e5bfb043d', 1.5))->toBeInstanceOf(HtmlString::class);
     expect($qrCode->Email('email@example.com'))->toBeInstanceOf(HtmlString::class);
     expect($qrCode->Geo('40.7128', '-74.0060'))->toBeInstanceOf(HtmlString::class);
     expect($qrCode->PhoneNumber('1234567890'))->toBeInstanceOf(HtmlString::class);
