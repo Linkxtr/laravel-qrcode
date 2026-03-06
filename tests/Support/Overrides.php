@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode {
     if (! function_exists('Linkxtr\QrCode\base_path')) {
-        function base_path($path = '')
+        function base_path($path = ''): string
         {
             $baseDiff = '/..';
 
@@ -15,7 +15,7 @@ namespace Linkxtr\QrCode {
     $GLOBALS['mockFilePutContents'] = false;
 
     if (! function_exists('Linkxtr\QrCode\file_put_contents')) {
-        function file_put_contents($filename, $data, $flags = 0, $context = null)
+        function file_put_contents($filename, $data, $flags = 0, $context = null): int|false
         {
             if (isset($GLOBALS['mockFilePutContents']) && $GLOBALS['mockFilePutContents']) {
                 return false;
@@ -29,7 +29,7 @@ namespace Linkxtr\QrCode {
     $GLOBALS['mockGdLoaded'] = true;
 
     if (! function_exists('Linkxtr\QrCode\extension_loaded')) {
-        function extension_loaded($extension)
+        function extension_loaded($extension): bool
         {
             if ($extension === 'imagick') {
                 return $GLOBALS['mockImagickLoaded'] ?? true;
@@ -46,7 +46,7 @@ namespace Linkxtr\QrCode {
     $GLOBALS['mockFileGetContents'] = null;
 
     if (! function_exists('Linkxtr\QrCode\file_get_contents')) {
-        function file_get_contents($filename, $use_include_path = false, $context = null, $offset = 0, $length = null)
+        function file_get_contents($filename, $use_include_path = false, $context = null, $offset = 0, $length = null): string|false
         {
             if (isset($GLOBALS['mockFileGetContents']) && $GLOBALS['mockFileGetContents'] === false) {
                 return false;
@@ -70,12 +70,17 @@ namespace Linkxtr\QrCode {
 }
 
 namespace Linkxtr\QrCode\Mergers {
+    use GdImage;
+
     if (! isset($GLOBALS['mockImageColorAllocateAlpha'])) {
         $GLOBALS['mockImageColorAllocateAlpha'] = null;
     }
 
     if (! function_exists('Linkxtr\QrCode\Mergers\imagecolorallocatealpha')) {
-        function imagecolorallocatealpha($image, $red, $green, $blue, $alpha)
+        /**
+         * @param  GdImage  $image
+         */
+        function imagecolorallocatealpha($image, $red, $green, $blue, $alpha): int|false
         {
             if (isset($GLOBALS['mockImageColorAllocateAlpha']) && $GLOBALS['mockImageColorAllocateAlpha'] === false) {
                 return false;
@@ -90,7 +95,10 @@ namespace Linkxtr\QrCode\Mergers {
     }
 
     if (! function_exists('Linkxtr\QrCode\Mergers\imagecolorallocate')) {
-        function imagecolorallocate($image, $red, $green, $blue)
+        /**
+         * @param  GdImage  $image
+         */
+        function imagecolorallocate($image, $red, $green, $blue): int|false
         {
             if (isset($GLOBALS['mockImageColorAllocate']) && $GLOBALS['mockImageColorAllocate'] === false) {
                 return false;
@@ -105,7 +113,7 @@ namespace Linkxtr\QrCode\Mergers {
     }
 
     if (! function_exists('Linkxtr\QrCode\Mergers\imagecreatetruecolor')) {
-        function imagecreatetruecolor($width, $height)
+        function imagecreatetruecolor($width, $height): GdImage|false
         {
             if (isset($GLOBALS['mockImageCreateTrueColor']) && $GLOBALS['mockImageCreateTrueColor'] === false) {
                 return false;
@@ -120,7 +128,7 @@ namespace Linkxtr\QrCode\Mergers {
     }
 
     if (! function_exists('Linkxtr\QrCode\Mergers\ob_get_clean')) {
-        function ob_get_clean()
+        function ob_get_clean(): string|false
         {
             if (isset($GLOBALS['mockObGetClean']) && $GLOBALS['mockObGetClean'] === false) {
                 return false;
@@ -135,7 +143,10 @@ namespace Linkxtr\QrCode\Mergers {
     }
 
     if (! function_exists('Linkxtr\QrCode\Mergers\imagefill')) {
-        function imagefill($image, $x, $y, $color)
+        /**
+         * @param  GdImage  $image
+         */
+        function imagefill($image, $x, $y, $color): bool
         {
             if (isset($GLOBALS['mockImageFill']) && $GLOBALS['mockImageFill'] === false) {
                 return false;
@@ -150,7 +161,11 @@ namespace Linkxtr\QrCode\Mergers {
     }
 
     if (! function_exists('Linkxtr\QrCode\Mergers\imagecopy')) {
-        function imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h)
+        /**
+         * @param  GdImage  $dst_im
+         * @param  GdImage  $src_im
+         */
+        function imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h): bool
         {
             if (isset($GLOBALS['mockImageCopy']) && $GLOBALS['mockImageCopy'] === false) {
                 return false;
@@ -165,7 +180,11 @@ namespace Linkxtr\QrCode\Mergers {
     }
 
     if (! function_exists('Linkxtr\QrCode\Mergers\imagecopyresampled')) {
-        function imagecopyresampled($dst_image, $src_image, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h)
+        /**
+         * @param  GdImage  $dst_image
+         * @param  GdImage  $src_image
+         */
+        function imagecopyresampled($dst_image, $src_image, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h): bool
         {
             if (isset($GLOBALS['mockImageCopyResampled']) && $GLOBALS['mockImageCopyResampled'] === false) {
                 return false;
@@ -180,7 +199,10 @@ namespace Linkxtr\QrCode\Mergers {
     }
 
     if (! function_exists('Linkxtr\QrCode\Mergers\imagesavealpha')) {
-        function imagesavealpha($image, $enable)
+        /**
+         * @param  GdImage  $image
+         */
+        function imagesavealpha($image, $enable): bool
         {
             if (isset($GLOBALS['mockImageSaveAlpha']) && $GLOBALS['mockImageSaveAlpha'] === false) {
                 return false;
@@ -195,7 +217,10 @@ namespace Linkxtr\QrCode\Mergers {
     }
 
     if (! function_exists('Linkxtr\QrCode\Mergers\imagesx')) {
-        function imagesx($image)
+        /**
+         * @param  GdImage  $image
+         */
+        function imagesx($image): int|false
         {
             if (isset($GLOBALS['mockImagesx'])) {
                 if ($GLOBALS['mockImagesx'] === false) {
@@ -218,7 +243,10 @@ namespace Linkxtr\QrCode\Mergers {
     }
 
     if (! function_exists('Linkxtr\QrCode\Mergers\imagesy')) {
-        function imagesy($image)
+        /**
+         * @param  GdImage  $image
+         */
+        function imagesy($image): int|false
         {
             if (isset($GLOBALS['mockImagesy'])) {
                 if ($GLOBALS['mockImagesy'] === false) {
@@ -252,12 +280,18 @@ namespace Linkxtr\QrCode\DataTypes {
 }
 
 namespace Linkxtr\QrCode\Support {
+    use GdImage;
+
     if (! isset($GLOBALS['mockImagesx'])) {
         $GLOBALS['mockImagesx'] = null;
     }
 
     if (! function_exists('Linkxtr\QrCode\Support\imagesx')) {
-        function imagesx($image)
+        /**
+         * @param  GdImage  $image
+         * @return int<0, max>|false
+         */
+        function imagesx($image): int|false
         {
             if (isset($GLOBALS['mockImagesx'])) {
                 if ($GLOBALS['mockImagesx'] === false) {
@@ -280,7 +314,7 @@ namespace Linkxtr\QrCode\Support {
     }
 
     if (! function_exists('Linkxtr\QrCode\Support\imagecreatefromstring')) {
-        function imagecreatefromstring($data)
+        function imagecreatefromstring($data): GdImage|false
         {
             if (isset($GLOBALS['mockImageCreateFromString']) && $GLOBALS['mockImageCreateFromString'] === false) {
                 return false;
@@ -295,7 +329,11 @@ namespace Linkxtr\QrCode\Support {
     }
 
     if (! function_exists('Linkxtr\QrCode\Support\imagesy')) {
-        function imagesy($image)
+        /**
+         * @param  GdImage  $image
+         * @return int<0, max>|false
+         */
+        function imagesy($image): int|false
         {
             if (isset($GLOBALS['mockImagesy'])) {
                 if ($GLOBALS['mockImagesy'] === false) {

@@ -33,8 +33,8 @@ final class Image
         $this->gdImage = null;
     }
 
-    /** @return int<0, max> */
-    public function getWidth(): int
+    /** @return int<0, max>|false */
+    public function getWidth(): int|false
     {
         if (! $this->gdImage instanceof GdImage) {
             throw new RuntimeException('Image resource has been released.');
@@ -43,8 +43,8 @@ final class Image
         return imagesx($this->gdImage);
     }
 
-    /** @return int<0, max> */
-    public function getHeight(): int
+    /** @return int<0, max>|false */
+    public function getHeight(): int|false
     {
         if (! $this->gdImage instanceof GdImage) {
             throw new RuntimeException('Image resource has been released.');
