@@ -1,6 +1,6 @@
 ---
-trigger: always_on
+trigger: model_decision
+description: After finishing any task or feature
 ---
 
-after each task/feature you done please run `coderabbit review --plain` to get a feedback
-and make sure that `composer test` is working fine
+Run `coderabbit review --plain` to get feedback.
