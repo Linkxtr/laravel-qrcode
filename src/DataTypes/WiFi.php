@@ -17,6 +17,8 @@ final class WiFi implements DataTypeInterface
 
     private bool $hidden;
 
+    private string $encryption;
+
     private string $separator = ';';
 
     public function __toString(): string
@@ -57,6 +59,17 @@ final class WiFi implements DataTypeInterface
             $this->password = $arguments['password'];
         }
 
+        if (isset($arguments['encryption']) && is_string($arguments['encryption'])) {
+            $encryption = strtoupper($arguments['encryption']);
+            $supported = ['WEP', 'WPA', 'WPA2', 'NOPASS'];
+
+            if (! in_array($encryption, $supported, true)) {
+                throw new InvalidArgumentException('Invalid encryption type. Supported types are WEP, WPA, WPA2, nopass.');
+            }
+
+            $this->encryption = $encryption === 'NOPASS' ? 'nopass' : $encryption;
+        }
+
         if (isset($arguments['hidden']) && is_bool($arguments['hidden'])) {
             $this->hidden = $arguments['hidden'];
         }
@@ -66,13 +79,15 @@ final class WiFi implements DataTypeInterface
     {
         $wifi = $this->prefix;
 
-        if (isset($this->password)) {
+        if (isset($this->encryption)) {
+            $wifi .= 'T:'.$this->encryption.$this->separator;
+        } elseif (isset($this->password)) {
             $wifi .= 'T:WPA'.$this->separator;
         }
 
         $wifi .= 'S:'.$this->ssid.$this->separator;
 
-        if (isset($this->password)) {
+        if (isset($this->password) && (! isset($this->encryption) || $this->encryption !== 'nopass')) {
             $wifi .= 'P:'.$this->password.$this->separator;
         }
 
