@@ -106,6 +106,17 @@ it('throws an exception when an invalid encryption type is provided', function (
     ]))->toThrow(InvalidArgumentException::class, 'Invalid encryption type. Supported types are WEP, WPA, WPA2, nopass.');
 });
 
+it('should handle case-insensitive encryption values', function () {
+    $this->wifi->create([
+        0 => [
+            'ssid' => 'SSID',
+            'password' => 'password',
+            'encryption' => 'wpa2',
+        ],
+    ]);
+    expect(strval($this->wifi))->toBe('WIFI:T:WPA2;S:SSID;P:password;');
+});
+
 it('throws an exception when SSID is missing', function () {
     expect(fn () => $this->wifi->create([]))
         ->toThrow(InvalidArgumentException::class);
