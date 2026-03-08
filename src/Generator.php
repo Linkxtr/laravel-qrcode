@@ -38,6 +38,7 @@ use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
 use Linkxtr\QrCode\Mergers\EpsMerger;
+use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Support\Image;
@@ -426,6 +427,12 @@ final class Generator
 
         if ($this->format === Format::SVG) {
             $merger = new SvgMerger($qrCode, $this->imageMerge, $this->imagePercentage);
+
+            return $merger->merge();
+        }
+
+        if (extension_loaded('imagick') && in_array($this->format, [Format::PNG, Format::WEBP])) {
+            $merger = new ImagickMerger($qrCode, $this->imageMerge, $this->format->value, $this->imagePercentage);
 
             return $merger->merge();
         }
