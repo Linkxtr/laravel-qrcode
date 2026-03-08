@@ -452,6 +452,10 @@ final class Generator
 
         $instance = new $class;
 
+        if ($instance::class !== $class) {
+            throw new BadMethodCallException;
+        }
+
         if (! $instance instanceof DataTypeInterface) {
             throw new BadMethodCallException;
         }
