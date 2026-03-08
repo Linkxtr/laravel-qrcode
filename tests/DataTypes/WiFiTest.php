@@ -147,3 +147,24 @@ it('throws an exception when SSID is missing', function () {
     ]))
         ->toThrow(InvalidArgumentException::class);
 });
+
+it('should normalize uppercase NOPASS to lowercase nopass', function () {
+    $this->wifi->create([
+        0 => [
+            'ssid' => 'SSID',
+            'encryption' => 'NOPASS',
+        ],
+    ]);
+    expect(strval($this->wifi))->toBe('WIFI:T:nopass;S:SSID;');
+});
+
+it('should generate a valid WiFi QR code with WPA encryption', function () {
+    $this->wifi->create([
+        0 => [
+            'ssid' => 'SSID',
+            'password' => 'password',
+            'encryption' => 'WPA',
+        ],
+    ]);
+    expect(strval($this->wifi))->toBe('WIFI:T:WPA;S:SSID;P:password;');
+});
