@@ -189,3 +189,13 @@ it('constrains merge image if it exceeds vertical bounds', function () {
 
     expect($output)->toBeString();
 });
+
+it('merges images successfully for webp', function () {
+    $source = new Image(file_get_contents(__DIR__.'/../images/linkxtr.png'));
+    $merge = new Image(file_get_contents(__DIR__.'/../images/300X200.png'));
+
+    $merger = new RasterMerger($source, $merge, 'webp', 0.2);
+    $output = $merger->merge();
+
+    expect($output)->toBeString();
+});
