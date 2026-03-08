@@ -96,7 +96,7 @@ QrCode::SMS('+1234567890', 'Message body');
 // WiFi
 QrCode::wiFi([
     'ssid' => 'Network',
-    'encryption' => 'WPA',
+    'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, nopass
     'password' => 'Password'
 ]);
 
@@ -218,10 +218,12 @@ QrCode::size(300)
 ```php
 QrCode::wiFi([
     'ssid' => 'MyWiFi',
-    'encryption' => 'WPA',
+    'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, nopass
     'password' => 'my-password'
 ]);
 ```
+
+> **Warning:** WEP encryption is deprecated and insecure. It is supported only for legacy compatibility. It is strongly recommended to use WPA or WPA2 instead.
 
 ### Styled QR Code
 
