@@ -52,6 +52,9 @@ it('merges images successfully for png', function () {
     $imagick = new Imagick;
     $imagick->readImageBlob($output);
     expect($imagick->getImageFormat())->toBe('PNG');
+
+    $imagick->clear();
+    $imagick->destroy();
 });
 
 it('merges images successfully for webp', function () {
@@ -67,6 +70,9 @@ it('merges images successfully for webp', function () {
     $imagick = new Imagick;
     $imagick->readImageBlob($output);
     expect($imagick->getImageFormat())->toBe('WEBP');
+
+    $imagick->clear();
+    $imagick->destroy();
 });
 
 it('constrains merge image if it exceeds vertical bounds', function () {

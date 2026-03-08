@@ -29,6 +29,9 @@ final readonly class ImagickMerger implements MergerInterface
 
     public function merge(): string
     {
+        $source = null;
+        $merge = null;
+
         try {
             $source = new Imagick;
             $source->readImageBlob($this->sourceImageContent);
@@ -66,16 +69,15 @@ final readonly class ImagickMerger implements MergerInterface
                 $source->setImageCompressionQuality(90);
             }
 
-            $blob = $source->getImageBlob();
+            return $source->getImageBlob();
 
-            $source->clear();
-            $source->destroy();
-            $merge->clear();
-            $merge->destroy();
-
-            return $blob;
         } catch (ImagickException $imagickException) {
             throw new RuntimeException('Imagick merge failed: '.$imagickException->getMessage(), $imagickException->getCode(), $imagickException);
+        } finally {
+            $source?->clear();
+            $source?->destroy();
+            $merge?->clear();
+            $merge?->destroy();
         }
     }
 }
