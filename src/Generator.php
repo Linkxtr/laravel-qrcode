@@ -41,7 +41,6 @@ use Linkxtr\QrCode\Mergers\EpsMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Support\Image;
-use ReflectionClass;
 use RuntimeException;
 
 final class Generator
@@ -441,12 +440,6 @@ final class Generator
         $class = $this->formatClass($method);
 
         if (! class_exists($class)) {
-            throw new BadMethodCallException;
-        }
-
-        $reflectionClass = new ReflectionClass($class);
-
-        if ($reflectionClass->getShortName() !== $method) {
             throw new BadMethodCallException;
         }
 
