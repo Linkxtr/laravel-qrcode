@@ -42,7 +42,6 @@ use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Support\Image;
-use ReflectionClass;
 use RuntimeException;
 
 final class Generator
@@ -451,13 +450,11 @@ final class Generator
             throw new BadMethodCallException;
         }
 
-        $reflectionClass = new ReflectionClass($class);
+        $instance = new $class;
 
-        if ($reflectionClass->getShortName() !== $method) {
+        if ($instance::class !== $class) {
             throw new BadMethodCallException;
         }
-
-        $instance = new $class;
 
         if (! $instance instanceof DataTypeInterface) {
             throw new BadMethodCallException;
