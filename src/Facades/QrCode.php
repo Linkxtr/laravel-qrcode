@@ -33,7 +33,7 @@ use Linkxtr\QrCode\Generator;
  * @method static HtmlString email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
  * @method static HtmlString ethereum(string $address, ?float $amount = null)
  * @method static HtmlString geo(float $latitude, float $longitude, string $name = '')
- * @method static HtmlString meCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null)
+ * @method static HtmlString meCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
  * @method static HtmlString phoneNumber(string $phoneNumber)
  * @method static HtmlString sms(string $smsAddress = '', string $message = '')
  * @method static HtmlString telegram(string|array<mixed> $username)
