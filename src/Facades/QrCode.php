@@ -28,6 +28,18 @@ use Linkxtr\QrCode\Generator;
  * @method static Generator merge(string $filePath, float $percentage = 0.2, bool $absolute = false)
  * @method static Generator mergeString(string $content, float $percentage = 0.2)
  * @method static HtmlString generate(string $text, ?string $filename = null)
+ * @method static HtmlString btc(string $address, float $amount, array<mixed> $options = [])
+ * @method static HtmlString calendarEvent(array<mixed> $attributes)
+ * @method static HtmlString email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
+ * @method static HtmlString ethereum(string $address, ?float $amount = null)
+ * @method static HtmlString geo(float $latitude, float $longitude, string $name = '')
+ * @method static HtmlString meCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
+ * @method static HtmlString phoneNumber(string $phoneNumber)
+ * @method static HtmlString sms(string $smsAddress = '', string $message = '')
+ * @method static HtmlString telegram(string|array<mixed> $username)
+ * @method static HtmlString vCard(array<mixed> $properties)
+ * @method static HtmlString whatsApp(string|array<mixed> $number, ?string $message = null)
+ * @method static HtmlString wiFi(array<mixed> $credentials)
  *
  * @see Generator
  */
