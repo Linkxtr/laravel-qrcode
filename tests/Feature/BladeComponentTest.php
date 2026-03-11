@@ -22,13 +22,11 @@ it('renders a qr code component with custom size', function () {
     expect($rendered)->toContain('<svg', 'width="300"');
 });
 
-it('renders a qr code component with format eps', function () {
+it('throws an exception when rendering eps format via component', function () {
     $blade_string = '<x-qr-code data="https://example.com" format="eps" />';
 
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('%!PS-Adobe-3.0 EPSF-3.0', 'Creator: BaconQrCode');
-});
+    Blade::render($blade_string);
+})->throws(\Illuminate\View\ViewException::class);
 
 it('renders a qr code component with rgb color', function () {
     $blade_string = '<x-qr-code data="https://example.com" color="255,0,0" />';

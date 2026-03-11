@@ -108,8 +108,12 @@ final class QrCodeComponent extends Component
 
         $htmlString = $generator->generate($this->data);
 
-        if (in_array($this->format, ['svg', 'eps'])) {
+        if ($this->format === 'svg') {
             return $htmlString;
+        }
+
+        if ($this->format === 'eps') {
+            throw new \InvalidArgumentException('EPS format is not supported for HTML embedding in the Blade component.');
         }
 
         return new HtmlString('<img src="data:image/'.$this->format.';base64,'.base64_encode($htmlString->__toString()).'" />');
