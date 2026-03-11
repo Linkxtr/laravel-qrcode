@@ -79,21 +79,21 @@ final class QrCodeComponent extends Component
         if ($this->eyeColor0) {
             $colors = $this->parseMultiColor($this->eyeColor0);
             if ($colors && count($colors) >= 6) {
-                $generator->eyeColor(0, ...$colors);
+                $generator->eyeColor(0, ...array_slice($colors, 0, 6));
             }
         }
 
         if ($this->eyeColor1) {
             $colors = $this->parseMultiColor($this->eyeColor1);
             if ($colors && count($colors) >= 6) {
-                $generator->eyeColor(1, ...$colors);
+                $generator->eyeColor(1, ...array_slice($colors, 0, 6));
             }
         }
 
         if ($this->eyeColor2) {
             $colors = $this->parseMultiColor($this->eyeColor2);
             if ($colors && count($colors) >= 6) {
-                $generator->eyeColor(2, ...$colors);
+                $generator->eyeColor(2, ...array_slice($colors, 0, 6));
             }
         }
 
