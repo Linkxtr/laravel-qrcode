@@ -124,15 +124,14 @@ it('renders a qr code component with default gradient type', function () {
 it('renders a qr code component with merge', function () {
     $blade_string = '<x-qr-code data="https://example.com" format="png" merge="images/linkxtr.png" merge-percentage=".3" />';
     $rendered = Blade::render($blade_string);
-    // Since merging PNG outputs a raw binary string, just verify it isn't empty.
-    expect($rendered)->not->toBeEmpty();
+    expect($rendered)->toStartWith('<img src="data:image/png;base64,');
 });
 
 it('renders a qr code component with absolute merge path', function () {
     $absolutePath = realpath(__DIR__.'/../images/linkxtr.png');
     $blade_string = '<x-qr-code data="https://example.com" format="png" merge="'.$absolutePath.'" merge-percentage=".3" merge-absolute="true" />';
     $rendered = Blade::render($blade_string);
-    expect($rendered)->not->toBeEmpty();
+    expect($rendered)->toStartWith('<img src="data:image/png;base64,');
 });
 
 it('renders a qr code component with merge string', function () {
