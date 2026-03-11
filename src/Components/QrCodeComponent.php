@@ -117,7 +117,7 @@ final class QrCodeComponent extends Component
             throw new InvalidArgumentException('EPS format is not supported for HTML embedding in the Blade component.');
         }
 
-        return new HtmlString('<img src="data:image/'.$this->format.';base64,'.base64_encode($htmlString->__toString()).'" />');
+        return new HtmlString('<img src="data:image/'.$this->format.';base64,'.base64_encode($htmlString->__toString()).'" alt="QR Code" />');
     }
 
     /**
@@ -168,14 +168,15 @@ final class QrCodeComponent extends Component
     }
 
     /**
-     * Parse multiple colors separated by '|' or ',' into a flat array of RGB integers.
-     * Example: "#ff0000, #00ff00" -> [255, 0, 0, 0, 255, 0]
+     * Parse multiple colors separated by '|' into a flat array of RGB integers.
+     * Hex colors can also use comma separation: "#ff0000, `#00ff00`".
+     * RGB format requires pipe: "255,0,0|0,255,0".
+     * Example: "#ff0000|#00ff00" -> [255, 0, 0, 0, 255, 0]
      *
      * @return array<int, int>|null
      */
     private function parseMultiColor(string $multiColor): ?array
     {
-        // Normalize common multi-color separators into a pipe
         $multiColor = str_replace([', #', ',#'], '|#', $multiColor);
         $multiColor = str_replace(';', '|', $multiColor);
 
