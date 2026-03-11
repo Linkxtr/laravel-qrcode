@@ -7,6 +7,7 @@ namespace Linkxtr\QrCode\Components;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
 use InvalidArgumentException;
+use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Facades\QrCode;
 
 final class QrCodeComponent extends Component
@@ -35,6 +36,14 @@ final class QrCodeComponent extends Component
 
     public function render(): HtmlString
     {
+        if (! in_array($this->format, Format::toArray())) {
+            throw new InvalidArgumentException('Invalid format.');
+        }
+
+        if ($this->format === 'eps') {
+            throw new InvalidArgumentException('EPS format is not supported for HTML embedding in the Blade component.');
+        }
+
         $generator = QrCode::size($this->size)->format($this->format)->margin($this->margin);
 
         if ($this->color) {
@@ -69,21 +78,21 @@ final class QrCodeComponent extends Component
 
         if ($this->eyeColor0) {
             $colors = $this->parseMultiColor($this->eyeColor0);
-            if ($colors) {
+            if ($colors && count($colors) >= 6) {
                 $generator->eyeColor(0, ...$colors);
             }
         }
 
         if ($this->eyeColor1) {
             $colors = $this->parseMultiColor($this->eyeColor1);
-            if ($colors) {
+            if ($colors && count($colors) >= 6) {
                 $generator->eyeColor(1, ...$colors);
             }
         }
 
         if ($this->eyeColor2) {
             $colors = $this->parseMultiColor($this->eyeColor2);
-            if ($colors) {
+            if ($colors && count($colors) >= 6) {
                 $generator->eyeColor(2, ...$colors);
             }
         }
@@ -113,10 +122,6 @@ final class QrCodeComponent extends Component
             return $htmlString;
         }
 
-        if ($this->format === 'eps') {
-            throw new InvalidArgumentException('EPS format is not supported for HTML embedding in the Blade component.');
-        }
-
         return new HtmlString('<img src="data:image/'.$this->format.';base64,'.base64_encode($htmlString->__toString()).'" alt="QR Code" />');
     }
 
@@ -131,9 +136,9 @@ final class QrCodeComponent extends Component
             $parts = array_map(trim(...), explode(',', $color));
             if (count($parts) === 3) {
                 return [
-                    (int) $parts[0],
-                    (int) $parts[1],
-                    (int) $parts[2],
+                    max(0, min(255, (int) $parts[0])),
+                    max(0, min(255, (int) $parts[1])),
+                    max(0, min(255, (int) $parts[2])),
                 ];
             }
 
