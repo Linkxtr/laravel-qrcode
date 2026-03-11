@@ -29,7 +29,7 @@ final class QrCodeComponent extends Component
         public ?string $merge = null,
         public ?string $mergeString = null,
         public float $mergePercentage = .2,
-        public bool $mergeAbsolute = false,
+        public bool|string $mergeAbsolute = false,
     ) {}
 
     public function render(): HtmlString
@@ -97,7 +97,11 @@ final class QrCodeComponent extends Component
         }
 
         if ($this->merge) {
-            $generator->merge($this->merge, $this->mergePercentage, $this->mergeAbsolute);
+            $mergeAbsolute = is_string($this->mergeAbsolute)
+                ? strtolower($this->mergeAbsolute) === 'true'
+                : (bool) $this->mergeAbsolute;
+
+            $generator->merge($this->merge, $this->mergePercentage, $mergeAbsolute);
         } elseif ($this->mergeString) {
             $generator->mergeString($this->mergeString, $this->mergePercentage);
         }
