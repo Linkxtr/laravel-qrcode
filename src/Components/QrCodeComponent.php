@@ -100,7 +100,7 @@ final class QrCodeComponent extends Component
         if ($this->merge) {
             $mergeAbsolute = is_string($this->mergeAbsolute)
                 ? strtolower($this->mergeAbsolute) === 'true'
-                : (bool) $this->mergeAbsolute;
+                : $this->mergeAbsolute;
 
             $generator->merge($this->merge, $this->mergePercentage, $mergeAbsolute);
         } elseif ($this->mergeString) {
@@ -128,12 +128,12 @@ final class QrCodeComponent extends Component
     private function parseColor(string $color): ?array
     {
         if (str_contains($color, ',')) {
-            $parts = explode(',', $color);
-            if (count($parts) >= 3) {
+            $parts = array_map(trim(...), explode(',', $color));
+            if (count($parts) === 3) {
                 return [
-                    (int) trim($parts[0]),
-                    (int) trim($parts[1]),
-                    (int) trim($parts[2]),
+                    (int) $parts[0],
+                    (int) $parts[1],
+                    (int) $parts[2],
                 ];
             }
 
