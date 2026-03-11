@@ -88,6 +88,12 @@ it('ignores completely invalid color string', function () {
     expect($rendered)->toContain('<svg');
 });
 
+it('ignores invalid hex color strings', function () {
+    $blade_string = '<x-qr-code data="https://example.com" color="#gg0000" />';
+    $rendered = Blade::render($blade_string);
+    expect($rendered)->toContain('<svg');
+});
+
 it('renders a qr code component with eye style', function () {
     $blade_string = '<x-qr-code data="https://example.com" eye="circle" />';
     $rendered = Blade::render($blade_string);

@@ -6,6 +6,7 @@ namespace Linkxtr\QrCode\Components;
 
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
+use InvalidArgumentException;
 use Linkxtr\QrCode\Facades\QrCode;
 
 final class QrCodeComponent extends Component
@@ -113,7 +114,7 @@ final class QrCodeComponent extends Component
         }
 
         if ($this->format === 'eps') {
-            throw new \InvalidArgumentException('EPS format is not supported for HTML embedding in the Blade component.');
+            throw new InvalidArgumentException('EPS format is not supported for HTML embedding in the Blade component.');
         }
 
         return new HtmlString('<img src="data:image/'.$this->format.';base64,'.base64_encode($htmlString->__toString()).'" />');
@@ -141,6 +142,11 @@ final class QrCodeComponent extends Component
 
         if (str_starts_with($color, '#')) {
             $hex = ltrim($color, '#');
+
+            if (! ctype_xdigit($hex)) {
+                return null;
+            }
+
             if (strlen($hex) === 3) {
                 $r = hexdec(str_repeat(substr($hex, 0, 1), 2));
                 $g = hexdec(str_repeat(substr($hex, 1, 1), 2));
