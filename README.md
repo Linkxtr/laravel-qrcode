@@ -32,16 +32,18 @@ The package uses Laravel's package auto-discovery, so the service provider and f
 
 ### Basic Usage in Blade Templates
 
+The `<x-qr-code>` component is automatically available after installation.
+
 ```blade
 <!-- Display QR code -->
 <x-qr-code data="Hello World!" />
 
 <!-- Display QR code with options -->
-<x-qr-code 
-    data="https://example.com" 
-    size="200" 
-    color="#ff0000" 
-    margin="1" 
+<x-qr-code
+    data="https://example.com"
+    size="200"
+    color="#ff0000"
+    margin="1"
 />
 ```
 
