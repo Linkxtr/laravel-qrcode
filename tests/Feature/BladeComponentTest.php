@@ -170,3 +170,9 @@ it('throws an exception when merge path contains directory traversal', function 
 
     Blade::render($blade_string);
 })->throws(ViewException::class, 'Invalid merge path, path traversal is not allowed.');
+
+it('throws an exception when merge path contains embedded directory traversal', function () {
+    $blade_string = '<x-qr-code data="https://example.com" merge="images/../../../etc/passwd" />';
+
+    Blade::render($blade_string);
+})->throws(ViewException::class, 'Invalid merge path, path traversal is not allowed.');
