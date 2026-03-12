@@ -164,3 +164,9 @@ it('renders a qr code component with merge string', function () {
 
     expect($rendered)->toContain('<svg', 'xmlns="http://www.w3.org/2000/svg"');
 });
+
+it('throws an exception when merge path contains directory traversal', function () {
+    $blade_string = '<x-qr-code data="https://example.com" merge="../images/logo.png" />';
+
+    Blade::render($blade_string);
+})->throws(ViewException::class, 'Invalid merge path, path traversal is not allowed.');
