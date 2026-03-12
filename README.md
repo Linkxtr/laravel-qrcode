@@ -34,10 +34,15 @@ The package uses Laravel's package auto-discovery, so the service provider and f
 
 ```blade
 <!-- Display QR code -->
-{!! QrCode::generate('Hello World!'); !!}
+<x-qr-code data="Hello World!" />
 
-<!-- Generate and save to file -->
-{!! QrCode::generate('Hello World!', public_path('qrcode.svg')); !!}
+<!-- Display QR code with options -->
+<x-qr-code 
+    data="https://example.com" 
+    size="200" 
+    color="#ff0000" 
+    margin="1" 
+/>
 ```
 
 ### In Controllers
@@ -265,10 +270,17 @@ Have an idea? [Open an issue](https://github.com/linkxtr/laravel-qrcode/issues) 
 
 **QR code not displaying in blade:**
 
+When using the facade directly, make sure to use unescaped output:
+
 ```blade
-<!-- Make sure to use unescaped output -->
 {!! QrCode::generate('Content') !!}  ✅
 {{ QrCode::generate('Content') }}     ❌
+```
+
+Alternatively, use the much simpler Blade component:
+
+```blade
+<x-qr-code data="Content" /> ✅
 ```
 
 **File permission errors:**
