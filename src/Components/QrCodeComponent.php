@@ -111,6 +111,10 @@ final class QrCodeComponent extends Component
                 ? strtolower($this->mergeAbsolute) === 'true'
                 : $this->mergeAbsolute;
 
+            if (str_contains($this->merge, '..')) {
+                throw new InvalidArgumentException('Invalid merge path, path traversal is not allowed.');
+            }
+
             $generator->merge($this->merge, $this->mergePercentage, $mergeAbsolute);
         } elseif ($this->mergeString) {
             $generator->mergeString($this->mergeString, $this->mergePercentage);
