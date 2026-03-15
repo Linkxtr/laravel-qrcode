@@ -151,6 +151,66 @@ final class Generator
     private float $imagePercentage = .2;
 
     /**
+     * Initialise the generator, optionally seeding defaults from the package config.
+     *
+     * @param  array<string, mixed>  $config  The resolved `config('qrcode')` array (or a subset of it).
+     */
+    public function __construct(array $config = [])
+    {
+        if (isset($config['size']) && is_int($config['size'])) {
+            $this->size = $config['size'];
+        }
+
+        if (isset($config['margin']) && is_int($config['margin'])) {
+            $this->margin = $config['margin'];
+        }
+
+        if (isset($config['format']) && is_string($config['format'])) {
+            $format = Format::tryFrom($config['format']);
+            if ($format !== null) {
+                $this->format = $format;
+            }
+        }
+
+        if (isset($config['error_correction']) && is_string($config['error_correction'])) {
+            $level = ErrorCorrectionLevel::tryFrom(strtoupper($config['error_correction']));
+            if ($level !== null) {
+                $this->errorCorrectionLevel = $level;
+            }
+        }
+
+        if (isset($config['encoding']) && is_string($config['encoding'])) {
+            $this->encoding = strtoupper($config['encoding']);
+        }
+
+        if (isset($config['color']) && is_array($config['color'])) {
+            /** @var array<int, mixed> $rgba */
+            $rgba = array_values($config['color']);
+            $r = isset($rgba[0]) && is_int($rgba[0]) ? $rgba[0] : 0;
+            $g = isset($rgba[1]) && is_int($rgba[1]) ? $rgba[1] : 0;
+            $b = isset($rgba[2]) && is_int($rgba[2]) ? $rgba[2] : 0;
+            $a = isset($rgba[3]) && is_int($rgba[3]) ? $rgba[3] : 0;
+            // Only override the default when the configured color is not the standard black (0,0,0) with no alpha
+            if ($r !== 0 || $g !== 0 || $b !== 0 || $a !== 0) {
+                $this->color = $this->createColor($r, $g, $b, $a === 0 ? null : $a);
+            }
+        }
+
+        if (isset($config['background_color']) && is_array($config['background_color'])) {
+            /** @var array<int, mixed> $rgba */
+            $rgba = array_values($config['background_color']);
+            $r = isset($rgba[0]) && is_int($rgba[0]) ? $rgba[0] : 255;
+            $g = isset($rgba[1]) && is_int($rgba[1]) ? $rgba[1] : 255;
+            $b = isset($rgba[2]) && is_int($rgba[2]) ? $rgba[2] : 255;
+            $a = isset($rgba[3]) && is_int($rgba[3]) ? $rgba[3] : 0;
+            // Only override the default when the configured color is not the standard white (255,255,255) with no alpha
+            if ($r !== 255 || $g !== 255 || $b !== 255 || $a !== 0) {
+                $this->backgroundColor = $this->createColor($r, $g, $b, $a === 0 ? null : $a);
+            }
+        }
+    }
+
+    /**
      * @param  array<int, mixed>  $arguments
      */
     public function __call(string $method, array $arguments): HtmlString
