@@ -184,7 +184,6 @@ final class Generator
         }
 
         if (isset($config['color']) && is_array($config['color'])) {
-            /** @var array<int, mixed> $rgba */
             $rgba = array_values($config['color']);
             $r = isset($rgba[0]) && is_int($rgba[0]) ? $rgba[0] : 0;
             $g = isset($rgba[1]) && is_int($rgba[1]) ? $rgba[1] : 0;
@@ -197,7 +196,6 @@ final class Generator
         }
 
         if (isset($config['background_color']) && is_array($config['background_color'])) {
-            /** @var array<int, mixed> $rgba */
             $rgba = array_values($config['background_color']);
             $r = isset($rgba[0]) && is_int($rgba[0]) ? $rgba[0] : 255;
             $g = isset($rgba[1]) && is_int($rgba[1]) ? $rgba[1] : 255;

@@ -36,6 +36,6 @@ final class QrCodeServiceProvider extends ServiceProvider
      */
     public function provides(): array
     {
-        return [Generator::class];
+        return [Generator::class, 'qrcode'];
     }
 }
