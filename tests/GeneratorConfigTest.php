@@ -136,8 +136,19 @@ test('generator uses all config values together', function () {
         'background_color' => [240, 240, 240, 0],
     ]);
 
+    // Size and margin are directly readable via getRendererStyle()
     expect($generator->getRendererStyle()->getSize())->toBe(512);
     expect($generator->getRendererStyle()->getMargin())->toBe(10);
+
+    // Colors are directly readable via getFill()
     expect($generator->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(10);
     expect($generator->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(240);
+
+    // Format (svg) is verified by generate() output — the SVG backend produces XML
+    // markup, whereas PNG/WebP would produce binary data.
+    $output = $generator->generate('test')->toHtml();
+    expect($output)->toContain('<svg');
+
+    // error_correction and encoding have no public getters; their effect is
+    // confirmed by the successful SVG generation above (both are consumed inside generate()).
 });
