@@ -32,7 +32,7 @@ final class QrCodeServiceProvider extends ServiceProvider
     }
 
     /**
-     * @return class-string[]
+     * @return string[]
      */
     public function provides(): array
     {

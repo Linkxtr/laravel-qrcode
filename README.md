@@ -46,7 +46,7 @@ return [
     'error_correction' => 'H',     // L | M | Q | H
     'encoding'         => 'UTF-8',
     'color'            => [0, 0, 0, 0],             // [R, G, B, A] — alpha: 0-127
-    'background_color' => [255, 255, 255, 0],        // [R, G, B, A] — alpha: 0-127
+    'background_color' => [255, 255, 255, 0],       // [R, G, B, A] — alpha: 0-127
 ];
 ```
 

@@ -184,27 +184,25 @@ final class Generator
         }
 
         if (isset($config['color']) && is_array($config['color'])) {
-            $rgba = array_values($config['color']);
-            $r = isset($rgba[0]) && is_int($rgba[0]) ? $rgba[0] : 0;
-            $g = isset($rgba[1]) && is_int($rgba[1]) ? $rgba[1] : 0;
-            $b = isset($rgba[2]) && is_int($rgba[2]) ? $rgba[2] : 0;
-            $a = isset($rgba[3]) && is_int($rgba[3]) ? $rgba[3] : 0;
-            // Only override the default when the configured color is not the standard black (0,0,0) with no alpha
-            if ($r !== 0 || $g !== 0 || $b !== 0 || $a !== 0) {
-                $this->color = $this->createColor($r, $g, $b, $a === 0 ? null : $a);
-            }
+            $raw = $config['color'];
+            // Accept both positional [R, G, B, A] and associative ['r'=>R, 'g'=>G, 'b'=>B, 'a'=>A]
+            $r = $this->readColorChannel($raw, 0, 'r', 0);
+            $g = $this->readColorChannel($raw, 1, 'g', 0);
+            $b = $this->readColorChannel($raw, 2, 'b', 0);
+            // Alpha: null means "not specified" (opaque); 0 is valid (fully transparent)
+            $a = $this->readColorChannelNullable($raw, 3, 'a');
+            $this->color = $this->createColor($r, $g, $b, $a);
         }
 
         if (isset($config['background_color']) && is_array($config['background_color'])) {
-            $rgba = array_values($config['background_color']);
-            $r = isset($rgba[0]) && is_int($rgba[0]) ? $rgba[0] : 255;
-            $g = isset($rgba[1]) && is_int($rgba[1]) ? $rgba[1] : 255;
-            $b = isset($rgba[2]) && is_int($rgba[2]) ? $rgba[2] : 255;
-            $a = isset($rgba[3]) && is_int($rgba[3]) ? $rgba[3] : 0;
-            // Only override the default when the configured color is not the standard white (255,255,255) with no alpha
-            if ($r !== 255 || $g !== 255 || $b !== 255 || $a !== 0) {
-                $this->backgroundColor = $this->createColor($r, $g, $b, $a === 0 ? null : $a);
-            }
+            $raw = $config['background_color'];
+            // Accept both positional [R, G, B, A] and associative ['r'=>R, 'g'=>G, 'b'=>B, 'a'=>A]
+            $r = $this->readColorChannel($raw, 0, 'r', 255);
+            $g = $this->readColorChannel($raw, 1, 'g', 255);
+            $b = $this->readColorChannel($raw, 2, 'b', 255);
+            // Alpha: null means "not specified" (opaque); 0 is valid (fully transparent)
+            $a = $this->readColorChannelNullable($raw, 3, 'a');
+            $this->backgroundColor = $this->createColor($r, $g, $b, $a);
         }
     }
 
@@ -477,6 +475,45 @@ final class Generator
         }
 
         return new Alpha($alpha, new Rgb($red, $green, $blue));
+    }
+
+    /**
+     * Read a colour channel from a config array that may use either a positional index
+     * or a named key.  Returns $default when the value is absent or not an int.
+     *
+     * @param  array<mixed>  $raw
+     */
+    private function readColorChannel(array $raw, int $index, string $key, int $default): int
+    {
+        if (isset($raw[$key]) && is_int($raw[$key])) {
+            return $raw[$key];
+        }
+
+        if (isset($raw[$index]) && is_int($raw[$index])) {
+            return $raw[$index];
+        }
+
+        return $default;
+    }
+
+    /**
+     * Read an optional alpha channel from a config array (positional index or named key).
+     * Returns null — meaning "not specified, stay opaque" — when the key is absent.
+     * Returning null is distinct from 0 (fully transparent), which is explicitly supported.
+     *
+     * @param  array<mixed>  $raw
+     */
+    private function readColorChannelNullable(array $raw, int $index, string $key): ?int
+    {
+        if (isset($raw[$key]) && is_int($raw[$key])) {
+            return $raw[$key];
+        }
+
+        if (isset($raw[$index]) && is_int($raw[$index])) {
+            return $raw[$index];
+        }
+
+        return null;
     }
 
     private function getFormatter(): ImageBackEndInterface
