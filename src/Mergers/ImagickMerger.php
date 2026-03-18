@@ -18,7 +18,7 @@ final readonly class ImagickMerger implements MergerInterface
         private string $format = 'png',
         private float $percentage = 0.2
     ) {
-        if (! in_array($this->format, ['png', 'webp'])) {
+        if (! in_array($this->format, ['png', 'webp'], true)) {
             throw new InvalidArgumentException('ImagickMerger only supports "png" or "webp" formats.');
         }
 
