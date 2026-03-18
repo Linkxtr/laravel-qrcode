@@ -445,7 +445,7 @@ final class Generator
             return $merger->merge();
         }
 
-        if (extension_loaded('imagick') && in_array($this->format, [Format::PNG, Format::WEBP])) {
+        if (extension_loaded('imagick') && in_array($this->format, [Format::PNG, Format::WEBP], true)) {
             $merger = new ImagickMerger($qrCode, $this->imageMerge, $this->format->value, $this->imagePercentage);
 
             return $merger->merge();
