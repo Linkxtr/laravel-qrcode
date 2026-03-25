@@ -211,7 +211,7 @@ test('generator uses channel defaults when color values are non-integers', funct
     // Non-int values cause both named-key and positional checks to fail,
     // exercising the $default fallback path in readColorChannel.
     $generator = new Generator([
-        'color' => ['not-an-int', null, 'also-not'],
+        'color' => ['not-an-int', 'null', 'also-not', 'string'],
     ]);
 
     // Falls back to default black (0, 0, 0) with no alpha

@@ -18,7 +18,7 @@ final readonly class RasterMerger implements MergerInterface
         private string $format = 'png',
         private float $percentage = 0.2
     ) {
-        if (! in_array($this->format, ['png', 'webp'])) {
+        if (! in_array($this->format, ['png', 'webp'], true)) {
             throw new InvalidArgumentException('RasterMerger only supports "png" or "webp" formats.');
         }
 
