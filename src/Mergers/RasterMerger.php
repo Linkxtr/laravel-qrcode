@@ -65,7 +65,7 @@ final readonly class RasterMerger implements MergerInterface
         }
 
         imagealphablending($canvas, false);
-        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 100);
 
         if (! $transparent) {
             throw new RuntimeException('Failed to create transparent color.');

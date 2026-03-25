@@ -41,7 +41,7 @@ Several classes have been reorganized. The most significant changes are:
 
 - The color methods (`color()` and `backgroundColor()`) now support an optional alpha channel parameter for transparency
 - Color handling has been updated for better type safety
-- Alpha channel values use the range 0-127, where 0 is fully opaque and 127 is fully transparent
+- Alpha channel values use the range 0-100, where 0 is fully transparent and 100 is fully opaque
 
 ### 4. Dropped Compatibility
 

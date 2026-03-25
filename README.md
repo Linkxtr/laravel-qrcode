@@ -45,8 +45,8 @@ return [
     'margin'           => 4,
     'error_correction' => 'H',     // L | M | Q | H
     'encoding'         => 'UTF-8',
-    'color'            => [0, 0, 0, 0],             // [R, G, B, A] — alpha: 0-127
-    'background_color' => [255, 255, 255, 0],       // [R, G, B, A] — alpha: 0-127
+    'color'            => [0, 0, 0, 0],             // [R, G, B, A] — alpha: 0-100
+    'background_color' => [255, 255, 255, 0],       // [R, G, B, A] — alpha: 0-100
 ];
 ```
 
@@ -329,8 +329,8 @@ QrCode::size(400)
 
 - `generate($text, $filename = null)` - Generate QR code
 - `size($size)` - Set size in pixels
-- `color($red, $green, $blue, $alpha = null)` - Set QR color (alpha 0-127)
-- `backgroundColor($red, $green, $blue, $alpha = null)` - Set background color (alpha 0-127)
+- `color($red, $green, $blue, $alpha = null)` - Set QR color (alpha 0-100)
+- `backgroundColor($red, $green, $blue, $alpha = null)` - Set background color (alpha 0-100)
 - `style($style)` - Set style (dot, square, round)
 - `eye($style)` - Set eye style (circle, square)
 - `gradient($startRed, $startGreen, $startBlue, $endRed, $endGreen, $endBlue, $type)` - Set gradient color
