@@ -38,3 +38,9 @@ it('provides generator class', function () {
     $provider = new QrCodeServiceProvider(app());
     expect($provider->provides())->toContain(Generator::class);
 });
+
+it('resolves generator with config', function () {
+    config(['qrcode.size' => 500]);
+    $generator = resolve('qrcode');
+    expect($generator->getRendererStyle()->getSize())->toBe(500);
+});

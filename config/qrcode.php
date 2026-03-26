@@ -53,7 +53,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option controls the default foreground color of the QR code.
-    | Format: [R, G, B, A] where each value is 0-255
+    | Format: [R, G, B, A] where R, G, B are 0-255 and A is optional between 0-100.
+    | Note: While PHP GD uses 0-127 for transparency, this package automatically scales the 0-100 alpha value.
     |
     */
     'color' => [
@@ -69,7 +70,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option controls the default background color of the QR code.
-    | Format: [R, G, B, A] where each value is 0-255 and A is optional between 0-100
+    | Format: [R, G, B, A] where R, G, B are 0-255 and A is optional between 0-100.
+    | Note: While PHP GD uses 0-127 for transparency, this package automatically scales the 0-100 alpha value.
     |
     */
     'background_color' => [
