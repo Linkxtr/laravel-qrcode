@@ -23,12 +23,14 @@ final class QrCodeServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/qrcode.php', 'qrcode');
 
-        $this->app->bind('qrcode', function (): Generator {
+        $this->app->bind(Generator::class, function (): Generator {
             /** @var array<string, mixed> $config */
             $config = config('qrcode', []);
 
             return new Generator($config);
         });
+
+        $this->app->alias(Generator::class, 'qrcode');
     }
 
     /**

@@ -57,11 +57,15 @@ return [
     | Note: While PHP GD uses 0-127 for transparency, this package automatically scales the 0-100 alpha value.
     |
     */
-    'color' => [
+    'color' => env('QR_CODE_COLOR_A') !== null ? [
         (int) (env('QR_CODE_COLOR_R') ?? 0),
         (int) (env('QR_CODE_COLOR_G') ?? 0),
         (int) (env('QR_CODE_COLOR_B') ?? 0),
-        (int) (env('QR_CODE_COLOR_A') ?? 0),
+        (int) env('QR_CODE_COLOR_A'),
+    ] : [
+        (int) (env('QR_CODE_COLOR_R') ?? 0),
+        (int) (env('QR_CODE_COLOR_G') ?? 0),
+        (int) (env('QR_CODE_COLOR_B') ?? 0),
     ],
 
     /*
@@ -74,11 +78,15 @@ return [
     | Note: While PHP GD uses 0-127 for transparency, this package automatically scales the 0-100 alpha value.
     |
     */
-    'background_color' => [
+    'background_color' => env('QR_CODE_BACKGROUND_COLOR_A') !== null ? [
         (int) (env('QR_CODE_BACKGROUND_COLOR_R') ?? 255),
         (int) (env('QR_CODE_BACKGROUND_COLOR_G') ?? 255),
         (int) (env('QR_CODE_BACKGROUND_COLOR_B') ?? 255),
-        (int) (env('QR_CODE_BACKGROUND_COLOR_A') ?? 0),
+        (int) env('QR_CODE_BACKGROUND_COLOR_A'),
+    ] : [
+        (int) (env('QR_CODE_BACKGROUND_COLOR_R') ?? 255),
+        (int) (env('QR_CODE_BACKGROUND_COLOR_G') ?? 255),
+        (int) (env('QR_CODE_BACKGROUND_COLOR_B') ?? 255),
     ],
 
     /*
