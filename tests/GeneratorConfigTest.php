@@ -16,20 +16,20 @@ covers(Generator::class);
 test('generator reads size from config', function () {
     $generator = new Generator(['size' => 350]);
 
-    expect($generator->getRendererStyle()->getSize())->toBe(350);
+    expect(invade($generator)->getRendererStyle()->getSize())->toBe(350);
 });
 
 test('generator reads margin from config', function () {
     $generator = new Generator(['margin' => 8]);
 
-    expect($generator->getRendererStyle()->getMargin())->toBe(8);
+    expect(invade($generator)->getRendererStyle()->getMargin())->toBe(8);
 });
 
 test('generator reads format from config', function () {
     $generator = new Generator(['format' => 'png']);
 
     // getRenderer() uses imagick backend for PNG when imagick is loaded
-    expect($generator->getRenderer())->not->toBeNull();
+    expect(invade($generator)->getRenderer())->not->toBeNull();
 });
 
 test('generator reads error_correction from config', function () {
@@ -55,7 +55,7 @@ test('generator applies foreground color without alpha from config', function ()
         'color' => [255, 0, 0],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getForegroundColor())->toBeInstanceOf(Rgb::class);
     expect($fill->getForegroundColor()->toRgb()->getRed())->toBe(255);
     expect($fill->getForegroundColor()->toRgb()->getGreen())->toBe(0);
@@ -68,7 +68,7 @@ test('generator applies black foreground color from config', function () {
         'color' => [0, 0, 0],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getForegroundColor())->toBeInstanceOf(Rgb::class);
     expect($fill->getForegroundColor()->toRgb()->getRed())->toBe(0);
 });
@@ -79,7 +79,7 @@ test('generator applies white background color from config', function () {
         'background_color' => [255, 255, 255],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getBackgroundColor())->toBeInstanceOf(Rgb::class);
     expect($fill->getBackgroundColor()->toRgb()->getRed())->toBe(255);
 });
@@ -89,7 +89,7 @@ test('generator applies non-default background color from config', function () {
         'background_color' => [0, 0, 0],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getBackgroundColor()->toRgb()->getRed())->toBe(0);
     expect($fill->getBackgroundColor()->toRgb()->getGreen())->toBe(0);
     expect($fill->getBackgroundColor()->toRgb()->getBlue())->toBe(0);
@@ -100,7 +100,7 @@ test('generator applies foreground color with non-zero alpha from config', funct
         'color' => [100, 150, 200, 50],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getForegroundColor())->toBeInstanceOf(Alpha::class);
     expect($fill->getForegroundColor()->getAlpha())->toBe(50);
 });
@@ -111,7 +111,7 @@ test('generator applies foreground color with explicit alpha zero (fully transpa
         'color' => [255, 0, 0, 0],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getForegroundColor())->toBeInstanceOf(Alpha::class);
     expect($fill->getForegroundColor()->getAlpha())->toBe(0);
 });
@@ -121,7 +121,7 @@ test('generator applies background color with non-zero alpha from config', funct
         'background_color' => [100, 150, 200, 30],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getBackgroundColor())->toBeInstanceOf(Alpha::class);
     expect($fill->getBackgroundColor()->getAlpha())->toBe(30);
 });
@@ -131,7 +131,7 @@ test('generator applies background color with explicit alpha zero from config', 
         'background_color' => [0, 0, 0, 0],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getBackgroundColor())->toBeInstanceOf(Alpha::class);
     expect($fill->getBackgroundColor()->getAlpha())->toBe(0);
 });
@@ -142,7 +142,7 @@ test('generator omits alpha when color has no fourth channel', function () {
         'color' => [10, 20, 30],
     ]);
 
-    expect($generator->getFill()->getForegroundColor())->toBeInstanceOf(Rgb::class);
+    expect(invade($generator)->getFill()->getForegroundColor())->toBeInstanceOf(Rgb::class);
 });
 
 // ---------------------------------------------------------------------------
@@ -154,7 +154,7 @@ test('generator accepts associative color keys from config', function () {
         'color' => ['r' => 100, 'g' => 150, 'b' => 200],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getForegroundColor())->toBeInstanceOf(Rgb::class);
     expect($fill->getForegroundColor()->toRgb()->getRed())->toBe(100);
     expect($fill->getForegroundColor()->toRgb()->getGreen())->toBe(150);
@@ -166,7 +166,7 @@ test('generator accepts associative color keys with alpha from config', function
         'color' => ['r' => 200, 'g' => 100, 'b' => 50, 'a' => 64],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getForegroundColor())->toBeInstanceOf(Alpha::class);
     expect($fill->getForegroundColor()->getAlpha())->toBe(64);
     expect($fill->getForegroundColor()->toRgb()->getRed())->toBe(200);
@@ -177,7 +177,7 @@ test('generator accepts associative background color keys from config', function
         'background_color' => ['r' => 10, 'g' => 20, 'b' => 30],
     ]);
 
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getBackgroundColor())->toBeInstanceOf(Rgb::class);
     expect($fill->getBackgroundColor()->toRgb()->getRed())->toBe(10);
 });
@@ -189,22 +189,22 @@ test('generator accepts associative background color keys from config', function
 test('generator ignores invalid format from config gracefully', function () {
     $generator = new Generator(['format' => 'invalid_format']);
 
-    expect($generator->getRendererStyle())->toBeInstanceOf(RendererStyle::class);
+    expect(invade($generator)->getRendererStyle())->toBeInstanceOf(RendererStyle::class);
 });
 
 test('generator ignores invalid error_correction from config gracefully', function () {
     $generator = new Generator(['error_correction' => 'Z']);
 
-    expect($generator->getRendererStyle())->toBeInstanceOf(RendererStyle::class);
+    expect(invade($generator)->getRendererStyle())->toBeInstanceOf(RendererStyle::class);
 });
 
 test('generator ignores unknown config keys gracefully', function () {
     $generator = new Generator(['unknown_key' => 'some_value']);
 
-    expect($generator->getRendererStyle())->toBeInstanceOf(RendererStyle::class);
+    expect(invade($generator)->getRendererStyle())->toBeInstanceOf(RendererStyle::class);
     // Verify it still uses default size/margin (confirms fallback worked)
-    expect($generator->getRendererStyle()->getSize())->toBe(100);
-    expect($generator->getRendererStyle()->getMargin())->toBe(0);
+    expect(invade($generator)->getRendererStyle()->getSize())->toBe(100);
+    expect(invade($generator)->getRendererStyle()->getMargin())->toBe(0);
 });
 
 test('generator uses channel defaults when color values are non-integers', function () {
@@ -215,7 +215,7 @@ test('generator uses channel defaults when color values are non-integers', funct
     ]);
 
     // Falls back to default black (0, 0, 0) with no alpha
-    $fill = $generator->getFill();
+    $fill = invade($generator)->getFill();
     expect($fill->getForegroundColor())->toBeInstanceOf(Rgb::class);
     expect($fill->getForegroundColor()->toRgb()->getRed())->toBe(0);
     expect($fill->getForegroundColor()->toRgb()->getGreen())->toBe(0);
@@ -230,12 +230,12 @@ test('generator uses hardcoded defaults when no config is given', function () {
     $generator = new Generator;
 
     // Hardcoded defaults
-    expect($generator->getRendererStyle()->getSize())->toBe(100);
-    expect($generator->getRendererStyle()->getMargin())->toBe(0);
+    expect(invade($generator)->getRendererStyle()->getSize())->toBe(100);
+    expect(invade($generator)->getRendererStyle()->getMargin())->toBe(0);
     // Default colors: black foreground, white background (from getFill() fallbacks)
-    expect($generator->getFill()->getForegroundColor())->toBeInstanceOf(Rgb::class);
-    expect($generator->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(0);
-    expect($generator->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(255);
+    expect(invade($generator)->getFill()->getForegroundColor())->toBeInstanceOf(Rgb::class);
+    expect(invade($generator)->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(0);
+    expect(invade($generator)->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(255);
 });
 
 // ---------------------------------------------------------------------------
@@ -254,12 +254,12 @@ test('generator uses all config values together', function () {
     ]);
 
     // Size and margin are directly readable via getRendererStyle()
-    expect($generator->getRendererStyle()->getSize())->toBe(512);
-    expect($generator->getRendererStyle()->getMargin())->toBe(10);
+    expect(invade($generator)->getRendererStyle()->getSize())->toBe(512);
+    expect(invade($generator)->getRendererStyle()->getMargin())->toBe(10);
 
     // Colors are directly readable via getFill()
-    expect($generator->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(10);
-    expect($generator->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(240);
+    expect(invade($generator)->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(10);
+    expect(invade($generator)->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(240);
 
     // Format (svg) is verified by generate() output — the SVG backend produces XML
     // markup, whereas PNG/WebP would produce binary data.

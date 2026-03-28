@@ -437,12 +437,12 @@ final class Generator
         return $this;
     }
 
-    public function getWriter(RendererInterface $renderer): Writer
+    private function getWriter(RendererInterface $renderer): Writer
     {
         return new Writer($renderer);
     }
 
-    public function getRenderer(): RendererInterface
+    private function getRenderer(): RendererInterface
     {
         if (! extension_loaded('imagick') && ! extension_loaded('gd')) {
             throw new RuntimeException('The imagick or gd extension is required to generate QR codes.');
@@ -468,12 +468,12 @@ final class Generator
         );
     }
 
-    public function getRendererStyle(): RendererStyle
+    private function getRendererStyle(): RendererStyle
     {
         return new RendererStyle($this->size, $this->margin, $this->getModule(), $this->getEye(), $this->getFill());
     }
 
-    public function getModule(): ModuleInterface
+    private function getModule(): ModuleInterface
     {
         if ($this->style === Style::DOT) {
             return new DotsModule($this->styleSize);
@@ -486,7 +486,7 @@ final class Generator
         return SquareModule::instance();
     }
 
-    public function getEye(): EyeInterface
+    private function getEye(): EyeInterface
     {
         $externalEye = $this->getEyeInstance($this->eyeStyle, $this->getModule());
 
@@ -516,7 +516,7 @@ final class Generator
         return new ModuleEye($module);
     }
 
-    public function getFill(): Fill
+    private function getFill(): Fill
     {
         $foregroundColor = $this->buildColor($this->colorValue) ?? new Rgb(0, 0, 0);
         $backgroundColor = $this->buildColor($this->backgroundColorValue) ?? new Rgb(255, 255, 255);
