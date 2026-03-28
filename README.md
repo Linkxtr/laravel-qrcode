@@ -45,12 +45,12 @@ return [
     'margin'           => 4,
     'error_correction' => 'H',     // L | M | Q | H
     'encoding'         => 'UTF-8',
-    'color'            => [0, 0, 0, 0],             // [R, G, B, A] — alpha: 0-100
-    'background_color' => [255, 255, 255, 0],       // [R, G, B, A] — alpha: 0-100
+    'color'            => [0, 0, 0],             // [R, G, B, A] — alpha: 0-100 (optional)
+    'background_color' => [255, 255, 255],       // [R, G, B, A] — alpha: 0-100 (optional)
 ];
 ```
 
-> **Note:** When constructing a `Generator` instance directly (e.g., `new Generator`), the hardcoded defaults (`size = 100`, `format = SVG`, etc.) are used. Config-driven defaults apply when the class is resolved through the service container (`QrCode::…` or `app('qrcode')`).
+> **Note:** Config-driven defaults automatically apply when resolving the `QrCode` facade, using the `<x-qr-code>` Blade component, or type-hinting `Linkxtr\QrCode\Generator` through Laravel's service container. If you manually construct an instance via `new Generator()`, you will get the hardcoded package defaults unless you pass the config array manually.
 
 ### Basic Usage in Blade Templates
 
