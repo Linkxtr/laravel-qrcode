@@ -109,6 +109,12 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ### New Formats
 
+- [ ] **Plain Text / ASCII Format**
+
+  ```php
+  QrCode::format('text')->generate('Content');
+  ```
+
 - [x] **WebP Format Support**
 
   ```php
@@ -131,12 +137,30 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ### Enhanced Core Features
 
+- [ ] **Forced QR Code Version (Size Matrix)**
+  ```php
+  QrCode::version(4)->generate('Content');
+  ```
+
 - [ ] **Binary Data Support**
   ```php
   QrCode::binary($binaryData)->generate('binary_qr.png');
   ```
 
 ### Advanced Styling Options
+
+- [ ] **Additional Eye Styles (Pointy / Composite)**
+
+  ```php
+  QrCode::eye('pointy')->generate('Content');
+  ```
+
+- [ ] **Advanced Color Models (CMYK / Gray)**
+
+  ```php
+  QrCode::colorCmyk(100, 50, 0, 0)->generate('Content');
+  QrCode::colorGray(50)->generate('Content');
+  ```
 
 - [x] **Gradient Backgrounds**
 

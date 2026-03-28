@@ -44,6 +44,10 @@ use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Support\Image;
 use RuntimeException;
 
+use function is_array;
+use function is_int;
+use function strval;
+
 /**
  * @method HtmlString btc(string $address, float $amount, array<mixed> $options = [])
  * @method HtmlString calendarEvent(array<mixed> $attributes)
@@ -62,14 +66,39 @@ final class Generator
 {
     /**
      * The PNG compression level.
+     * Only applicable to PNG format when using GDLibRenderer.
      */
     private const PNG_COMPRESSION_LEVEL = 9;
 
     /**
      * The output format.
-     * ['svg', 'eps', 'png', 'webp']
+     * See `Format` enum for possible values.
      */
     private Format $format = Format::SVG;
+
+    /**
+     * The error correction level.
+     * See `ErrorCorrectionLevel` enum for possible values.
+     */
+    private ErrorCorrectionLevel $errorCorrectionLevel = ErrorCorrectionLevel::L;
+
+    /**
+     * The style of the blocks within the QR code.
+     * See `Style` enum for possible values.
+     */
+    private Style $style = Style::SQUARE;
+
+    /**
+     * The style to apply to the eyes of the QR code.
+     * See `EyeStyle` enum for possible values.
+     */
+    private ?EyeStyle $eyeStyle = null;
+
+    /**
+     * The size of the selected style between 0 and 1.
+     * Only applicable to 'dot' and 'round' styles.
+     */
+    private float $styleSize = 0.5;
 
     /**
      * The size of the QR code in pixels.
@@ -82,15 +111,6 @@ final class Generator
     private int $margin = 0;
 
     /**
-     * The error correction level.
-     * L: 7% loss.
-     * M: 15% loss.
-     * Q: 25% loss.
-     * H: 30% loss.
-     */
-    private ErrorCorrectionLevel $errorCorrectionLevel = ErrorCorrectionLevel::L;
-
-    /**
      * The encoding mode. Possible values are
      * ISO-8859-2, ISO-8859-3, ISO-8859-4, ISO-8859-5, ISO-8859-6,
      * ISO-8859-7, ISO-8859-8, ISO-8859-9, ISO-8859-10, ISO-8859-11,
@@ -99,24 +119,6 @@ final class Generator
      * UTF-16BE, UTF-8, ASCII, GBK, EUC-KR.
      */
     private string $encoding = Encoder::DEFAULT_BYTE_MODE_ENCODING;
-
-    /**
-     * The style of the blocks within the QR code.
-     * Possible values are 'square', 'dot' and 'round'.
-     */
-    private Style $style = Style::SQUARE;
-
-    /**
-     * The size of the selected style between 0 and 1.
-     * Only applicable to 'dot' and 'round' styles.
-     */
-    private float $styleSize = 0.5;
-
-    /**
-     * The style to apply to the eyes of the QR code.
-     * Possible values are circle and square.
-     */
-    private ?EyeStyle $eyeStyle = null;
 
     /**
      * The foreground color of the QR code.
@@ -149,6 +151,48 @@ final class Generator
      * The percentage that a merged image should take over the source image.
      */
     private float $imagePercentage = .2;
+
+    /**
+     * Initialise the generator, optionally seeding defaults from the package config.
+     *
+     * @param  array<mixed>  $config  The resolved `config('qrcode')` array (or a subset of it).
+     */
+    public function __construct(array $config = [])
+    {
+        if (isset($config['size']) && is_int($config['size'])) {
+            $this->size = $config['size'] > 0 ? $config['size'] : $this->size;
+        }
+
+        if (isset($config['margin']) && is_int($config['margin'])) {
+            $this->margin = $config['margin'] >= 0 ? $config['margin'] : $this->margin;
+        }
+
+        if (isset($config['format']) && \is_string($config['format'])) {
+            $format = Format::tryFrom(strtolower($config['format']));
+            if ($format !== null) {
+                $this->format = $format;
+            }
+        }
+
+        if (isset($config['error_correction']) && \is_string($config['error_correction'])) {
+            $level = ErrorCorrectionLevel::tryFrom(strtoupper($config['error_correction']));
+            if ($level !== null) {
+                $this->errorCorrectionLevel = $level;
+            }
+        }
+
+        if (isset($config['encoding']) && \is_string($config['encoding'])) {
+            $this->encoding = strtoupper($config['encoding']);
+        }
+
+        if (isset($config['color']) && is_array($config['color'])) {
+            $this->color = $this->createColor(...$this->readRgb($config['color'], 0));
+        }
+
+        if (isset($config['background_color']) && is_array($config['background_color'])) {
+            $this->backgroundColor = $this->createColor(...$this->readRgb($config['background_color'], 255));
+        }
+    }
 
     /**
      * @param  array<int, mixed>  $arguments
@@ -419,6 +463,39 @@ final class Generator
         }
 
         return new Alpha($alpha, new Rgb($red, $green, $blue));
+    }
+
+    /**
+     * Read a RGB colour from a config array that may use either a positional index
+     * or a named key.  Returns $default when the value is absent or not an int.
+     *
+     * @param  array<mixed>  $raw
+     * @return array{int, int, int, int|null}
+     */
+    private function readRgb(array $raw, int $default): array
+    {
+        $red = $raw['r'] ?? $raw[0] ?? $default;
+        $green = $raw['g'] ?? $raw[1] ?? $default;
+        $blue = $raw['b'] ?? $raw[2] ?? $default;
+        $alpha = $raw['a'] ?? $raw[3] ?? null;
+
+        if (! is_int($red)) {
+            $red = $default;
+        }
+
+        if (! is_int($green)) {
+            $green = $default;
+        }
+
+        if (! is_int($blue)) {
+            $blue = $default;
+        }
+
+        if ($alpha !== null && ! is_int($alpha)) {
+            $alpha = null;
+        }
+
+        return [$red, $green, $blue, $alpha];
     }
 
     private function getFormatter(): ImageBackEndInterface

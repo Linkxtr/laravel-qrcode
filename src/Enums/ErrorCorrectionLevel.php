@@ -11,10 +11,10 @@ enum ErrorCorrectionLevel: string
 {
     use EnumHelper;
 
-    case L = 'L';
-    case M = 'M';
-    case Q = 'Q';
-    case H = 'H';
+    case L = 'L'; // 7% loss.
+    case M = 'M'; // 15% loss.
+    case Q = 'Q'; // 25% loss.
+    case H = 'H'; // 30% loss.
 
     public function toBaconErrorCorrectionLevel(): BaconErrorCorrectionLevel
     {

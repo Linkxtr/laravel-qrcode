@@ -65,6 +65,7 @@ final readonly class RasterMerger implements MergerInterface
         }
 
         imagealphablending($canvas, false);
+        imagesavealpha($canvas, true);
         $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
 
         if (! $transparent) {
