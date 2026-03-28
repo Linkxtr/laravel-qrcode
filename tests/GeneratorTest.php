@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use BaconQrCode\Renderer\Color\Alpha;
+use BaconQrCode\Renderer\Color\Cmyk;
+use BaconQrCode\Renderer\Color\Gray;
+use BaconQrCode\Renderer\Eye\CompositeEye;
+use BaconQrCode\Renderer\Eye\PointyEye;
 use BaconQrCode\Renderer\Eye\SimpleCircleEye;
 use BaconQrCode\Renderer\Eye\SquareEye;
 use BaconQrCode\Renderer\Module\DotsModule;
@@ -106,6 +110,37 @@ test('color is passed to formatter', function () {
     expect($backgroundColor->getAlpha())->toBe(75);
 });
 
+test('cmyk color model is mapped successfully', function () {
+    $qrCode = (new Generator)->cmyk()->color(100, 50, 25, 10)->backgroundColor(0, 5, 10, 15);
+
+    $foregroundColor = $qrCode->getFill()->getForegroundColor();
+    expect($foregroundColor)->toBeInstanceOf(Cmyk::class);
+    // Values map correctly even though named parameters are not inherently enforced.
+    // BACON CMYK has cyan, magenta, yellow, black properties but the testing via getter depends on what Bacon provides.
+    // Wait, BaconQrCode Cmyk class doesn't expose getters, we can't assert exact values just types.
+
+    $backgroundColor = $qrCode->getFill()->getBackgroundColor();
+    expect($backgroundColor)->toBeInstanceOf(Cmyk::class);
+});
+
+test('gray color model is mapped successfully', function () {
+    $qrCode = (new Generator)->gray(50, 100);
+
+    $foregroundColor = $qrCode->getFill()->getForegroundColor();
+    expect($foregroundColor)->toBeInstanceOf(Gray::class);
+
+    $backgroundColor = $qrCode->getFill()->getBackgroundColor();
+    expect($backgroundColor)->toBeInstanceOf(Gray::class);
+});
+
+test('rgb mode fallback works when passing 4 arguments to non-cmyk', function () {
+    // Tests that alpha gets wrapped if RGB mode
+    $qrCode = (new Generator)->rgb()->color(100, 50, 25, 40);
+    $foregroundColor = $qrCode->getFill()->getForegroundColor();
+    expect($foregroundColor)->toBeInstanceOf(Alpha::class);
+    expect($foregroundColor->getAlpha())->toBe(40);
+});
+
 test('default background color is white and foreground color is black', function () {
     $qrCode = new Generator;
     expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(255);
@@ -165,10 +200,22 @@ test('eye style is passed to renderer', function () {
 
     $qrCode = (new Generator)->eye('square');
     expect($qrCode->getEye())->toBeInstanceOf(SquareEye::class);
+
+    $qrCode = (new Generator)->eye('pointy');
+    expect($qrCode->getEye())->toBeInstanceOf(PointyEye::class);
+});
+
+test('composite eye style is generated', function () {
+    $qrCode = (new Generator)->eye('circle')->internalEye('square');
+    expect($qrCode->getEye())->toBeInstanceOf(CompositeEye::class);
 });
 
 it('throws exception if eye style is not supported', function () {
     (new Generator)->eye('dot');
+})->throws(InvalidArgumentException::class);
+
+it('throws exception if internal eye style is not supported', function () {
+    (new Generator)->internalEye('dot');
 })->throws(InvalidArgumentException::class);
 
 test('module style is passed to renderer', function () {

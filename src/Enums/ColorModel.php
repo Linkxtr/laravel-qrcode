@@ -6,11 +6,11 @@ namespace Linkxtr\QrCode\Enums;
 
 use Linkxtr\QrCode\Enums\Concerns\EnumHelper;
 
-enum EyeStyle: string
+enum ColorModel: string
 {
     use EnumHelper;
 
-    case SQUARE = 'square';
-    case CIRCLE = 'circle';
-    case POINTY = 'pointy';
+    case RGB = 'rgb';
+    case CMYK = 'cmyk';
+    case GRAY = 'gray';
 }

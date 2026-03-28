@@ -6,10 +6,14 @@ namespace Linkxtr\QrCode;
 
 use BaconQrCode\Encoder\Encoder;
 use BaconQrCode\Renderer\Color\Alpha;
+use BaconQrCode\Renderer\Color\Cmyk;
 use BaconQrCode\Renderer\Color\ColorInterface;
+use BaconQrCode\Renderer\Color\Gray;
 use BaconQrCode\Renderer\Color\Rgb;
+use BaconQrCode\Renderer\Eye\CompositeEye;
 use BaconQrCode\Renderer\Eye\EyeInterface;
 use BaconQrCode\Renderer\Eye\ModuleEye;
+use BaconQrCode\Renderer\Eye\PointyEye;
 use BaconQrCode\Renderer\Eye\SimpleCircleEye;
 use BaconQrCode\Renderer\Eye\SquareEye;
 use BaconQrCode\Renderer\GDLibRenderer;
@@ -32,6 +36,7 @@ use BadMethodCallException;
 use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
 use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
@@ -42,6 +47,7 @@ use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Support\Image;
+use Linkxtr\QrCode\ValueObjects\ColorValue;
 use RuntimeException;
 
 use function is_array;
@@ -95,6 +101,12 @@ final class Generator
     private ?EyeStyle $eyeStyle = null;
 
     /**
+     * The internal style to apply to the eyes of the QR code.
+     * Only applies when a composite eye is desired.
+     */
+    private ?EyeStyle $internalEyeStyle = null;
+
+    /**
      * The size of the selected style between 0 and 1.
      * Only applicable to 'dot' and 'round' styles.
      */
@@ -121,14 +133,19 @@ final class Generator
     private string $encoding = Encoder::DEFAULT_BYTE_MODE_ENCODING;
 
     /**
-     * The foreground color of the QR code.
+     * The foreground color value of the QR code.
      */
-    private ?ColorInterface $color = null;
+    private ?ColorValue $colorValue = null;
 
     /**
-     * The background color of the QR code.
+     * The background color value of the QR code.
      */
-    private ?ColorInterface $backgroundColor = null;
+    private ?ColorValue $backgroundColorValue = null;
+
+    /**
+     * The color model used to build colors.
+     */
+    private ColorModel $colorModel = ColorModel::RGB;
 
     /**
      * An array that holds EyeFills of the color of the eyes.
@@ -186,11 +203,11 @@ final class Generator
         }
 
         if (isset($config['color']) && is_array($config['color'])) {
-            $this->color = $this->createColor(...$this->readRgb($config['color'], 0));
+            $this->colorValue = new ColorValue(...$this->readRgb($config['color'], 0));
         }
 
         if (isset($config['background_color']) && is_array($config['background_color'])) {
-            $this->backgroundColor = $this->createColor(...$this->readRgb($config['background_color'], 255));
+            $this->backgroundColorValue = new ColorValue(...$this->readRgb($config['background_color'], 255));
         }
     }
 
@@ -268,16 +285,42 @@ final class Generator
         return $this;
     }
 
-    public function color(int $red, int $green, int $blue, ?int $alpha = null): self
+    public function cmyk(): self
     {
-        $this->color = $this->createColor($red, $green, $blue, $alpha);
+        $this->colorModel = ColorModel::CMYK;
 
         return $this;
     }
 
-    public function backgroundColor(int $red, int $green, int $blue, ?int $alpha = null): self
+    public function rgb(): self
     {
-        $this->backgroundColor = $this->createColor($red, $green, $blue, $alpha);
+        $this->colorModel = ColorModel::RGB;
+
+        return $this;
+    }
+
+    public function gray(int $gray, ?int $backgroundGray = null): self
+    {
+        $this->colorModel = ColorModel::GRAY;
+        $this->colorValue = new ColorValue($gray, 0, 0);
+
+        if ($backgroundGray !== null) {
+            $this->backgroundColorValue = new ColorValue($backgroundGray, 0, 0);
+        }
+
+        return $this;
+    }
+
+    public function color(int $c1, int $c2, int $c3, ?int $c4 = null): self
+    {
+        $this->colorValue = new ColorValue($c1, $c2, $c3, $c4);
+
+        return $this;
+    }
+
+    public function backgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null): self
+    {
+        $this->backgroundColorValue = new ColorValue($c1, $c2, $c3, $c4);
 
         return $this;
     }
@@ -326,6 +369,21 @@ final class Generator
         }
 
         $this->eyeStyle = $style;
+
+        return $this;
+    }
+
+    public function internalEye(string|EyeStyle $style): self
+    {
+        if (is_string($style)) {
+            $style = EyeStyle::tryFrom($style);
+        }
+
+        if (! $style) {
+            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', EyeStyle::toArray()));
+        }
+
+        $this->internalEyeStyle = $style;
 
         return $this;
     }
@@ -430,21 +488,38 @@ final class Generator
 
     public function getEye(): EyeInterface
     {
-        if ($this->eyeStyle === EyeStyle::SQUARE) {
+        $externalEye = $this->getEyeInstance($this->eyeStyle, $this->getModule());
+
+        if ($this->internalEyeStyle instanceof EyeStyle) {
+            $internalEye = $this->getEyeInstance($this->internalEyeStyle, $this->getModule());
+
+            return new CompositeEye($externalEye, $internalEye);
+        }
+
+        return $externalEye;
+    }
+
+    private function getEyeInstance(?EyeStyle $eyeStyle, ModuleInterface $module): EyeInterface
+    {
+        if ($eyeStyle === EyeStyle::SQUARE) {
             return SquareEye::instance();
         }
 
-        if ($this->eyeStyle === EyeStyle::CIRCLE) {
+        if ($eyeStyle === EyeStyle::CIRCLE) {
             return SimpleCircleEye::instance();
         }
 
-        return new ModuleEye($this->getModule());
+        if ($eyeStyle === EyeStyle::POINTY) {
+            return PointyEye::instance();
+        }
+
+        return new ModuleEye($module);
     }
 
     public function getFill(): Fill
     {
-        $foregroundColor = $this->color ?? new Rgb(0, 0, 0);
-        $backgroundColor = $this->backgroundColor ?? new Rgb(255, 255, 255);
+        $foregroundColor = $this->buildColor($this->colorValue) ?? new Rgb(0, 0, 0);
+        $backgroundColor = $this->buildColor($this->backgroundColorValue) ?? new Rgb(255, 255, 255);
         $eye0 = $this->eyeColors[0] ?? EyeFill::inherit();
         $eye1 = $this->eyeColors[1] ?? EyeFill::inherit();
         $eye2 = $this->eyeColors[2] ?? EyeFill::inherit();
@@ -456,7 +531,24 @@ final class Generator
         return Fill::withForegroundColor($backgroundColor, $foregroundColor, $eye0, $eye1, $eye2);
     }
 
-    public function createColor(int $red, int $green, int $blue, ?int $alpha = null): ColorInterface
+    private function buildColor(?ColorValue $colorValue): ?ColorInterface
+    {
+        if (! $colorValue instanceof ColorValue) {
+            return null;
+        }
+
+        if ($this->colorModel === ColorModel::GRAY) {
+            return new Gray($colorValue->c1);
+        }
+
+        if ($this->colorModel === ColorModel::CMYK) {
+            return new Cmyk($colorValue->c1, $colorValue->c2, $colorValue->c3, $colorValue->c4 ?? 0);
+        }
+
+        return $this->createColor($colorValue->c1, $colorValue->c2, $colorValue->c3, $colorValue->c4);
+    }
+
+    private function createColor(int $red, int $green, int $blue, ?int $alpha = null): ColorInterface
     {
         if (is_null($alpha)) {
             return new Rgb($red, $green, $blue);
