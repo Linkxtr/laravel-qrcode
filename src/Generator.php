@@ -155,7 +155,7 @@ final class Generator
     /**
      * Initialise the generator, optionally seeding defaults from the package config.
      *
-     * @param  array<string, mixed>  $config  The resolved `config('qrcode')` array (or a subset of it).
+     * @param  array<mixed>  $config  The resolved `config('qrcode')` array (or a subset of it).
      */
     public function __construct(array $config = [])
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Linkxtr\QrCode\Components\QrCodeComponent;
 
@@ -24,8 +25,7 @@ final class QrCodeServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/qrcode.php', 'qrcode');
 
         $this->app->bind(Generator::class, function (): Generator {
-            /** @var array<string, mixed> $config */
-            $config = config('qrcode', []);
+            $config = Config::array('qrcode', []);
 
             return new Generator($config);
         });
