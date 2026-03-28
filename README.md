@@ -269,16 +269,7 @@ QrCode::size(250)
 
 ### Version 2 Roadmap
 
-We're actively working on Version 2 with these planned features:
-
-- [x] vCard data type
-- [x] Calendar event data type
-- [x] WebP format support
-- [x] Telegram data type support
-- [x] WhatsApp data type support
-- [ ] Animated QR codes
-- [ ] Bitcoin payment QR codes
-- [ ] Extended customization options
+For a detailed and up-to-date look at what's planned for Version 2, please check out our [ROADMAP.md](ROADMAP.md) file.
 
 ### Contributing
 

@@ -42,7 +42,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   ]);
   ```
 
-- [ ] **Cryptocurrency Payments**
+- [x] **Cryptocurrency Payments**
   - [x] **Bitcoin**
     ```php
     QrCode::btc('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', 0.001);
@@ -239,11 +239,11 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 ### Developer Experience
 
 - [ ] **Better IDE Support**
-  - Enhanced PHPDoc annotations
-  - IDE helper file generation
-  - Laravel Idea compatibility
+  - [x] Enhanced PHPDoc annotations
+  - [ ] IDE helper file generation
+  - [ ] Laravel Idea compatibility
 
-- [ ] **Configuration File**
+- [x] **Configuration File**
 
   ```php
   // config/qrcode.php
@@ -272,7 +272,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ### Modern PHP Features
 
-- [ ] **PHP 8.2+ Minimum Requirement**
+- [x] **PHP 8.2+ Minimum Requirement**
 - [x] **Native Enums**
 
   ```php
