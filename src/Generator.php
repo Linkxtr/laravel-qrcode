@@ -160,15 +160,15 @@ final class Generator
     public function __construct(array $config = [])
     {
         if (isset($config['size']) && is_int($config['size'])) {
-            $this->size = $config['size'];
+            $this->size = $config['size'] > 0 ? $config['size'] : $this->size;
         }
 
         if (isset($config['margin']) && is_int($config['margin'])) {
-            $this->margin = $config['margin'];
+            $this->margin = $config['margin'] >= 0 ? $config['margin'] : $this->margin;
         }
 
         if (isset($config['format']) && \is_string($config['format'])) {
-            $format = Format::tryFrom($config['format']);
+            $format = Format::tryFrom(strtolower($config['format']));
             if ($format !== null) {
                 $this->format = $format;
             }
