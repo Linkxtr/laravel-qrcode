@@ -5,6 +5,7 @@ declare(strict_types=1);
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Cmyk;
 use BaconQrCode\Renderer\Color\Gray;
+use BaconQrCode\Renderer\Color\Rgb;
 use BaconQrCode\Renderer\Eye\CompositeEye;
 use BaconQrCode\Renderer\Eye\PointyEye;
 use BaconQrCode\Renderer\Eye\SimpleCircleEye;
@@ -90,14 +91,18 @@ it('throws exception if format is not supported', function () {
 
 test('color is passed to formatter', function () {
     $qrCode = (new Generator)->color(100, 150, 200);
-    expect(invade($qrCode)->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(100);
-    expect(invade($qrCode)->getFill()->getForegroundColor()->toRgb()->getGreen())->toBe(150);
-    expect(invade($qrCode)->getFill()->getForegroundColor()->toRgb()->getBlue())->toBe(200);
+    $foregroundColor = invade($qrCode)->getFill()->getForegroundColor();
+    expect($foregroundColor)->toBeInstanceOf(Rgb::class);
+    expect($foregroundColor->getRed())->toBe(100);
+    expect($foregroundColor->getGreen())->toBe(150);
+    expect($foregroundColor->getBlue())->toBe(200);
 
     $qrCode = (new Generator)->backgroundColor(50, 75, 100);
-    expect(invade($qrCode)->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(50);
-    expect(invade($qrCode)->getFill()->getBackgroundColor()->toRgb()->getGreen())->toBe(75);
-    expect(invade($qrCode)->getFill()->getBackgroundColor()->toRgb()->getBlue())->toBe(100);
+    $backgroundColor = invade($qrCode)->getFill()->getBackgroundColor();
+    expect($backgroundColor)->toBeInstanceOf(Rgb::class);
+    expect($backgroundColor->getRed())->toBe(50);
+    expect($backgroundColor->getGreen())->toBe(75);
+    expect($backgroundColor->getBlue())->toBe(100);
 
     $qrCode = (new Generator)->color(100, 150, 200, 100);
     $foregroundColor = invade($qrCode)->getFill()->getForegroundColor();
@@ -115,9 +120,17 @@ test('cmyk color model is mapped successfully', function () {
 
     $foregroundColor = invade($qrCode)->getFill()->getForegroundColor();
     expect($foregroundColor)->toBeInstanceOf(Cmyk::class);
+    expect($foregroundColor->getCyan())->toBe(100);
+    expect($foregroundColor->getMagenta())->toBe(50);
+    expect($foregroundColor->getYellow())->toBe(25);
+    expect($foregroundColor->getBlack())->toBe(10);
 
     $backgroundColor = invade($qrCode)->getFill()->getBackgroundColor();
     expect($backgroundColor)->toBeInstanceOf(Cmyk::class);
+    expect($backgroundColor->getCyan())->toBe(0);
+    expect($backgroundColor->getMagenta())->toBe(5);
+    expect($backgroundColor->getYellow())->toBe(10);
+    expect($backgroundColor->getBlack())->toBe(15);
 });
 
 test('gray color model is mapped successfully', function () {
@@ -128,6 +141,16 @@ test('gray color model is mapped successfully', function () {
 
     $backgroundColor = invade($qrCode)->getFill()->getBackgroundColor();
     expect($backgroundColor)->toBeInstanceOf(Gray::class);
+});
+
+test('gray color model accepts boundary values', function () {
+    $qrCode = (new Generator)->gray(0, 0);
+    expect(invade($qrCode)->getFill()->getForegroundColor())->toBeInstanceOf(Gray::class);
+    expect(invade($qrCode)->getFill()->getBackgroundColor())->toBeInstanceOf(Gray::class);
+
+    $qrCode = (new Generator)->gray(100, 100);
+    expect(invade($qrCode)->getFill()->getForegroundColor())->toBeInstanceOf(Gray::class);
+    expect(invade($qrCode)->getFill()->getBackgroundColor())->toBeInstanceOf(Gray::class);
 });
 
 test('gray color model throws exception if value is out of range', function () {
@@ -214,6 +237,18 @@ test('composite eye style is generated', function () {
     $qrCode = (new Generator)->eye('circle')->internalEye('square');
     expect(invade($qrCode)->getEye())->toBeInstanceOf(CompositeEye::class);
 });
+
+test('composite eye supports all style combinations', function ($external, $internal) {
+    $qrCode = (new Generator)->eye($external)->internalEye($internal);
+    expect(invade($qrCode)->getEye())->toBeInstanceOf(CompositeEye::class);
+})->with([
+    ['external' => 'square', 'internal' => 'pointy'],
+    ['external' => 'square', 'internal' => 'circle'],
+    ['external' => 'pointy', 'internal' => 'circle'],
+    ['external' => 'pointy', 'internal' => 'square'],
+    ['external' => 'circle', 'internal' => 'square'],
+    ['external' => 'circle', 'internal' => 'pointy'],
+]);
 
 it('throws exception if eye style is not supported', function () {
     (new Generator)->eye('dot');
