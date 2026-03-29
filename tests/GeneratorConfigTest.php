@@ -201,20 +201,19 @@ test('generator ignores invalid error_correction from config gracefully', functi
 test('generator ignores unknown config keys gracefully', function () {
     $generator = new Generator(['unknown_key' => 'some_value']);
 
-    expect(invade($generator)->getRendererStyle())->toBeInstanceOf(RendererStyle::class);
+    $style = invade($generator)->getRendererStyle();
+
+    expect($style)->toBeInstanceOf(RendererStyle::class);
     // Verify it still uses default size/margin (confirms fallback worked)
-    expect(invade($generator)->getRendererStyle()->getSize())->toBe(100);
-    expect(invade($generator)->getRendererStyle()->getMargin())->toBe(0);
+    expect($style->getSize())->toBe(100);
+    expect($style->getMargin())->toBe(0);
 });
 
 test('generator uses channel defaults when color values are non-integers', function () {
-    // Non-int values cause both named-key and positional checks to fail,
-    // exercising the $default fallback path in readColorChannel.
     $generator = new Generator([
         'color' => ['not-an-int', 'null', 'also-not', 'string'],
     ]);
 
-    // Falls back to default black (0, 0, 0) with no alpha
     $fill = invade($generator)->getFill();
     expect($fill->getForegroundColor())->toBeInstanceOf(Rgb::class);
     expect($fill->getForegroundColor()->toRgb()->getRed())->toBe(0);
@@ -229,13 +228,16 @@ test('generator uses channel defaults when color values are non-integers', funct
 test('generator uses hardcoded defaults when no config is given', function () {
     $generator = new Generator;
 
+    $style = invade($generator)->getRendererStyle();
+
     // Hardcoded defaults
-    expect(invade($generator)->getRendererStyle()->getSize())->toBe(100);
-    expect(invade($generator)->getRendererStyle()->getMargin())->toBe(0);
+    expect($style->getSize())->toBe(100);
+    expect($style->getMargin())->toBe(0);
     // Default colors: black foreground, white background (from getFill() fallbacks)
-    expect(invade($generator)->getFill()->getForegroundColor())->toBeInstanceOf(Rgb::class);
-    expect(invade($generator)->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(0);
-    expect(invade($generator)->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(255);
+    $fill = invade($generator)->getFill();
+    expect($fill->getForegroundColor())->toBeInstanceOf(Rgb::class);
+    expect($fill->getForegroundColor()->toRgb()->getRed())->toBe(0);
+    expect($fill->getBackgroundColor()->toRgb()->getRed())->toBe(255);
 });
 
 // ---------------------------------------------------------------------------
@@ -253,19 +255,14 @@ test('generator uses all config values together', function () {
         'background_color' => [240, 240, 240],
     ]);
 
-    // Size and margin are directly readable via getRendererStyle()
-    expect(invade($generator)->getRendererStyle()->getSize())->toBe(512);
-    expect(invade($generator)->getRendererStyle()->getMargin())->toBe(10);
+    $style = invade($generator)->getRendererStyle();
+    expect($style->getSize())->toBe(512);
+    expect($style->getMargin())->toBe(10);
 
-    // Colors are directly readable via getFill()
-    expect(invade($generator)->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(10);
-    expect(invade($generator)->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(240);
+    $fill = invade($generator)->getFill();
+    expect($fill->getForegroundColor()->toRgb()->getRed())->toBe(10);
+    expect($fill->getBackgroundColor()->toRgb()->getRed())->toBe(240);
 
-    // Format (svg) is verified by generate() output — the SVG backend produces XML
-    // markup, whereas PNG/WebP would produce binary data.
     $output = $generator->generate('test')->toHtml();
     expect($output)->toContain('<svg');
-
-    // error_correction and encoding have no public getters; their effect is
-    // confirmed by the successful SVG generation above (both are consumed inside generate()).
 });

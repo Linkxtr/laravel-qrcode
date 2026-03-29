@@ -115,9 +115,6 @@ test('cmyk color model is mapped successfully', function () {
 
     $foregroundColor = invade($qrCode)->getFill()->getForegroundColor();
     expect($foregroundColor)->toBeInstanceOf(Cmyk::class);
-    // Values map correctly even though named parameters are not inherently enforced.
-    // BACON CMYK has cyan, magenta, yellow, black properties but the testing via getter depends on what Bacon provides.
-    // Wait, BaconQrCode Cmyk class doesn't expose getters, we can't assert exact values just types.
 
     $backgroundColor = invade($qrCode)->getFill()->getBackgroundColor();
     expect($backgroundColor)->toBeInstanceOf(Cmyk::class);

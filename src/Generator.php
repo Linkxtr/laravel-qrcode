@@ -304,9 +304,7 @@ final class Generator
         $this->colorModel = ColorModel::GRAY;
         $this->colorValue = new ColorValue($gray, 0, 0);
 
-        if ($backgroundGray !== null) {
-            $this->backgroundColorValue = new ColorValue($backgroundGray, 0, 0);
-        }
+        $this->backgroundColorValue = new ColorValue($backgroundGray ?? 100, 0, 0);
 
         return $this;
     }
@@ -488,10 +486,11 @@ final class Generator
 
     private function getEye(): EyeInterface
     {
-        $externalEye = $this->getEyeInstance($this->eyeStyle, $this->getModule());
+        $module = $this->getModule();
+        $externalEye = $this->getEyeInstance($this->eyeStyle, $module);
 
         if ($this->internalEyeStyle instanceof EyeStyle) {
-            $internalEye = $this->getEyeInstance($this->internalEyeStyle, $this->getModule());
+            $internalEye = $this->getEyeInstance($this->internalEyeStyle, $module);
 
             return new CompositeEye($externalEye, $internalEye);
         }
@@ -501,19 +500,12 @@ final class Generator
 
     private function getEyeInstance(?EyeStyle $eyeStyle, ModuleInterface $module): EyeInterface
     {
-        if ($eyeStyle === EyeStyle::SQUARE) {
-            return SquareEye::instance();
-        }
-
-        if ($eyeStyle === EyeStyle::CIRCLE) {
-            return SimpleCircleEye::instance();
-        }
-
-        if ($eyeStyle === EyeStyle::POINTY) {
-            return PointyEye::instance();
-        }
-
-        return new ModuleEye($module);
+        return match ($eyeStyle) {
+            EyeStyle::SQUARE => SquareEye::instance(),
+            EyeStyle::CIRCLE => SimpleCircleEye::instance(),
+            EyeStyle::POINTY => PointyEye::instance(),
+            null => new ModuleEye($module),
+        };
     }
 
     private function getFill(): Fill
