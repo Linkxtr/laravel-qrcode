@@ -30,7 +30,7 @@ The package uses Laravel's package auto-discovery, so the service provider and f
 
 ## ⚙️ Configuration
 
-Optionally publish the config file to customise the package-wide defaults:
+Optionally publish the config file to customize the package-wide defaults:
 
 ```bash
 php artisan vendor:publish --tag=qrcode-config
@@ -265,6 +265,20 @@ QrCode::size(250)
     ->generate('Styled QR Code');
 ```
 
+### Advanced Color Models & Composite Eyes
+
+Customize QR codes with CMYK color mode and composite eyes (separate styling for outer and inner eye patterns):
+
+```php
+QrCode::size(300)
+    ->cmyk()
+    ->color(100, 50, 0, 10)
+    ->backgroundColor(0, 0, 0, 0)
+    ->eye('circle')
+    ->internalEye('square') // Style the inner eye pattern separately
+    ->generate('Advanced QR Code');
+```
+
 ## 🤝 Contributing & 🗺️ Roadmap
 
 ### Version 2 Roadmap
@@ -320,11 +334,15 @@ QrCode::size(400)
 
 - `generate($text, $filename = null)` - Generate QR code
 - `size($size)` - Set size in pixels
-- `color($red, $green, $blue, $alpha = null)` - Set QR color (alpha 0-100)
-- `backgroundColor($red, $green, $blue, $alpha = null)` - Set background color (alpha 0-100)
+- `color($c1, $c2, $c3, $c4 = null)` - Set foreground color. In RGB mode: ($red, $green, $blue, $alpha). In CMYK mode: ($cyan, $magenta, $yellow, $black). Default: RGB
+- `backgroundColor($c1, $c2, $c3, $c4 = null)` - Set background color. Same parameter meaning as `color()`
+- `cmyk()` - Switch to CMYK color model (0-100 scale for each component)
+- `rgb()` - Switch to RGB color model (0-255 scale). This is the default mode
+- `gray($gray, $backgroundGray = null)` - Set grayscale colors (0=black, 100=white). If $backgroundGray is null, uses white (100)
 - `style($style)` - Set style (dot, square, round)
-- `eye($style)` - Set eye style (circle, square)
-- `gradient($startRed, $startGreen, $startBlue, $endRed, $endGreen, $endBlue, $type)` - Set gradient color
+- `eye($style)` - Set eye style (circle, square, pointy)
+- `internalEye($style)` - Set internal eye style (circle, square, pointy) for composite eyes
+- `gradient($startRed, $startGreen, $startBlue, $endRed, $endGreen, $endBlue, $type)` - Set gradient color (RGB mode only)
 - `format($format)` - Set format (svg, png, eps, webp)
 - `margin($margin)` - Set margin size
 - `errorCorrection($level)` - Set error correction level (L, M, Q, H)

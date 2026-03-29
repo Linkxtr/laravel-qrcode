@@ -23,7 +23,7 @@ it('can call methods via the facade', function () {
     $size = 250;
     QrCode::size($size);
 
-    expect(QrCode::getFacadeRoot()->getRendererStyle()->getSize())->toBe($size);
+    expect(invade(QrCode::getFacadeRoot())->getRendererStyle()->getSize())->toBe($size);
 });
 
 it('resolves alias correctly', function () {
@@ -42,5 +42,5 @@ it('provides generator class', function () {
 it('resolves generator with config', function () {
     config(['qrcode.size' => 500]);
     $generator = resolve('qrcode');
-    expect($generator->getRendererStyle()->getSize())->toBe(500);
+    expect(invade($generator)->getRendererStyle()->getSize())->toBe(500);
 });

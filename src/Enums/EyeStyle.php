@@ -12,4 +12,5 @@ enum EyeStyle: string
 
     case SQUARE = 'square';
     case CIRCLE = 'circle';
+    case POINTY = 'pointy';
 }

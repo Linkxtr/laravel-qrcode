@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 use BaconQrCode\Renderer\Color\Alpha;
+use BaconQrCode\Renderer\Color\Cmyk;
+use BaconQrCode\Renderer\Color\Gray;
+use BaconQrCode\Renderer\Color\Rgb;
+use BaconQrCode\Renderer\Eye\CompositeEye;
+use BaconQrCode\Renderer\Eye\PointyEye;
 use BaconQrCode\Renderer\Eye\SimpleCircleEye;
 use BaconQrCode\Renderer\Eye\SquareEye;
 use BaconQrCode\Renderer\Module\DotsModule;
@@ -59,25 +64,25 @@ test('gradient supported', function () {
 test('size is passed to renderer', function () {
     $qrCode = (new Generator)->size(200);
 
-    expect($qrCode->getRendererStyle()->getSize())->toBe(200);
+    expect(invade($qrCode)->getRendererStyle()->getSize())->toBe(200);
 });
 
 test('default size is 100', function () {
     $qrCode = new Generator;
 
-    expect($qrCode->getRendererStyle()->getSize())->toBe(100);
+    expect(invade($qrCode)->getRendererStyle()->getSize())->toBe(100);
 });
 
 test('margin is passed to renderer', function () {
     $qrCode = (new Generator)->margin(20);
 
-    expect($qrCode->getRendererStyle()->getMargin())->toBe(20);
+    expect(invade($qrCode)->getRendererStyle()->getMargin())->toBe(20);
 });
 
 test('default margin is 0', function () {
     $qrCode = new Generator;
 
-    expect($qrCode->getRendererStyle()->getMargin())->toBe(0);
+    expect(invade($qrCode)->getRendererStyle()->getMargin())->toBe(0);
 });
 
 it('throws exception if format is not supported', function () {
@@ -86,34 +91,92 @@ it('throws exception if format is not supported', function () {
 
 test('color is passed to formatter', function () {
     $qrCode = (new Generator)->color(100, 150, 200);
-    expect($qrCode->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(100);
-    expect($qrCode->getFill()->getForegroundColor()->toRgb()->getGreen())->toBe(150);
-    expect($qrCode->getFill()->getForegroundColor()->toRgb()->getBlue())->toBe(200);
+    $foregroundColor = invade($qrCode)->getFill()->getForegroundColor();
+    expect($foregroundColor)->toBeInstanceOf(Rgb::class);
+    expect($foregroundColor->getRed())->toBe(100);
+    expect($foregroundColor->getGreen())->toBe(150);
+    expect($foregroundColor->getBlue())->toBe(200);
 
     $qrCode = (new Generator)->backgroundColor(50, 75, 100);
-    expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(50);
-    expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getGreen())->toBe(75);
-    expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getBlue())->toBe(100);
+    $backgroundColor = invade($qrCode)->getFill()->getBackgroundColor();
+    expect($backgroundColor)->toBeInstanceOf(Rgb::class);
+    expect($backgroundColor->getRed())->toBe(50);
+    expect($backgroundColor->getGreen())->toBe(75);
+    expect($backgroundColor->getBlue())->toBe(100);
 
     $qrCode = (new Generator)->color(100, 150, 200, 100);
-    $foregroundColor = $qrCode->getFill()->getForegroundColor();
+    $foregroundColor = invade($qrCode)->getFill()->getForegroundColor();
     expect($foregroundColor)->toBeInstanceOf(Alpha::class);
     expect($foregroundColor->getAlpha())->toBe(100);
 
     $qrCode = (new Generator)->backgroundColor(50, 75, 100, 75);
-    $backgroundColor = $qrCode->getFill()->getBackgroundColor();
+    $backgroundColor = invade($qrCode)->getFill()->getBackgroundColor();
     expect($backgroundColor)->toBeInstanceOf(Alpha::class);
     expect($backgroundColor->getAlpha())->toBe(75);
 });
 
+test('cmyk color model is mapped successfully', function () {
+    $qrCode = (new Generator)->cmyk()->color(100, 50, 25, 10)->backgroundColor(0, 5, 10, 15);
+
+    $foregroundColor = invade($qrCode)->getFill()->getForegroundColor();
+    expect($foregroundColor)->toBeInstanceOf(Cmyk::class);
+    expect($foregroundColor->getCyan())->toBe(100);
+    expect($foregroundColor->getMagenta())->toBe(50);
+    expect($foregroundColor->getYellow())->toBe(25);
+    expect($foregroundColor->getBlack())->toBe(10);
+
+    $backgroundColor = invade($qrCode)->getFill()->getBackgroundColor();
+    expect($backgroundColor)->toBeInstanceOf(Cmyk::class);
+    expect($backgroundColor->getCyan())->toBe(0);
+    expect($backgroundColor->getMagenta())->toBe(5);
+    expect($backgroundColor->getYellow())->toBe(10);
+    expect($backgroundColor->getBlack())->toBe(15);
+});
+
+test('gray color model is mapped successfully', function () {
+    $qrCode = (new Generator)->gray(50, 100);
+
+    $foregroundColor = invade($qrCode)->getFill()->getForegroundColor();
+    expect($foregroundColor)->toBeInstanceOf(Gray::class);
+
+    $backgroundColor = invade($qrCode)->getFill()->getBackgroundColor();
+    expect($backgroundColor)->toBeInstanceOf(Gray::class);
+});
+
+test('gray color model accepts boundary values', function () {
+    $qrCode = (new Generator)->gray(0, 0);
+    expect(invade($qrCode)->getFill()->getForegroundColor())->toBeInstanceOf(Gray::class);
+    expect(invade($qrCode)->getFill()->getBackgroundColor())->toBeInstanceOf(Gray::class);
+
+    $qrCode = (new Generator)->gray(100, 100);
+    expect(invade($qrCode)->getFill()->getForegroundColor())->toBeInstanceOf(Gray::class);
+    expect(invade($qrCode)->getFill()->getBackgroundColor())->toBeInstanceOf(Gray::class);
+});
+
+test('gray color model throws exception if value is out of range', function () {
+    (new Generator)->gray(101);
+})->throws(InvalidArgumentException::class);
+
+test('gray color model throws exception if background value is out of range', function () {
+    (new Generator)->gray(50, 101);
+})->throws(InvalidArgumentException::class);
+
+test('rgb mode fallback works when passing 4 arguments to non-cmyk', function () {
+    // Tests that alpha gets wrapped if RGB mode
+    $qrCode = (new Generator)->rgb()->color(100, 50, 25, 40);
+    $foregroundColor = invade($qrCode)->getFill()->getForegroundColor();
+    expect($foregroundColor)->toBeInstanceOf(Alpha::class);
+    expect($foregroundColor->getAlpha())->toBe(40);
+});
+
 test('default background color is white and foreground color is black', function () {
     $qrCode = new Generator;
-    expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(255);
-    expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getGreen())->toBe(255);
-    expect($qrCode->getFill()->getBackgroundColor()->toRgb()->getBlue())->toBe(255);
-    expect($qrCode->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(0);
-    expect($qrCode->getFill()->getForegroundColor()->toRgb()->getGreen())->toBe(0);
-    expect($qrCode->getFill()->getForegroundColor()->toRgb()->getBlue())->toBe(0);
+    expect(invade($qrCode)->getFill()->getBackgroundColor()->toRgb()->getRed())->toBe(255);
+    expect(invade($qrCode)->getFill()->getBackgroundColor()->toRgb()->getGreen())->toBe(255);
+    expect(invade($qrCode)->getFill()->getBackgroundColor()->toRgb()->getBlue())->toBe(255);
+    expect(invade($qrCode)->getFill()->getForegroundColor()->toRgb()->getRed())->toBe(0);
+    expect(invade($qrCode)->getFill()->getForegroundColor()->toRgb()->getGreen())->toBe(0);
+    expect(invade($qrCode)->getFill()->getForegroundColor()->toRgb()->getBlue())->toBe(0);
 });
 
 test('eye color is passed to renderer', function () {
@@ -121,25 +184,25 @@ test('eye color is passed to renderer', function () {
     $qrCode->eyeColor(1, 100, 20, 60, 2, 10, 20);
     $qrCode->eyeColor(2, 200, 30, 70, 3, 12, 22);
 
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getExternalColor()->toRgb()->getRed())->toBe(0);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getExternalColor()->toRgb()->getRed())->toBe(100);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getExternalColor()->toRgb()->getRed())->toBe(200);
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getExternalColor()->toRgb()->getGreen())->toBe(10);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getExternalColor()->toRgb()->getGreen())->toBe(20);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getExternalColor()->toRgb()->getGreen())->toBe(30);
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getExternalColor()->toRgb()->getBlue())->toBe(50);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getExternalColor()->toRgb()->getBlue())->toBe(60);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getExternalColor()->toRgb()->getBlue())->toBe(70);
+    expect(invade($qrCode)->getFill()->getTopLeftEyeFill()->getExternalColor()->toRgb()->getRed())->toBe(0);
+    expect(invade($qrCode)->getFill()->getTopRightEyeFill()->getExternalColor()->toRgb()->getRed())->toBe(100);
+    expect(invade($qrCode)->getFill()->getBottomLeftEyeFill()->getExternalColor()->toRgb()->getRed())->toBe(200);
+    expect(invade($qrCode)->getFill()->getTopLeftEyeFill()->getExternalColor()->toRgb()->getGreen())->toBe(10);
+    expect(invade($qrCode)->getFill()->getTopRightEyeFill()->getExternalColor()->toRgb()->getGreen())->toBe(20);
+    expect(invade($qrCode)->getFill()->getBottomLeftEyeFill()->getExternalColor()->toRgb()->getGreen())->toBe(30);
+    expect(invade($qrCode)->getFill()->getTopLeftEyeFill()->getExternalColor()->toRgb()->getBlue())->toBe(50);
+    expect(invade($qrCode)->getFill()->getTopRightEyeFill()->getExternalColor()->toRgb()->getBlue())->toBe(60);
+    expect(invade($qrCode)->getFill()->getBottomLeftEyeFill()->getExternalColor()->toRgb()->getBlue())->toBe(70);
 
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getInternalColor()->toRgb()->getRed())->toBe(1);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getInternalColor()->toRgb()->getRed())->toBe(2);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getInternalColor()->toRgb()->getRed())->toBe(3);
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getInternalColor()->toRgb()->getGreen())->toBe(8);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getInternalColor()->toRgb()->getGreen())->toBe(10);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getInternalColor()->toRgb()->getGreen())->toBe(12);
-    expect($qrCode->getFill()->getTopLeftEyeFill()->getInternalColor()->toRgb()->getBlue())->toBe(18);
-    expect($qrCode->getFill()->getTopRightEyeFill()->getInternalColor()->toRgb()->getBlue())->toBe(20);
-    expect($qrCode->getFill()->getBottomLeftEyeFill()->getInternalColor()->toRgb()->getBlue())->toBe(22);
+    expect(invade($qrCode)->getFill()->getTopLeftEyeFill()->getInternalColor()->toRgb()->getRed())->toBe(1);
+    expect(invade($qrCode)->getFill()->getTopRightEyeFill()->getInternalColor()->toRgb()->getRed())->toBe(2);
+    expect(invade($qrCode)->getFill()->getBottomLeftEyeFill()->getInternalColor()->toRgb()->getRed())->toBe(3);
+    expect(invade($qrCode)->getFill()->getTopLeftEyeFill()->getInternalColor()->toRgb()->getGreen())->toBe(8);
+    expect(invade($qrCode)->getFill()->getTopRightEyeFill()->getInternalColor()->toRgb()->getGreen())->toBe(10);
+    expect(invade($qrCode)->getFill()->getBottomLeftEyeFill()->getInternalColor()->toRgb()->getGreen())->toBe(12);
+    expect(invade($qrCode)->getFill()->getTopLeftEyeFill()->getInternalColor()->toRgb()->getBlue())->toBe(18);
+    expect(invade($qrCode)->getFill()->getTopRightEyeFill()->getInternalColor()->toRgb()->getBlue())->toBe(20);
+    expect(invade($qrCode)->getFill()->getBottomLeftEyeFill()->getInternalColor()->toRgb()->getBlue())->toBe(22);
 });
 
 it('throws exception if eye color greater than 2', function () {
@@ -152,7 +215,7 @@ it('throws exception if eye color less than 0', function () {
 
 test('gradient is passed to renderer', function () {
     $qrCode = (new Generator)->gradient(100, 150, 200, 50, 75, 100, 'vertical');
-    expect($qrCode->getFill()->getForegroundGradient())->toBeInstanceOf(Gradient::class);
+    expect(invade($qrCode)->getFill()->getForegroundGradient())->toBeInstanceOf(Gradient::class);
 });
 
 it('throws exception if gradient type is not supported', function () {
@@ -161,25 +224,49 @@ it('throws exception if gradient type is not supported', function () {
 
 test('eye style is passed to renderer', function () {
     $qrCode = (new Generator)->eye('circle');
-    expect($qrCode->getEye())->toBeInstanceOf(SimpleCircleEye::class);
+    expect(invade($qrCode)->getEye())->toBeInstanceOf(SimpleCircleEye::class);
 
     $qrCode = (new Generator)->eye('square');
-    expect($qrCode->getEye())->toBeInstanceOf(SquareEye::class);
+    expect(invade($qrCode)->getEye())->toBeInstanceOf(SquareEye::class);
+
+    $qrCode = (new Generator)->eye('pointy');
+    expect(invade($qrCode)->getEye())->toBeInstanceOf(PointyEye::class);
 });
+
+test('composite eye style is generated', function () {
+    $qrCode = (new Generator)->eye('circle')->internalEye('square');
+    expect(invade($qrCode)->getEye())->toBeInstanceOf(CompositeEye::class);
+});
+
+test('composite eye supports all style combinations', function ($external, $internal) {
+    $qrCode = (new Generator)->eye($external)->internalEye($internal);
+    expect(invade($qrCode)->getEye())->toBeInstanceOf(CompositeEye::class);
+})->with([
+    ['external' => 'square', 'internal' => 'pointy'],
+    ['external' => 'square', 'internal' => 'circle'],
+    ['external' => 'pointy', 'internal' => 'circle'],
+    ['external' => 'pointy', 'internal' => 'square'],
+    ['external' => 'circle', 'internal' => 'square'],
+    ['external' => 'circle', 'internal' => 'pointy'],
+]);
 
 it('throws exception if eye style is not supported', function () {
     (new Generator)->eye('dot');
 })->throws(InvalidArgumentException::class);
 
+it('throws exception if internal eye style is not supported', function () {
+    (new Generator)->internalEye('dot');
+})->throws(InvalidArgumentException::class);
+
 test('module style is passed to renderer', function () {
     $qrCode = (new Generator)->style('dot', 1);
-    expect($qrCode->getModule())->toBeInstanceOf(DotsModule::class);
+    expect(invade($qrCode)->getModule())->toBeInstanceOf(DotsModule::class);
 
     $qrCode = (new Generator)->style('square');
-    expect($qrCode->getModule())->toBeInstanceOf(SquareModule::class);
+    expect(invade($qrCode)->getModule())->toBeInstanceOf(SquareModule::class);
 
     $qrCode = (new Generator)->style('round');
-    expect($qrCode->getModule())->toBeInstanceOf(RoundnessModule::class);
+    expect(invade($qrCode)->getModule())->toBeInstanceOf(RoundnessModule::class);
 });
 
 it('throws exception if module style is not supported', function () {
@@ -212,7 +299,7 @@ it('throws exception if dot module with 0 roundness is set', function () {
 
 test('get renderer return a renderer instance', function () {
     $qrCode = new Generator;
-    expect($qrCode->getRendererStyle())->not->toBeNull()->toBeInstanceOf(RendererStyle::class);
+    expect(invade($qrCode)->getRendererStyle())->not->toBeNull()->toBeInstanceOf(RendererStyle::class);
 });
 
 it('throws exception if data type is not supported', function () {
