@@ -130,6 +130,14 @@ test('gray color model is mapped successfully', function () {
     expect($backgroundColor)->toBeInstanceOf(Gray::class);
 });
 
+test('gray color model throws exception if value is out of range', function () {
+    (new Generator)->gray(101);
+})->throws(InvalidArgumentException::class);
+
+test('gray color model throws exception if background value is out of range', function () {
+    (new Generator)->gray(50, 101);
+})->throws(InvalidArgumentException::class);
+
 test('rgb mode fallback works when passing 4 arguments to non-cmyk', function () {
     // Tests that alpha gets wrapped if RGB mode
     $qrCode = (new Generator)->rgb()->color(100, 50, 25, 40);

@@ -301,6 +301,14 @@ final class Generator
 
     public function gray(int $gray, ?int $backgroundGray = null): self
     {
+        if ($gray < 0 || $gray > 100) {
+            throw new InvalidArgumentException('Gray value must be between 0 and 100.');
+        }
+
+        if ($backgroundGray !== null && ($backgroundGray < 0 || $backgroundGray > 100)) {
+            throw new InvalidArgumentException('Background gray value must be between 0 and 100.');
+        }
+
         $this->colorModel = ColorModel::GRAY;
         $this->colorValue = new ColorValue($gray, 0, 0);
 
