@@ -6,7 +6,6 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\ViewException;
-use Linkxtr\QrCode\Components\QrCodeComponent;
 
 it('renders a default qr code component', function () {
     $blade_string = '<x-qr-code data="https://example.com" />';
