@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Components;
 
-use Illuminate\Support\HtmlString;
+use Closure;
+use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Enums\Format;
@@ -34,7 +35,7 @@ final class QrCodeComponent extends Component
         public bool|string $mergeAbsolute = false,
     ) {}
 
-    public function render(): HtmlString
+    public function render(): Closure
     {
         if (! in_array($this->format, Format::toArray())) {
             throw new InvalidArgumentException('Invalid format.');
@@ -101,7 +102,6 @@ final class QrCodeComponent extends Component
             $colors = $this->parseMultiColor($this->gradient);
             $type = $this->gradientType ?? 'vertical';
             if ($colors && count($colors) >= 6) {
-                // startRed, startGreen, startBlue, endRed, endGreen, endBlue, type
                 $generator->gradient($colors[0], $colors[1], $colors[2], $colors[3], $colors[4], $colors[5], $type);
             }
         }
@@ -122,11 +122,13 @@ final class QrCodeComponent extends Component
 
         $htmlString = $generator->generate($this->data);
 
-        if ($this->format === 'svg') {
-            return $htmlString;
-        }
+        return function () use ($htmlString): string {
+            if ($this->format === 'svg') {
+                return Str::replace('<svg', '<svg {{ $attributes }}', $htmlString->__toString());
+            }
 
-        return new HtmlString('<img src="data:image/'.$this->format.';base64,'.base64_encode($htmlString->__toString()).'" alt="QR Code" />');
+            return '<img {{ $attributes->merge(["alt" => "QR Code"]) }} src="data:image/{{ $format }};base64,'.base64_encode($htmlString->__toString()).'" />';
+        };
     }
 
     /**

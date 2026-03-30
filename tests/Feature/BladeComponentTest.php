@@ -142,7 +142,8 @@ it('renders a qr code component with default gradient type', function () {
 it('renders a qr code component with merge', function () {
     $blade_string = '<x-qr-code data="https://example.com" format="png" merge="images/linkxtr.png" merge-percentage=".3" />';
     $rendered = Blade::render($blade_string);
-    expect($rendered)->toStartWith('<img src="data:image/png;base64,');
+
+    expect($rendered)->toContain('<img', 'src="data:image/png;base64,');
 });
 
 it('renders a qr code component with absolute merge path', function () {
@@ -150,17 +151,14 @@ it('renders a qr code component with absolute merge path', function () {
     expect($absolutePath)->not->toBeFalse('Test image file not found: '.__DIR__.'/../images/linkxtr.png');
     $blade_string = '<x-qr-code data="https://example.com" format="png" merge="'.$absolutePath.'" merge-percentage=".3" merge-absolute="true" />';
     $rendered = Blade::render($blade_string);
-    expect($rendered)->toStartWith('<img src="data:image/png;base64,');
+    expect($rendered)->toContain('<img', 'src="data:image/png;base64,');
 });
 
 it('renders a qr code component with merge string', function () {
-    // The previous test failed because BaconQrCode relies on getimagesizefromstring() which ONLY supports bitmap/raster formats (PNG/JPEG/etc), even when generating an SVG.
-    // We pass a raw valid PNG string here.
     $imgData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 
-    // We can't render raw binary inside Blade templates easily without corruption, so let's use the Component class directly to verify.
-    $component = new QrCodeComponent('https://example.com', 100, 'svg', mergeString: $imgData, mergePercentage: .3);
-    $rendered = $component->render()->toHtml();
+    $blade_string = '<x-qr-code data="https://example.com" format="svg" merge-string="'.$imgData.'" merge-percentage=".3" />';
+    $rendered = Blade::render($blade_string);
 
     expect($rendered)->toContain('<svg', 'xmlns="http://www.w3.org/2000/svg"');
 });
@@ -176,3 +174,21 @@ it('throws an exception when merge path contains embedded directory traversal', 
 
     Blade::render($blade_string);
 })->throws(ViewException::class, 'Invalid merge path, path traversal is not allowed.');
+
+it('applies html attributes to the svg tag', function () {
+    $blade = '<x-qr-code data="https://example.com" class="mb-4 shadow" id="my-qr" />';
+    $html = Blade::render($blade);
+
+    expect($html)
+        ->toContain('class="mb-4 shadow"')
+        ->toContain('id="my-qr"');
+});
+
+it('applies html attributes to the img tag', function () {
+    $blade = '<x-qr-code data="https://example.com" format="png" class="mb-4 shadow" id="my-qr" />';
+    $html = Blade::render($blade);
+
+    expect($html)
+        ->toContain('class="mb-4 shadow"')
+        ->toContain('id="my-qr"');
+});
