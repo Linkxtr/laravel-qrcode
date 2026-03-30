@@ -191,3 +191,27 @@ it('applies html attributes to the img tag', function () {
         ->toContain('class="mb-4 shadow"')
         ->toContain('id="my-qr"');
 });
+
+it('support alpha channel in colors reendering svg', function () {
+    $blade_string = '<x-qr-code data="https://example.com" color="255,0,0,50" background-color="0,0,255,50" />';
+    $rendered = Blade::render($blade_string);
+    expect($rendered)->toContain('<svg')->and($rendered)->toContain('fill-opacity="0.5"');
+});
+
+it('support alpha channel in colors reendering png', function () {
+    $blade_string = '<x-qr-code data="https://example.com" format="png" color="255,0,0,50" background-color="0,0,255,50" />';
+    $rendered = Blade::render($blade_string);
+    expect($rendered)->toContain('<img')->and($rendered)->toContain('src="data:image/png;base64,');
+});
+
+it('support 8 letter hex color', function () {
+    $blade_string = '<x-qr-code data="https://example.com" color="#ff0000ff" />';
+    $rendered = Blade::render($blade_string);
+    expect($rendered)->toContain('<svg')->and($rendered)->toContain('fill="#ff0000"');
+});
+
+it('support 8 letter hex background color', function () {
+    $blade_string = '<x-qr-code data="https://example.com" background-color="#ff0000ff" />';
+    $rendered = Blade::render($blade_string);
+    expect($rendered)->toContain('<svg')->and($rendered)->toContain('fill="#ff0000"');
+});
