@@ -50,14 +50,14 @@ final class QrCodeComponent extends Component
         if ($this->color) {
             $rgb = $this->parseColor($this->color);
             if ($rgb) {
-                $generator->color($rgb[0], $rgb[1], $rgb[2]);
+                $generator->color($rgb[0], $rgb[1], $rgb[2], $rgb[3] ?? null);
             }
         }
 
         if ($this->backgroundColor) {
             $rgb = $this->parseColor($this->backgroundColor);
             if ($rgb) {
-                $generator->backgroundColor($rgb[0], $rgb[1], $rgb[2]);
+                $generator->backgroundColor($rgb[0], $rgb[1], $rgb[2], $rgb[3] ?? null);
             }
         }
 
@@ -127,12 +127,12 @@ final class QrCodeComponent extends Component
                 return Str::replaceFirst('<svg', '<svg {{ $attributes }}', $htmlString->__toString());
             }
 
-            return '<img {{ $attributes->merge(["alt" => "QR Code"]) }} src="data:image/{{ $format }};base64,'.base64_encode($htmlString->__toString()).'" />';
+            return '<img {{ $attributes->except("src")->merge(["alt" => "QR Code"]) }} src="data:image/{{ $format }};base64,'.base64_encode($htmlString->__toString()).'" />';
         };
     }
 
     /**
-     * Parse a "R,G,B" string or "#HEX" string into an array of [R, G, B].
+     * Parse a "R,G,B" or "R,G,B,A" string or "#HEX" or "#HEXA" string into an array of [R, G, B] or [R, G, B, A].
      *
      * @return array<int, int>|null
      */
@@ -140,15 +140,23 @@ final class QrCodeComponent extends Component
     {
         if (str_contains($color, ',')) {
             $parts = array_map(trim(...), explode(',', $color));
-            if (count($parts) === 3) {
-                return [
-                    max(0, min(255, (int) $parts[0])),
-                    max(0, min(255, (int) $parts[1])),
-                    max(0, min(255, (int) $parts[2])),
-                ];
+            $count = count($parts);
+
+            if ($count !== 3 && $count !== 4) {
+                return null;
             }
 
-            return null;
+            $r = max(0, min(255, (int) $parts[0]));
+            $g = max(0, min(255, (int) $parts[1]));
+            $b = max(0, min(255, (int) $parts[2]));
+
+            if ($count === 3) {
+                return [$r, $g, $b];
+            }
+
+            $a = max(0, min(100, (int) $parts[3]));
+
+            return [$r, $g, $b, $a];
         }
 
         if (str_starts_with($color, '#')) {
@@ -166,12 +174,18 @@ final class QrCodeComponent extends Component
                 return [(int) $r, (int) $g, (int) $b];
             }
 
-            if (strlen($hex) === 6) {
+            if (strlen($hex) === 6 || strlen($hex) === 8) {
                 $r = hexdec(substr($hex, 0, 2));
                 $g = hexdec(substr($hex, 2, 2));
                 $b = hexdec(substr($hex, 4, 2));
 
-                return [(int) $r, (int) $g, (int) $b];
+                if (strlen($hex) === 6) {
+                    return [(int) $r, (int) $g, (int) $b];
+                }
+
+                $a = max(0, min(100, hexdec(substr($hex, 6, 2))));
+
+                return [(int) $r, (int) $g, (int) $b, (int) $a];
             }
         }
 
@@ -197,7 +211,7 @@ final class QrCodeComponent extends Component
         foreach ($parts as $part) {
             $rgb = $this->parseColor(trim($part));
             if ($rgb) {
-                $result = array_merge($result, $rgb);
+                $result = array_merge($result, array_slice($rgb, 0, 3));
             }
         }
 
