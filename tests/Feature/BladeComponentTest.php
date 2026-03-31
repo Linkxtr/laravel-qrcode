@@ -221,3 +221,13 @@ it('supports 8-character hex color with alpha', function () {
     $rendered = Blade::render($blade_string);
     expect($rendered)->toContain('fill="#ff0000"')->and($rendered)->toContain('fill-opacity="0.47"');
 });
+
+it('includes accessibility attributes and title in svg output', function () {
+    $blade_string = '<x-qr-code data="https://example.com" format="svg" />';
+    $rendered = Blade::render($blade_string);
+
+    expect($rendered)
+        ->toContain('role="img"')
+        ->toContain('aria-label="QR Code"')
+        ->toContain('<title>QR Code</title>');
+});
