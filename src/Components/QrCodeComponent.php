@@ -124,10 +124,15 @@ final class QrCodeComponent extends Component
 
         return function () use ($htmlString): string {
             if ($this->format === 'svg') {
-                $svg = $htmlString->__toString();
-                $svg = (string) preg_replace('/(<svg[^>]+>)/', "$1\n<title>QR Code</title>", $svg, 1);
+                $svg = Str::of($htmlString->__toString())
+                    ->replaceFirst('<svg', '<svg {{ $attributes->merge(["role" => "img", "aria-label" => "QR Code"]) }}');
 
-                return Str::replaceFirst('<svg', '<svg {{ $attributes->merge(["role" => "img", "aria-label" => "QR Code"]) }}', $svg);
+                if (! $svg->contains('<title>')) {
+                    // Target the closing bracket of the opening <svg> tag to inject the accessibility title
+                    $svg = $svg->replaceFirst('">', '"><title>QR Code</title>');
+                }
+
+                return $svg->toString();
             }
 
             return '<img {{ $attributes->except("src")->merge(["alt" => "QR Code"]) }} src="data:image/{{ $format }};base64,'.base64_encode($htmlString->__toString()).'" />';
