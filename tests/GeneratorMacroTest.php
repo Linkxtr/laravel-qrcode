@@ -7,7 +7,7 @@ use Linkxtr\QrCode\Facades\QrCode;
 
 it('can register and call custom macros that return a string payload', function () {
     QrCode::macro('spotify', function (string $uri) {
-        return 'spotify:track:' . $uri;
+        return 'spotify:track:'.$uri;
     });
 
     $result = QrCode::spotify('4uLU6hMCjMI75M1A2tKUQC');
