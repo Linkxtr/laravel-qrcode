@@ -20,6 +20,54 @@ it('can register and call custom macros', function () {
     Generator::flushMacros();
 });
 
+it('wraps string returns from macro in HtmlString', function () {
+    Generator::macro('returnString', function () {
+        return '<svg>custom string</svg>';
+    });
+
+    $generator = new Generator;
+    $result = $generator->returnString();
+
+    expect($result)->toBeInstanceOf(HtmlString::class);
+    expect((string) $result)->toBe('<svg>custom string</svg>');
+})->after(function () {
+    Generator::flushMacros();
+});
+
+it('wraps Stringable object returns from macro in HtmlString', function () {
+    Generator::macro('returnStringable', function () {
+        return new class implements Stringable
+        {
+            public function __toString(): string
+            {
+                return '<svg>custom stringable</svg>';
+            }
+        };
+    });
+
+    $generator = new Generator;
+    $result = $generator->returnStringable();
+
+    expect($result)->toBeInstanceOf(HtmlString::class);
+    expect((string) $result)->toBe('<svg>custom stringable</svg>');
+})->after(function () {
+    Generator::flushMacros();
+});
+
+it('wraps unsupported type returns from macro in an empty HtmlString', function () {
+    Generator::macro('returnArray', function () {
+        return ['an' => 'array'];
+    });
+
+    $generator = new Generator;
+    $result = $generator->returnArray();
+
+    expect($result)->toBeInstanceOf(HtmlString::class);
+    expect((string) $result)->toBe('');
+})->after(function () {
+    Generator::flushMacros();
+});
+
 it('still delegates to data types if macro is not registered', function () {
     $generator = new Generator;
     $result = $generator->Email('test@example.com');
