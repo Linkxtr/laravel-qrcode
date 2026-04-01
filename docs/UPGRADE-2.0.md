@@ -48,6 +48,20 @@ Several classes have been reorganized. The most significant changes are:
 - Compatibility with `simplesoftwareio/simple-qrcode` has been dropped.
 - The `QrCode` facade is no longer a drop-in replacement for `simplesoftwareio`. Users migrating from `simplesoftwareio` may need to update their code to match the new API.
 
+### 5. Configuration Defaults (v2.4.x+)
+
+Several default package configuration values have been updated in `v2.4.0` for modern usage:
+
+- **`format`**: Changed from `png` to `svg`.
+- **`size`**: Increased from `200` to `400`.
+- **`error_correction`**: Changed from `H` (High) to `M` (Medium).
+
+If your application relied on the previous package defaults, ensure you define your configuration manually by publishing the config file, setting `format`, `size`, and `error_correction` to override these new defaults:
+
+```bash
+php artisan vendor:publish --tag=qrcode-config
+```
+
 ## Upgrade Steps
 
 ### 1. Update Dependencies

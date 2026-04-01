@@ -41,9 +41,9 @@ This creates `config/qrcode.php` where you can set global defaults for every QR 
 ```php
 return [
     'format'           => 'svg',   // svg | png | eps | webp
-    'size'             => 200,
+    'size'             => 400,
     'margin'           => 4,
-    'error_correction' => 'H',     // L | M | Q | H
+    'error_correction' => 'M',     // L | M | Q | H
     'encoding'         => 'UTF-8',
     'color'            => [0, 0, 0],             // [R, G, B, A] — alpha: 0-100 (optional)
     'background_color' => [255, 255, 255],       // [R, G, B, A] — alpha: 0-100 (optional)
