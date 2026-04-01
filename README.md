@@ -216,6 +216,28 @@ QrCode::format('svg')->merge('path/to/logo.png', 0.3, true)->generate('With Logo
 
 **Note:** Image merge is not supported for EPS format.
 
+### 🧩 Custom Data Types / Macros
+
+You can define your own custom Data Types using the `macro` method. This allows you to extend the QR Code generator without modifying the core package. 
+Register your macros in the `boot` method of your `AppServiceProvider` or a dedicated service provider:
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+public function boot(): void
+{
+    QrCode::macro('spotify', function (string $uri) {
+        return $this->generate('spotify:track:' . $uri);
+    });
+}
+```
+
+Then you can use it just like the built-in Data Types:
+
+```php
+QrCode::spotify('4uLU6hMCjMI75M1A2tKUQC');
+```
+
 ## 💡 Common Examples
 
 ### Generate QR for Website

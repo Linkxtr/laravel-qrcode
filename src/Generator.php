@@ -34,6 +34,7 @@ use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use BadMethodCallException;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\Enums\ColorModel;
@@ -49,6 +50,7 @@ use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Support\Image;
 use Linkxtr\QrCode\ValueObjects\ColorValue;
 use RuntimeException;
+use Stringable;
 
 use function is_array;
 use function is_int;
@@ -70,6 +72,10 @@ use function strval;
  */
 final class Generator
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The PNG compression level.
      * Only applicable to PNG format when using GDLibRenderer.
@@ -216,6 +222,18 @@ final class Generator
      */
     public function __call(string $method, array $arguments): HtmlString
     {
+        if (self::hasMacro($method)) {
+            $result = $this->macroCall($method, $arguments);
+
+            if ($result instanceof HtmlString) {
+                return $result;
+            }
+
+            $stringResult = is_string($result) || $result instanceof Stringable ? (string) $result : '';
+
+            return new HtmlString($stringResult);
+        }
+
         $dataType = $this->createClass($method);
         $dataType->create($arguments);
 
