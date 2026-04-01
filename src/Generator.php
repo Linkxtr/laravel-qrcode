@@ -58,18 +58,18 @@ use function is_int;
 use function strval;
 
 /**
- * @method HtmlString btc(string $address, float $amount, array<mixed> $options = [])
- * @method HtmlString calendarEvent(array<mixed> $attributes)
- * @method HtmlString email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
- * @method HtmlString ethereum(string $address, ?float $amount = null)
- * @method HtmlString geo(float $latitude, float $longitude, string $name = '')
- * @method HtmlString meCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
- * @method HtmlString phoneNumber(string $phoneNumber)
- * @method HtmlString sms(string $smsAddress = '', string $message = '')
- * @method HtmlString telegram(string|array<mixed> $username)
- * @method HtmlString vCard(array<mixed> $properties)
- * @method HtmlString whatsApp(string|array<mixed> $number, ?string $message = null)
- * @method HtmlString wiFi(array<mixed> $credentials)
+ * @method HtmlString BTC(string $address, float $amount, array<mixed> $options = [])
+ * @method HtmlString CalendarEvent(array<mixed> $attributes)
+ * @method HtmlString Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
+ * @method HtmlString Ethereum(string $address, ?float $amount = null)
+ * @method HtmlString Geo(float $latitude, float $longitude, string $name = '')
+ * @method HtmlString MeCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
+ * @method HtmlString PhoneNumber(string $phoneNumber)
+ * @method HtmlString SMS(string $smsAddress = '', string $message = '')
+ * @method HtmlString Telegram(string|array<mixed> $username)
+ * @method HtmlString VCard(array<mixed> $properties)
+ * @method HtmlString WhatsApp(string|array<mixed> $number, ?string $message = null)
+ * @method HtmlString WiFi(array<mixed> $credentials)
  */
 final class Generator
 {
