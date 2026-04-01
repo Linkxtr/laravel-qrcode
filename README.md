@@ -72,7 +72,7 @@ The `<x-qr-code>` component is automatically available after installation.
 ### In Controllers
 
 ```php
-use Linkxtr\LaravelQrCode\Facades\QrCode;
+use Linkxtr\QrCode\Facades\QrCode;
 
 public function generate()
 {
@@ -216,26 +216,43 @@ QrCode::format('svg')->merge('path/to/logo.png', 0.3, true)->generate('With Logo
 
 **Note:** Image merge is not supported for EPS format.
 
-### 🧩 Custom Data Types / Macros
+### 🧩 Custom Data Types (Macros)
 
-You can define your own custom Data Types using the `macro` method. This allows you to extend the QR Code generator without modifying the core package. 
-Register your macros in the `boot` method of your `AppServiceProvider` or a dedicated service provider:
+While this package provides many built-in data types (WiFi, vCard, BTC), your application likely has its own specific data structures. Using Laravel's `Macroable` trait, you can define your own custom QR code payloads without extending classes or waiting for package updates.
+
+This keeps your controllers clean, ensures DRY (Don't Repeat Yourself) principles, and standardizes QR generation across your application.
+
+1. Register the Macro
+   Define your macro in the `boot` method of your `AppServiceProvider`. You can either return a plain string (which will automatically be converted into a QR code) or call `$this->generate()` if you want to apply default styles inside the macro.
 
 ```php
 use Linkxtr\QrCode\Facades\QrCode;
 
 public function boot(): void
 {
+    // Example 1: Return a string payload (Automatically encoded)
     QrCode::macro('spotify', function (string $uri) {
-        return $this->generate('spotify:track:' . $uri);
+        return 'spotify:track:' . $uri;
+    });
+
+    // Example 2: Return pre-styled generation for an internal company asset
+    QrCode::macro('assetTag', function (string $serialNumber) {
+        $payload = json_encode(['type' => 'hardware', 'sn' => $serialNumber]);
+
+        return $this->size(300)->margin(2)->generate($payload);
     });
 }
 ```
 
-Then you can use it just like the built-in Data Types:
+2. Use it Anywhere
+   Once registered, your macros are available seamlessly on the Facade:
 
 ```php
-QrCode::spotify('4uLU6hMCjMI75M1A2tKUQC');
+// Generates a Spotify URI QR code
+echo QrCode::spotify('4uLU6hMCjMI75M1A2tKUQC');
+
+// Generates a pre-styled 300px JSON asset tag
+echo QrCode::assetTag('SN-99812-X');
 ```
 
 ## 💡 Common Examples
