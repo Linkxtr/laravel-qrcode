@@ -3,80 +3,56 @@
 declare(strict_types=1);
 
 use Illuminate\Support\HtmlString;
-use Linkxtr\QrCode\Generator;
+use Linkxtr\QrCode\Facades\QrCode;
 
-it('can register and call custom macros', function () {
-    Generator::macro('spotify', function (string $uri) {
-        return $this->generate('spotify:track:'.$uri);
+it('can register and call custom macros that return a string payload', function () {
+    QrCode::macro('spotify', function (string $uri) {
+        return 'spotify:track:' . $uri;
     });
 
-    $generator = new Generator;
-    $result = $generator->spotify('4uLU6hMCjMI75M1A2tKUQC');
+    $result = QrCode::spotify('4uLU6hMCjMI75M1A2tKUQC');
 
     expect($result)->toBeInstanceOf(HtmlString::class);
+
     // Generating an SVG with default settings should output the data
     expect((string) $result)->toContain('<svg', '</svg>');
 })->after(function () {
-    Generator::flushMacros();
+    QrCode::flushMacros();
 });
 
-it('wraps string returns from macro in HtmlString', function () {
-    Generator::macro('returnString', function () {
-        return '<svg>custom string</svg>';
+it('can register and call custom macros that return pre-styled generation', function () {
+    QrCode::macro('assetTag', function (string $serialNumber) {
+        $payload = json_encode(['type' => 'hardware', 'sn' => $serialNumber]);
+
+        return $this->size(300)->margin(2)->generate($payload);
     });
 
-    $generator = new Generator;
-    $result = $generator->returnString();
+    $result = QrCode::assetTag('SN-99812-X');
 
     expect($result)->toBeInstanceOf(HtmlString::class);
-    expect((string) $result)->toBe('<svg>custom string</svg>');
+
+    expect((string) $result)->toContain('<svg', '</svg>');
 })->after(function () {
-    Generator::flushMacros();
+    QrCode::flushMacros();
 });
 
-it('wraps Stringable object returns from macro in HtmlString', function () {
-    Generator::macro('returnStringable', function () {
-        return new class implements Stringable
-        {
-            public function __toString(): string
-            {
-                return '<svg>custom stringable</svg>';
-            }
-        };
-    });
-
-    $generator = new Generator;
-    $result = $generator->returnStringable();
-
-    expect($result)->toBeInstanceOf(HtmlString::class);
-    expect((string) $result)->toBe('<svg>custom stringable</svg>');
-})->after(function () {
-    Generator::flushMacros();
-});
-
-it('wraps unsupported type returns from macro in an empty HtmlString', function () {
-    Generator::macro('returnArray', function () {
+it('throws an exception for unsupported type returns from macro', function () {
+    QrCode::macro('returnArray', function () {
         return ['an' => 'array'];
     });
 
-    $generator = new Generator;
-    $result = $generator->returnArray();
-
-    expect($result)->toBeInstanceOf(HtmlString::class);
-    expect((string) $result)->toBe('');
-})->after(function () {
-    Generator::flushMacros();
+    QrCode::returnArray();
+})->throws(UnexpectedValueException::class)->after(function () {
+    QrCode::flushMacros();
 });
 
 it('still delegates to data types if macro is not registered', function () {
-    $generator = new Generator;
-    $result = $generator->Email('test@example.com');
+    $result = QrCode::Email('test@example.com');
 
     expect($result)->toBeInstanceOf(HtmlString::class);
     expect((string) $result)->toContain('<svg');
 });
 
 it('throws bad method exception for completely non-existent methods', function () {
-    $generator = new Generator;
-    $generator->nonExistentMacro('test');
+    QrCode::nonExistentMacro('test');
 })->throws(BadMethodCallException::class);

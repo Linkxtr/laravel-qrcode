@@ -51,6 +51,7 @@ use Linkxtr\QrCode\Support\Image;
 use Linkxtr\QrCode\ValueObjects\ColorValue;
 use RuntimeException;
 use Stringable;
+use UnexpectedValueException;
 
 use function is_array;
 use function is_int;
@@ -229,9 +230,15 @@ final class Generator
                 return $result;
             }
 
-            $stringResult = is_string($result) || $result instanceof Stringable ? (string) $result : '';
+            if (is_string($result) || $result instanceof Stringable) {
+                return $this->generate((string) $result);
+            }
 
-            return new HtmlString($stringResult);
+            throw new UnexpectedValueException(sprintf(
+                'Macro "%s" must return a string, Stringable, or HtmlString. %s returned.',
+                $method,
+                get_debug_type($result)
+            ));
         }
 
         $dataType = $this->createClass($method);
