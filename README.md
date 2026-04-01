@@ -41,9 +41,9 @@ This creates `config/qrcode.php` where you can set global defaults for every QR 
 ```php
 return [
     'format'           => 'svg',   // svg | png | eps | webp
-    'size'             => 200,
+    'size'             => 400,
     'margin'           => 4,
-    'error_correction' => 'H',     // L | M | Q | H
+    'error_correction' => 'M',     // L | M | Q | H
     'encoding'         => 'UTF-8',
     'color'            => [0, 0, 0],             // [R, G, B, A] — alpha: 0-100 (optional)
     'background_color' => [255, 255, 255],       // [R, G, B, A] — alpha: 0-100 (optional)
@@ -72,7 +72,7 @@ The `<x-qr-code>` component is automatically available after installation.
 ### In Controllers
 
 ```php
-use Linkxtr\LaravelQrCode\Facades\QrCode;
+use Linkxtr\QrCode\Facades\QrCode;
 
 public function generate()
 {
@@ -114,31 +114,31 @@ QrCode::merge('path/to/logo.png')->generate('With Logo');
 QrCode::generate('https://example.com');
 
 // Emails
-QrCode::email('to@example.com', 'Subject', 'Body');
+QrCode::Email('to@example.com', 'Subject', 'Body');
 
 // Phone numbers
-QrCode::phoneNumber('+1234567890');
+QrCode::PhoneNumber('+1234567890');
 
 // SMS
 QrCode::SMS('+1234567890', 'Message body');
 
 // WiFi
-QrCode::wiFi([
+QrCode::WiFi([
     'ssid' => 'Network',
     'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, nopass
     'password' => 'Password'
 ]);
 
 // Geolocation
-QrCode::geo(37.7749, -122.4194);
+QrCode::Geo(37.7749, -122.4194);
 
 // BTC
-QrCode::btc(['btcaddress', 0.0034, ['label' => 'label', 'message' => 'message', 'returnAddress' => 'https://www.returnaddress.com']]);
+QrCode::BTC(['btcaddress', 0.0034, ['label' => 'label', 'message' => 'message', 'returnAddress' => 'https://www.returnaddress.com']]);
 
 // Ethereum (amount in ETH)
-QrCode::ethereum('0x742d35Cc6634C0532925a3b8D2b2CE1e5bfb043d', 1.5);
+QrCode::Ethereum('0x742d35Cc6634C0532925a3b8D2b2CE1e5bfb043d', 1.5);
 // vCard
-QrCode::vCard([
+QrCode::VCard([
     'name' => 'John Doe',
     'first_name' => 'John',
     'last_name' => 'Doe',
@@ -152,7 +152,7 @@ QrCode::vCard([
 // Calendar Event
 use Carbon\Carbon;
 
-QrCode::calendar([
+QrCode::CalendarEvent([
     'summary' => 'Laracon US',
     'description' => 'The official Laravel conference.',
     'location' => 'New York, NY',
@@ -164,7 +164,7 @@ QrCode::calendar([
 QrCode::WhatsApp(['number' => '+1234567890', 'message' => 'Hello from Laravel!']);
 
 // Telegram
-QrCode::telegram('username');
+QrCode::Telegram('username');
 ```
 
 ## 🔧 Advanced Usage
@@ -216,6 +216,45 @@ QrCode::format('svg')->merge('path/to/logo.png', 0.3, true)->generate('With Logo
 
 **Note:** Image merge is not supported for EPS format.
 
+### 🧩 Custom Data Types (Macros)
+
+While this package provides many built-in data types (WiFi, vCard, BTC), your application likely has its own specific data structures. Using Laravel's `Macroable` trait, you can define your own custom QR code payloads without extending classes or waiting for package updates.
+
+This keeps your controllers clean, ensures DRY (Don't Repeat Yourself) principles, and standardizes QR generation across your application.
+
+1. Register the Macro
+   Define your macro in the `boot` method of your `AppServiceProvider`. You can either return a plain string (which will automatically be converted into a QR code) or call `$this->generate()` if you want to apply default styles inside the macro.
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+public function boot(): void
+{
+    // Example 1: Return a string payload (Automatically encoded)
+    QrCode::macro('Spotify', function (string $uri) {
+        return 'spotify:track:' . $uri;
+    });
+
+    // Example 2: Return pre-styled generation for an internal company asset
+    QrCode::macro('AssetTag', function (string $serialNumber) {
+        $payload = json_encode(['type' => 'hardware', 'sn' => $serialNumber]);
+
+        return $this->size(300)->margin(2)->generate($payload);
+    });
+}
+```
+
+2. Use it Anywhere
+   Once registered, your macros are available seamlessly on the Facade:
+
+```php
+// Generates a Spotify URI QR code
+echo QrCode::Spotify('4uLU6hMCjMI75M1A2tKUQC');
+
+// Generates a pre-styled 300px JSON asset tag
+echo QrCode::AssetTag('SN-99812-X');
+```
+
 ## 💡 Common Examples
 
 ### Generate QR for Website
@@ -245,7 +284,7 @@ QrCode::size(300)
 ### WiFi QR Code
 
 ```php
-QrCode::wiFi([
+QrCode::WiFi([
     'ssid' => 'MyWiFi',
     'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, nopass
     'password' => 'my-password'
@@ -351,17 +390,17 @@ QrCode::size(400)
 
 ### Data Type Methods
 
-- `email($to, $subject, $body)` - Generate email QR
-- `phoneNumber($phone)` - Generate phone QR
+- `Email($to, $subject, $body)` - Generate email QR
+- `PhoneNumber($phone)` - Generate phone QR
 - `SMS($phone, $message)` - Generate SMS QR
-- `geo($lat, $lng)` - Generate location QR
-- `wiFi($config)` - Generate WiFi QR
-- `btc($config)` - Generate BTC QR
-- `ethereum($address, $amount = null)` - Generate Ethereum QR (amount in ETH)
-- `vCard($config)` - Generate vCard QR
-- `calendar($config)` - Generate Calendar Event QR
+- `Geo($lat, $lng)` - Generate location QR
+- `WiFi($config)` - Generate WiFi QR
+- `BTC($config)` - Generate BTC QR
+- `Ethereum($address, $amount = null)` - Generate Ethereum QR (amount in ETH)
+- `VCard($config)` - Generate vCard QR
+- `CalendarEvent($config)` - Generate Calendar Event QR
 - `WhatsApp($params)` - Generate WhatsApp QR (array with `number` and optional `message`)
-- `telegram($username)` - Generate Telegram QR
+- `Telegram($username)` - Generate Telegram QR
 
 ## 📄 License
 

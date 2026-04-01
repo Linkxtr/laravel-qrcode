@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode;
 
-use BaconQrCode\Encoder\Encoder;
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Cmyk;
 use BaconQrCode\Renderer\Color\ColorInterface;
@@ -34,6 +33,7 @@ use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use BadMethodCallException;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\Enums\ColorModel;
@@ -49,27 +49,33 @@ use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Support\Image;
 use Linkxtr\QrCode\ValueObjects\ColorValue;
 use RuntimeException;
+use Stringable;
+use UnexpectedValueException;
 
 use function is_array;
 use function is_int;
 use function strval;
 
 /**
- * @method HtmlString btc(string $address, float $amount, array<mixed> $options = [])
- * @method HtmlString calendarEvent(array<mixed> $attributes)
- * @method HtmlString email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
- * @method HtmlString ethereum(string $address, ?float $amount = null)
- * @method HtmlString geo(float $latitude, float $longitude, string $name = '')
- * @method HtmlString meCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
- * @method HtmlString phoneNumber(string $phoneNumber)
- * @method HtmlString sms(string $smsAddress = '', string $message = '')
- * @method HtmlString telegram(string|array<mixed> $username)
- * @method HtmlString vCard(array<mixed> $properties)
- * @method HtmlString whatsApp(string|array<mixed> $number, ?string $message = null)
- * @method HtmlString wiFi(array<mixed> $credentials)
+ * @method HtmlString BTC(string $address, float $amount, array<mixed> $options = [])
+ * @method HtmlString CalendarEvent(array<mixed> $attributes)
+ * @method HtmlString Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
+ * @method HtmlString Ethereum(string $address, ?float $amount = null)
+ * @method HtmlString Geo(float $latitude, float $longitude, string $name = '')
+ * @method HtmlString MeCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
+ * @method HtmlString PhoneNumber(string $phoneNumber)
+ * @method HtmlString SMS(string $smsAddress = '', string $message = '')
+ * @method HtmlString Telegram(string|array<mixed> $username)
+ * @method HtmlString VCard(array<mixed> $properties)
+ * @method HtmlString WhatsApp(string|array<mixed> $number, ?string $message = null)
+ * @method HtmlString WiFi(array<mixed> $credentials)
  */
 final class Generator
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The PNG compression level.
      * Only applicable to PNG format when using GDLibRenderer.
@@ -86,7 +92,7 @@ final class Generator
      * The error correction level.
      * See `ErrorCorrectionLevel` enum for possible values.
      */
-    private ErrorCorrectionLevel $errorCorrectionLevel = ErrorCorrectionLevel::L;
+    private ErrorCorrectionLevel $errorCorrectionLevel = ErrorCorrectionLevel::M;
 
     /**
      * The style of the blocks within the QR code.
@@ -115,12 +121,12 @@ final class Generator
     /**
      * The size of the QR code in pixels.
      */
-    private int $size = 100;
+    private int $size = 400;
 
     /**
      * The margin around the QR code.
      */
-    private int $margin = 0;
+    private int $margin = 4;
 
     /**
      * The encoding mode. Possible values are
@@ -130,7 +136,7 @@ final class Generator
      * SHIFT-JIS, WINDOWS-1250, WINDOWS-1251, WINDOWS-1252, WINDOWS-1256,
      * UTF-16BE, UTF-8, ASCII, GBK, EUC-KR.
      */
-    private string $encoding = Encoder::DEFAULT_BYTE_MODE_ENCODING;
+    private string $encoding = 'UTF-8';
 
     /**
      * The foreground color value of the QR code.
@@ -216,6 +222,24 @@ final class Generator
      */
     public function __call(string $method, array $arguments): HtmlString
     {
+        if (self::hasMacro($method)) {
+            $result = $this->macroCall($method, $arguments);
+
+            if ($result instanceof HtmlString) {
+                return $result;
+            }
+
+            if (is_string($result) || $result instanceof Stringable) {
+                return $this->generate((string) $result);
+            }
+
+            throw new UnexpectedValueException(sprintf(
+                'Macro "%s" must return a string, Stringable, or HtmlString. %s returned.',
+                $method,
+                get_debug_type($result)
+            ));
+        }
+
         $dataType = $this->createClass($method);
         $dataType->create($arguments);
 

@@ -205,8 +205,8 @@ test('generator ignores unknown config keys gracefully', function () {
 
     expect($style)->toBeInstanceOf(RendererStyle::class);
     // Verify it still uses default size/margin (confirms fallback worked)
-    expect($style->getSize())->toBe(100);
-    expect($style->getMargin())->toBe(0);
+    expect($style->getSize())->toBe(400);
+    expect($style->getMargin())->toBe(4);
 });
 
 test('generator uses channel defaults when color values are non-integers', function () {
@@ -231,8 +231,8 @@ test('generator uses hardcoded defaults when no config is given', function () {
     $style = invade($generator)->getRendererStyle();
 
     // Hardcoded defaults
-    expect($style->getSize())->toBe(100);
-    expect($style->getMargin())->toBe(0);
+    expect($style->getSize())->toBe(400);
+    expect($style->getMargin())->toBe(4);
     // Default colors: black foreground, white background (from getFill() fallbacks)
     $fill = invade($generator)->getFill();
     expect($fill->getForegroundColor())->toBeInstanceOf(Rgb::class);
