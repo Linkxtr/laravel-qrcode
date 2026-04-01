@@ -93,7 +93,7 @@ final class Generator
      * The error correction level.
      * See `ErrorCorrectionLevel` enum for possible values.
      */
-    private ErrorCorrectionLevel $errorCorrectionLevel = ErrorCorrectionLevel::L;
+    private ErrorCorrectionLevel $errorCorrectionLevel = ErrorCorrectionLevel::M;
 
     /**
      * The style of the blocks within the QR code.
@@ -122,12 +122,12 @@ final class Generator
     /**
      * The size of the QR code in pixels.
      */
-    private int $size = 100;
+    private int $size = 400;
 
     /**
      * The margin around the QR code.
      */
-    private int $margin = 0;
+    private int $margin = 4;
 
     /**
      * The encoding mode. Possible values are
@@ -137,7 +137,7 @@ final class Generator
      * SHIFT-JIS, WINDOWS-1250, WINDOWS-1251, WINDOWS-1252, WINDOWS-1256,
      * UTF-16BE, UTF-8, ASCII, GBK, EUC-KR.
      */
-    private string $encoding = Encoder::DEFAULT_BYTE_MODE_ENCODING;
+    private string $encoding = 'UTF-8';
 
     /**
      * The foreground color value of the QR code.

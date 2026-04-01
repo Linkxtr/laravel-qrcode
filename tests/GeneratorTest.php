@@ -67,10 +67,10 @@ test('size is passed to renderer', function () {
     expect(invade($qrCode)->getRendererStyle()->getSize())->toBe(200);
 });
 
-test('default size is 100', function () {
+test('default size is 400', function () {
     $qrCode = new Generator;
 
-    expect(invade($qrCode)->getRendererStyle()->getSize())->toBe(100);
+    expect(invade($qrCode)->getRendererStyle()->getSize())->toBe(400);
 });
 
 test('margin is passed to renderer', function () {
@@ -79,10 +79,10 @@ test('margin is passed to renderer', function () {
     expect(invade($qrCode)->getRendererStyle()->getMargin())->toBe(20);
 });
 
-test('default margin is 0', function () {
+test('default margin is 4', function () {
     $qrCode = new Generator;
 
-    expect(invade($qrCode)->getRendererStyle()->getMargin())->toBe(0);
+    expect(invade($qrCode)->getRendererStyle()->getMargin())->toBe(4);
 });
 
 it('throws exception if format is not supported', function () {
