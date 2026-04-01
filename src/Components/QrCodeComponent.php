@@ -126,10 +126,12 @@ final class QrCodeComponent extends Component
             if ($this->format === 'svg') {
                 $svg = $htmlString->__toString();
 
-                if (! str_contains($svg, '<title>')) {
-                    $title = is_string(__('QR Code')) ? __('QR Code') : 'QR Code';
+                if (stripos($svg, '<title') === false) {
+                    $translated_title = __('QR Code');
+                    $title = is_string($translated_title) ? e($translated_title) : 'QR Code';
                     // inject title attribute to svg after opening tag
-                    $svg = (string) preg_replace('/(<svg[^>]*>)/i', '$1<title>'.$title.'</title>', $svg, 1);
+                    $injected_svg = preg_replace('/(<svg[^>]*>)/i', '$1<title>'.$title.'</title>', $svg, 1);
+                    $svg = $injected_svg ?? $svg;
                 }
 
                 return Str::replaceFirst(
