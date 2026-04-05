@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Linkxtr\QrCode\Components\QrCodeComponent;
+use Linkxtr\QrCode\Console\Commands\GenerateQrCodeCommand;
 
 final class QrCodeServiceProvider extends ServiceProvider
 {
@@ -16,6 +17,12 @@ final class QrCodeServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/qrcode.php' => config_path('qrcode.php'),
         ], 'qrcode-config');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                GenerateQrCodeCommand::class,
+            ]);
+        }
 
         Blade::component('qr-code', QrCodeComponent::class);
     }
