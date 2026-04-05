@@ -68,12 +68,39 @@ it('fails when an invalid error correction level is provided via options', funct
         ->assertFailed();
 });
 
-it('fails when an invalid foreground color is provided', function () {
+it('fails when size is invalid', function () {
+    $this->artisan('qr:generate', [
+        'data' => 'https://example.com',
+        '--size' => '-50',
+    ])
+        ->expectsOutputToContain('Size must be a positive integer.')
+        ->assertFailed();
+});
+
+it('fails when margin is invalid', function () {
+    $this->artisan('qr:generate', [
+        'data' => 'https://example.com',
+        '--margin' => '-1',
+    ])
+        ->expectsOutputToContain('Margin must be a positive integer or zero.')
+        ->assertFailed();
+});
+
+it('fails when an invalid foreground color format is provided', function () {
     $this->artisan('qr:generate', [
         'data' => 'https://example.com',
         '--color' => 'not-a-color',
     ])
-        ->expectsOutputToContain('Invalid format.')
+        ->expectsOutputToContain('Invalid format. Please use RGB or RGBA comma-separated values (e.g., 255,0,0).')
+        ->assertFailed();
+});
+
+it('fails when an invalid foreground color data type is provided', function () {
+    $this->artisan('qr:generate', [
+        'data' => 'https://example.com',
+        '--color' => '255,red,0',
+    ])
+        ->expectsOutputToContain('All color values must be numeric.')
         ->assertFailed();
 });
 

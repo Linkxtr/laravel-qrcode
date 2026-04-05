@@ -112,6 +112,18 @@ final class GenerateQrCodeCommand extends Command
             );
         }
 
+        if (! is_numeric($size) || (int) $size <= 0) {
+            error('Size must be a positive integer.');
+
+            return self::FAILURE;
+        }
+
+        if (! is_numeric($margin) || (int) $margin < 0) {
+            error('Margin must be a positive integer or zero.');
+
+            return self::FAILURE;
+        }
+
         $errorCorrectionLevel = ErrorCorrectionLevel::tryFrom(strtoupper((string) $errorCorrection));
 
         if ($errorCorrectionLevel === null) {
@@ -174,7 +186,12 @@ final class GenerateQrCodeCommand extends Command
         }
 
         foreach ($rgb as $index => $val) {
-            $val = (int) trim($val);
+            $trimmed = trim($val);
+            if (! is_numeric($trimmed)) {
+                return 'All color values must be numeric.';
+            }
+
+            $val = (int) $trimmed;
             if ($index < 3 && ($val < 0 || $val > 255)) {
                 return 'RGB values must be between 0 and 255.';
             }

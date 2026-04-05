@@ -112,14 +112,16 @@ php artisan qr:generate "https://example.com" \
   --errorCorrection=H
 ```
 
+> **Note on Naming Conventions:** The CLI command uses camelCase for its flags (e.g., `--errorCorrection`, `--backgroundColor`) to match common shell practices, whereas the `config/qrcode.php` file uses snake_case keys (e.g., `error_correction`, `background_color`). When translating your configuration to CLI commands, ensure you convert snake_case values to camelCase.
+
 **Available Options:**
 
 - `data`: (Argument) The data/payload to encode.
 - `-O`, `--output`: The file path to save the QR code (e.g., `public/qr.svg`). If omitted, the raw output is printed to the console.
 - `-F`, `--format`: Output format (`svg`, `png`, `webp`, `eps`). Default: `svg`.
 - `-S`, `--size`: Size in pixels. Default: `400`.
-- `-C`, `--color`: Foreground color as comma-separated RGB or RGBA (e.g., `255,0,0`). Default: `0,0,0`.
-- `-B`, `--backgroundColor`: Background color as comma-separated RGB or RGBA. Default: `255,255,255`.
+- `-C`, `--color`: Foreground color as comma-separated RGB or RGBA, where the optional alpha is an integer from 0–100 (e.g., `255,0,0` or `255,0,0,50`). Default: `0,0,0`.
+- `-B`, `--backgroundColor`: Background color as comma-separated RGB or RGBA, where the optional alpha is an integer from 0–100 (e.g., `255,255,255` or `255,255,255,50`). Default: `255,255,255`.
 - `-E`, `--errorCorrection`: Error correction level (`L`, `M`, `Q`, `H`). Default: `M`.
 - `-M`, `--margin`: Margin around the QR code. Default: `4`.
 
