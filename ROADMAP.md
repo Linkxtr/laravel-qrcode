@@ -4,12 +4,12 @@
 
 ## Overview
 
-This roadmap provides a high-level overview of the future direction of Laravel QR Code Generator. It's a living document that evolves based on community needs and technological changes.
+This roadmap provides a high-level overview of the future direction of Laravel QR Code Generator. It is a living document that evolves based on community needs and technological changes.
 
 ## 🎯 Version Strategy
 
 - **Version 1.x**: Maintains full backward compatibility with `simplesoftwareio/simple-qrcode`
-- **Version 2.x**: Introduces new features and May include breaking changes for major improvements (when necessary)
+- **Version 2.x**: Introduces new features and may include breaking changes for major improvements (when necessary)
 
 ---
 
@@ -17,78 +17,7 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
 ### New Data Types
 
-- [x] **vCard Support**
-
-  ```php
-  QrCode::vCard([
-      'name' => 'John Doe',
-      'email' => 'john@example.com',
-      'phone' => '+1234567890',
-      'company' => 'ACME Inc.',
-      'title' => 'Developer',
-      'url' => 'https://example.com'
-  ]);
-  ```
-
-- [x] **Calendar Events**
-
-  ```php
-  QrCode::calendarEvent([
-      'summary' => 'Team Meeting',
-      'description' => 'Weekly team sync',
-      'location' => 'Conference Room A',
-      'start' => '2024-06-01 10:00:00',
-      'end' => '2024-06-01 11:00:00'
-  ]);
-  ```
-
-- [x] **Cryptocurrency Payments**
-  - [x] **Bitcoin**
-    ```php
-    QrCode::btc('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', 0.001);
-    ```
-  - [x] **Ethereum**
-    ```php
-    QrCode::ethereum('0x742d35Cc6634C0532925a3b8D...');
-    ```
-
-- [x] **MeCard Support**
-
-  ```php
-  QrCode::meCard('John Doe', '+1234567890', 'john@example.com');
-  ```
-
-- [ ] **Messaging & Communication**
-  - [x] **WhatsApp**
-    ```php
-    QrCode::whatsapp('1234567890', 'Hello World');
-    ```
-  - [x] **Telegram**
-    ```php
-    QrCode::telegram('username');
-    ```
-  - **Skype**
-    ```php
-    QrCode::skype('username', 'call');
-    ```
-  - **Zoom**
-    ```php
-    QrCode::zoom('meeting-id', 'password');
-    ```
-  - **FaceTime**
-    ```php
-    QrCode::facetime('user@example.com');
-    ```
-
 - [ ] **Payments**
-  - **PayPal**
-    ```php
-    QrCode::paypal('user@example.com', 10.00, 'USD', 'Payment Description');
-    ```
-  - **UPI (Unified Payments Interface)**
-    ```php
-    QrCode::upi('payee@upi', 'Payee Name', 100.00, 'Note');
-    ```
   - **EPC (SEPA Credit Transfer)**
     ```php
     QrCode::epc([
@@ -96,8 +25,16 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
         'bic' => 'GENO...',
         'name' => 'Recipient Name',
         'amount' => 50.00,
-        'purpose' => 'Invoice 123'
+        'reference' => 'Invoice 123'
     ]);
+    ```
+  - **PayPal**
+    ```php
+    QrCode::paypal('user@example.com', 10.00, 'USD', 'Payment Description');
+    ```
+  - **UPI (Unified Payments Interface)**
+    ```php
+    QrCode::upi('payee@upi', 'Payee Name', 100.00, 'Note');
     ```
 
 - [ ] **Utilities**
@@ -115,12 +52,6 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
   QrCode::format('text')->generate('Content');
   ```
 
-- [x] **WebP Format Support**
-
-  ```php
-  QrCode::format('webp')->generate('Content');
-  ```
-
 - [ ] **AVIF Format Support**
 
   ```php
@@ -135,179 +66,126 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
       ->generate('animated_qr.gif');
   ```
 
-### Enhanced Core Features
+---
+
+### 🎨 Advanced Styling & Frontend Polish
+
+#### Advanced Styling Options
+
+- [ ] **Smart Logo Mergers (Clearance Zones)**
+
+  ```php
+  QrCode::mergeWithClearance('logo.png')
+      ->logoSize(0.2)
+      ->generate('Content');
+  // Automatically erases QR dots behind the transparent logo to improve scannability
+  ```
+
+- [ ] **Custom Dot Shapes**
+  ```php
+  QrCode::dotStyle('star')->generate('Content');
+  ```
+- [ ] **Logo Positioning**
+  ```php
+  QrCode::merge('logo.png')->logoPosition('center')->generate('Content');
+  ```
+
+#### Reusable Themes & Presets
+
+- [ ] **Config-Driven Themes**
+  ```php
+  // Define themes in config/qrcode.php, then use them globally
+  QrCode::theme('primary')->generate('Content');
+  QrCode::theme('invoice')->generate('Content');
+  ```
+- [ ] **Custom Theme Creation (Runtime)**
+  ```php
+  QrCode::createTheme('modern', function($qr) {
+    return $qr->style('dot')->color(58, 94, 255)->eye('circle');
+  });
+  ```
+
+### Frontend & UI Integration
+
+- [ ] ** Downloadable Blade Component**
+  ```blade
+  <x-qr-code data="Hello World" downloadable="my-code.svg" />
+  ```
+
+### ⚙️ Core Enhancements & Laravel Integration
+
+#### Deep Laravel Integration
+
+- [ ] **Automatic Route Resolution**
+  ```php
+  // Automatically generates a QR code pointing to a named route
+  QrCode::route('invoice.show', $invoice)->generate();
+  ```
+- [ ] **Eloquent Model Resolution**
+  ```php
+  // Automatically extracts the model's routable URL or ID
+  QrCode::model($user)->generate();
+  ```
+
+#### Performance Improvements
+
+- [ ] **Native Laravel Caching**
+  ```php
+  // Hooks into Laravel's Cache store to prevent regenerating static codes
+  QrCode::cache(ttl: 3600)->generate('Content');
+  ```
+- [ ] **Batch Generation**
+  ```php
+  QrCode::batch()
+    ->add('QR1', 'Content 1')
+    ->add('QR2', 'Content 2')
+    ->generate('output_directory');
+  ```
+- [ ] **Lazy Generation**
+  ```php
+  $qr = QrCode::lazy()->generate('Content');
+  // QR is generated only when the string is actively cast or requested
+  ```
+
+#### Enhanced Core Features
 
 - [ ] **Forced QR Code Version (Size Matrix)**
   ```php
   QrCode::version(4)->generate('Content');
   ```
-
 - [ ] **Binary Data Support**
   ```php
   QrCode::binary($binaryData)->generate('binary_qr.png');
   ```
 
-### Advanced Styling Options
+---
 
-- [ ] **Additional Eye Styles (Pointy / Composite)**
+### 🛠 Developer Experience & Architecture
 
-  ```php
-  QrCode::eye('pointy')->generate('Content');
-  ```
+#### Developer Experience
 
-- [ ] **Advanced Color Models (CMYK / Gray)**
-
-  ```php
-  QrCode::colorCmyk(100, 50, 0, 0)->generate('Content');
-  QrCode::colorGray(50)->generate('Content');
-  ```
-
-- [x] **Gradient Backgrounds**
-
-  ```php
-  QrCode::gradient(255, 0, 0, 0, 0, 255, 'diagonal')
-      ->generate('Content');
-  ```
-
-- [ ] **Custom Dot Shapes**
-
-  ```php
-  QrCode::dotStyle('star')
-      ->generate('Content');
-  ```
-
-- [ ] **Logo Positioning & Scaling**
-
-  ```php
-  QrCode::merge('logo.png')
-      ->logoPosition('center')
-      ->logoSize(0.2) // 20% of QR code
-      ->generate('Content');
-  ```
-
-- [x] **Transparent Backgrounds**
-  ```php
-  QrCode::backgroundColor(255, 255, 255, 0) // Transparent
-      ->generate('Content');
-  ```
-
-### Template System
-
-- [ ] **QR Code Templates**
-
-  ```php
-  QrCode::template('modern')
-      ->generate('Content');
-
-  QrCode::template('corporate')
-      ->generate('Content');
-  ```
-
-- [ ] **Custom Template Creation**
-  ```php
-  QrCode::createTemplate('my-template', function($qr) {
-      return $qr->style('dot')
-          ->color(58, 94, 255)
-          ->eye('circle');
-  });
-  ```
-
-### Performance Improvements
-
-- [ ] **Caching System**
-
-  ```php
-  QrCode::cache(3600) // Cache for 1 hour
-      ->generate('Content');
-  ```
-
-- [ ] **Batch Generation**
-
-  ```php
-  QrCode::batch()
-      ->add('QR1', 'Content 1')
-      ->add('QR2', 'Content 2')
-      ->generate('output_directory');
-  ```
-
-- [ ] **Lazy Generation**
-  ```php
-  $qr = QrCode::lazy()->generate('Content');
-  // QR is generated only when needed
-  ```
-
-### Developer Experience
-
-- [ ] **Better IDE Support**
-  - [x] Enhanced PHPDoc annotations
-  - [ ] IDE helper file generation
-  - [ ] Laravel Idea compatibility
-
-- [x] **Configuration File**
-
-  ```php
-  // config/qrcode.php
-  return [
-      'default_size' => 200,
-      'default_format' => 'svg',
-      'default_error_correction' => 'H',
-      'cache' => [
-          'enabled' => true,
-          'duration' => 3600,
-      ],
-  ];
-  ```
-
-- [ ] **Artisan Commands**
+- [ ] **Artisan Bulk Command**
   ```bash
-  php artisan qr-code:generate "Content" --size=300 --format=png
-  php artisan qr-code:batch-csv qr_codes.csv
+  php artisan qr:batch-csv qr_codes.csv
   ```
-
-### Testing & Quality
-
-- [x] **Increased Test Coverage** (100%)
-- [ ] **Performance Benchmarking**
-- [ ] **Security Auditing**
-
-### Modern PHP Features
-
-- [x] **PHP 8.2+ Minimum Requirement**
-- [x] **Native Enums**
-
-  ```php
-  QrCode::format(Format::WEBP);
-  QrCode::errorCorrection(ErrorCorrectionLevel::H);
-  ```
-
-- [ ] **Constructor Property Promotion**
-- [ ] **Readonly Properties**
 
 ### New Architecture
 
 - [ ] **Renderer Abstraction**
 
   ```php
-  QrCode::renderWith(CustomRenderer::class)
-      ->generate('Content');
+  QrCode::renderWith(CustomRenderer::class)->generate('Content');
   ```
 
 - [ ] **Event System**
 
   ```php
   QrCode::creating(function($content, $options) {
-      // Modify before generation
+    // Modify before generation
   });
 
   QrCode::created(function($qrCode, $content) {
-      // Post-generation hooks
-  });
-  ```
-
-- [ ] **Plugin System**
-  ```php
-  QrCode::extend('customType', function($data) {
-      // Custom QR code type
+    // Post-generation hooks
   });
   ```
 
@@ -317,21 +195,9 @@ This roadmap provides a high-level overview of the future direction of Laravel Q
 
   ```php
   QrCode::dynamic()
-      ->url('https://example.com/track/{id}')
-      ->generate();
+    ->url('[https://example.com/track/](https://example.com/track/){id}')
+    ->generate();
   ```
-
-- [ ] **QR Code Analytics**
-
-  ```php
-  QrCode::analytics(true)
-      ->generate('Trackable Content');
-  ```
-
-- [ ] **Multi-language Support**
-- [ ] **Accessibility Features**
-
----
 
 ## 🔄 Maintenance & Compatibility
 
@@ -392,6 +258,6 @@ We particularly welcome ideas for:
 
 **This roadmap is a living document and may change based on community feedback and technological developments.**
 
-Last updated: Feb 2026
+Last updated: April 2026
 
 </div>
