@@ -30,10 +30,8 @@ use BaconQrCode\Renderer\RendererStyle\Fill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
-use BadMethodCallException;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Traits\Macroable;
-use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
@@ -45,13 +43,12 @@ use Linkxtr\QrCode\Mergers\EpsMerger;
 use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
+use Linkxtr\QrCode\Support\DataTypeResolver;
 use Linkxtr\QrCode\Support\Image;
 use Linkxtr\QrCode\ValueObjects\ColorValue;
 use RuntimeException;
 use Stringable;
 use UnexpectedValueException;
-
-use function strval;
 
 /**
  * @method HtmlString BTC(string $address, float $amount, array<mixed> $options = [])
@@ -92,32 +89,31 @@ final class Generator
     }
 
     /**
-     * @param  array<int, mixed>  $arguments
+     * @param  array<mixed>  $arguments
      */
     public function __call(string $method, array $arguments): HtmlString
     {
-        if (self::hasMacro($method)) {
-            $result = $this->macroCall($method, $arguments);
+        if (! self::hasMacro($method)) {
+            $payload = DataTypeResolver::resolve($method, $arguments);
 
-            if ($result instanceof HtmlString) {
-                return $result;
-            }
-
-            if (is_string($result) || $result instanceof Stringable) {
-                return $this->generate((string) $result);
-            }
-
-            throw new UnexpectedValueException(sprintf(
-                'Macro "%s" must return a string, Stringable, or HtmlString. %s returned.',
-                $method,
-                get_debug_type($result)
-            ));
+            return $this->generate($payload);
         }
 
-        $dataType = $this->createClass($method);
-        $dataType->create($arguments);
+        $result = $this->macroCall($method, $arguments);
 
-        return $this->generate(strval($dataType));
+        if ($result instanceof HtmlString) {
+            return $result;
+        }
+
+        if (is_string($result) || $result instanceof Stringable) {
+            return $this->generate((string) $result);
+        }
+
+        throw new UnexpectedValueException(sprintf(
+            'Macro "%s" must return a string, Stringable, or HtmlString. %s returned.',
+            $method,
+            get_debug_type($result)
+        ));
     }
 
     public function generate(string $text, ?string $filename = null): HtmlString
@@ -392,31 +388,5 @@ final class Generator
         $merger = new RasterMerger(new Image($qrCode), new Image($this->config->getImageMerge()), $this->config->getFormat()->value, $this->config->getImagePercentage());
 
         return $merger->merge();
-    }
-
-    private function createClass(string $method): DataTypeInterface
-    {
-        $class = $this->formatClass($method);
-
-        if (! class_exists($class)) {
-            throw new BadMethodCallException;
-        }
-
-        $instance = new $class;
-
-        if ($instance::class !== $class) {
-            throw new BadMethodCallException;
-        }
-
-        if (! $instance instanceof DataTypeInterface) {
-            throw new BadMethodCallException;
-        }
-
-        return $instance;
-    }
-
-    private function formatClass(string $method): string
-    {
-        return 'Linkxtr\\QrCode\\DataTypes\\'.$method;
     }
 }

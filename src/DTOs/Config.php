@@ -39,6 +39,12 @@ final class Config
     private Style $style = Style::SQUARE;
 
     /**
+     * The size of the selected style between 0 and 1.
+     * Only applicable to 'dot' and 'round' styles.
+     */
+    private float $styleSize = 0.5;
+
+    /**
      * The style to apply to the eyes of the QR code.
      * See `EyeStyle` enum for possible values.
      */
@@ -49,12 +55,6 @@ final class Config
      * Only applies when a composite eye is desired.
      */
     private ?EyeStyle $internalEyeStyle = null;
-
-    /**
-     * The size of the selected style between 0 and 1.
-     * Only applicable to 'dot' and 'round' styles.
-     */
-    private float $styleSize = 0.5;
 
     /**
      * The size of the QR code in pixels.
@@ -77,6 +77,11 @@ final class Config
     private string $encoding = 'UTF-8';
 
     /**
+     * The color model used to build colors.
+     */
+    private ColorModel $colorModel = ColorModel::RGB;
+
+    /**
      * The foreground color value of the QR code.
      */
     private ?ColorValue $colorValue = null;
@@ -85,11 +90,6 @@ final class Config
      * The background color value of the QR code.
      */
     private ?ColorValue $backgroundColorValue = null;
-
-    /**
-     * The color model used to build colors.
-     */
-    private ColorModel $colorModel = ColorModel::RGB;
 
     /**
      * An array that holds EyeFills of the color of the eyes.
@@ -153,24 +153,6 @@ final class Config
         }
     }
 
-    public function setSize(int $size): void
-    {
-        if ($size <= 0) {
-            throw new InvalidArgumentException(sprintf('Size must be greater than 0. %s given.', $size));
-        }
-
-        $this->size = $size;
-    }
-
-    public function setMargin(int $margin): void
-    {
-        if ($margin < 0) {
-            throw new InvalidArgumentException(sprintf('Margin cannot be negative. %s given.', $margin));
-        }
-
-        $this->margin = $margin;
-    }
-
     public function setFormat(string|Format $format): void
     {
         if (is_string($format)) {
@@ -207,9 +189,20 @@ final class Config
         return $this->errorCorrectionLevel;
     }
 
+    public function setupStyle(string|Style $style, float $size): void
+    {
+        $this->setStyle($style);
+        $this->setStyleSize($size);
+    }
+
     public function getStyle(): Style
     {
         return $this->style;
+    }
+
+    public function getStyleSize(): float
+    {
+        return $this->styleSize;
     }
 
     public function setEyeStyle(string|EyeStyle $style): void
@@ -248,14 +241,27 @@ final class Config
         return $this->internalEyeStyle;
     }
 
-    public function getStyleSize(): float
+    public function setSize(int $size): void
     {
-        return $this->styleSize;
+        if ($size <= 0) {
+            throw new InvalidArgumentException(sprintf('Size must be greater than 0. %s given.', $size));
+        }
+
+        $this->size = $size;
     }
 
     public function getSize(): int
     {
         return $this->size;
+    }
+
+    public function setMargin(int $margin): void
+    {
+        if ($margin < 0) {
+            throw new InvalidArgumentException(sprintf('Margin cannot be negative. %s given.', $margin));
+        }
+
+        $this->margin = $margin;
     }
 
     public function getMargin(): int
@@ -283,39 +289,6 @@ final class Config
         return $this->colorModel;
     }
 
-    public function getColorValue(): ?ColorValue
-    {
-        return $this->colorValue;
-    }
-
-    public function getBackgroundColorValue(): ?ColorValue
-    {
-        return $this->backgroundColorValue;
-    }
-
-    /**
-     * @return array<int, EyeFill>
-     */
-    public function getEyeColors(): array
-    {
-        return $this->eyeColors;
-    }
-
-    public function getGradient(): ?Gradient
-    {
-        return $this->gradient;
-    }
-
-    public function getImageMerge(): string
-    {
-        return $this->imageMerge;
-    }
-
-    public function getImagePercentage(): float
-    {
-        return $this->imagePercentage;
-    }
-
     public function setGrayscale(int $gray, ?int $backgroundGray = null): void
     {
         if ($gray < 0 || $gray > 100) {
@@ -329,6 +302,48 @@ final class Config
         $this->setColorModel(ColorModel::GRAY);
         $this->setColorValue(new ColorValue($gray, 0, 0));
         $this->setBackgroundColorValue(new ColorValue($backgroundGray ?? 100, 0, 0));
+    }
+
+    public function setupColor(int $c1, int $c2, int $c3, ?int $c4 = null): void
+    {
+        $this->setColorValue(new ColorValue($c1, $c2, $c3, $c4));
+    }
+
+    public function setupBackgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null): void
+    {
+        $this->setBackgroundColorValue(new ColorValue($c1, $c2, $c3, $c4));
+    }
+
+    public function getColorValue(): ?ColorValue
+    {
+        return $this->colorValue;
+    }
+
+    public function getBackgroundColorValue(): ?ColorValue
+    {
+        return $this->backgroundColorValue;
+    }
+
+    public function setupEyeColor(int $eyeNumber, int $innerRed, int $innerGreen, int $innerBlue, int $outerRed = 0, int $outerGreen = 0, int $outerBlue = 0): void
+    {
+        if ($eyeNumber < 0 || $eyeNumber > 2) {
+            throw new InvalidArgumentException('Eye number must be 0, 1, or 2.');
+        }
+
+        $this->validateRgb($innerRed, $innerGreen, $innerBlue, $outerRed, $outerGreen, $outerBlue);
+
+        $this->setEyeColor($eyeNumber, new EyeFill(
+            $this->createColor($innerRed, $innerGreen, $innerBlue),
+            $this->createColor($outerRed, $outerGreen, $outerBlue)
+        ));
+    }
+
+    /**
+     * @return array<int, EyeFill>
+     */
+    public function getEyeColors(): array
+    {
+        return $this->eyeColors;
     }
 
     public function setupGradient(int $startRed, int $startGreen, int $startBlue, int $endRed, int $endGreen, int $endBlue, string|GradientType $type): void
@@ -352,34 +367,9 @@ final class Config
         ));
     }
 
-    public function setupEyeColor(int $eyeNumber, int $innerRed, int $innerGreen, int $innerBlue, int $outerRed = 0, int $outerGreen = 0, int $outerBlue = 0): void
+    public function getGradient(): ?Gradient
     {
-        if ($eyeNumber < 0 || $eyeNumber > 2) {
-            throw new InvalidArgumentException('Eye number must be 0, 1, or 2.');
-        }
-
-        $this->validateRgb($innerRed, $innerGreen, $innerBlue, $outerRed, $outerGreen, $outerBlue);
-
-        $this->setEyeColor($eyeNumber, new EyeFill(
-            $this->createColor($innerRed, $innerGreen, $innerBlue),
-            $this->createColor($outerRed, $outerGreen, $outerBlue)
-        ));
-    }
-
-    public function setupColor(int $c1, int $c2, int $c3, ?int $c4 = null): void
-    {
-        $this->setColorValue(new ColorValue($c1, $c2, $c3, $c4));
-    }
-
-    public function setupBackgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null): void
-    {
-        $this->setBackgroundColorValue(new ColorValue($c1, $c2, $c3, $c4));
-    }
-
-    public function setupStyle(string|Style $style, float $size): void
-    {
-        $this->setStyle($style);
-        $this->setStyleSize($size);
+        return $this->gradient;
     }
 
     public function setupMergePath(string $filepath, float $percentage, bool $absolute = false): void
@@ -405,6 +395,16 @@ final class Config
 
         $this->imageMerge = $content;
         $this->imagePercentage = $percentage;
+    }
+
+    public function getImageMerge(): string
+    {
+        return $this->imageMerge;
+    }
+
+    public function getImagePercentage(): float
+    {
+        return $this->imagePercentage;
     }
 
     /**

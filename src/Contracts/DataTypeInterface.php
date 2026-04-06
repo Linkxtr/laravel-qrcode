@@ -8,6 +8,6 @@ interface DataTypeInterface
 {
     public function __toString(): string;
 
-    /** @param array<int, mixed> $arguments */
+    /** @param array<mixed> $arguments */
     public function create(array $arguments): void;
 }
