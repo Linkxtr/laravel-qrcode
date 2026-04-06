@@ -378,7 +378,11 @@ final class Config
             $filepath = base_path().DIRECTORY_SEPARATOR.ltrim($filepath, '\\/');
         }
 
-        $content = @file_get_contents($filepath);
+        if (! is_file($filepath) || ! is_readable($filepath)) {
+            throw new InvalidArgumentException('Image file does not exist or is not readable: '.$filepath);
+        }
+
+        $content = file_get_contents($filepath);
 
         if ($content === false) {
             throw new InvalidArgumentException('Failed to read image file: '.$filepath);

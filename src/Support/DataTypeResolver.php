@@ -30,11 +30,11 @@ final class DataTypeResolver
         $dataType = new $className;
 
         if ($dataType::class !== $className) {
-            throw new BadMethodCallException;
+            throw new BadMethodCallException(sprintf('Class "%s" must implement DataTypeInterface.', $className));
         }
 
         if (! $dataType instanceof DataTypeInterface) {
-            throw new BadMethodCallException;
+            throw new BadMethodCallException(sprintf('Class "%s" must implement DataTypeInterface.', $className));
         }
 
         $dataType->create($arguments);

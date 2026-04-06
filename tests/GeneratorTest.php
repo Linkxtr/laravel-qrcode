@@ -448,7 +448,7 @@ it('throws exception if file_get_contents fails', function () {
     } finally {
         $mockFileGetContents = null;
     }
-})->throws(InvalidArgumentException::class, 'Failed to read image file');
+})->throws(InvalidArgumentException::class, 'Image file does not exist or is not readable');
 
 it('throws exception if imagick and gd are not loaded and format is png', function () {
     global $mockImagickLoaded;
