@@ -44,7 +44,7 @@ it('accepts ErrorCorrectionLevel string', function () {
     $generator = new Generator;
     $generator->errorCorrection('M');
 
-    expect(invade($generator)->config->getErrorCorrectionLevel())->toEqual(ErrorCorrectionLevel::M);
+    expect(invade($generator)->config->getErrorCorrectionLevel())->toBe(ErrorCorrectionLevel::M);
 });
 
 it('throws exception for invalid ErrorCorrectionLevel', function () {
@@ -53,10 +53,10 @@ it('throws exception for invalid ErrorCorrectionLevel', function () {
 })->throws(InvalidArgumentException::class);
 
 it('converts ErrorCorrectionLevel enum to BaconErrorCorrectionLevel', function () {
-    expect(ErrorCorrectionLevel::L->toBaconErrorCorrectionLevel())->toEqual(BaconErrorCorrectionLevel::L());
-    expect(ErrorCorrectionLevel::M->toBaconErrorCorrectionLevel())->toEqual(BaconErrorCorrectionLevel::M());
-    expect(ErrorCorrectionLevel::Q->toBaconErrorCorrectionLevel())->toEqual(BaconErrorCorrectionLevel::Q());
-    expect(ErrorCorrectionLevel::H->toBaconErrorCorrectionLevel())->toEqual(BaconErrorCorrectionLevel::H());
+    expect(ErrorCorrectionLevel::L->toBaconErrorCorrectionLevel())->toBe(BaconErrorCorrectionLevel::L());
+    expect(ErrorCorrectionLevel::M->toBaconErrorCorrectionLevel())->toBe(BaconErrorCorrectionLevel::M());
+    expect(ErrorCorrectionLevel::Q->toBaconErrorCorrectionLevel())->toBe(BaconErrorCorrectionLevel::Q());
+    expect(ErrorCorrectionLevel::H->toBaconErrorCorrectionLevel())->toBe(BaconErrorCorrectionLevel::H());
 });
 
 it('accepts GradientType enum', function () {
@@ -67,9 +67,9 @@ it('accepts GradientType enum', function () {
 });
 
 it('converts GradientType enum to BaconGradientType', function () {
-    expect(GradientType::VERTICAL->toBaconGradientType())->toEqual(BaconGradientType::VERTICAL());
-    expect(GradientType::HORIZONTAL->toBaconGradientType())->toEqual(BaconGradientType::HORIZONTAL());
-    expect(GradientType::DIAGONAL->toBaconGradientType())->toEqual(BaconGradientType::DIAGONAL());
-    expect(GradientType::INVERSE_DIAGONAL->toBaconGradientType())->toEqual(BaconGradientType::INVERSE_DIAGONAL());
-    expect(GradientType::RADIAL->toBaconGradientType())->toEqual(BaconGradientType::RADIAL());
+    expect(GradientType::VERTICAL->toBaconGradientType())->toBe(BaconGradientType::VERTICAL());
+    expect(GradientType::HORIZONTAL->toBaconGradientType())->toBe(BaconGradientType::HORIZONTAL());
+    expect(GradientType::DIAGONAL->toBaconGradientType())->toBe(BaconGradientType::DIAGONAL());
+    expect(GradientType::INVERSE_DIAGONAL->toBaconGradientType())->toBe(BaconGradientType::INVERSE_DIAGONAL());
+    expect(GradientType::RADIAL->toBaconGradientType())->toBe(BaconGradientType::RADIAL());
 });

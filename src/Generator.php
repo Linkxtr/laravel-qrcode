@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode;
 
-use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Cmyk;
 use BaconQrCode\Renderer\Color\ColorInterface;
 use BaconQrCode\Renderer\Color\Gray;
@@ -357,16 +356,7 @@ final class Generator
             return new Cmyk($colorValue->c1, $colorValue->c2, $colorValue->c3, $colorValue->c4 ?? 0);
         }
 
-        return $this->createColor($colorValue->c1, $colorValue->c2, $colorValue->c3, $colorValue->c4);
-    }
-
-    private function createColor(int $red, int $green, int $blue, ?int $alpha = null): ColorInterface
-    {
-        if (is_null($alpha)) {
-            return new Rgb($red, $green, $blue);
-        }
-
-        return new Alpha($alpha, new Rgb($red, $green, $blue));
+        return $this->config->createColor($colorValue->c1, $colorValue->c2, $colorValue->c3, $colorValue->c4);
     }
 
     private function getFormatter(): ImageBackEndInterface

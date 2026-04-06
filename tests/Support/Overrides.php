@@ -73,9 +73,7 @@ namespace Linkxtr\QrCode\DTOs {
     if (! function_exists('Linkxtr\QrCode\DTOs\base_path')) {
         function base_path($path = ''): string
         {
-            $baseDiff = '/..';
-
-            return $path === '' ? __DIR__.$baseDiff : __DIR__.$baseDiff.'/'.ltrim($path, '/');
+            return \Linkxtr\QrCode\base_path($path);
         }
     }
 }

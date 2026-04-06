@@ -171,36 +171,6 @@ final class Config
         $this->margin = $margin;
     }
 
-    public function setStyleSize(float $size): void
-    {
-        if ($size <= 0 || $size > 1) {
-            throw new InvalidArgumentException(sprintf('Style size must be between 0 and 1. %s given.', $size));
-        }
-
-        $this->styleSize = $size;
-    }
-
-    public function setEyeColor(int $eyeNumber, EyeFill $eyeFill): void
-    {
-        if ($eyeNumber < 0 || $eyeNumber > 2) {
-            throw new InvalidArgumentException(sprintf('Eye number must be 0, 1, or 2. %s given.', $eyeNumber));
-        }
-
-        $this->eyeColors[$eyeNumber] = $eyeFill;
-    }
-
-    public function setImageMerge(string $content, float $percentage): void
-    {
-        if ($percentage <= 0 || $percentage >= 1) {
-            throw new InvalidArgumentException('Image merge percentage must be between 0 and 1 (exclusive).');
-        }
-
-        $this->imageMerge = $content;
-        $this->imagePercentage = $percentage;
-    }
-
-    // --- Standard Setters & Getters ---
-
     public function setFormat(string|Format $format): void
     {
         if (is_string($format)) {
@@ -235,19 +205,6 @@ final class Config
     public function getErrorCorrectionLevel(): ErrorCorrectionLevel
     {
         return $this->errorCorrectionLevel;
-    }
-
-    public function setStyle(string|Style $style): void
-    {
-        if (is_string($style)) {
-            $style = Style::tryFrom($style);
-        }
-
-        if (! $style) {
-            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', Style::toArray()));
-        }
-
-        $this->style = $style;
     }
 
     public function getStyle(): Style
@@ -326,19 +283,9 @@ final class Config
         return $this->colorModel;
     }
 
-    public function setColorValue(ColorValue $colorValue): void
-    {
-        $this->colorValue = $colorValue;
-    }
-
     public function getColorValue(): ?ColorValue
     {
         return $this->colorValue;
-    }
-
-    public function setBackgroundColorValue(ColorValue $colorValue): void
-    {
-        $this->backgroundColorValue = $colorValue;
     }
 
     public function getBackgroundColorValue(): ?ColorValue
@@ -352,11 +299,6 @@ final class Config
     public function getEyeColors(): array
     {
         return $this->eyeColors;
-    }
-
-    public function setGradient(Gradient $gradient): void
-    {
-        $this->gradient = $gradient;
     }
 
     public function getGradient(): ?Gradient
@@ -403,11 +345,11 @@ final class Config
 
         $this->validateRgb($startRed, $startGreen, $startBlue);
         $this->validateRgb($endRed, $endGreen, $endBlue);
-        $this->gradient = new Gradient(
+        $this->setGradient(new Gradient(
             $this->createColor($startRed, $startGreen, $startBlue),
             $this->createColor($endRed, $endGreen, $endBlue),
             $type->toBaconGradientType()
-        );
+        ));
     }
 
     public function setupEyeColor(int $eyeNumber, int $innerRed, int $innerGreen, int $innerBlue, int $outerRed = 0, int $outerGreen = 0, int $outerBlue = 0): void
@@ -418,10 +360,10 @@ final class Config
 
         $this->validateRgb($innerRed, $innerGreen, $innerBlue, $outerRed, $outerGreen, $outerBlue);
 
-        $this->eyeColors[$eyeNumber] = new EyeFill(
+        $this->setEyeColor($eyeNumber, new EyeFill(
             $this->createColor($innerRed, $innerGreen, $innerBlue),
             $this->createColor($outerRed, $outerGreen, $outerBlue)
-        );
+        ));
     }
 
     public function setupColor(int $c1, int $c2, int $c3, ?int $c4 = null): void
@@ -440,11 +382,6 @@ final class Config
         $this->setStyleSize($size);
     }
 
-    /**
-     * Configure an image merge from a file path.
-     *
-     * @throws InvalidArgumentException
-     */
     public function setupMergePath(string $filepath, float $percentage, bool $absolute = false): void
     {
         if (function_exists('base_path') && ! $absolute) {
@@ -460,11 +397,6 @@ final class Config
         $this->setupMergeString($content, $percentage);
     }
 
-    /**
-     * Configure an image merge from a raw string payload.
-     *
-     * @throws InvalidArgumentException
-     */
     public function setupMergeString(string $content, float $percentage): void
     {
         if ($percentage <= 0 || $percentage >= 1) {
@@ -473,6 +405,65 @@ final class Config
 
         $this->imageMerge = $content;
         $this->imagePercentage = $percentage;
+    }
+
+    /**
+     * Create a BaconQrCode color object.
+     *
+     * @param  int  $red  Red component (0-255)
+     * @param  int  $green  Green component (0-255)
+     * @param  int  $blue  Blue component (0-255)
+     * @param  int|null  $alpha  Alpha/opacity (0-100, not 0-255)
+     */
+    public function createColor(int $red, int $green, int $blue, ?int $alpha = null): ColorInterface
+    {
+        if (is_null($alpha)) {
+            return new Rgb($red, $green, $blue);
+        }
+
+        return new Alpha($alpha, new Rgb($red, $green, $blue));
+    }
+
+    private function setStyleSize(float $size): void
+    {
+        if ($size <= 0 || $size > 1) {
+            throw new InvalidArgumentException(sprintf('Style size must be between 0 and 1. %s given.', $size));
+        }
+
+        $this->styleSize = $size;
+    }
+
+    private function setEyeColor(int $eyeNumber, EyeFill $eyeFill): void
+    {
+        $this->eyeColors[$eyeNumber] = $eyeFill;
+    }
+
+    private function setStyle(string|Style $style): void
+    {
+        if (is_string($style)) {
+            $style = Style::tryFrom($style);
+        }
+
+        if (! $style) {
+            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', Style::toArray()));
+        }
+
+        $this->style = $style;
+    }
+
+    private function setColorValue(ColorValue $colorValue): void
+    {
+        $this->colorValue = $colorValue;
+    }
+
+    private function setBackgroundColorValue(ColorValue $colorValue): void
+    {
+        $this->backgroundColorValue = $colorValue;
+    }
+
+    private function setGradient(Gradient $gradient): void
+    {
+        $this->gradient = $gradient;
     }
 
     /**
@@ -515,14 +506,5 @@ final class Config
                 throw new InvalidArgumentException('RGB values must be between 0 and 255.');
             }
         }
-    }
-
-    private function createColor(int $red, int $green, int $blue, ?int $alpha = null): ColorInterface
-    {
-        if (is_null($alpha)) {
-            return new Rgb($red, $green, $blue);
-        }
-
-        return new Alpha($alpha, new Rgb($red, $green, $blue));
     }
 }
