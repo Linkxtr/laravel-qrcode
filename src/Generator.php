@@ -39,12 +39,6 @@ final class Generator
         __call as macroCall;
     }
 
-    /**
-     * The PNG compression level.
-     * Only applicable to PNG format when using GDLibRenderer.
-     */
-    private const PNG_COMPRESSION_LEVEL = 9;
-
     private Config $config;
 
     /**
@@ -87,15 +81,15 @@ final class Generator
 
     public function generate(string $text, ?string $filename = null): HtmlString
     {
-        $renderer = new BaconRenderer($this->config);
+        $baconRenderer = new BaconRenderer($this->config);
 
-        $qrCode = $renderer->render($text);
+        $htmlString = $baconRenderer->render($text);
 
-        if ($filename && file_put_contents($filename, (string) $qrCode) === false) {
+        if ($filename && file_put_contents($filename, (string) $htmlString) === false) {
             throw new RuntimeException('Failed to write QR code to file: '.$filename);
         }
 
-        return $qrCode;
+        return $htmlString;
     }
 
     public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self

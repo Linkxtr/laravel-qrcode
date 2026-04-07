@@ -44,16 +44,15 @@ use Linkxtr\QrCode\Support\Image;
 use Linkxtr\QrCode\ValueObjects\ColorValue;
 use RuntimeException;
 
-final class BaconRenderer
+final readonly class BaconRenderer
 {
     /**
      * The PNG compression level.
      * Only applicable to PNG format when using GDLibRenderer.
      */
     private const PNG_COMPRESSION_LEVEL = 9;
-    public function __construct(private Config $config)
-    {
-    }
+
+    public function __construct(private Config $config) {}
 
     /**
      * Render the QR code based on the provided payload and config.
@@ -107,15 +106,6 @@ final class BaconRenderer
         return new RendererStyle($this->config->getSize(), $this->config->getMargin(), $this->getModule(), $this->getEye(), $this->getFill());
     }
 
-    private function getBackEnd(): ImageBackEndInterface
-    {
-        return match ($this->config->getFormat()) {
-            Format::SVG => new SvgImageBackEnd(),
-            Format::EPS => new EpsImageBackEnd(),
-            default => new ImagickImageBackEnd($this->config->getFormat()->value),
-        };
-    }
-
     private function getModule(): ModuleInterface
     {
         if ($this->config->getStyle() === Style::DOT) {
@@ -128,7 +118,7 @@ final class BaconRenderer
 
         return SquareModule::instance();
     }
-    
+
     private function mergeImage(string $qrCode): string
     {
         if ($this->config->getFormat() === Format::EPS) {
