@@ -7,7 +7,6 @@ namespace Linkxtr\QrCode\Renderers;
 use BaconQrCode\Renderer\Color\Cmyk;
 use BaconQrCode\Renderer\Color\ColorInterface;
 use BaconQrCode\Renderer\Color\Gray;
-use BaconQrCode\Renderer\Color\Rgb;
 use BaconQrCode\Renderer\Eye\CompositeEye;
 use BaconQrCode\Renderer\Eye\EyeInterface;
 use BaconQrCode\Renderer\Eye\ModuleEye;
@@ -130,11 +129,12 @@ final readonly class BaconRenderer
         $imageMerge = $this->config->getImageMerge();
         $percentage = $this->config->getImagePercentage();
 
-        return match (true) {
-            $format === Format::EPS => new EpsMerger($qrCode, $imageMerge, $percentage),
-            $format === Format::SVG => new SvgMerger($qrCode, $imageMerge, $percentage),
-            extension_loaded('imagick') => (new ImagickMerger($qrCode, $imageMerge, $percentage))->setFormat($format),
-            default => (new RasterMerger($qrCode, $imageMerge, $percentage))->setFormat($format),
+        return match ($format) {
+            Format::EPS => new EpsMerger($qrCode, $imageMerge, $percentage),
+            Format::SVG => new SvgMerger($qrCode, $imageMerge, $percentage),
+            default => extension_loaded('imagick')
+                ? new ImagickMerger($qrCode, $imageMerge, $percentage)->setFormat($format)
+                : new RasterMerger($qrCode, $imageMerge, $percentage)->setFormat($format),
         };
     }
 
@@ -150,8 +150,8 @@ final readonly class BaconRenderer
 
     private function getFill(): Fill
     {
-        $foregroundColor = $this->buildColor($this->config->getColorValue()) ?? new Rgb(0, 0, 0);
-        $backgroundColor = $this->buildColor($this->config->getBackgroundColorValue()) ?? new Rgb(255, 255, 255);
+        $foregroundColor = $this->buildColor($this->config->getColorValue());
+        $backgroundColor = $this->buildColor($this->config->getBackgroundColorValue());
         $eye0 = $this->config->getEyeColors()[0] ?? EyeFill::inherit();
         $eye1 = $this->config->getEyeColors()[1] ?? EyeFill::inherit();
         $eye2 = $this->config->getEyeColors()[2] ?? EyeFill::inherit();
@@ -163,12 +163,8 @@ final readonly class BaconRenderer
         return Fill::withForegroundColor($backgroundColor, $foregroundColor, $eye0, $eye1, $eye2);
     }
 
-    private function buildColor(?ColorValue $colorValue): ?ColorInterface
+    private function buildColor(ColorValue $colorValue): ColorInterface
     {
-        if (! $colorValue instanceof ColorValue) {
-            return null;
-        }
-
         if ($this->config->getColorModel() === ColorModel::GRAY) {
             return new Gray($colorValue->c1);
         }

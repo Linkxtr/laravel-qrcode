@@ -15,12 +15,17 @@ use BaconQrCode\Renderer\GDLibRenderer;
 use BaconQrCode\Renderer\Module\DotsModule;
 use BaconQrCode\Renderer\Module\RoundnessModule;
 use BaconQrCode\Renderer\Module\SquareModule;
+use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\Style;
+use Linkxtr\QrCode\Mergers\EpsMerger;
+use Linkxtr\QrCode\Mergers\ImagickMerger;
+use Linkxtr\QrCode\Mergers\RasterMerger;
+use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Renderers\BaconRenderer;
 
 covers(BaconRenderer::class);
@@ -35,6 +40,7 @@ beforeEach(function () {
 
 it('renders an html string with merged image', function () use ($tinyPng) {
     $config = new Config;
+    $config->setFormat(Format::SVG);
     $config->setupMergeString($tinyPng, 0.2);
     $renderer = new BaconRenderer($config);
 
@@ -106,11 +112,34 @@ it('builds the fill correctly with and without gradient', function () {
     expect(invade($renderer)->getFill()->hasGradientFill())->toBeTrue();
 });
 
-it('builds the correct color models', function () {
+it('builds the correct eye fills', function () {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
-    expect(invade($renderer)->buildColor(null))->toBeNull();
+    $config->setupEyeColor(0, 10, 20, 30);
+    $config->setupEyeColor(1, 40, 50, 60);
+    $config->setupEyeColor(2, 70, 80, 90);
+
+    expect(invade($renderer)->getFill()->getTopLeftEyeFill())->toBeInstanceOf(EyeFill::class)
+        ->and(invade($renderer)->getFill()->getTopLeftEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and(invade($renderer)->getFill()->getTopLeftEyeFill()->getExternalColor()->getRed())->toBe(10)
+        ->and(invade($renderer)->getFill()->getTopLeftEyeFill()->getExternalColor()->getGreen())->toBe(20)
+        ->and(invade($renderer)->getFill()->getTopLeftEyeFill()->getExternalColor()->getBlue())->toBe(30)
+        ->and(invade($renderer)->getFill()->getTopRightEyeFill())->toBeInstanceOf(EyeFill::class)
+        ->and(invade($renderer)->getFill()->getTopRightEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and(invade($renderer)->getFill()->getTopRightEyeFill()->getExternalColor()->getRed())->toBe(40)
+        ->and(invade($renderer)->getFill()->getTopRightEyeFill()->getExternalColor()->getGreen())->toBe(50)
+        ->and(invade($renderer)->getFill()->getTopRightEyeFill()->getExternalColor()->getBlue())->toBe(60)
+        ->and(invade($renderer)->getFill()->getBottomLeftEyeFill())->toBeInstanceOf(EyeFill::class)
+        ->and(invade($renderer)->getFill()->getBottomLeftEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and(invade($renderer)->getFill()->getBottomLeftEyeFill()->getExternalColor()->getRed())->toBe(70)
+        ->and(invade($renderer)->getFill()->getBottomLeftEyeFill()->getExternalColor()->getGreen())->toBe(80)
+        ->and(invade($renderer)->getFill()->getBottomLeftEyeFill()->getExternalColor()->getBlue())->toBe(90);
+});
+
+it('builds the correct color models', function () {
+    $config = new Config;
+    $renderer = new BaconRenderer($config);
 
     $config->setupColor(255, 0, 0, 50);
     expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Alpha::class);
@@ -120,7 +149,12 @@ it('builds the correct color models', function () {
 
     $config->setColorModel(ColorModel::CMYK);
     $config->setupColor(10, 20, 30, 40);
-    expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Cmyk::class);
+    expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Cmyk::class)
+        ->and(invade($renderer)->buildColor($config->getColorValue())->getBlack())->toBe(40);
+
+    $config->setupColor(10, 20, 30);
+    expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Cmyk::class)
+        ->and(invade($renderer)->buildColor($config->getColorValue())->getBlack())->toBe(0);
 
     $config->setGrayscale(50);
     expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Gray::class);
@@ -151,17 +185,17 @@ it('calls the correct merger based on format', function () use ($tinyPng) {
 
     $config->setFormat(Format::SVG);
     $config->setupMergeString($tinyPng, 0.2);
-    expect(invade($renderer)->mergeImage('<svg id="qr" width="100" height="100"></svg>'))->toBeString();
+    expect(invade($renderer)->getMerger('test'))->toBeInstanceOf(SvgMerger::class);
 
     $config->setFormat(Format::EPS);
     $config->setupMergeString($tinyPng, 0.2);
-    expect(invade($renderer)->mergeImage('%%BoundingBox: 0 0 420 595'))->toBeString();
+    expect(invade($renderer)->getMerger('test'))->toBeInstanceOf(EpsMerger::class);
 
     $config->setFormat(Format::PNG);
     $config->setupMergeString($tinyPng, 0.2);
-    expect(invade($renderer)->mergeImage($tinyPng))->toBeString();
+    expect(invade($renderer)->getMerger($tinyPng))->toBeInstanceOf(ImagickMerger::class);
 
     global $mockImagickLoaded;
     $mockImagickLoaded = false;
-    expect(invade($renderer)->mergeImage($tinyPng))->toBeString();
+    expect(invade($renderer)->getMerger($tinyPng))->toBeInstanceOf(RasterMerger::class);
 });

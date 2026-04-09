@@ -15,14 +15,14 @@ final class RasterMerger implements MergerInterface
 {
     private Format $format = Format::PNG;
 
-    private Image $sourceImage;
+    private readonly Image $sourceImage;
 
-    private Image $mergeImage;
+    private readonly Image $mergeImage;
 
     public function __construct(
         string $sourceImage,
         string $mergeImage,
-        private float $percentage = 0.2
+        private readonly float $percentage = 0.2
     ) {
         if ($this->percentage <= 0 || $this->percentage >= 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');

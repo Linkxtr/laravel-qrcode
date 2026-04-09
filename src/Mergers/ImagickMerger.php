@@ -16,9 +16,9 @@ final class ImagickMerger implements MergerInterface
     private Format $format = Format::PNG;
 
     public function __construct(
-        private string $sourceImageContent,
-        private string $mergeImageContent,
-        private float $percentage = 0.2
+        private readonly string $sourceImageContent,
+        private readonly string $mergeImageContent,
+        private readonly float $percentage = 0.2
     ) {
         if ($this->percentage <= 0 || $this->percentage >= 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');

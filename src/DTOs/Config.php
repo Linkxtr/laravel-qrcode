@@ -42,7 +42,7 @@ final class Config
      * The size of the selected style between 0 and 1.
      * Only applicable to 'dot' and 'round' styles.
      */
-    private float $styleSize;
+    private float $styleSize = 0.5;
 
     /**
      * The style to apply to the eyes of the QR code.
@@ -59,12 +59,12 @@ final class Config
     /**
      * The size of the QR code in pixels.
      */
-    private int $size;
+    private int $size = 400;
 
     /**
      * The margin around the QR code.
      */
-    private int $margin;
+    private int $margin = 4;
 
     /**
      * The encoding mode. Possible values are
@@ -106,24 +106,18 @@ final class Config
     /**
      * Holds an image string that will be merged with the QR code.
      */
-    private string $imageMerge;
+    private string $imageMerge = '';
 
     /**
      * The percentage that a merged image should take over the source image.
      */
-    private float $imagePercentage;
+    private float $imagePercentage = .2;
 
     /**
      * @param  array<mixed>  $config
      */
     public function __construct(array $config = [])
     {
-        $this->styleSize = 0.5;
-        $this->size = 400;
-        $this->margin = 4;
-        $this->imageMerge = '';
-        $this->imagePercentage = .2;
-
         if (isset($config['size']) && is_int($config['size'])) {
             $this->size = $config['size'] > 0 ? $config['size'] : $this->size;
         }
