@@ -7,24 +7,40 @@ namespace Linkxtr\QrCode\Mergers;
 use GdImage;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
+use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Support\Image;
 use RuntimeException;
 
-final readonly class RasterMerger implements MergerInterface
+final class RasterMerger implements MergerInterface
 {
+    private Format $format = Format::PNG;
+
+    private Image $sourceImage;
+
+    private Image $mergeImage;
+
     public function __construct(
-        private Image $sourceImage,
-        private Image $mergeImage,
-        private string $format = 'png',
+        string $sourceImage,
+        string $mergeImage,
         private float $percentage = 0.2
     ) {
-        if (! in_array($this->format, ['png', 'webp'], true)) {
-            throw new InvalidArgumentException('RasterMerger only supports "png" or "webp" formats.');
-        }
-
         if ($this->percentage <= 0 || $this->percentage >= 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
+
+        $this->sourceImage = new Image($sourceImage);
+        $this->mergeImage = new Image($mergeImage);
+    }
+
+    public function setFormat(Format $format): self
+    {
+        if (! in_array($format, [Format::PNG, Format::WEBP], true)) {
+            throw new InvalidArgumentException('RasterMerger only supports "png" or "webp" formats.');
+        }
+
+        $this->format = $format;
+
+        return $this;
     }
 
     public function merge(): string
@@ -33,14 +49,14 @@ final readonly class RasterMerger implements MergerInterface
         $sourceWidth = $this->sourceImage->getWidth();
         $sourceHeight = $this->sourceImage->getHeight();
 
-        if ($sourceWidth === 0 || $sourceHeight === 0) {
+        if (! $sourceWidth || ! $sourceHeight) {
             throw new InvalidArgumentException('Source image has zero width or height.');
         }
 
         $mergeWidth = $this->mergeImage->getWidth();
         $mergeHeight = $this->mergeImage->getHeight();
 
-        if ($mergeWidth === 0 || $mergeHeight === 0) {
+        if (! $mergeWidth || ! $mergeHeight) {
             throw new InvalidArgumentException('Merge image has zero width or height.');
         }
 
@@ -110,7 +126,7 @@ final readonly class RasterMerger implements MergerInterface
     {
         ob_start();
 
-        if ($this->format === 'webp') {
+        if ($this->format === Format::WEBP) {
             imagewebp($gdImage, null, 90);
         } else {
             imagepng($gdImage);

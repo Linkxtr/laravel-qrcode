@@ -8,23 +8,32 @@ use Imagick;
 use ImagickException;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
+use Linkxtr\QrCode\Enums\Format;
 use RuntimeException;
 
-final readonly class ImagickMerger implements MergerInterface
+final class ImagickMerger implements MergerInterface
 {
+    private Format $format = Format::PNG;
+
     public function __construct(
         private string $sourceImageContent,
         private string $mergeImageContent,
-        private string $format = 'png',
         private float $percentage = 0.2
     ) {
-        if (! in_array($this->format, ['png', 'webp'], true)) {
-            throw new InvalidArgumentException('ImagickMerger only supports "png" or "webp" formats.');
-        }
-
         if ($this->percentage <= 0 || $this->percentage >= 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
+    }
+
+    public function setFormat(Format $format): self
+    {
+        if (! in_array($format, [Format::PNG, Format::WEBP], true)) {
+            throw new InvalidArgumentException('ImagickMerger only supports "png" or "webp" formats.');
+        }
+
+        $this->format = $format;
+
+        return $this;
     }
 
     public function merge(): string
@@ -63,9 +72,9 @@ final readonly class ImagickMerger implements MergerInterface
 
             $source->compositeImage($merge, Imagick::COMPOSITE_DEFAULT, $centerX, $centerY);
 
-            $source->setImageFormat($this->format);
+            $source->setImageFormat($this->format->value);
 
-            if ($this->format === 'webp') {
+            if ($this->format === Format::WEBP) {
                 $source->setImageCompressionQuality(90);
             }
 

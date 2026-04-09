@@ -27,19 +27,19 @@ final readonly class ColorValue
         public ?int $c4 = null,
     ) {
         if ($c1 < 0 || $c1 > 255) {
-            throw new InvalidArgumentException('c1 must be between 0 and 255, got '.$c1);
+            throw new InvalidArgumentException('RGB values must be between 0 and 255, got '.$c1);
         }
 
         if ($c2 < 0 || $c2 > 255) {
-            throw new InvalidArgumentException('c2 must be between 0 and 255, got '.$c2);
+            throw new InvalidArgumentException('RGB values must be between 0 and 255, got '.$c2);
         }
 
         if ($c3 < 0 || $c3 > 255) {
-            throw new InvalidArgumentException('c3 must be between 0 and 255, got '.$c3);
+            throw new InvalidArgumentException('RGB values must be between 0 and 255, got '.$c3);
         }
 
         if ($c4 !== null && ($c4 < 0 || $c4 > 100)) {
-            throw new InvalidArgumentException('c4 must be between 0 and 100, got '.$c4);
+            throw new InvalidArgumentException('Alpha values must be between 0 and 100, got '.$c4);
         }
     }
 }

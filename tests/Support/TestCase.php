@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests;
+namespace Tests\Support;
 
 use Orchestra\Testbench\TestCase as Orchestra;
 

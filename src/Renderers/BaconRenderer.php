@@ -31,6 +31,7 @@ use BaconQrCode\Renderer\RendererStyle\Gradient;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Illuminate\Support\HtmlString;
+use Linkxtr\QrCode\Contracts\MergerInterface;
 use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\EyeStyle;
@@ -40,7 +41,6 @@ use Linkxtr\QrCode\Mergers\EpsMerger;
 use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
-use Linkxtr\QrCode\Support\Image;
 use Linkxtr\QrCode\ValueObjects\ColorValue;
 use RuntimeException;
 
@@ -50,7 +50,7 @@ final readonly class BaconRenderer
      * The PNG compression level.
      * Only applicable to PNG format when using GDLibRenderer.
      */
-    private const PNG_COMPRESSION_LEVEL = 9;
+    private const PNG_COMPRESSION_LEVEL = 9; // @pest-mutate-ignore
 
     public function __construct(private Config $config) {}
 
@@ -121,27 +121,21 @@ final readonly class BaconRenderer
 
     private function mergeImage(string $qrCode): string
     {
-        if ($this->config->getFormat() === Format::EPS) {
-            $merger = new EpsMerger($qrCode, $this->config->getImageMerge(), $this->config->getImagePercentage());
+        return $this->getMerger($qrCode)->merge();
+    }
 
-            return $merger->merge();
-        }
+    private function getMerger(string $qrCode): MergerInterface
+    {
+        $format = $this->config->getFormat();
+        $imageMerge = $this->config->getImageMerge();
+        $percentage = $this->config->getImagePercentage();
 
-        if ($this->config->getFormat() === Format::SVG) {
-            $merger = new SvgMerger($qrCode, $this->config->getImageMerge(), $this->config->getImagePercentage());
-
-            return $merger->merge();
-        }
-
-        if (extension_loaded('imagick') && in_array($this->config->getFormat(), [Format::PNG, Format::WEBP], true)) {
-            $merger = new ImagickMerger($qrCode, $this->config->getImageMerge(), $this->config->getFormat()->value, $this->config->getImagePercentage());
-
-            return $merger->merge();
-        }
-
-        $merger = new RasterMerger(new Image($qrCode), new Image($this->config->getImageMerge()), $this->config->getFormat()->value, $this->config->getImagePercentage());
-
-        return $merger->merge();
+        return match (true) {
+            $format === Format::EPS => new EpsMerger($qrCode, $imageMerge, $percentage),
+            $format === Format::SVG => new SvgMerger($qrCode, $imageMerge, $percentage),
+            extension_loaded('imagick') => (new ImagickMerger($qrCode, $imageMerge, $percentage))->setFormat($format),
+            default => (new RasterMerger($qrCode, $imageMerge, $percentage))->setFormat($format),
+        };
     }
 
     private function getFormatter(): ImageBackEndInterface

@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd" bootstrap="vendor/autoload.php" colors="true" executionOrder="depends,defects" beStrictAboutCoverageMetadata="false" beStrictAboutOutputDuringTests="true" failOnRisky="true" failOnWarning="true">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.5/phpunit.xsd" bootstrap="vendor/autoload.php" colors="true" cacheDirectory=".phpunit.cache" executionOrder="depends,defects" beStrictAboutOutputDuringTests="true" failOnRisky="true" failOnWarning="true">
   <testsuites>
-    <testsuite name="package">
-      <directory suffix="Test.php">./tests</directory>
+    <testsuite name="Unit">
+      <directory>tests/Unit</directory>
+    </testsuite>
+    <testsuite name="Feature">
+      <directory>tests/Feature</directory>
+    </testsuite>
+    <testsuite name="Scannability">
+      <directory>tests/Scannability</directory>
+    </testsuite>
+    <testsuite name="Scalability">
+      <directory>tests/Scalability</directory>
     </testsuite>
   </testsuites>
-  <coverage includeUncoveredFiles="true">
-    <report>
-      <clover outputFile="build/logs/clover.xml"/>
-      <text outputFile="php://stdout" showUncoveredFiles="true" showOnlySummary="false"/>
-    </report>
-  </coverage>
+  <source restrictNotices="true" restrictWarnings="true" ignoreIndirectDeprecations="true">
+    <include>
+      <directory>src</directory>
+    </include>
+  </source>
   <php>
     <env name="APP_ENV" value="testing"/>
     <env name="BCRYPT_ROUNDS" value="4"/>
@@ -20,14 +28,5 @@
     <env name="MAIL_MAILER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
     <env name="SESSION_DRIVER" value="array"/>
-    <env name="TELESCOPE_ENABLED" value="false"/>
   </php>
-  <source>
-    <include>
-      <directory suffix=".php">./src</directory>
-    </include>
-    <exclude>
-      <directory>./vendor</directory>
-    </exclude>
-  </source>
 </phpunit>

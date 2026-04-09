@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use chillerlan\QRCode\QRCode as QRCodeDecoder;
-use Tests\TestCase;
+use Tests\Support\TestCase;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,7 +14,7 @@ use Tests\TestCase;
 |
 */
 
-uses(TestCase::class)->in(__DIR__);
+uses(TestCase::class)->in('Unit', 'Scannability');
 
 /*
 |--------------------------------------------------------------------------

@@ -42,7 +42,7 @@ final class Config
      * The size of the selected style between 0 and 1.
      * Only applicable to 'dot' and 'round' styles.
      */
-    private float $styleSize = 0.5;
+    private float $styleSize;
 
     /**
      * The style to apply to the eyes of the QR code.
@@ -59,12 +59,12 @@ final class Config
     /**
      * The size of the QR code in pixels.
      */
-    private int $size = 400;
+    private int $size;
 
     /**
      * The margin around the QR code.
      */
-    private int $margin = 4;
+    private int $margin;
 
     /**
      * The encoding mode. Possible values are
@@ -106,18 +106,24 @@ final class Config
     /**
      * Holds an image string that will be merged with the QR code.
      */
-    private string $imageMerge = '';
+    private string $imageMerge;
 
     /**
      * The percentage that a merged image should take over the source image.
      */
-    private float $imagePercentage = .2;
+    private float $imagePercentage;
 
     /**
      * @param  array<mixed>  $config
      */
     public function __construct(array $config = [])
     {
+        $this->styleSize = 0.5;
+        $this->size = 400;
+        $this->margin = 4;
+        $this->imageMerge = '';
+        $this->imagePercentage = .2;
+
         if (isset($config['size']) && is_int($config['size'])) {
             $this->size = $config['size'] > 0 ? $config['size'] : $this->size;
         }
@@ -189,10 +195,13 @@ final class Config
         return $this->errorCorrectionLevel;
     }
 
-    public function setupStyle(string|Style $style, float $size): void
+    public function setupStyle(string|Style $style, ?float $size = null): void
     {
         $this->setStyle($style);
-        $this->setStyleSize($size);
+
+        if ($size !== null) {
+            $this->setStyleSize($size);
+        }
     }
 
     public function getStyle(): Style
@@ -314,14 +323,14 @@ final class Config
         $this->setBackgroundColorValue(new ColorValue($c1, $c2, $c3, $c4));
     }
 
-    public function getColorValue(): ?ColorValue
+    public function getColorValue(): ColorValue
     {
-        return $this->colorValue;
+        return $this->colorValue ?? new ColorValue(0, 0, 0);
     }
 
-    public function getBackgroundColorValue(): ?ColorValue
+    public function getBackgroundColorValue(): ColorValue
     {
-        return $this->backgroundColorValue;
+        return $this->backgroundColorValue ?? new ColorValue(255, 255, 255);
     }
 
     public function setupEyeColor(int $eyeNumber, int $innerRed, int $innerGreen, int $innerBlue, int $outerRed = 0, int $outerGreen = 0, int $outerBlue = 0): void
