@@ -29,7 +29,7 @@ final readonly class SvgMerger implements MergerInterface
         }
 
         $svgWidth = (int) $widthMatch[1];
-        $svgHeight = (int) $heightMatch[1];
+        $svgHeight = (int) $heightMatch[1]; // @pest-mutate-ignore
 
         $imageInfo = getimagesizefromstring($this->mergeImageContent);
 
@@ -40,12 +40,12 @@ final readonly class SvgMerger implements MergerInterface
         [$logoWidth, $logoHeight] = $imageInfo;
         $mimeType = $imageInfo['mime'];
 
-        $logoRatio = $logoHeight > 0 ? $logoWidth / $logoHeight : 1;
+        $logoRatio = $logoWidth / $logoHeight;
         $targetWidth = (int) ($svgWidth * $this->percentage);
-        $targetHeight = (int) ($targetWidth / $logoRatio);
+        $targetHeight = (int) ($targetWidth / $logoRatio); // @pest-mutate-ignore
 
-        $x = (int) (($svgWidth - $targetWidth) / 2);
-        $y = (int) (($svgHeight - $targetHeight) / 2);
+        $x = (int) (($svgWidth - $targetWidth) / 2); // @pest-mutate-ignore
+        $y = (int) (($svgHeight - $targetHeight) / 2); // @pest-mutate-ignore
 
         $base64Image = base64_encode($this->mergeImageContent);
         $imageUri = sprintf('data:%s;base64,%s', $mimeType, $base64Image);

@@ -59,7 +59,7 @@ final class Geo implements DataTypeInterface
             throw new InvalidArgumentException(sprintf('Invalid %s value: must be a number', $type));
         }
 
-        $value = (float) $value; // @pest-mutate-ignore
+        $value = (float) $value;
 
         if ($type === 'latitude' && ($value < -90 || $value > 90)) {
             throw new InvalidArgumentException('Latitude must be between -90 and 90 degrees');
