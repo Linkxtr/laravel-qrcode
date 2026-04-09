@@ -30,7 +30,7 @@ namespace Linkxtr\QrCode\Renderers {
     $GLOBALS['mockImagickLoaded'] = true;
     $GLOBALS['mockGdLoaded'] = true;
 
-    if (! function_exists('Linkxtr\QrCode\Renderers\extension_loaded')) {
+    if (! function_exists(__NAMESPACE__.'\extension_loaded')) {
         function extension_loaded($extension): bool
         {
             if ($extension === 'imagick') {
@@ -46,47 +46,47 @@ namespace Linkxtr\QrCode\Renderers {
     }
 }
 
-// namespace Linkxtr\QrCode {
-//     if (! function_exists('Linkxtr\QrCode\base_path')) {
-//         function base_path($path = ''): string
-//         {
-//             $baseDiff = '/..';
+namespace Linkxtr\QrCode {
+    // if (! function_exists('Linkxtr\QrCode\base_path')) {
+    //     function base_path($path = ''): string
+    //     {
+    //         $baseDiff = '/..';
 
-//             return $path === '' ? __DIR__.$baseDiff : __DIR__.$baseDiff.'/'.ltrim($path, '/');
-//         }
-//     }
+    //         return $path === '' ? __DIR__.$baseDiff : __DIR__.$baseDiff.'/'.ltrim($path, '/');
+    //     }
+    // }
 
-//     $GLOBALS['mockFilePutContents'] = false;
+    // $GLOBALS['mockFilePutContents'] = false;
 
-//     if (! function_exists('Linkxtr\QrCode\file_put_contents')) {
-//         function file_put_contents($filename, $data, $flags = 0, $context = null): int|false
-//         {
-//             if (isset($GLOBALS['mockFilePutContents']) && $GLOBALS['mockFilePutContents']) {
-//                 return false;
-//             }
+    if (! function_exists(__NAMESPACE__.'\file_put_contents')) {
+        function file_put_contents($filename, $data, $flags = 0, $context = null): int|false
+        {
+            if (isset($GLOBALS['mockFilePutContents']) && $GLOBALS['mockFilePutContents']) {
+                return false;
+            }
 
-//             return \file_put_contents($filename, $data, $flags, $context);
-//         }
-//     }
+            return \file_put_contents($filename, $data, $flags, $context);
+        }
+    }
 
-//     $GLOBALS['mockImagickLoaded'] = true;
-//     $GLOBALS['mockGdLoaded'] = true;
+    // $GLOBALS['mockImagickLoaded'] = true;
+    // $GLOBALS['mockGdLoaded'] = true;
 
-//     if (! function_exists('Linkxtr\QrCode\extension_loaded')) {
-//         function extension_loaded($extension): bool
-//         {
-//             if ($extension === 'imagick') {
-//                 return $GLOBALS['mockImagickLoaded'] ?? true;
-//             }
+    // if (! function_exists('Linkxtr\QrCode\extension_loaded')) {
+    //     function extension_loaded($extension): bool
+    //     {
+    //         if ($extension === 'imagick') {
+    //             return $GLOBALS['mockImagickLoaded'] ?? true;
+    //         }
 
-//             if ($extension === 'gd') {
-//                 return $GLOBALS['mockGdLoaded'] ?? true;
-//             }
+    //         if ($extension === 'gd') {
+    //             return $GLOBALS['mockGdLoaded'] ?? true;
+    //         }
 
-//             return \extension_loaded($extension);
-//         }
-//     }
-// }
+    //         return \extension_loaded($extension);
+    //     }
+    // }
+}
 
 // namespace Linkxtr\QrCode\Mergers {
 //     use GdImage;
