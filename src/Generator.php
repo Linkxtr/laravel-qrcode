@@ -85,7 +85,7 @@ final class Generator
 
         $htmlString = $baconRenderer->render($text);
 
-        if ($filename && file_put_contents($filename, (string) $htmlString) === false) {
+        if ($filename && file_put_contents($filename, $htmlString) === false) {
             throw new RuntimeException('Failed to write QR code to file: '.$filename);
         }
 
@@ -183,7 +183,7 @@ final class Generator
         return $this;
     }
 
-    public function style(string|Style $style, float $size = 0.5): self
+    public function style(string|Style $style, ?float $size = null): self
     {
         $this->config->setupStyle($style, $size);
 

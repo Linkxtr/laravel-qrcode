@@ -11,9 +11,7 @@ use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
-use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
-use Linkxtr\QrCode\ValueObjects\ColorValue;
 
 require_once __DIR__.'/../Support/Overrides.php';
 
@@ -34,7 +32,7 @@ it('passes array config from constructor to the underlying DTO', function () {
 });
 
 it('can register and call custom macros that return a string payload', function () {
-   Generator::macro('myMacro', function (string $data) {
+    Generator::macro('myMacro', function (string $data) {
         return 'dummy:'.$data;
     });
 
@@ -46,13 +44,49 @@ it('can register and call custom macros that return a string payload', function 
 });
 
 it('can register and call custom macros that return pre-styled generation', function () {
-   Generator::macro('myStyledMacro', function (string $data) {
+    Generator::macro('myStyledMacro', function (string $data) {
         return $this->size(500)->generate($data);
     });
 
     $generator = new Generator([]);
 
     expect($generator->myStyledMacro('hello-world'))->toBeInstanceOf(HtmlString::class);
+})->after(function () {
+    Generator::flushMacros();
+});
+
+test('macro returning HtmlString is returned directly without regeneration', function () {
+    $expectedHtml = new HtmlString('<svg id="exact-macro-match"></svg>');
+
+    Generator::macro('returnsHtml', function () use ($expectedHtml) {
+        return $expectedHtml;
+    });
+
+    $generator = new Generator;
+    $result = $generator->returnsHtml();
+
+    expect($result)->toBe($expectedHtml)
+        ->and($result->toHtml())->toBe('<svg id="exact-macro-match"></svg>');
+})->after(function () {
+    Generator::flushMacros();
+});
+
+test('macro returning a Stringable object is successfully generated', function () {
+    Generator::macro('returnsStringable', function () {
+        return new class implements Stringable
+        {
+            public function __toString(): string
+            {
+                return 'stringable-payload';
+            }
+        };
+    });
+
+    $generator = new Generator;
+    $result = $generator->returnsStringable();
+
+    expect($result)->toBeInstanceOf(HtmlString::class)
+        ->and($result->toHtml())->toContain('<svg');
 })->after(function () {
     Generator::flushMacros();
 });
@@ -79,7 +113,7 @@ it('still delegates to data types if macro is not registered', function () {
 });
 
 test('fluent configuration methods delegate to config and return self', function () {
-    $generator = new Generator();
+    $generator = new Generator;
 
     expect($generator->size(500))->toBeInstanceOf(Generator::class)
         ->and(invade($generator)->config->getSize())->toBe(500);
@@ -108,10 +142,10 @@ test('fluent configuration methods delegate to config and return self', function
 
     expect($generator->color(10, 20, 30))->toBeInstanceOf(Generator::class)
         ->and(invade($generator)->config->getColorValue()->c1)->toBe(10);
-        
+
     expect($generator->backgroundColor(10, 20, 30))->toBeInstanceOf(Generator::class)
         ->and(invade($generator)->config->getBackgroundColorValue()->c1)->toBe(10);
-        
+
     expect($generator->cmyk())->toBeInstanceOf(Generator::class)
         ->and(invade($generator)->config->getColorModel())->toBe(ColorModel::CMYK);
 
@@ -125,8 +159,8 @@ test('fluent configuration methods delegate to config and return self', function
         ->and(invade($generator)->config->getEyeColors()[0])->toBeInstanceOf(EyeFill::class);
 
     expect($generator->gradient(10, 20, 30, 40, 50, 60, GradientType::DIAGONAL))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getEyeColors()[0])->toBeInstanceOf(EyeFill::class);
-    
+        ->and(invade($generator)->config->getGradient())->toBeInstanceOf(Gradient::class);
+
     expect($generator->mergeString('test'))->toBeInstanceOf(Generator::class)
         ->and(invade($generator)->config->getImageMerge())->toBe('test');
 
@@ -135,8 +169,8 @@ test('fluent configuration methods delegate to config and return self', function
 });
 
 test('generate throws exception if file_put_contents fails', function () {
-    $generator = new Generator();
-    
+    $generator = new Generator;
+
     global $mockFilePutContents;
     $mockFilePutContents = true;
 
