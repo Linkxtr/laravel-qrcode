@@ -17,12 +17,6 @@ require_once __DIR__.'/../Support/Overrides.php';
 
 covers(Generator::class);
 
-// beforeEach(function () {
-//     global $mockImagickLoaded, $mockGdLoaded;
-//     $mockImagickLoaded = true;
-//     $mockGdLoaded = true;
-// });
-
 it('passes array config from constructor to the underlying DTO', function () {
     $generator = new Generator(['size' => 350, 'margin' => 2]);
     $config = invade($generator)->config;
@@ -99,9 +93,10 @@ it('throws an exception for unsupported type returns from macro', function () {
     $generator = new Generator([]);
 
     $generator->returnArray();
-})->throws(UnexpectedValueException::class, 'Macro "returnArray" must return a string, Stringable, or HtmlString. array returned.')->after(function () {
-    Generator::flushMacros();
-});
+})->throws(UnexpectedValueException::class, 'Macro "returnArray" must return a string, Stringable, or HtmlString. array returned.')
+    ->after(function () {
+        Generator::flushMacros();
+    });
 
 it('still delegates to data types if macro is not registered', function () {
     $generator = new Generator([]);
