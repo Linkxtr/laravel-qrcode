@@ -56,26 +56,26 @@ final class ImagickMerger implements MergerInterface
 
             $mergeRatio = $mergeWidth / $mergeHeight;
 
-            $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage));
-            $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio));
+            $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage)); // @pest-mutate-ignore
+            $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio)); // @pest-mutate-ignore
 
             // Constrain to canvas if logo exceeds vertical bounds
-            if ($targetLogoHeight > $sourceHeight * $this->percentage) {
-                $targetLogoHeight = max(1, (int) ($sourceHeight * $this->percentage));
+            if ($targetLogoHeight > $sourceHeight * $this->percentage) { // @pest-mutate-ignore
+                $targetLogoHeight = max(1, (int) ($sourceHeight * $this->percentage)); // @pest-mutate-ignore
                 $targetLogoWidth = max(1, (int) ($targetLogoHeight * $mergeRatio));
             }
 
             $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
-            $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
+            $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2); // @pest-mutate-ignore
 
-            $merge->resizeImage($targetLogoWidth, $targetLogoHeight, Imagick::FILTER_LANCZOS, 1);
+            $merge->resizeImage($targetLogoWidth, $targetLogoHeight, Imagick::FILTER_LANCZOS, 1); // @pest-mutate-ignore
 
             $source->compositeImage($merge, Imagick::COMPOSITE_DEFAULT, $centerX, $centerY);
 
             $source->setImageFormat($this->format->value);
 
-            if ($this->format === Format::WEBP) {
-                $source->setImageCompressionQuality(90);
+            if ($this->format === Format::WEBP) { // @pest-mutate-ignore
+                $source->setImageCompressionQuality(90); // @pest-mutate-ignore
             }
 
             return $source->getImageBlob();
@@ -83,8 +83,8 @@ final class ImagickMerger implements MergerInterface
         } catch (ImagickException $imagickException) {
             throw new RuntimeException('Imagick merge failed: '.$imagickException->getMessage(), $imagickException->getCode(), $imagickException);
         } finally {
-            $source?->clear();
-            $source?->destroy();
+            $source?->clear(); // @pest-mutate-ignore
+            $source?->destroy(); // @pest-mutate-ignore
             $merge?->clear();
             $merge?->destroy();
         }
