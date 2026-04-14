@@ -9,7 +9,7 @@ use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class BTC implements DataTypeInterface
 {
-    private string $prefix = 'bitcoin:';
+    private const PREFIX = 'bitcoin:';
 
     private string $address;
 
@@ -23,21 +23,20 @@ final class BTC implements DataTypeInterface
 
     public function __toString(): string
     {
-        return $this->buildBitCoinString();
+        $params = [
+            'amount' => $this->amount,
+            'label' => $this->label,
+            'message' => $this->message,
+            'r' => $this->returnAddress,
+        ];
+
+        return self::PREFIX.$this->address.'?'.http_build_query($params, encoding_type: PHP_QUERY_RFC3986);
     }
 
     /**
      * @param  list<mixed>  $arguments
      */
     public function create(array $arguments): void
-    {
-        $this->setProperties($arguments);
-    }
-
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    private function setProperties(array $arguments): void
     {
         if (count($arguments) < 2) {
             throw new InvalidArgumentException('Bitcoin address and amount are required.');
@@ -51,23 +50,19 @@ final class BTC implements DataTypeInterface
             throw new InvalidArgumentException('Bitcoin amount must be a numeric value.');
         }
 
-        if ((float) $arguments[1] < 0) {
+        if ($arguments[1] < 0) {
             throw new InvalidArgumentException('Bitcoin amount must be non-negative.');
         }
 
         $this->address = $arguments[0];
         $this->amount = (float) $arguments[1];
 
-        if (isset($arguments[2]) && is_array($arguments[2])) {
-            $this->setOptions($arguments[2]);
+        if (! isset($arguments[2]) || ! is_array($arguments[2])) {
+            return;
         }
-    }
 
-    /**
-     * @param  array<mixed>  $options
-     */
-    private function setOptions(array $options): void
-    {
+        $options = $arguments[2];
+
         if (isset($options['label']) && is_string($options['label'])) {
             $this->label = $options['label'];
         }
@@ -79,19 +74,5 @@ final class BTC implements DataTypeInterface
         if (isset($options['returnAddress']) && is_string($options['returnAddress'])) {
             $this->returnAddress = $options['returnAddress'];
         }
-    }
-
-    private function buildBitCoinString(): string
-    {
-        $params = [
-            'amount' => $this->amount,
-            'label' => $this->label,
-            'message' => $this->message,
-            'r' => $this->returnAddress,
-        ];
-
-        $params = array_filter($params, fn (null|string|float $value): bool => $value !== null);
-
-        return $this->prefix.$this->address.'?'.http_build_query($params);
     }
 }
