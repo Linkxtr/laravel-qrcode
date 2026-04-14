@@ -7,12 +7,14 @@ namespace Linkxtr\QrCode\Support;
 use ErrorException;
 use GdImage;
 use InvalidArgumentException;
-use RuntimeException;
 
-final class Image
+final readonly class Image
 {
-    private ?GdImage $gdImage = null;
+    private GdImage $gdImage;
 
+    /**
+     * @param  string  $image  Raw binary image data (not a file path).
+     */
     public function __construct(string $image)
     {
         try {
@@ -28,42 +30,20 @@ final class Image
         $this->gdImage = $img;
     }
 
-    public function __destruct()
-    {
-        $this->gdImage = null;
-    }
-
     /** @return int<0, max> */
     public function getWidth(): int
     {
-        if (! $this->gdImage instanceof GdImage) {
-            throw new RuntimeException('Image resource has been released.');
-        }
-
         return imagesx($this->gdImage);
     }
 
     /** @return int<0, max> */
     public function getHeight(): int
     {
-        if (! $this->gdImage instanceof GdImage) {
-            throw new RuntimeException('Image resource has been released.');
-        }
-
         return imagesy($this->gdImage);
     }
 
     public function getImageResource(): GdImage
     {
-        if (! $this->gdImage instanceof GdImage) {
-            throw new RuntimeException('Image resource has been released.');
-        }
-
         return $this->gdImage;
-    }
-
-    public function setImageResource(GdImage $gdImage): void
-    {
-        $this->gdImage = $gdImage;
     }
 }

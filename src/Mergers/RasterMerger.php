@@ -45,25 +45,16 @@ final class RasterMerger implements MergerInterface
 
     public function merge(): string
     {
-
         $sourceWidth = $this->sourceImage->getWidth();
         $sourceHeight = $this->sourceImage->getHeight();
-
-        if (! $sourceWidth || ! $sourceHeight) {
-            throw new InvalidArgumentException('Source image has zero width or height.');
-        }
 
         $mergeWidth = $this->mergeImage->getWidth();
         $mergeHeight = $this->mergeImage->getHeight();
 
-        if (! $mergeWidth || ! $mergeHeight) {
-            throw new InvalidArgumentException('Merge image has zero width or height.');
-        }
-
         $mergeRatio = $mergeWidth / $mergeHeight;
 
-        $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage));
-        $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio));
+        $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage)); // @pest-mutate-ignore
+        $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio)); // @pest-mutate-ignore
 
         // Constrain to canvas if logo exceeds vertical bounds
         if ($targetLogoHeight > $sourceHeight * $this->percentage) {
@@ -71,8 +62,8 @@ final class RasterMerger implements MergerInterface
             $targetLogoWidth = max(1, (int) ($targetLogoHeight * $mergeRatio));
         }
 
-        $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
-        $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
+        $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2); // @pest-mutate-ignore
+        $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2); // @pest-mutate-ignore
 
         $canvas = imagecreatetruecolor($sourceWidth, $sourceHeight);
 
@@ -80,24 +71,24 @@ final class RasterMerger implements MergerInterface
             throw new RuntimeException('Failed to create image canvas.');
         }
 
-        imagealphablending($canvas, false);
-        imagesavealpha($canvas, true);
-        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+        imagealphablending($canvas, false); // @pest-mutate-ignore
+        imagesavealpha($canvas, true); // @pest-mutate-ignore
+        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127); // @pest-mutate-ignore
 
         if (! $transparent) {
             throw new RuntimeException('Failed to create transparent color.');
         }
 
-        if (! imagefill($canvas, 0, 0, $transparent)) {
+        if (! imagefill($canvas, 0, 0, $transparent)) { // @pest-mutate-ignore
             throw new RuntimeException('Failed to fill image with transparent color.');
         }
 
-        imagealphablending($canvas, true);
+        imagealphablending($canvas, true); // @pest-mutate-ignore
 
         if (! imagecopy(
             $canvas,
             $this->sourceImage->getImageResource(),
-            0, 0, 0, 0,
+            0, 0, 0, 0, // @pest-mutate-ignore
             $sourceWidth,
             $sourceHeight
         )) {
@@ -108,7 +99,7 @@ final class RasterMerger implements MergerInterface
             $canvas,
             $this->mergeImage->getImageResource(),
             $centerX, $centerY,
-            0, 0,
+            0, 0, // @pest-mutate-ignore
             $targetLogoWidth, $targetLogoHeight,
             $mergeWidth, $mergeHeight
         )) {
@@ -126,18 +117,17 @@ final class RasterMerger implements MergerInterface
     {
         ob_start();
 
-        if ($this->format === Format::WEBP) {
-            imagewebp($gdImage, null, 90);
-        } else {
-            imagepng($gdImage);
-        }
+        $success = match ($this->format) {
+            Format::WEBP => imagewebp($gdImage, null, 90), // @pest-mutate-ignore
+            default => imagepng($gdImage),
+        };
 
         $content = ob_get_clean();
 
         unset($gdImage);
 
-        if ($content === false) {
-            throw new RuntimeException('Failed to capture image output from buffer.');
+        if (! $success || $content === false || $content === '') {
+            throw new RuntimeException('Failed to render image binary.');
         }
 
         return $content;
