@@ -83,23 +83,20 @@ namespace Linkxtr\QrCode\Mergers {
         }
     }
 
-    // if (! isset($GLOBALS['mockImageColorAllocate'])) {
-    //     $GLOBALS['mockImageColorAllocate'] = null;
-    // }
+    if (! isset($GLOBALS['mockImageColorAllocate'])) {
+        $GLOBALS['mockImageColorAllocate'] = null;
+    }
 
-    // if (! function_exists(__NAMESPACE__.'\imagecolorallocate')) {
-    //     /**
-    //      * @param  GdImage  $image
-    //      */
-    //     function imagecolorallocate($image, $red, $green, $blue): int|false
-    //     {
-    //         if (isset($GLOBALS['mockImageColorAllocate']) && $GLOBALS['mockImageColorAllocate'] === false) {
-    //             return false;
-    //         }
+    if (! function_exists(__NAMESPACE__.'\imagecolorallocate')) {
+        function imagecolorallocate(...$args): int|false
+        {
+            if (isset($GLOBALS['mockImageColorAllocate']) && $GLOBALS['mockImageColorAllocate'] === false) {
+                return false;
+            }
 
-    //         return \imagecolorallocate($image, $red, $green, $blue);
-    //     }
-    // }
+            return \imagecolorallocate(...$args);
+        }
+    }
 
     if (! isset($GLOBALS['mockImageCreateTrueColor'])) {
         $GLOBALS['mockImageCreateTrueColor'] = null;

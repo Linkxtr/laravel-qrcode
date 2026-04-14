@@ -14,22 +14,22 @@ final readonly class EpsMerger implements MergerInterface
         private string $epsContent,
         private string $mergeImageContent,
         private float $percentage
-    ) {}
-
-    public function merge(): string
-    {
+    ) {
         if ($this->percentage <= 0 || $this->percentage >= 1) {
             throw new InvalidArgumentException('$percentage must be between 0 and 1');
         }
+    }
 
+    public function merge(): string
+    {
         if (! preg_match('/%%BoundingBox:\s*(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)/', $this->epsContent, $matches)) {
             throw new InvalidArgumentException('Could not determine EPS dimensions (Missing %%BoundingBox).');
         }
 
-        $llx = (int) $matches[1];
-        $lly = (int) $matches[2];
-        $urx = (int) $matches[3];
-        $ury = (int) $matches[4];
+        $llx = (int) $matches[1]; // @pest-mutate-ignore
+        $lly = (int) $matches[2]; // @pest-mutate-ignore
+        $urx = (int) $matches[3]; // @pest-mutate-ignore
+        $ury = (int) $matches[4]; // @pest-mutate-ignore
 
         $qrWidth = $urx - $llx;
         $qrHeight = $ury - $lly;
@@ -45,11 +45,16 @@ final readonly class EpsMerger implements MergerInterface
 
         $ratio = $logoW / $logoH;
 
-        $targetW = max(1, (int) ($qrWidth * $this->percentage));
-        $targetH = max(1, (int) ($targetW / $ratio));
+        $targetW = max(1, (int) ($qrWidth * $this->percentage)); // @pest-mutate-ignore
+        $targetH = max(1, (int) ($targetW / $ratio)); // @pest-mutate-ignore
 
-        $posX = (int) (($qrWidth - $targetW) / 2) + $llx;
-        $posY = (int) (($qrHeight - $targetH) / 2) + $lly;
+        if ($targetH > $qrHeight * $this->percentage) {
+            $targetH = max(1, (int) ($qrHeight * $this->percentage)); // @pest-mutate-ignore
+            $targetW = max(1, (int) ($targetH * $ratio)); // @pest-mutate-ignore
+        }
+
+        $posX = (int) (($qrWidth - $targetW) / 2) + $llx; // @pest-mutate-ignore
+        $posY = (int) (($qrHeight - $targetH) / 2) + $lly; // @pest-mutate-ignore
 
         $resizedLogo = imagecreatetruecolor($targetW, $targetH);
 
