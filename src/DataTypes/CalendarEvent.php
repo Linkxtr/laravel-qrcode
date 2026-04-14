@@ -30,27 +30,31 @@ final class CalendarEvent implements DataTypeInterface
             throw new LogicException('CalendarEvent must be initialized via create() before rendering.');
         }
 
-        $event = "BEGIN:VCALENDAR\r\n";
-        $event .= "VERSION:2.0\r\n";
-        $event .= "PRODID:-//Linkxtr//LaravelQrCode//EN\r\n";
-        $event .= "BEGIN:VEVENT\r\n";
-        $event .= 'UID:'.$this->uid."\r\n";
-        $event .= 'DTSTAMP:'.Carbon::now()->utc()->format('Ymd\THis\Z')."\r\n";
-        $event .= 'SUMMARY:'.$this->formatProperty($this->summary)."\r\n";
+        $lines = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//Linkxtr//LaravelQrCode//EN',
+            'BEGIN:VEVENT',
+            'UID:'.$this->uid,
+            'DTSTAMP:'.Carbon::now()->utc()->format('Ymd\THis\Z'),
+            'SUMMARY:'.$this->formatProperty($this->summary),
+        ];
 
-        if ($this->description) {
-            $event .= 'DESCRIPTION:'.$this->formatProperty($this->description)."\r\n";
+        if ($this->description !== null) {
+            $lines[] = 'DESCRIPTION:'.$this->formatProperty($this->description);
         }
 
-        if ($this->location) {
-            $event .= 'LOCATION:'.$this->formatProperty($this->location)."\r\n";
+        if ($this->location !== null) {
+            $lines[] = 'LOCATION:'.$this->formatProperty($this->location);
         }
 
-        $event .= 'DTSTART:'.$this->start->copy()->utc()->format('Ymd\THis\Z')."\r\n";
-        $event .= 'DTEND:'.$this->end->copy()->utc()->format('Ymd\THis\Z')."\r\n";
-        $event .= "END:VEVENT\r\n";
+        $lines[] = 'DTSTART:'.$this->start->copy()->utc()->format('Ymd\THis\Z');
+        $lines[] = 'DTEND:'.$this->end->copy()->utc()->format('Ymd\THis\Z');
+        $lines[] = 'END:VEVENT';
+        $lines[] = 'END:VCALENDAR';
+        $lines[] = ''; // Required to generate the final trailing \r\n
 
-        return $event."END:VCALENDAR\r\n";
+        return implode("\r\n", $lines);
     }
 
     /**
