@@ -9,21 +9,43 @@ use Linkxtr\QrCode\Contracts\DataTypeInterface;
 
 final class Email implements DataTypeInterface
 {
-    private string $prefix = 'mailto:';
+    private const PREFIX = 'mailto:';
 
-    private ?string $address = null;
+    private string $address;
 
-    private string $subject;
+    private ?string $subject = null;
 
-    private string $body;
+    private ?string $body = null;
 
-    private string $cc;
+    private ?string $cc = null;
 
-    private string $bcc;
+    private ?string $bcc = null;
 
     public function __toString(): string
     {
-        return $this->buildEmailString();
+        $params = [];
+
+        if ($this->subject !== null) {
+            $params['subject'] = $this->subject;
+        }
+
+        if ($this->body !== null) {
+            $params['body'] = $this->body;
+        }
+
+        if ($this->cc !== null) {
+            $params['cc'] = $this->cc;
+        }
+
+        if ($this->bcc !== null) {
+            $params['bcc'] = $this->bcc;
+        }
+
+        if ($params === []) {
+            return self::PREFIX.$this->address;
+        }
+
+        return self::PREFIX.$this->address.'?'.http_build_query($params, encoding_type: PHP_QUERY_RFC3986);
     }
 
     /**
@@ -31,24 +53,20 @@ final class Email implements DataTypeInterface
      */
     public function create(array $arguments): void
     {
-        $this->setProperties($arguments);
-    }
-
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    private function setProperties(array $arguments): void
-    {
-        if (isset($arguments[0])) {
-            $this->address = $this->setAddress($arguments[0]);
+        if (! isset($arguments[0])) {
+            throw new InvalidArgumentException('Email address is required.');
         }
+
+        $this->address = $this->validateAddress($arguments[0]);
 
         if (isset($arguments[1])) {
             if (! is_string($arguments[1])) {
                 throw new InvalidArgumentException('Invalid subject provided to Email.');
             }
 
-            $this->subject = $arguments[1];
+            if ($arguments[1] !== '') {
+                $this->subject = $arguments[1];
+            }
         }
 
         if (isset($arguments[2])) {
@@ -56,50 +74,21 @@ final class Email implements DataTypeInterface
                 throw new InvalidArgumentException('Invalid body provided to Email.');
             }
 
-            $this->body = $arguments[2];
+            if ($arguments[2] !== '') {
+                $this->body = $arguments[2];
+            }
         }
 
-        if (isset($arguments[3])) {
-            $this->cc = $this->setAddress($arguments[3]);
+        if (isset($arguments[3]) && $arguments[3] !== '') {
+            $this->cc = $this->validateAddress($arguments[3]);
         }
 
-        if (isset($arguments[4])) {
-            $this->bcc = $this->setAddress($arguments[4]);
+        if (isset($arguments[4]) && $arguments[4] !== '') {
+            $this->bcc = $this->validateAddress($arguments[4]);
         }
     }
 
-    private function buildEmailString(): string
-    {
-        if ($this->address === null) {
-            throw new InvalidArgumentException('Email address is required.');
-        }
-
-        $params = [];
-
-        if (isset($this->subject) && $this->subject !== '') {
-            $params['subject'] = $this->subject;
-        }
-
-        if (isset($this->body) && $this->body !== '') {
-            $params['body'] = $this->body;
-        }
-
-        if (isset($this->cc) && $this->cc !== '') {
-            $params['cc'] = $this->cc;
-        }
-
-        if (isset($this->bcc) && $this->bcc !== '') {
-            $params['bcc'] = $this->bcc;
-        }
-
-        if ($params === []) {
-            return $this->prefix.$this->address;
-        }
-
-        return $this->prefix.$this->address.'?'.http_build_query($params);
-    }
-
-    private function setAddress(mixed $address): string
+    private function validateAddress(mixed $address): string
     {
         if (! filter_var($address, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException('Invalid email address provided to Email.');
