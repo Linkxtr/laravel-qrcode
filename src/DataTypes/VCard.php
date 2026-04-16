@@ -6,10 +6,11 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use LogicException;
 
 final class VCard implements DataTypeInterface
 {
-    private string $name;
+    private string $name = '';
 
     private ?string $firstName = null;
 
@@ -17,95 +18,166 @@ final class VCard implements DataTypeInterface
 
     private ?string $email = null;
 
+    private ?string $emailWork = null;
+
+    private ?string $emailHome = null;
+
     private ?string $phone = null;
+
+    private ?string $phoneWork = null;
+
+    private ?string $phoneHome = null;
+
+    private ?string $phoneCell = null;
 
     private ?string $company = null;
 
-    private ?string $title = null;
+    private ?string $job = null;
+
+    private ?string $role = null;
+
+    private ?string $address = null;
 
     private ?string $url = null;
 
+    private ?string $note = null;
+
+    private ?string $birthday = null;
+
     public function __toString(): string
     {
-        $vCard = "BEGIN:VCARD\r\nVERSION:3.0\r\n";
-
-        $vCard .= "FN:{$this->escapeValue($this->name)}\r\n";
-        $vCard .= "N:{$this->escapeValue($this->lastName ?? '')};{$this->escapeValue($this->firstName ?? '')};;;\r\n";
-
-        if ($this->email) {
-            $vCard .= "EMAIL:{$this->escapeValue($this->email)}\r\n";
+        if ($this->name === '') {
+            throw new LogicException('VCard must be initialized via create() before rendering.');
         }
 
-        if ($this->phone) {
-            $vCard .= "TEL:{$this->escapeValue($this->phone)}\r\n";
+        $lines = [
+            'BEGIN:VCARD',
+            'VERSION:3.0',
+        ];
+
+        $lines[] = 'FN:'.$this->escapeValue($this->name);
+
+        if ($this->firstName !== null || $this->lastName !== null) {
+            $lines[] = 'N:'.$this->escapeValue((string) $this->lastName).';'.$this->escapeValue((string) $this->firstName).';;;';
         }
 
-        if ($this->company) {
-            $vCard .= "ORG:{$this->escapeValue($this->company)}\r\n";
+        if ($this->company !== null) {
+            $lines[] = 'ORG:'.$this->escapeValue($this->company);
         }
 
-        if ($this->title) {
-            $vCard .= "TITLE:{$this->escapeValue($this->title)}\r\n";
+        if ($this->job !== null) {
+            $lines[] = 'TITLE:'.$this->escapeValue($this->job);
         }
 
-        if ($this->url) {
-            $vCard .= "URL:{$this->escapeValue($this->url)}\r\n";
+        if ($this->role !== null) {
+            $lines[] = 'ROLE:'.$this->escapeValue($this->role);
         }
 
-        return $vCard."END:VCARD\r\n";
+        if ($this->email !== null) {
+            $lines[] = 'EMAIL;type=INTERNET:'.$this->escapeValue($this->email);
+        }
+
+        if ($this->emailWork !== null) {
+            $lines[] = 'EMAIL;type=INTERNET,WORK:'.$this->escapeValue($this->emailWork);
+        }
+
+        if ($this->emailHome !== null) {
+            $lines[] = 'EMAIL;type=INTERNET,HOME:'.$this->escapeValue($this->emailHome);
+        }
+
+        if ($this->phone !== null) {
+            $lines[] = 'TEL:'.$this->escapeValue($this->phone);
+        }
+
+        if ($this->phoneWork !== null) {
+            $lines[] = 'TEL;type=WORK:'.$this->escapeValue($this->phoneWork);
+        }
+
+        if ($this->phoneHome !== null) {
+            $lines[] = 'TEL;type=HOME:'.$this->escapeValue($this->phoneHome);
+        }
+
+        if ($this->phoneCell !== null) {
+            $lines[] = 'TEL;type=CELL:'.$this->escapeValue($this->phoneCell);
+        }
+
+        if ($this->address !== null) {
+            $lines[] = 'ADR:;;'.$this->escapeValue($this->address).';;;;';
+        }
+
+        if ($this->url !== null) {
+            $lines[] = 'URL:'.$this->escapeValue($this->url);
+        }
+
+        if ($this->note !== null) {
+            $lines[] = 'NOTE:'.$this->escapeValue($this->note);
+        }
+
+        if ($this->birthday !== null) {
+            $lines[] = 'BDAY:'.$this->escapeValue($this->birthday);
+        }
+
+        $lines[] = 'END:VCARD';
+
+        return implode("\n", $lines);
     }
 
     /**
-     * @param  array<int, mixed>  $arguments
+     * @param  list<mixed>|array<string, mixed>  $arguments
      */
     public function create(array $arguments): void
     {
-        $properties = $arguments;
-
-        if (isset($arguments[0]) && is_array($arguments[0])) {
-            $properties = $arguments[0];
+        if (isset($arguments[0]) && is_array($arguments[0]) && count($arguments) === 1) {
+            $arguments = $arguments[0];
         }
 
-        if (! isset($properties['name']) || ! is_string($properties['name'])) {
-            throw new InvalidArgumentException('vCard FN (Formatted Name) is mandatory.');
+        $properties = $arguments;
+
+        // Support positional arguments for the most common fields
+        if (array_is_list($arguments)) {
+            $properties = [];
+            $map = ['name', 'phone', 'email', 'company', 'job'];
+
+            foreach ($map as $index => $key) {
+                if (isset($arguments[$index])) {
+                    $properties[$key] = $arguments[$index];
+                }
+            }
+        }
+
+        if (! isset($properties['name']) || ! is_string($properties['name']) || $properties['name'] === '') {
+            throw new InvalidArgumentException('VCard Name is mandatory.');
         }
 
         $this->name = $properties['name'];
 
-        if (isset($properties['first_name']) && is_string($properties['first_name'])) {
-            $this->firstName = $properties['first_name'];
-        }
+        $this->assignStringProperty($properties, 'firstName');
+        $this->assignStringProperty($properties, 'lastName');
+        $this->assignStringProperty($properties, 'email');
+        $this->assignStringProperty($properties, 'emailWork');
+        $this->assignStringProperty($properties, 'emailHome');
+        $this->assignStringProperty($properties, 'phone');
+        $this->assignStringProperty($properties, 'phoneWork');
+        $this->assignStringProperty($properties, 'phoneHome');
+        $this->assignStringProperty($properties, 'phoneCell');
+        $this->assignStringProperty($properties, 'company');
+        $this->assignStringProperty($properties, 'job');
+        $this->assignStringProperty($properties, 'role');
+        $this->assignStringProperty($properties, 'address');
+        $this->assignStringProperty($properties, 'url');
+        $this->assignStringProperty($properties, 'note');
+        $this->assignStringProperty($properties, 'birthday');
+    }
 
-        if (isset($properties['last_name']) && is_string($properties['last_name'])) {
-            $this->lastName = $properties['last_name'];
-        }
-
-        if (isset($properties['email']) && is_string($properties['email'])) {
-            if (! filter_var($properties['email'], FILTER_VALIDATE_EMAIL)) {
-                throw new InvalidArgumentException('Invalid email address provided to vCard.');
-            }
-
-            $this->email = $properties['email'];
-        }
-
-        if (isset($properties['phone']) && is_string($properties['phone'])) {
-            $this->phone = $properties['phone'];
-        }
-
-        if (isset($properties['company']) && is_string($properties['company'])) {
-            $this->company = $properties['company'];
-        }
-
-        if (isset($properties['title']) && is_string($properties['title'])) {
-            $this->title = $properties['title'];
-        }
-
-        if (isset($properties['url']) && is_string($properties['url'])) {
-            if (! filter_var($properties['url'], FILTER_VALIDATE_URL)) {
-                throw new InvalidArgumentException('Invalid URL provided to vCard.');
-            }
-
-            $this->url = $properties['url'];
+    /**
+     * Helper to safely map optional properties and ignore empty/invalid values.
+     *
+     * @param  array<int|string, mixed>  $properties
+     */
+    private function assignStringProperty(array $properties, string $key): void
+    {
+        if (isset($properties[$key]) && is_string($properties[$key]) && $properties[$key] !== '') {
+            $this->{$key} = $properties[$key];
         }
     }
 
@@ -113,10 +185,9 @@ final class VCard implements DataTypeInterface
     {
         return strtr($value, [
             '\\' => '\\\\',
-            ',' => '\\,',
             ';' => '\\;',
+            ',' => '\\,',
             "\n" => '\\n',
-            "\r" => '',
         ]);
     }
 }
