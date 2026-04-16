@@ -12,17 +12,21 @@ final class SMS implements DataTypeInterface
 {
     use ValidatesPhoneNumbers;
 
-    private string $prefix = 'SMSTO:';
+    private const PREFIX = 'sms:';
 
-    private string $separator = ':';
-
-    private ?string $smsAddress = null;
+    private string $phoneNumber;
 
     private ?string $message = null;
 
     public function __toString(): string
     {
-        return $this->buildSMSString();
+        $uri = self::PREFIX.$this->phoneNumber;
+
+        if ($this->message !== null) {
+            return $uri.'?'.http_build_query(['body' => $this->message], encoding_type: PHP_QUERY_RFC3986);
+        }
+
+        return $uri;
     }
 
     /**
@@ -30,44 +34,24 @@ final class SMS implements DataTypeInterface
      */
     public function create(array $arguments): void
     {
-        $this->setProperties($arguments);
-    }
-
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    private function setProperties(array $arguments): void
-    {
-        if (! isset($arguments[0]) && ! isset($arguments[1])) {
-            throw new InvalidArgumentException('Either SMS address or message is required.');
+        if (! isset($arguments[0])) {
+            throw new InvalidArgumentException('SMS phone number is required.');
         }
 
-        if (isset($arguments[0])) {
-            if (! is_string($arguments[0])) {
-                throw new InvalidArgumentException('SMS address must be a string.');
+        if (! is_string($arguments[0]) && ! is_numeric($arguments[0])) {
+            throw new InvalidArgumentException('SMS phone number must be a string or numeric value.');
+        }
+
+        $this->phoneNumber = $this->validatePhoneNumber((string) $arguments[0]);
+
+        if (isset($arguments[1])) {
+            if (! is_string($arguments[1])) {
+                throw new InvalidArgumentException('SMS message must be a string.');
             }
 
-            if ($arguments[0] === '') {
-                throw new InvalidArgumentException('SMS address cannot be empty.');
+            if ($arguments[1] !== '') {
+                $this->message = $arguments[1];
             }
-
-            $this->validatePhoneNumber($arguments[0]);
-            $this->smsAddress = $arguments[0];
         }
-
-        if (isset($arguments[1]) && is_string($arguments[1])) {
-            $this->message = $arguments[1];
-        }
-    }
-
-    private function buildSMSString(): string
-    {
-        $sms = $this->prefix.($this->smsAddress ?? '');
-
-        if ($this->message !== null) {
-            $sms .= $this->separator.rawurlencode($this->message);
-        }
-
-        return $sms;
     }
 }
