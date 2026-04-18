@@ -141,7 +141,7 @@ it('builds the correct color models', function () {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
-    $config->setupColor(255, 0, 0, 50);
+    $config->setupColor(255, 0, 0, 99);
     expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Alpha::class);
 
     $config->setupColor(255, 0, 0);
@@ -154,7 +154,7 @@ it('builds the correct color models', function () {
 
     $config->setupColor(10, 20, 30);
     expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Cmyk::class)
-        ->and(invade($renderer)->buildColor($config->getColorValue())->getBlack())->toBe(0);
+        ->and(invade($renderer)->buildColor($config->getColorValue())->getBlack())->toBe(100);
 
     $config->setGrayscale(50);
     expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Gray::class);

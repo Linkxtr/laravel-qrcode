@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Renderers;
 
-use BaconQrCode\Renderer\Color\Cmyk;
-use BaconQrCode\Renderer\Color\ColorInterface;
-use BaconQrCode\Renderer\Color\Gray;
+use BaconQrCode\Renderer\Color\Alpha;
+use BaconQrCode\Renderer\Color\ColorInterface as BaconColorInterface;
 use BaconQrCode\Renderer\Eye\CompositeEye;
 use BaconQrCode\Renderer\Eye\EyeInterface;
 use BaconQrCode\Renderer\Eye\ModuleEye;
@@ -30,9 +29,9 @@ use BaconQrCode\Renderer\RendererStyle\Gradient;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Illuminate\Support\HtmlString;
+use Linkxtr\QrCode\Contracts\ColorInterface;
 use Linkxtr\QrCode\Contracts\MergerInterface;
 use Linkxtr\QrCode\DTOs\Config;
-use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\Style;
@@ -40,7 +39,6 @@ use Linkxtr\QrCode\Mergers\EpsMerger;
 use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
-use Linkxtr\QrCode\ValueObjects\ColorValue;
 use RuntimeException;
 
 final readonly class BaconRenderer
@@ -163,17 +161,15 @@ final readonly class BaconRenderer
         return Fill::withForegroundColor($backgroundColor, $foregroundColor, $eye0, $eye1, $eye2);
     }
 
-    private function buildColor(ColorValue $colorValue): ColorInterface
+    private function buildColor(ColorInterface $color): BaconColorInterface
     {
-        if ($this->config->getColorModel() === ColorModel::GRAY) {
-            return new Gray($colorValue->c1);
+        $baconColor = $color->toBaconColor();
+
+        if ($color->getAlpha() < 100) {
+            return new Alpha($color->getAlpha(), $baconColor);
         }
 
-        if ($this->config->getColorModel() === ColorModel::CMYK) {
-            return new Cmyk($colorValue->c1, $colorValue->c2, $colorValue->c3, $colorValue->c4 ?? 0);
-        }
-
-        return $this->config->createColor($colorValue->c1, $colorValue->c2, $colorValue->c3, $colorValue->c4);
+        return $baconColor;
     }
 
     private function getEye(): EyeInterface

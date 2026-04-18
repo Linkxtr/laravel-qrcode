@@ -2,8 +2,7 @@
 
 declare(strict_types=1);
 
-use BaconQrCode\Renderer\Color\Alpha;
-use BaconQrCode\Renderer\Color\Rgb;
+use BaconQrCode\Renderer\Color\Rgb as BaconRgb;
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
 use Linkxtr\QrCode\DTOs\Config;
@@ -13,6 +12,9 @@ use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
+use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
+use Linkxtr\QrCode\ValueObjects\Colors\Gray;
+use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 require_once __DIR__.'/../../Support/Overrides.php';
 
@@ -34,14 +36,14 @@ test('it initializes with default values', function () {
         ->and($config->getGradient())->toBeNull()
         ->and($config->getImageMerge())->toBe('')
         ->and($config->getImagePercentage())->toBe(0.2)
-        ->and($config->getColorValue()->c1)->toBe(0)
-        ->and($config->getColorValue()->c2)->toBe(0)
-        ->and($config->getColorValue()->c3)->toBe(0)
-        ->and($config->getColorValue()->c4)->toBe(null)
-        ->and($config->getBackgroundColorValue()->c1)->toBe(255)
-        ->and($config->getBackgroundColorValue()->c2)->toBe(255)
-        ->and($config->getBackgroundColorValue()->c3)->toBe(255)
-        ->and($config->getBackgroundColorValue()->c4)->toBe(null);
+        ->and($config->getColorValue()->red)->toBe(0)
+        ->and($config->getColorValue()->green)->toBe(0)
+        ->and($config->getColorValue()->blue)->toBe(0)
+        ->and($config->getColorValue()->alpha)->toBe(100)
+        ->and($config->getBackgroundColorValue()->red)->toBe(255)
+        ->and($config->getBackgroundColorValue()->green)->toBe(255)
+        ->and($config->getBackgroundColorValue()->blue)->toBe(255)
+        ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
 });
 
 test('it seeds configuration from array payload', function () {
@@ -60,14 +62,14 @@ test('it seeds configuration from array payload', function () {
         ->and($config->getFormat())->toBe(Format::PNG)
         ->and($config->getErrorCorrectionLevel())->toBe(ErrorCorrectionLevel::H)
         ->and($config->getEncoding())->toBe('ISO-8859-1')
-        ->and($config->getColorValue()->c1)->toBe(10)
-        ->and($config->getColorValue()->c2)->toBe(20)
-        ->and($config->getColorValue()->c3)->toBe(30)
-        ->and($config->getColorValue()->c4)->toBe(40)
-        ->and($config->getBackgroundColorValue()->c1)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c2)->toBe(255)
-        ->and($config->getBackgroundColorValue()->c3)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c4)->toBe(null);
+        ->and($config->getColorValue()->red)->toBe(10)
+        ->and($config->getColorValue()->green)->toBe(20)
+        ->and($config->getColorValue()->blue)->toBe(30)
+        ->and($config->getColorValue()->alpha)->toBe(40)
+        ->and($config->getBackgroundColorValue()->red)->toBe(0)
+        ->and($config->getBackgroundColorValue()->green)->toBe(255)
+        ->and($config->getBackgroundColorValue()->blue)->toBe(0)
+        ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
 });
 
 test('it seeds color config with keyed array', function () {
@@ -76,14 +78,14 @@ test('it seeds color config with keyed array', function () {
         'background_color' => ['r' => 0, 'g' => 200, 'b' => 0, 'a' => 50],
     ]);
 
-    expect($config->getColorValue()->c1)->toBe(255)
-        ->and($config->getColorValue()->c2)->toBe(0)
-        ->and($config->getColorValue()->c3)->toBe(40)
-        ->and($config->getColorValue()->c4)->toBe(50)
-        ->and($config->getBackgroundColorValue()->c1)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c2)->toBe(200)
-        ->and($config->getBackgroundColorValue()->c3)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c4)->toBe(50);
+    expect($config->getColorValue()->red)->toBe(255)
+        ->and($config->getColorValue()->green)->toBe(0)
+        ->and($config->getColorValue()->blue)->toBe(40)
+        ->and($config->getColorValue()->alpha)->toBe(50)
+        ->and($config->getBackgroundColorValue()->red)->toBe(0)
+        ->and($config->getBackgroundColorValue()->green)->toBe(200)
+        ->and($config->getBackgroundColorValue()->blue)->toBe(0)
+        ->and($config->getBackgroundColorValue()->alpha)->toBe(50);
 });
 
 test('it falls back to default size when provide invalid size and margin', function () {
@@ -210,17 +212,17 @@ test('it validates RGB boundaries across all color methods', function () {
     $config->setupColor(255, 255, 255);
     $config->setupBackgroundColor(0, 0, 0);
 
-    expect($config->getColorValue()->c1)->toBe(255)
-        ->and($config->getColorValue()->c2)->toBe(255)
-        ->and($config->getColorValue()->c3)->toBe(255)
-        ->and($config->getColorValue()->c4)->toBe(null)
-        ->and($config->getBackgroundColorValue()->c1)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c2)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c3)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c4)->toBe(null);
+    expect($config->getColorValue()->red)->toBe(255)
+        ->and($config->getColorValue()->green)->toBe(255)
+        ->and($config->getColorValue()->blue)->toBe(255)
+        ->and($config->getColorValue()->alpha)->toBe(100)
+        ->and($config->getBackgroundColorValue()->red)->toBe(0)
+        ->and($config->getBackgroundColorValue()->green)->toBe(0)
+        ->and($config->getBackgroundColorValue()->blue)->toBe(0)
+        ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
 
-    expect(fn () => $config->setupColor(-1, 0, 0))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupColor(256, 0, 0))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
+    expect(fn () => $config->setupColor(-1, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupColor(256, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
 });
 
 test('it falls back to default color if any of the values is not an integer', function () {
@@ -234,14 +236,14 @@ test('it falls back to default color if any of the values is not an integer', fu
         'background_color' => ['invalid', 'string', [], 2.5],
     ]);
 
-    expect($config->getColorValue()->c1)->toBe(0)
-        ->and($config->getColorValue()->c2)->toBe(0)
-        ->and($config->getColorValue()->c3)->toBe(0)
-        ->and($config->getColorValue()->c4)->toBe(null)
-        ->and($config->getBackgroundColorValue()->c1)->toBe(255)
-        ->and($config->getBackgroundColorValue()->c2)->toBe(255)
-        ->and($config->getBackgroundColorValue()->c3)->toBe(255)
-        ->and($config->getBackgroundColorValue()->c4)->toBe(null);
+    expect($config->getColorValue()->red)->toBe(0)
+        ->and($config->getColorValue()->green)->toBe(0)
+        ->and($config->getColorValue()->blue)->toBe(0)
+        ->and($config->getColorValue()->alpha)->toBe(100)
+        ->and($config->getBackgroundColorValue()->red)->toBe(255)
+        ->and($config->getBackgroundColorValue()->green)->toBe(255)
+        ->and($config->getBackgroundColorValue()->blue)->toBe(255)
+        ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
 });
 
 test('it handles grayscale configuration', function () {
@@ -249,38 +251,20 @@ test('it handles grayscale configuration', function () {
     $config->setGrayscale(0, 0);
 
     expect($config->getColorModel())->toBe(ColorModel::GRAY)
-        ->and($config->getColorValue()->c1)->toBe(0)
-        ->and($config->getColorValue()->c2)->toBe(0)
-        ->and($config->getColorValue()->c3)->toBe(0)
-        ->and($config->getColorValue()->c4)->toBe(null)
-        ->and($config->getBackgroundColorValue()->c1)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c2)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c3)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c4)->toBe(null);
+        ->and($config->getColorValue()->gray)->toBe(0)
+        ->and($config->getBackgroundColorValue()->gray)->toBe(0);
 
     $config->setGrayscale(100, 100);
 
     expect($config->getColorModel())->toBe(ColorModel::GRAY)
-        ->and($config->getColorValue()->c1)->toBe(100)
-        ->and($config->getColorValue()->c2)->toBe(0)
-        ->and($config->getColorValue()->c3)->toBe(0)
-        ->and($config->getColorValue()->c4)->toBe(null)
-        ->and($config->getBackgroundColorValue()->c1)->toBe(100)
-        ->and($config->getBackgroundColorValue()->c2)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c3)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c4)->toBe(null);
+        ->and($config->getColorValue()->gray)->toBe(100)
+        ->and($config->getBackgroundColorValue()->gray)->toBe(100);
 
     $config->setGrayscale(50);
 
     expect($config->getColorModel())->toBe(ColorModel::GRAY)
-        ->and($config->getColorValue()->c1)->toBe(50)
-        ->and($config->getColorValue()->c2)->toBe(0)
-        ->and($config->getColorValue()->c3)->toBe(0)
-        ->and($config->getColorValue()->c4)->toBe(null)
-        ->and($config->getBackgroundColorValue()->c1)->toBe(100)
-        ->and($config->getBackgroundColorValue()->c2)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c3)->toBe(0)
-        ->and($config->getBackgroundColorValue()->c4)->toBe(null);
+        ->and($config->getColorValue()->gray)->toBe(50)
+        ->and($config->getBackgroundColorValue()->gray)->toBe(100);
 
     expect(fn () => $config->setGrayscale(-1))->toThrow(InvalidArgumentException::class, 'Gray value must be between 0 and 100');
     expect(fn () => $config->setGrayscale(101))->toThrow(InvalidArgumentException::class, 'Gray value must be between 0 and 100');
@@ -295,32 +279,32 @@ test('it handles eye color configuration and validates eye numbers and colors', 
     $config->setupEyeColor(2, 0, 0, 255);
 
     expect($config->getEyeColors()[0])->toBeInstanceOf(EyeFill::class)
-        ->and($config->getEyeColors()[0]->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and($config->getEyeColors()[0]->getExternalColor())->toBeInstanceOf(BaconRgb::class)
         ->and($config->getEyeColors()[0]->getExternalColor()->getRed())->toBe(255)
         ->and($config->getEyeColors()[0]->getExternalColor()->getGreen())->toBe(0)
         ->and($config->getEyeColors()[0]->getExternalColor()->getBlue())->toBe(0)
-        ->and($config->getEyeColors()[0]->getInternalColor())->toBeInstanceOf(Rgb::class)
+        ->and($config->getEyeColors()[0]->getInternalColor())->toBeInstanceOf(BaconRgb::class)
         ->and($config->getEyeColors()[0]->getInternalColor()->getRed())->toBe(0)
         ->and($config->getEyeColors()[0]->getInternalColor()->getGreen())->toBe(255)
         ->and($config->getEyeColors()[0]->getInternalColor()->getBlue())->toBe(0)
         ->and($config->getEyeColors()[2])->toBeInstanceOf(EyeFill::class)
-        ->and($config->getEyeColors()[2]->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and($config->getEyeColors()[2]->getExternalColor())->toBeInstanceOf(BaconRgb::class)
         ->and($config->getEyeColors()[2]->getExternalColor()->getRed())->toBe(0)
         ->and($config->getEyeColors()[2]->getExternalColor()->getGreen())->toBe(0)
         ->and($config->getEyeColors()[2]->getExternalColor()->getBlue())->toBe(255)
-        ->and($config->getEyeColors()[2]->getInternalColor())->toBeInstanceOf(Rgb::class)
+        ->and($config->getEyeColors()[2]->getInternalColor())->toBeInstanceOf(BaconRgb::class)
         ->and($config->getEyeColors()[2]->getInternalColor()->getRed())->toBe(0)
         ->and($config->getEyeColors()[2]->getInternalColor()->getGreen())->toBe(0)
         ->and($config->getEyeColors()[2]->getInternalColor()->getBlue())->toBe(0);
 
     expect(fn () => $config->setupEyeColor(-1, 0, 0, 0))->toThrow(InvalidArgumentException::class, 'Eye number must be 0, 1, or 2');
     expect(fn () => $config->setupEyeColor(3, 0, 0, 0))->toThrow(InvalidArgumentException::class, 'Eye number must be 0, 1, or 2');
-    expect(fn () => $config->setupEyeColor(0, -1, 0, 0))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupEyeColor(0, 256, 0, 0))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupEyeColor(0, 0, -1, 0))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupEyeColor(0, 0, 256, 0))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupEyeColor(0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupEyeColor(0, 0, 0, 256))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
+    expect(fn () => $config->setupEyeColor(0, -1, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, 256, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, 0, -1, 0))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, 0, 256, 0))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, 0, 0, 256))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
 });
 
 test('it configures gradients from strings and enums', function () {
@@ -338,18 +322,18 @@ test('it configures gradients from strings and enums', function () {
 test('it throws exception when gradient colors are invalid', function () {
     $config = new Config;
 
-    expect(fn () => $config->setupGradient(-1, 0, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(256, 0, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(0, -1, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(0, 256, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(0, 0, -1, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(0, 0, 256, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(0, 0, 0, -1, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(0, 0, 0, 256, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(0, 0, 0, 0, -1, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(0, 0, 0, 0, 256, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(0, 0, 0, 0, 0, -1, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
-    expect(fn () => $config->setupGradient(0, 0, 0, 0, 0, 256, 'diagonal'))->toThrow(InvalidArgumentException::class, 'RGB values must be between 0 and 255');
+    expect(fn () => $config->setupGradient(-1, 0, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(256, 0, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(0, -1, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(0, 256, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(0, 0, -1, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(0, 0, 256, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(0, 0, 0, -1, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(0, 0, 0, 256, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(0, 0, 0, 0, -1, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(0, 0, 0, 0, 256, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(0, 0, 0, 0, 0, -1, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(0, 0, 0, 0, 0, 256, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
 });
 
 test('it sets up image merge from absolute file path', function () {
@@ -431,11 +415,93 @@ test('it sets up string image merges and validates percentages', function () {
     expect(fn () => $config->setupMergeString('data', 1.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
 });
 
-test('method createColor returns correct color type', function () {
+test('it sets up color model and converts existing colors', function () {
     $config = new Config;
-    $color = $config->createColor(255, 0, 0);
-    expect($color)->toBeInstanceOf(Rgb::class);
 
-    $color = $config->createColor(255, 0, 0, 0);
-    expect($color)->toBeInstanceOf(Alpha::class);
+    $config->setupColor(255, 0, 0);
+    expect($config->getColorValue())->toBeInstanceOf(Rgb::class)
+        ->and($config->getColorValue()->red)->toBe(255)
+        ->and($config->getColorValue()->green)->toBe(0)
+        ->and($config->getColorValue()->blue)->toBe(0);
+
+    $config->setColorModel(ColorModel::CMYK);
+    expect($config->getColorValue())->toBeInstanceOf(Cmyk::class)
+        ->and($config->getColorValue()->cyan)->toBe(0)
+        ->and($config->getColorValue()->magenta)->toBe(100)
+        ->and($config->getColorValue()->yellow)->toBe(100)
+        ->and($config->getColorValue()->black)->toBe(0);
+
+    $config->setupColor(0, 0, 0, 0);
+    $config->setupBackgroundColor(0, 0, 0, 100);
+    expect($config->getColorValue())->toBeInstanceOf(Cmyk::class)
+        ->and($config->getColorValue()->cyan)->toBe(0)
+        ->and($config->getColorValue()->magenta)->toBe(0)
+        ->and($config->getColorValue()->yellow)->toBe(0)
+        ->and($config->getColorValue()->black)->toBe(0)
+        ->and($config->getBackgroundColorValue())->toBeInstanceOf(Cmyk::class)
+        ->and($config->getBackgroundColorValue()->cyan)->toBe(0)
+        ->and($config->getBackgroundColorValue()->magenta)->toBe(0)
+        ->and($config->getBackgroundColorValue()->yellow)->toBe(0)
+        ->and($config->getBackgroundColorValue()->black)->toBe(100);
+
+    $config->setColorModel(ColorModel::GRAY);
+    expect($config->getColorValue())->toBeInstanceOf(Gray::class)
+        ->and($config->getColorValue()->gray)->toBe(0)
+        ->and($config->getBackgroundColorValue())->toBeInstanceOf(Gray::class)
+        ->and($config->getBackgroundColorValue()->gray)->toBe(100);
+});
+
+test('it handles c4 parameter fallback and override in setupColor across all color models', function () {
+    $config = new Config;
+
+    $config->setColorModel(ColorModel::RGB);
+
+    $config->setupColor(10, 20, 30);
+    expect($config->getColorValue()->alpha)->toBe(100);
+
+    $config->setupColor(10, 20, 30, 50);
+    expect($config->getColorValue()->alpha)->toBe(50);
+
+    $config->setColorModel(ColorModel::CMYK);
+
+    $config->setupColor(10, 20, 30);
+    expect($config->getColorValue()->black)->toBe(100);
+
+    $config->setupColor(10, 20, 30, 50);
+    expect($config->getColorValue()->black)->toBe(50);
+
+    $config->setColorModel(ColorModel::GRAY);
+    $config->setupColor(10, 0, 0);
+    expect($config->getColorValue()->alpha)->toBe(100);
+
+    $config->setupColor(10, 0, 0, 50);
+    expect($config->getColorValue()->alpha)->toBe(50);
+});
+
+test('it handles c4 parameter fallback and override in setupBackgroundColor across all color models', function () {
+    $config = new Config;
+
+    $config->setColorModel(ColorModel::RGB);
+    
+    $config->setupBackgroundColor(10, 20, 30);
+    expect($config->getBackgroundColorValue()->alpha)->toBe(100);
+    
+    $config->setupBackgroundColor(10, 20, 30, 50);
+    expect($config->getBackgroundColorValue()->alpha)->toBe(50);
+
+    $config->setColorModel(ColorModel::CMYK);
+    
+    $config->setupBackgroundColor(10, 20, 30);
+    expect($config->getBackgroundColorValue()->black)->toBe(100);
+    
+    $config->setupBackgroundColor(10, 20, 30, 50);
+    expect($config->getBackgroundColorValue()->black)->toBe(50);
+
+    $config->setColorModel(ColorModel::GRAY);
+    
+    $config->setupBackgroundColor(10, 0, 0);
+    expect($config->getBackgroundColorValue()->alpha)->toBe(100);
+    
+    $config->setupBackgroundColor(10, 0, 0, 50);
+    expect($config->getBackgroundColorValue()->alpha)->toBe(50);
 });

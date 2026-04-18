@@ -136,10 +136,10 @@ test('fluent configuration methods delegate to config and return self', function
         ->and(invade($generator)->config->getInternalEyeStyle())->toBe(EyeStyle::SQUARE);
 
     expect($generator->color(10, 20, 30))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getColorValue()->c1)->toBe(10);
+        ->and(invade($generator)->config->getColorValue()->red)->toBe(10);
 
     expect($generator->backgroundColor(10, 20, 30))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getBackgroundColorValue()->c1)->toBe(10);
+        ->and(invade($generator)->config->getBackgroundColorValue()->red)->toBe(10);
 
     expect($generator->cmyk())->toBeInstanceOf(Generator::class)
         ->and(invade($generator)->config->getColorModel())->toBe(ColorModel::CMYK);

@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DTOs;
 
-use BaconQrCode\Renderer\Color\Alpha;
-use BaconQrCode\Renderer\Color\ColorInterface;
-use BaconQrCode\Renderer\Color\Rgb;
+use BaconQrCode\Renderer\Color\Rgb as BaconRgb;
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\ColorInterface;
 use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
 use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
-use Linkxtr\QrCode\ValueObjects\ColorValue;
+use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
+use Linkxtr\QrCode\ValueObjects\Colors\Gray;
+use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 final class Config
 {
@@ -84,12 +85,12 @@ final class Config
     /**
      * The foreground color value of the QR code.
      */
-    private ?ColorValue $colorValue = null;
+    private ?ColorInterface $colorValue = null;
 
     /**
      * The background color value of the QR code.
      */
-    private ?ColorValue $backgroundColorValue = null;
+    private ?ColorInterface $backgroundColorValue = null;
 
     /**
      * An array that holds EyeFills of the color of the eyes.
@@ -145,11 +146,11 @@ final class Config
         }
 
         if (isset($config['color']) && is_array($config['color'])) {
-            $this->colorValue = new ColorValue(...$this->readRgb($config['color'], 0));
+            $this->colorValue = new Rgb(...$this->readRgb($config['color'], 0));
         }
 
         if (isset($config['background_color']) && is_array($config['background_color'])) {
-            $this->backgroundColorValue = new ColorValue(...$this->readRgb($config['background_color'], 255));
+            $this->backgroundColorValue = new Rgb(...$this->readRgb($config['background_color'], 255));
         }
     }
 
@@ -285,6 +286,22 @@ final class Config
     public function setColorModel(ColorModel $colorModel): void
     {
         $this->colorModel = $colorModel;
+
+        if ($this->colorValue instanceof ColorInterface) {
+            $this->colorValue = match ($colorModel) {
+                ColorModel::RGB => $this->colorValue->toRgb(),
+                ColorModel::CMYK => $this->colorValue->toCmyk(),
+                ColorModel::GRAY => $this->colorValue->toGray(),
+            };
+        }
+
+        if ($this->backgroundColorValue instanceof ColorInterface) {
+            $this->backgroundColorValue = match ($colorModel) {
+                ColorModel::RGB => $this->backgroundColorValue->toRgb(),
+                ColorModel::CMYK => $this->backgroundColorValue->toCmyk(),
+                ColorModel::GRAY => $this->backgroundColorValue->toGray(),
+            };
+        }
     }
 
     public function getColorModel(): ColorModel
@@ -303,28 +320,36 @@ final class Config
         }
 
         $this->setColorModel(ColorModel::GRAY);
-        $this->setColorValue(new ColorValue($gray, 0, 0));
-        $this->setBackgroundColorValue(new ColorValue($backgroundGray ?? 100, 0, 0));
+        $this->setColorValue(new Gray($gray));
+        $this->setBackgroundColorValue(new Gray($backgroundGray ?? 100));
     }
 
     public function setupColor(int $c1, int $c2, int $c3, ?int $c4 = null): void
     {
-        $this->setColorValue(new ColorValue($c1, $c2, $c3, $c4));
+        $this->setColorValue(match ($this->colorModel) {
+            ColorModel::RGB => new Rgb($c1, $c2, $c3, $c4 ?? 100),
+            ColorModel::CMYK => new Cmyk($c1, $c2, $c3, $c4 ?? 100),
+            ColorModel::GRAY => new Gray($c1, $c4 ?? 100),
+        });
     }
 
     public function setupBackgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null): void
     {
-        $this->setBackgroundColorValue(new ColorValue($c1, $c2, $c3, $c4));
+        $this->setBackgroundColorValue(match ($this->colorModel) {
+            ColorModel::RGB => new Rgb($c1, $c2, $c3, $c4 ?? 100),
+            ColorModel::CMYK => new Cmyk($c1, $c2, $c3, $c4 ?? 100),
+            ColorModel::GRAY => new Gray($c1, $c4 ?? 100),
+        });
     }
 
-    public function getColorValue(): ColorValue
+    public function getColorValue(): ColorInterface
     {
-        return $this->colorValue ?? new ColorValue(0, 0, 0);
+        return $this->colorValue ?? new Rgb(0, 0, 0);
     }
 
-    public function getBackgroundColorValue(): ColorValue
+    public function getBackgroundColorValue(): ColorInterface
     {
-        return $this->backgroundColorValue ?? new ColorValue(255, 255, 255);
+        return $this->backgroundColorValue ?? new Rgb(255, 255, 255);
     }
 
     public function setupEyeColor(int $eyeNumber, int $innerRed, int $innerGreen, int $innerBlue, int $outerRed = 0, int $outerGreen = 0, int $outerBlue = 0): void
@@ -333,11 +358,12 @@ final class Config
             throw new InvalidArgumentException('Eye number must be 0, 1, or 2.');
         }
 
-        $this->validateRgb($innerRed, $innerGreen, $innerBlue, $outerRed, $outerGreen, $outerBlue);
+        $innerColor = new Rgb($innerRed, $innerGreen, $innerBlue);
+        $outerColor = new Rgb($outerRed, $outerGreen, $outerBlue);
 
         $this->setEyeColor($eyeNumber, new EyeFill(
-            $this->createColor($innerRed, $innerGreen, $innerBlue),
-            $this->createColor($outerRed, $outerGreen, $outerBlue)
+            new BaconRgb($innerColor->red, $innerColor->green, $innerColor->blue),
+            new BaconRgb($outerColor->red, $outerColor->green, $outerColor->blue)
         ));
     }
 
@@ -361,11 +387,12 @@ final class Config
             );
         }
 
-        $this->validateRgb($startRed, $startGreen, $startBlue);
-        $this->validateRgb($endRed, $endGreen, $endBlue);
+        $startColor = new Rgb($startRed, $startGreen, $startBlue);
+        $endColor = new Rgb($endRed, $endGreen, $endBlue);
+
         $this->setGradient(new Gradient(
-            $this->createColor($startRed, $startGreen, $startBlue),
-            $this->createColor($endRed, $endGreen, $endBlue),
+            new BaconRgb($startColor->red, $startColor->green, $startColor->blue),
+            new BaconRgb($endColor->red, $endColor->green, $endColor->blue),
             $type->toBaconGradientType()
         ));
     }
@@ -414,23 +441,6 @@ final class Config
         return $this->imagePercentage;
     }
 
-    /**
-     * Create a BaconQrCode color object.
-     *
-     * @param  int  $red  Red component (0-255)
-     * @param  int  $green  Green component (0-255)
-     * @param  int  $blue  Blue component (0-255)
-     * @param  int|null  $alpha  Alpha/opacity (0-100, not 0-255)
-     */
-    public function createColor(int $red, int $green, int $blue, ?int $alpha = null): ColorInterface
-    {
-        if (is_null($alpha)) {
-            return new Rgb($red, $green, $blue);
-        }
-
-        return new Alpha($alpha, new Rgb($red, $green, $blue));
-    }
-
     private function setStyleSize(float $size): void
     {
         if ($size <= 0 || $size > 1) {
@@ -458,14 +468,14 @@ final class Config
         $this->style = $style;
     }
 
-    private function setColorValue(ColorValue $colorValue): void
+    private function setColorValue(ColorInterface $color): void
     {
-        $this->colorValue = $colorValue;
+        $this->colorValue = $color;
     }
 
-    private function setBackgroundColorValue(ColorValue $colorValue): void
+    private function setBackgroundColorValue(ColorInterface $color): void
     {
-        $this->backgroundColorValue = $colorValue;
+        $this->backgroundColorValue = $color;
     }
 
     private function setGradient(Gradient $gradient): void
@@ -478,14 +488,14 @@ final class Config
      * or a named key.  Returns $default when the value is absent or not an int.
      *
      * @param  array<mixed>  $raw
-     * @return array{int, int, int, int|null}
+     * @return array<int>
      */
     private function readRgb(array $raw, int $default): array
     {
         $red = $raw['r'] ?? $raw[0] ?? $default;
         $green = $raw['g'] ?? $raw[1] ?? $default;
         $blue = $raw['b'] ?? $raw[2] ?? $default;
-        $alpha = $raw['a'] ?? $raw[3] ?? null;
+        $alpha = $raw['a'] ?? $raw[3] ?? 100;
 
         if (! is_int($red)) {
             $red = $default;
@@ -499,19 +509,10 @@ final class Config
             $blue = $default;
         }
 
-        if ($alpha !== null && ! is_int($alpha)) {
-            $alpha = null;
+        if (! is_int($alpha)) {
+            $alpha = 100;
         }
 
         return [$red, $green, $blue, $alpha];
-    }
-
-    private function validateRgb(int ...$colors): void
-    {
-        foreach ($colors as $color) {
-            if ($color < 0 || $color > 255) {
-                throw new InvalidArgumentException('RGB values must be between 0 and 255.');
-            }
-        }
     }
 }
