@@ -54,6 +54,6 @@ final class QrCode extends Facade
      */
     protected static function getFacadeAccessor(): string
     {
-        return Generator::class;
+        return 'qrcode';
     }
 }
