@@ -85,10 +85,10 @@ final readonly class Rgb implements ColorInterface
 
     public function toGray(): Gray
     {
-        return new Gray(
-            $this->red,
-            $this->alpha
-        );
+        $luminance = ($this->red * 0.299) + ($this->green * 0.587) + ($this->blue * 0.114);
+        $grayValue = (int) round(($luminance / 255) * 100);
+
+        return new Gray($grayValue, $this->alpha);
     }
 
     private function validate(int $value, string $name): void

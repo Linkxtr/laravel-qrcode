@@ -35,10 +35,12 @@ final readonly class Gray implements ColorInterface
 
     public function toRgb(): Rgb
     {
+        $rgbValue = (int) round(($this->gray / 100) * 255);
+
         return new Rgb(
-            $this->gray,
-            $this->gray,
-            $this->gray,
+            $rgbValue,
+            $rgbValue,
+            $rgbValue,
             $this->alpha
         );
     }
@@ -46,9 +48,10 @@ final readonly class Gray implements ColorInterface
     public function toCmyk(): Cmyk
     {
         return new Cmyk(
-            $this->gray,
-            $this->gray,
-            $this->gray,
+            0,
+            0,
+            0,
+            100 - $this->gray,
             $this->alpha
         );
     }

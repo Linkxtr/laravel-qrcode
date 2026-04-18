@@ -39,10 +39,18 @@ final readonly class Cmyk implements ColorInterface
 
     public function toRgb(): Rgb
     {
+        $c = $this->cyan / 100;
+        $m = $this->magenta / 100;
+        $y = $this->yellow / 100;
+        $k = $this->black / 100;
+        $r = (int) round(255 * (1 - $c) * (1 - $k));
+        $g = (int) round(255 * (1 - $m) * (1 - $k));
+        $b = (int) round(255 * (1 - $y) * (1 - $k));
+
         return new Rgb(
-            $this->cyan,
-            $this->magenta,
-            $this->yellow,
+            $r,
+            $g,
+            $b,
             $this->alpha
         );
     }
@@ -54,8 +62,18 @@ final readonly class Cmyk implements ColorInterface
 
     public function toGray(): Gray
     {
+        $c = $this->cyan / 100;
+        $m = $this->magenta / 100;
+        $y = $this->yellow / 100;
+        $k = $this->black / 100;
+        $r = (1 - $c) * (1 - $k);
+        $g = (1 - $m) * (1 - $k);
+        $b = (1 - $y) * (1 - $k);
+
+        $luminance = ($r * 0.299) + ($g * 0.587) + ($b * 0.114);
+
         return new Gray(
-            $this->black,
+            (int) round($luminance * 100),
             $this->alpha
         );
     }

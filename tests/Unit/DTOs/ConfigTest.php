@@ -446,9 +446,9 @@ test('it sets up color model and converts existing colors', function () {
 
     $config->setColorModel(ColorModel::GRAY);
     expect($config->getColorValue())->toBeInstanceOf(Gray::class)
-        ->and($config->getColorValue()->gray)->toBe(0)
+        ->and($config->getColorValue()->gray)->toBe(100)
         ->and($config->getBackgroundColorValue())->toBeInstanceOf(Gray::class)
-        ->and($config->getBackgroundColorValue()->gray)->toBe(100);
+        ->and($config->getBackgroundColorValue()->gray)->toBe(0);
 });
 
 test('it handles c4 parameter fallback and override in setupColor across all color models', function () {
@@ -482,26 +482,26 @@ test('it handles c4 parameter fallback and override in setupBackgroundColor acro
     $config = new Config;
 
     $config->setColorModel(ColorModel::RGB);
-    
+
     $config->setupBackgroundColor(10, 20, 30);
     expect($config->getBackgroundColorValue()->alpha)->toBe(100);
-    
+
     $config->setupBackgroundColor(10, 20, 30, 50);
     expect($config->getBackgroundColorValue()->alpha)->toBe(50);
 
     $config->setColorModel(ColorModel::CMYK);
-    
+
     $config->setupBackgroundColor(10, 20, 30);
     expect($config->getBackgroundColorValue()->black)->toBe(100);
-    
+
     $config->setupBackgroundColor(10, 20, 30, 50);
     expect($config->getBackgroundColorValue()->black)->toBe(50);
 
     $config->setColorModel(ColorModel::GRAY);
-    
+
     $config->setupBackgroundColor(10, 0, 0);
     expect($config->getBackgroundColorValue()->alpha)->toBe(100);
-    
+
     $config->setupBackgroundColor(10, 0, 0, 50);
     expect($config->getBackgroundColorValue()->alpha)->toBe(50);
 });
