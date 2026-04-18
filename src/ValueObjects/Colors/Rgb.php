@@ -42,9 +42,9 @@ final readonly class Rgb implements ColorInterface
         }
 
         return new self(
-            hexdec(substr($cleanHex, 0, 2)),
-            hexdec(substr($cleanHex, 2, 2)),
-            hexdec(substr($cleanHex, 4)),
+            intval(substr($cleanHex, 0, 2), 16),
+            intval(substr($cleanHex, 2, 2), 16),
+            intval(substr($cleanHex, 4), 16),
             $alpha
         );
     }
