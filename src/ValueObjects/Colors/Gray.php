@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\ValueObjects\Colors;
 
+use BaconQrCode\Renderer\Color\Alpha;
+use BaconQrCode\Renderer\Color\ColorInterface as BaconColorInterface;
 use BaconQrCode\Renderer\Color\Gray as BaconGray;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\ColorInterface;
@@ -28,9 +30,15 @@ final readonly class Gray implements ColorInterface
         return $this->alpha;
     }
 
-    public function toBaconColor(): BaconGray
+    public function toBaconColor(): BaconColorInterface
     {
-        return new BaconGray($this->gray);
+        $gray = new BaconGray($this->gray);
+
+        if ($this->alpha < 100) {
+            return new Alpha($this->alpha, $gray);
+        }
+
+        return $gray;
     }
 
     public function toRgb(): Rgb

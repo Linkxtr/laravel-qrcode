@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Gray as BaconGray;
 use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
 use Linkxtr\QrCode\ValueObjects\Colors\Gray;
@@ -9,39 +10,95 @@ use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 covers(Gray::class);
 
-test('it throws exception if Gray values breach the 0 and 100 boundaries', function () {
-    expect(fn () => new Gray(-1))->toThrow(InvalidArgumentException::class, 'Gray must be between 0 and 100.');
-    expect(fn () => new Gray(101))->toThrow(InvalidArgumentException::class, 'Gray must be between 0 and 100.');
+test('it creates valid gray color and respects default alpha', function () {
+    $color = new Gray(50);
+    expect($color->gray)->toBe(50)
+        ->and($color->getAlpha())->toBe(100);
+
+    $colorWithAlpha = new Gray(100, 25);
+    expect($colorWithAlpha->getAlpha())->toBe(25);
 });
 
-test('it dynamically assigns and returns alpha boundaries', function () {
-    expect((new Gray(0, 50))->getAlpha())->toBe(50);
-    expect(fn () => new Gray(0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
+test('it throws exception on boundary violations for gray channel', function () {
+    expect(fn () => new Gray(-1))->toThrow(InvalidArgumentException::class, 'Gray must be between 0 and 100.')
+        ->and(fn () => new Gray(101))->toThrow(InvalidArgumentException::class, 'Gray must be between 0 and 100.');
 });
 
-test('it converts gray to rgb', function () {
-    expect((new Gray(0))->toRgb())->toEqual(new Rgb(0, 0, 0));
-    expect((new Gray(100))->toRgb())->toEqual(new Rgb(255, 255, 255));
-    expect((new Gray(50))->toRgb())->toEqual(new Rgb(128, 128, 128));
+test('it throws exception on boundary violations for alpha', function () {
+    expect(fn () => new Gray(0, -1))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.')
+        ->and(fn () => new Gray(0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
 });
 
-test('it converts gray to rgb with alpha', function () {
-    expect((new Gray(0, 50))->toRgb())->toEqual(new Rgb(0, 0, 0, 50));
+test('it converts to bacon gray color', function () {
+    $color = new Gray(75, 100);
+    $baconColor = $color->toBaconColor();
+
+    expect($baconColor)->toBeInstanceOf(BaconGray::class)
+        ->and($baconColor->getGray())->toBe(75);
+
+    $colorWithAlpha = new Gray(100, 99);
+    $baconColorWithAlpha = $colorWithAlpha->toBaconColor();
+
+    expect($baconColorWithAlpha)->toBeInstanceOf(Alpha::class)
+        ->and($baconColorWithAlpha->getAlpha())->toBe(99)
+        ->and($baconColorWithAlpha->getBaseColor())->toBeInstanceOf(BaconGray::class);
 });
 
-test('it converts gray to cmyk', function () {
-    expect((new Gray(0))->toCmyk())->toEqual(new Cmyk(0, 0, 0, 100));
+test('toGray returns itself', function () {
+    $color = new Gray(50);
+    expect($color->toGray())->toBe($color);
 });
 
-test('it converts gray to cmyk with alpha', function () {
-    expect((new Gray(0, 50))->toCmyk())->toEqual(new Cmyk(0, 0, 0, 100, 50));
+test('it converts to rgb accurately', function () {
+    $white = (new Gray(100, 60))->toRgb();
+    expect($white)->toBeInstanceOf(Rgb::class)
+        ->and($white->red)->toBe(255)
+        ->and($white->green)->toBe(255)
+        ->and($white->blue)->toBe(255)
+        ->and($white->getAlpha())->toBe(60);
+
+    $black = (new Gray(0))->toRgb();
+    expect($black->red)->toBe(0)
+        ->and($black->green)->toBe(0)
+        ->and($black->blue)->toBe(0);
+
+    $mid = (new Gray(50))->toRgb();
+    expect($mid->red)->toBe(128)
+        ->and($mid->green)->toBe(128)
+        ->and($mid->blue)->toBe(128);
+
+    $dark = (new Gray(2))->toRgb();
+    expect($dark->red)->toBe(5)
+        ->and($dark->green)->toBe(5)
+        ->and($dark->blue)->toBe(5);
 });
 
-test('it returns itself when calling toGray', function () {
-    $gray = new Gray(0);
-    expect($gray->toGray())->toBe($gray);
+test('it converts to cmyk accurately', function () {
+    $white = (new Gray(100, 90))->toCmyk();
+    expect($white)->toBeInstanceOf(Cmyk::class)
+        ->and($white->cyan)->toBe(0)
+        ->and($white->magenta)->toBe(0)
+        ->and($white->yellow)->toBe(0)
+        ->and($white->black)->toBe(0)
+        ->and($white->getAlpha())->toBe(90);
+
+    $black = (new Gray(0))->toCmyk();
+    expect($black->cyan)->toBe(0)
+        ->and($black->magenta)->toBe(0)
+        ->and($black->yellow)->toBe(0)
+        ->and($black->black)->toBe(100);
+
+    $mid = (new Gray(50))->toCmyk();
+    expect($mid->cyan)->toBe(0)
+        ->and($mid->magenta)->toBe(0)
+        ->and($mid->yellow)->toBe(0)
+        ->and($mid->black)->toBe(50);
 });
 
-test('it converts gray to bacon color', function () {
-    expect((new Gray(0))->toBaconColor())->toEqual(new BaconGray(0));
+test('it allows exact boundary values for alpha without throwing exceptions', function () {
+    $colorMinAlpha = new Gray(50, 0);
+    expect($colorMinAlpha->getAlpha())->toBe(0);
+
+    $colorMaxAlpha = new Gray(50, 100);
+    expect($colorMaxAlpha->getAlpha())->toBe(100);
 });

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Renderers;
 
-use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\ColorInterface as BaconColorInterface;
 use BaconQrCode\Renderer\Eye\CompositeEye;
 use BaconQrCode\Renderer\Eye\EyeInterface;
@@ -163,13 +162,7 @@ final readonly class BaconRenderer
 
     private function buildColor(ColorInterface $color): BaconColorInterface
     {
-        $baconColor = $color->toBaconColor();
-
-        if ($color->getAlpha() < 100) {
-            return new Alpha($color->getAlpha(), $baconColor);
-        }
-
-        return $baconColor;
+        return $color->toBaconColor();
     }
 
     private function getEye(): EyeInterface

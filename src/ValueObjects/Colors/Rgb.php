@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\ValueObjects\Colors;
 
+use BaconQrCode\Renderer\Color\Alpha;
+use BaconQrCode\Renderer\Color\ColorInterface as BaconColorInterface;
 use BaconQrCode\Renderer\Color\Rgb as BaconRgb;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\ColorInterface;
@@ -30,7 +32,7 @@ final readonly class Rgb implements ColorInterface
         $cleanHex = ltrim($hex, '#');
 
         if (strlen($cleanHex) === 3) {
-            $cleanHex = $cleanHex[0].$cleanHex[0].$cleanHex[1].$cleanHex[1].$cleanHex[2].$cleanHex[2];
+            $cleanHex = sprintf('%1$s%1$s%2$s%2$s%3$s%3$s', $cleanHex[0], $cleanHex[1], $cleanHex[2]);
         } elseif (strlen($cleanHex) !== 6) {
             throw new InvalidArgumentException('Invalid hex color format. Must be 3 or 6 characters.');
         }
@@ -40,9 +42,9 @@ final readonly class Rgb implements ColorInterface
         }
 
         return new self(
-            (int) hexdec(substr($cleanHex, 0, 2)),
-            (int) hexdec(substr($cleanHex, 2, 2)),
-            (int) hexdec(substr($cleanHex, 4, 2)),
+            hexdec(substr($cleanHex, 0, 2)),
+            hexdec(substr($cleanHex, 2, 2)),
+            hexdec(substr($cleanHex, 4)),
             $alpha
         );
     }
@@ -52,9 +54,15 @@ final readonly class Rgb implements ColorInterface
         return $this->alpha;
     }
 
-    public function toBaconColor(): BaconRgb
+    public function toBaconColor(): BaconColorInterface
     {
-        return new BaconRgb($this->red, $this->green, $this->blue);
+        $rgb = new BaconRgb($this->red, $this->green, $this->blue);
+
+        if ($this->alpha < 100) {
+            return new Alpha($this->alpha, $rgb);
+        }
+
+        return $rgb;
     }
 
     public function toRgb(): Rgb

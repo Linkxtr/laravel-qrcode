@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\ValueObjects\Colors;
 
+use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Cmyk as BaconCmyk;
+use BaconQrCode\Renderer\Color\ColorInterface as BaconColorInterface;
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\ColorInterface;
 
@@ -32,9 +34,15 @@ final readonly class Cmyk implements ColorInterface
         return $this->alpha;
     }
 
-    public function toBaconColor(): BaconCmyk
+    public function toBaconColor(): BaconColorInterface
     {
-        return new BaconCmyk($this->cyan, $this->magenta, $this->yellow, $this->black);
+        $cmyk = new BaconCmyk($this->cyan, $this->magenta, $this->yellow, $this->black);
+
+        if ($this->alpha < 100) {
+            return new Alpha($this->alpha, $cmyk);
+        }
+
+        return $cmyk;
     }
 
     public function toRgb(): Rgb
