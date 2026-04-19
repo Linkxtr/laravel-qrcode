@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode;
 
-use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Linkxtr\QrCode\Components\QrCodeComponent;
+use Linkxtr\QrCode\Console\Commands\GenerateQrCodeCommand;
 
-final class QrCodeServiceProvider extends ServiceProvider implements DeferrableProvider
+final class QrCodeServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
@@ -17,6 +17,10 @@ final class QrCodeServiceProvider extends ServiceProvider implements DeferrableP
             $this->publishes([
                 __DIR__.'/../config/qrcode.php' => config_path('qrcode.php'),
             ], 'qrcode-config');
+
+            $this->commands([
+                GenerateQrCodeCommand::class,
+            ]);
         }
 
         $this->loadViewComponentsAs('qrcode', [

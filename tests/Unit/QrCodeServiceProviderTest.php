@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Linkxtr\QrCode\Components\QrCodeComponent;
+use Linkxtr\QrCode\Console\Commands\GenerateQrCodeCommand;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\QrCodeServiceProvider;
 
@@ -24,12 +27,10 @@ test('it binds the generator to the container as a singleton', function () {
 });
 
 test('it registers the blade component', function () {
-    $compiler = app('blade.compiler');
+    $aliases = Blade::getClassComponentAliases();
 
-    $components = $compiler->getClassComponentAliases();
-
-    expect($components)->toHaveKey('qrcode-qr-code-component')
-        ->and($components['qrcode-qr-code-component'])->toBe(QrCodeComponent::class);
+    expect($aliases)->toHaveKey('qrcode-qr-code-component')
+        ->and($aliases['qrcode-qr-code-component'])->toBe(QrCodeComponent::class);
 });
 
 test('it registers publishable assets when running in console', function () {
@@ -51,4 +52,12 @@ test('it registers publishable assets when running in console', function () {
 
     expect(realpath($actualSourcePathString))->toBe($expectedSourcePath)
         ->and($actualDestinationPath)->toBe(config_path('qrcode.php'));
+});
+
+test('it registers the generate qr code command', function () {
+    $commands = Artisan::all();
+
+    expect($commands)->toHaveKey('qr:generate');
+
+    expect(get_class($commands['qr:generate']))->toBe(GenerateQrCodeCommand::class);
 });
