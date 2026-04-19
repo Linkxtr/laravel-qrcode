@@ -150,8 +150,8 @@ it('constrains merge image if it exceeds vertical bounds', function () {
 
     $merge = (string) $tallImageData;
 
-    $merger = new RasterMerger($squarePng, $merge, 0.5)->setFormat(Format::PNG);
-    $output = $merger->merge();
+    $merger = new RasterMerger($squarePng, $merge, 0.5);
+    $output = $merger->setFormat(Format::PNG)->merge();
 
     expect($output)->toBeString();
 
