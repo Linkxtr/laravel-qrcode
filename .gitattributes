@@ -1,0 +1,12 @@
+# Ignore AI Agent instructions
+.agents/ export-ignore
+
+# Ignore testing and development files for Composer downloads
+/tests/ export-ignore
+/.github/ export-ignore
+/.styleci.yml export-ignore
+/phpunit.xml export-ignore
+/pest.yml export-ignore
+/phpstan.neon export-ignore
+/pint.json export-ignore
+/rector.php export-ignore
