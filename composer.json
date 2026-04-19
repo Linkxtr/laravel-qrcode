@@ -4,9 +4,14 @@
   "keywords": [
     "laravel",
     "qrcode",
-    "bacon",
     "qr",
-    "generator"
+    "qr-code",
+    "bacon-qr-code",
+    "svg",
+    "png",
+    "wifi",
+    "vcard",
+    "payment"
   ],
   "type": "library",
   "license": "MIT",
