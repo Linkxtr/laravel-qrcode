@@ -7,9 +7,10 @@ namespace Linkxtr\QrCode\Components;
 use Closure;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
+use Illuminate\View\ComponentAttributeBag;
 use InvalidArgumentException;
-use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Facades\QrCode;
+use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 final class QrCodeComponent extends Component
 {
@@ -31,204 +32,183 @@ final class QrCodeComponent extends Component
         public ?string $gradientType = null,
         public ?string $merge = null,
         public ?string $mergeString = null,
-        public float $mergePercentage = .2,
+        public float $mergePercentage = 0.2,
         public bool|string $mergeAbsolute = false,
     ) {}
 
     public function render(): Closure
     {
-        if (! in_array($this->format, Format::toArray())) {
-            throw new InvalidArgumentException('Invalid format.');
-        }
-
-        if ($this->format === 'eps') {
-            throw new InvalidArgumentException('EPS format is not supported for HTML embedding in the Blade component.');
+        if (! in_array($this->format, ['svg', 'png', 'webp'], true)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Format "%s" is not supported in the Blade component. Supported HTML embed formats are: %s.',
+                    $this->format,
+                    implode(', ', ['svg', 'png', 'webp'])
+                )
+            );
         }
 
         $generator = QrCode::size($this->size)->format($this->format)->margin($this->margin);
 
-        if ($this->color) {
-            $rgb = $this->parseColor($this->color);
-            if ($rgb) {
-                $generator->color($rgb[0], $rgb[1], $rgb[2], $rgb[3] ?? null);
-            }
+        if ($this->color !== null && $rgb = $this->resolveColor($this->color)) {
+            $generator->color($rgb[0], $rgb[1], $rgb[2], $rgb[3] ?? null);
         }
 
-        if ($this->backgroundColor) {
-            $rgb = $this->parseColor($this->backgroundColor);
-            if ($rgb) {
-                $generator->backgroundColor($rgb[0], $rgb[1], $rgb[2], $rgb[3] ?? null);
-            }
+        if ($this->backgroundColor !== null && $rgb = $this->resolveColor($this->backgroundColor)) {
+            $generator->backgroundColor($rgb[0], $rgb[1], $rgb[2], $rgb[3] ?? null);
         }
 
-        if ($this->style) {
+        if ($this->style !== null) {
             $generator->style($this->style);
         }
 
-        if ($this->errorCorrection) {
+        if ($this->errorCorrection !== null) {
             $generator->errorCorrection($this->errorCorrection);
         }
 
-        if ($this->encoding) {
+        if ($this->encoding !== null) {
             $generator->encoding($this->encoding);
         }
 
-        if ($this->eye) {
+        if ($this->eye !== null) {
             $generator->eye($this->eye);
         }
 
-        if ($this->eyeColor0) {
-            $colors = $this->parseMultiColor($this->eyeColor0);
-            if ($colors && count($colors) >= 6) {
-                $generator->eyeColor(0, ...array_slice($colors, 0, 6));
-            }
+        if ($this->eyeColor0 !== null && $colors = $this->resolveMultiColor($this->eyeColor0)) {
+            $generator->eyeColor(0, ...$colors);
         }
 
-        if ($this->eyeColor1) {
-            $colors = $this->parseMultiColor($this->eyeColor1);
-            if ($colors && count($colors) >= 6) {
-                $generator->eyeColor(1, ...array_slice($colors, 0, 6));
-            }
+        if ($this->eyeColor1 !== null && $colors = $this->resolveMultiColor($this->eyeColor1)) {
+            $generator->eyeColor(1, ...$colors);
         }
 
-        if ($this->eyeColor2) {
-            $colors = $this->parseMultiColor($this->eyeColor2);
-            if ($colors && count($colors) >= 6) {
-                $generator->eyeColor(2, ...array_slice($colors, 0, 6));
-            }
+        if ($this->eyeColor2 !== null && $colors = $this->resolveMultiColor($this->eyeColor2)) {
+            $generator->eyeColor(2, ...$colors);
         }
 
-        if ($this->gradient) {
-            $colors = $this->parseMultiColor($this->gradient);
-            $type = $this->gradientType ?? 'vertical';
-            if ($colors && count($colors) >= 6) {
-                $generator->gradient($colors[0], $colors[1], $colors[2], $colors[3], $colors[4], $colors[5], $type);
-            }
+        if ($this->gradient !== null && $colors = $this->resolveMultiColor($this->gradient)) {
+            $generator->gradient($colors[0], $colors[1], $colors[2], $colors[3], $colors[4], $colors[5], $this->gradientType ?? 'vertical');
         }
 
-        if ($this->merge) {
-            $mergeAbsolute = is_string($this->mergeAbsolute)
-                ? strtolower($this->mergeAbsolute) === 'true'
+        if ($this->merge !== null) {
+            $absolute = is_string($this->mergeAbsolute)
+                ? filter_var($this->mergeAbsolute, FILTER_VALIDATE_BOOLEAN)
                 : $this->mergeAbsolute;
 
             if (str_contains($this->merge, '..')) {
                 throw new InvalidArgumentException('Invalid merge path, path traversal is not allowed.');
             }
 
-            $generator->merge($this->merge, $this->mergePercentage, $mergeAbsolute);
-        } elseif ($this->mergeString) {
+            $generator->merge($this->merge, $this->mergePercentage, $absolute);
+        } elseif ($this->mergeString !== null) {
             $generator->mergeString($this->mergeString, $this->mergePercentage);
         }
 
-        $htmlString = $generator->generate($this->data);
+        $htmlString = (string) $generator->generate($this->data);
 
-        return function () use ($htmlString): string {
+        return function (array $data) use ($htmlString): string {
+            /** @var ComponentAttributeBag $attributes */
+            $attributes = $data['attributes'];
+
             if ($this->format === 'svg') {
-                $svg = $htmlString->__toString();
+                $svg = $htmlString;
 
-                if (stripos($svg, '<title') === false) {
-                    $translated_title = __('QR Code');
-                    $title = is_string($translated_title) ? e($translated_title) : 'QR Code';
-                    // inject title attribute to svg after opening tag
-                    $injected_svg = preg_replace('/(<svg[^>]*>)/i', '$1<title>'.$title.'</title>', $svg, 1);
-                    $svg = $injected_svg ?? $svg;
+                if (! str_contains($svg, '<title')) {
+                    $translatedTitle = __('QR Code');
+                    $title = e(is_string($translatedTitle) ? $translatedTitle : 'QR Code');
+
+                    $replacedSvg = preg_replace('/(<svg[^>]*>)/i', '$1<title>'.$title.'</title>', $svg, 1);
+                    $svg = is_string($replacedSvg) ? $replacedSvg : $svg;
                 }
 
-                return Str::replaceFirst(
-                    '<svg',
-                    '<svg {{ $attributes->merge(["role" => "img", "aria-label" => __("QR Code")]) }}',
-                    $svg
-                );
+                $mergedAttributes = $attributes->merge([
+                    'role' => 'img',
+                    'aria-label' => __('QR Code'),
+                ]);
+
+                return Str::replaceFirst('<svg', '<svg '.$mergedAttributes->toHtml(), $svg);
             }
 
-            return '<img {{ $attributes->except("src")->merge(["alt" => __("QR Code")]) }} src="data:image/{{ $format }};base64,'.base64_encode($htmlString->__toString()).'" />';
+            $mergedAttributes = $attributes->except('src')->merge([
+                'alt' => __('QR Code'),
+            ]);
+
+            $base64 = base64_encode($htmlString);
+
+            return '<img '.$mergedAttributes->toHtml().' src="data:image/'.$this->format.';base64,'.$base64.'" />';
         };
     }
 
     /**
-     * Parse a "R,G,B" or "R,G,B,A" string or "#HEX" or "#HEXA" string into an array of [R, G, B] or [R, G, B, A].
+     * Safely resolve Hex or CSV strings into an array of integers.
      *
-     * @return array<int, int>|null
+     * @return array{0: int, 1: int, 2: int, 3?: int|null}|null
      */
-    private function parseColor(string $color): ?array
+    private function resolveColor(string $color): ?array
     {
-        if (str_contains($color, ',')) {
-            $parts = array_map(trim(...), explode(',', $color));
-            $count = count($parts);
+        $color = trim($color);
 
-            if ($count !== 3 && $count !== 4) {
-                return null;
-            }
+        try {
+            if (str_starts_with($color, '#')) {
+                $rgb = Rgb::fromHex($color);
+            } elseif (str_contains($color, ',')) {
+                $parts = array_map(fn (string $p): int => (int) $p, explode(',', $color));
+                $count = count($parts);
 
-            $r = max(0, min(255, (int) $parts[0]));
-            $g = max(0, min(255, (int) $parts[1]));
-            $b = max(0, min(255, (int) $parts[2]));
-
-            if ($count === 3) {
-                return [$r, $g, $b];
-            }
-
-            $a = max(0, min(100, (int) $parts[3]));
-
-            return [$r, $g, $b, $a];
-        }
-
-        if (str_starts_with($color, '#')) {
-            $hex = ltrim($color, '#');
-
-            if (! ctype_xdigit($hex)) {
-                return null;
-            }
-
-            if (strlen($hex) === 3) {
-                $r = hexdec(str_repeat(substr($hex, 0, 1), 2));
-                $g = hexdec(str_repeat(substr($hex, 1, 1), 2));
-                $b = hexdec(str_repeat(substr($hex, 2, 1), 2));
-
-                return [(int) $r, (int) $g, (int) $b];
-            }
-
-            if (strlen($hex) === 6 || strlen($hex) === 8) {
-                $r = hexdec(substr($hex, 0, 2));
-                $g = hexdec(substr($hex, 2, 2));
-                $b = hexdec(substr($hex, 4, 2));
-
-                if (strlen($hex) === 6) {
-                    return [(int) $r, (int) $g, (int) $b];
+                if ($count !== 3 && $count !== 4) {
+                    return null;
                 }
 
-                $a = max(0, min(100, hexdec(substr($hex, 6, 2))));
-
-                return [(int) $r, (int) $g, (int) $b, (int) $a];
+                $rgb = new Rgb(
+                    $parts[0],
+                    $parts[1],
+                    $parts[2],
+                    $count === 4 ? $parts[3] : 100
+                );
+            } else {
+                return null;
             }
-        }
 
-        return null;
+            return [$rgb->red, $rgb->green, $rgb->blue, $rgb->getAlpha() === 100 ? null : $rgb->getAlpha()];
+        } catch (InvalidArgumentException) {
+            return null;
+        }
     }
 
     /**
-     * Parse multiple colors separated by '|' into a flat array of RGB integers.
-     * Hex colors can also use comma separation: "#ff0000, `#00ff00`".
-     * RGB format requires pipe: "255,0,0|0,255,0".
-     * Example: "#ff0000|#00ff00" -> [255, 0, 0, 0, 255, 0]
+     * Resolve multiple colors separated by common delimiters into a flat array.
+     * Guarantees returning exactly 6 integers if successful, preventing unpack errors.
      *
      * @return array<int, int>|null
      */
-    private function parseMultiColor(string $multiColor): ?array
+    private function resolveMultiColor(string $multiColor): ?array
     {
-        $multiColor = str_replace([', #', ',#'], '|#', $multiColor);
-        $multiColor = str_replace(';', '|', $multiColor);
+        $multiColor = str_replace([';', ', #', ',#'], ['|', '|#', '|#'], $multiColor);
 
-        $parts = array_filter(explode('|', $multiColor));
+        $parts = explode('|', $multiColor);
 
-        $result = [];
+        $colors = [];
         foreach ($parts as $part) {
-            $rgb = $this->parseColor(trim($part));
-            if ($rgb) {
-                $result = array_merge($result, array_slice($rgb, 0, 3));
+            $resolved = $this->resolveColor($part);
+            if ($resolved !== null) {
+                $colors[] = $resolved;
             }
         }
 
-        return $result === [] ? null : $result;
+        if ($colors === []) {
+            return null;
+        }
+
+        if (count($colors) === 1) {
+            return [
+                $colors[0][0], $colors[0][1], $colors[0][2],
+                $colors[0][0], $colors[0][1], $colors[0][2],
+            ];
+        }
+
+        return [
+            $colors[0][0], $colors[0][1], $colors[0][2],
+            $colors[1][0], $colors[1][1], $colors[1][2],
+        ];
     }
 }
