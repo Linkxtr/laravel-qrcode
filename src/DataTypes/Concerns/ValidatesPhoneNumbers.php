@@ -10,7 +10,7 @@ trait ValidatesPhoneNumbers
 {
     protected function validatePhoneNumber(string $phoneNumber): string
     {
-        $cleaned = (string) preg_replace('/[^\d+]/', '', $phoneNumber);
+        $cleaned = sprintf('%s', preg_replace('/[^\d+]/', '', $phoneNumber));
 
         if (! preg_match('/^\+?\d{1,15}$/', $cleaned)) {
             throw new InvalidArgumentException('Invalid phone number format. Must be 1-15 digits, optionally starting with +');

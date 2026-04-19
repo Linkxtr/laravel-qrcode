@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
 
-// Create an anonymous class to expose the protected trait method for testing
+covers(ValidatesPhoneNumbers::class);
+
 $traitTester = new class
 {
     use ValidatesPhoneNumbers;

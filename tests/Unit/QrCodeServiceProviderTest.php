@@ -29,8 +29,8 @@ test('it binds the generator to the container as a singleton', function () {
 test('it registers the blade component', function () {
     $aliases = Blade::getClassComponentAliases();
 
-    expect($aliases)->toHaveKey('qrcode-qr-code-component')
-        ->and($aliases['qrcode-qr-code-component'])->toBe(QrCodeComponent::class);
+    expect($aliases)->toHaveKey('qrcode')
+        ->and($aliases['qrcode'])->toBe(QrCodeComponent::class);
 });
 
 test('it registers publishable assets when running in console', function () {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Linkxtr\QrCode\Components\QrCodeComponent;
@@ -23,9 +24,7 @@ final class QrCodeServiceProvider extends ServiceProvider
             ]);
         }
 
-        $this->loadViewComponentsAs('qrcode', [
-            QrCodeComponent::class,
-        ]);
+        Blade::component('qrcode', QrCodeComponent::class);
     }
 
     public function register(): void
