@@ -62,6 +62,11 @@ If your application relied on the previous package defaults, ensure you define y
 php artisan vendor:publish --tag=qrcode-config
 ```
 
+### 6. Strict Data Validation
+
+In previous versions, passing incorrectly formatted data (like a bad phone number or invalid Wi-Fi config) might have silently generated a corrupted QR code.
+In v2.0, all Data Types strictly validate their inputs. If you pass invalid data, the package will now throw an `InvalidArgumentException`. You should wrap dynamic user inputs in `try/catch` blocks if you do not validate them beforehand.
+
 ## Upgrade Steps
 
 ### 1. Update Dependencies

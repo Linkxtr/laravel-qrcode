@@ -87,9 +87,9 @@ public function generate()
 }
 ```
 
-### Via Artisan CLI
+### 🛠 CLI Generator
 
-You can generate QR codes directly from the command line using the `qr:generate` Artisan command. This is useful for quickly creating QR codes or integrating generation into shell scripts.
+You can generate QR codes directly from the command line using the `qr:generate` Artisan command. This is perfect for build scripts or quick exports.
 
 **Interactive Mode**
 

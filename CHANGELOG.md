@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MeCard and vCard data type support.
 - Image merge support for WebP, SVG and EPS image formats.
 - GD Backend support for PNG and WebP generation (useful when Imagick is not available).
+- **Artisan CLI Command:** Added `php artisan qr:generate` with interactive prompts and strict option parsing.
+- **Blade Component:** Added `<x-qrcode />` for direct, clean view integration.
+- **Strict Data Types:** All payloads (`PhoneNumber`, `WiFi`, `Email`, etc.) now strictly validate input formatting.
+- **Macroable Facade:** Developers can now register custom macros on the `QrCode` facade.
 
 ### Changed
 

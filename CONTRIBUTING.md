@@ -162,6 +162,13 @@ composer lint
 - Test both success and failure scenarios
 - Use descriptive test method names
 
+We enforce a strict 100% Type Coverage and 100% Mutation Score Index (MSI). Before submitting a PR, you MUST run:
+
+1. `composer test` (Runs Pest, PHPStan, and Pint)
+2. `./vendor/bin/pest --mutate --covered-only` (Ensures no mutants survive your new code)
+
+Pull requests that drop the test coverage, type coverage, or mutation score below 100% will not be accepted.
+
 ```php
 <?php
 
