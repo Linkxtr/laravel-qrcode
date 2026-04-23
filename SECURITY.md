@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Only the latest major version receives security updates.
+Security updates are provided for the current stable release and any branch explicitly marked as LTS or maintenance.
 
 ## Reporting a Vulnerability
 
