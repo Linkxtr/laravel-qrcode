@@ -204,20 +204,6 @@ namespace Linkxtr\QrCode\Mergers {
     }
 }
 
-// namespace Linkxtr\QrCode\DataTypes {
-//     final class InvalidDataType
-//     {
-//         public function __construct() {}
-
-//         public function __toString(): string
-//         {
-//             return '';
-//         }
-
-//         public function create(array $arguments): void {}
-//     }
-// }
-
 namespace Linkxtr\QrCode\Support {
     use GdImage;
 

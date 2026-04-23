@@ -11,6 +11,9 @@ use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 interface ColorInterface
 {
+    /**
+     * Return the alpha channel using BaconQrCode's 0-100 convention.
+     */
     public function getAlpha(): int;
 
     public function toBaconColor(): BaconColorInterface;

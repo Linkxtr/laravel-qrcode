@@ -21,6 +21,7 @@ test('the artisan command generates a real file on the disk', function () {
     $this->artisan('qr:generate', [
         'data' => 'CLI Test Data',
         '--output' => $outputPath,
+        '--format' => 'svg',
         '--size' => '200',
         '--color' => '0,0,255',
     ])->assertSuccessful();

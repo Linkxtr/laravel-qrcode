@@ -73,7 +73,6 @@ final class GenerateQrCodeCommand extends Command
         $margin = $this->getStringOption('margin') ?? '4';
         $errorCorrection = $this->getStringOption('errorCorrection') ?? 'M';
 
-        // Use array_filter to eliminate `||` operators, crushing BooleanOrToBooleanAnd mutants
         $advancedPassed = array_filter([
             $this->option('size'),
             $this->option('color'),
@@ -84,7 +83,6 @@ final class GenerateQrCodeCommand extends Command
 
         $hasPassedAdvancedOptions = $advancedPassed !== [];
 
-        // Passing the dynamic false variable crushes the FalseToTrue default mutant
         if ($isInteractive && ! $hasPassedAdvancedOptions && confirm(label: 'Do you want to configure advanced options (size, colors, margin)?', default: $hasPassedAdvancedOptions)) {
             $size = text(label: 'Size in pixels', default: '400', validate: $this->validateSize(...));
             $color = text(label: 'Foreground color (RGB or RGBA comma-separated)', default: '0,0,0', validate: $this->validateColorString(...));
@@ -106,7 +104,6 @@ final class GenerateQrCodeCommand extends Command
             return self::FAILURE;
         }
 
-        // Removed the dead (string) cast to kill the cast mutant!
         $errorCorrectionLevel = ErrorCorrectionLevel::tryFrom(strtoupper($errorCorrection));
 
         if ($errorCorrectionLevel === null) {
@@ -150,7 +147,6 @@ final class GenerateQrCodeCommand extends Command
 
     private function validateSize(string $value): ?string
     {
-        // Using filter_var strictly enforces integers, removing all casting mutants
         $intVal = filter_var($value, FILTER_VALIDATE_INT);
 
         return is_int($intVal) && $intVal > 0 ? null : 'Size must be a positive integer.';

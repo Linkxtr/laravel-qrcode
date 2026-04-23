@@ -16,8 +16,27 @@ class TestCase extends Orchestra
     protected function tearDown(): void
     {
         parent::tearDown();
-        global $mockFilePutContents;
-        $mockFilePutContents = false;
+        
+        global $mockFileGetContents, $mockImagickLoaded, $mockGdLoaded,
+               $mockFilePutContents, $mockImageColorAllocateAlpha, $mockImageColorAllocate,
+               $mockImageCreateTrueColor, $mockObGetClean, $mockImageFill,
+               $mockImageCopy, $mockImageCopyResampled, $mockImageSaveAlpha,
+               $mock_imagepng_empty, $mockImageCreateFromString;
+
+        $mockFileGetContents = null;
+        $mockImagickLoaded = true;
+        $mockGdLoaded = true;
+        $mockFilePutContents = null;
+        $mockImageColorAllocateAlpha = null;
+        $mockImageColorAllocate = null;
+        $mockImageCreateTrueColor = null;
+        $mockObGetClean = null;
+        $mockImageFill = null;
+        $mockImageCopy = null;
+        $mockImageCopyResampled = null;
+        $mockImageSaveAlpha = null;
+        $mock_imagepng_empty = null;
+        $mockImageCreateFromString = null;
     }
 
     protected function getPackageProviders($app)
