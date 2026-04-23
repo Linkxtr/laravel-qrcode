@@ -183,6 +183,8 @@ final class VCard implements DataTypeInterface
 
     private function escapeValue(string $value): string
     {
+        $value = str_replace(["\r\n", "\r"], "\n", $value);
+
         return strtr($value, [
             '\\' => '\\\\',
             ';' => '\\;',

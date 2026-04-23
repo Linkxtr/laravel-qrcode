@@ -62,8 +62,6 @@ final class CalendarEvent implements DataTypeInterface
      */
     public function create(array $arguments): void
     {
-        $this->uid = uniqid('', true).'@linkxtr-qrcode';
-
         $attributes = $arguments[0] ?? [];
 
         if (! is_array($attributes)) {
@@ -74,31 +72,34 @@ final class CalendarEvent implements DataTypeInterface
             throw new InvalidArgumentException('Summary is required and must be a string.');
         }
 
-        $this->summary = $attributes['summary'];
-
         if (! isset($attributes['start'])) {
             throw new InvalidArgumentException('Start date is required.');
         }
 
-        $this->start = $this->parseDate($attributes['start']);
+        $start = $this->parseDate($attributes['start']);
 
         if (! isset($attributes['end'])) {
             throw new InvalidArgumentException('End date is required.');
         }
 
-        $this->end = $this->parseDate($attributes['end']);
+        $end = $this->parseDate($attributes['end']);
 
-        if ($this->end <= $this->start) {
+        if ($end <= $start) {
             throw new InvalidArgumentException('End date must be after start date.');
         }
 
-        if (isset($attributes['description']) && is_string($attributes['description'])) {
-            $this->description = $attributes['description'];
-        }
+        $this->uid = uniqid('', true).'@linkxtr-qrcode';
+        $this->summary = $attributes['summary'];
+        $this->start = $start;
+        $this->end = $end;
 
-        if (isset($attributes['location']) && is_string($attributes['location'])) {
-            $this->location = $attributes['location'];
-        }
+        $this->description = (isset($attributes['description']) && is_string($attributes['description']))
+            ? $attributes['description']
+            : null;
+
+        $this->location = (isset($attributes['location']) && is_string($attributes['location']))
+            ? $attributes['location']
+            : null;
     }
 
     private function parseDate(mixed $date): Carbon

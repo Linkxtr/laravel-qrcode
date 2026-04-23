@@ -7,6 +7,8 @@ use Linkxtr\QrCode\DataTypes\CalendarEvent;
 
 covers(CalendarEvent::class);
 
+afterEach(fn () => Carbon::setTestNow());
+
 test('it throws exception if rendered before creation', function () {
     $event = new CalendarEvent;
     expect(fn () => (string) $event)
@@ -126,7 +128,7 @@ test('it ignores optional parameters if they are not strings', function () {
         ->and($result)->not->toContain('LOCATION:');
 });
 
-test('it rigorously escapes special characters in strings to kill formatting mutants', function () {
+test('it rigorously escapes special characters in strings', function () {
     $event = new CalendarEvent;
 
     $chaosString = "Line1\\Line2,Line3;Line4\r\nLine5\nLine6\rLine7";
@@ -144,7 +146,7 @@ test('it rigorously escapes special characters in strings to kill formatting mut
     expect($result)->toContain($expectedSummary);
 });
 
-test('it generates a valid structured UID to kill concatenation and entropy mutants', function () {
+test('it generates a valid structured UID', function () {
     $event = new CalendarEvent;
     $event->create([[
         'summary' => 'Meeting',
@@ -159,4 +161,51 @@ test('it generates a valid structured UID to kill concatenation and entropy muta
     $uniquePart = str_replace('@linkxtr-qrcode', '', $uid);
 
     expect(strlen($uniquePart))->toBe(23);
+});
+
+test('it clears stale optional data and applies state atomically on object reuse', function () {
+    $event = new CalendarEvent;
+
+    $event->create([[
+        'summary' => 'Meeting 1',
+        'start' => '2023-12-01 12:00:00',
+        'end' => '2023-12-01 14:00:00',
+        'description' => 'Old Description',
+        'location' => 'Old Location',
+    ]]);
+
+    expect((string) $event)->toContain('DESCRIPTION:Old Description')
+        ->and((string) $event)->toContain('LOCATION:Old Location');
+
+    $event->create([[
+        'summary' => 'Meeting 2',
+        'start' => '2023-12-02 12:00:00',
+        'end' => '2023-12-02 14:00:00',
+    ]]);
+
+    expect((string) $event)->not->toContain('DESCRIPTION:')
+        ->and((string) $event)->not->toContain('LOCATION:');
+});
+
+test('it does not mutate instance state if validation fails', function () {
+    $event = new CalendarEvent;
+
+    $event->create([[
+        'summary' => 'Meeting 1',
+        'start' => '2023-12-01 12:00:00',
+        'end' => '2023-12-01 14:00:00',
+    ]]);
+
+    $originalUid = invade($event)->uid;
+
+    try {
+        $event->create([[
+            'summary' => 'Meeting 2',
+            'start' => '2023-12-02 12:00:00',
+        ]]);
+    } catch (InvalidArgumentException $e) {
+    }
+
+    expect(invade($event)->summary)->toBe('Meeting 1')
+        ->and(invade($event)->uid)->toBe($originalUid);
 });

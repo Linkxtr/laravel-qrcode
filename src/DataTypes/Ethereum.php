@@ -13,7 +13,7 @@ final class Ethereum implements DataTypeInterface
 
     private string $address;
 
-    private ?float $amount = null;
+    private ?string $amount = null;
 
     public function __toString(): string
     {
@@ -33,22 +33,24 @@ final class Ethereum implements DataTypeInterface
             throw new InvalidArgumentException('Ethereum address is required.');
         }
 
-        if (! is_string($arguments[0])) {
-            throw new InvalidArgumentException('Ethereum address must be a string.');
+        if (! is_string($arguments[0]) || trim($arguments[0]) === '') {
+            throw new InvalidArgumentException('Ethereum address must be a non-empty string.');
         }
 
-        $this->address = $arguments[0];
+        $this->address = trim($arguments[0]);
 
         if (isset($arguments[1])) {
-            if (! is_numeric($arguments[1])) {
-                throw new InvalidArgumentException('Ethereum amount must be a numeric value.');
+            if (! is_scalar($arguments[1])) {
+                throw new InvalidArgumentException('Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
             }
 
-            if ($arguments[1] < 0) {
-                throw new InvalidArgumentException('Ethereum amount must be non-negative.');
+            $amount = (string) $arguments[1];
+
+            if (! preg_match('/^(0|[1-9]\d*)(\.\d+)?$/', $amount)) {
+                throw new InvalidArgumentException('Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
             }
 
-            $this->amount = (float) $arguments[1];
+            $this->amount = $amount;
         }
     }
 }

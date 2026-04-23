@@ -59,3 +59,16 @@ test('it generates full SMS uri and safely encodes spaces to kill concat mutants
 
     expect((string) $sms)->toBe('sms:+15551234567?body=Hello%20World%21');
 });
+
+test('it clears stale message data on object reuse to prevent state leakage', function () {
+    $sms = new SMS;
+
+    $sms->create(['+15551234567', 'Hello there']);
+
+    expect((string) $sms)->toContain('body=Hello%20there');
+
+    $sms->create(['+15551234567']);
+
+    expect((string) $sms)->not->toContain('body=Hello%20there')
+        ->and((string) $sms)->not->toContain('body=');
+});

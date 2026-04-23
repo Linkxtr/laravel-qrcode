@@ -47,6 +47,9 @@ final class WiFi implements DataTypeInterface
             $arguments = $arguments[0];
         }
 
+        $this->password = null;
+        $this->hidden = false;
+
         $properties = $arguments;
 
         // Support positional arguments: SSID, Encryption, Password, Hidden
@@ -68,9 +71,6 @@ final class WiFi implements DataTypeInterface
         $this->ssid = $properties['ssid'];
 
         $hasPassword = isset($properties['password']) && is_string($properties['password']) && $properties['password'] !== '';
-        if ($hasPassword) {
-            $this->password = $properties['password'];
-        }
 
         if (isset($properties['encryption']) && is_string($properties['encryption']) && $properties['encryption'] !== '') {
             $encryption = strtoupper($properties['encryption']);
@@ -83,8 +83,20 @@ final class WiFi implements DataTypeInterface
             $this->encryption = $hasPassword ? 'WPA' : 'NOPASS';
         }
 
+        if ($this->encryption === 'NOPASS' && $hasPassword) {
+            throw new InvalidArgumentException('WiFi password cannot be provided when encryption is NOPASS.');
+        }
+
+        if ($hasPassword) {
+            $this->password = $properties['password'];
+        }
+
         if (isset($properties['hidden'])) {
-            $this->hidden = (bool) $properties['hidden'];
+            if (! is_scalar($properties['hidden'])) {
+                throw new InvalidArgumentException('WiFi hidden flag must be a boolean or a string representation of a boolean.');
+            }
+
+            $this->hidden = filter_var($properties['hidden'], FILTER_VALIDATE_BOOLEAN);
         }
     }
 

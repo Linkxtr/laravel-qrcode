@@ -44,6 +44,14 @@ final class Geo implements DataTypeInterface
         $this->latitude = (float) $arguments[0];
         $this->longitude = (float) $arguments[1];
 
+        if ($this->latitude < -90 || $this->latitude > 90) {
+            throw new InvalidArgumentException('Latitude must be between -90 and 90.');
+        }
+
+        if ($this->longitude < -180 || $this->longitude > 180) {
+            throw new InvalidArgumentException('Longitude must be between -180 and 180.');
+        }
+
         if (isset($arguments[2])) {
             if (! is_string($arguments[2])) {
                 throw new InvalidArgumentException('Geo name must be a string.');

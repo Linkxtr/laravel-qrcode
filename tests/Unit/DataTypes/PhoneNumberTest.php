@@ -21,7 +21,7 @@ test('it throws exception if phone number is an invalid type', function () {
 test('it throws exception if phone number is an empty string', function () {
     $phone = new PhoneNumber;
     expect(fn () => $phone->create(['']))
-        ->toThrow(InvalidArgumentException::class, 'Invalid phone number format. Must be 1-15 digits, optionally starting with +');
+        ->toThrow(InvalidArgumentException::class, 'Phone number contains invalid characters. Only digits, spaces, hyphens, parentheses, dots, and a leading plus are allowed.');
 });
 
 test('it formats string phone numbers correctly and strips spaces to kill string mutants', function () {

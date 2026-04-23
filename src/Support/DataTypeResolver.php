@@ -27,14 +27,17 @@ final class DataTypeResolver
             ));
         }
 
-        $dataType = new $className;
-
-        if ($dataType::class !== $className) {
+        if (! is_subclass_of($className, DataTypeInterface::class, true)) {
             throw new BadMethodCallException(sprintf('Class "%s" must implement DataTypeInterface.', $className));
         }
 
-        if (! $dataType instanceof DataTypeInterface) {
-            throw new BadMethodCallException(sprintf('Class "%s" must implement DataTypeInterface.', $className));
+        $dataType = new $className;
+
+        if ($dataType::class !== $className) {
+            throw new BadMethodCallException(sprintf(
+                'Method "%s" does not exist on the QrCode Generator. It is not a registered macro or a valid Data Type.',
+                $method
+            ));
         }
 
         $dataType->create($arguments);

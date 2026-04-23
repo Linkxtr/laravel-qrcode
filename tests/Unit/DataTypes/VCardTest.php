@@ -97,7 +97,7 @@ test('it successfully maps massive associative array arguments', function () {
     expect((string) $vcard)->toBe($expected);
 });
 
-test('it ignores non-string associative arguments to kill type constraint mutants', function () {
+test('it ignores non-string associative arguments', function () {
     $vcard = new VCard;
     $vcard->create([[
         'name' => 'Khaled Sadek',
@@ -108,7 +108,6 @@ test('it ignores non-string associative arguments to kill type constraint mutant
         'job' => 456.7,
     ]]);
 
-    // Fallback gracefully without throwing exceptions, rendering only valid fields
     $expected = implode("\n", [
         'BEGIN:VCARD',
         'VERSION:3.0',
@@ -119,7 +118,7 @@ test('it ignores non-string associative arguments to kill type constraint mutant
     expect((string) $vcard)->toBe($expected);
 });
 
-test('it strips empty string associative arguments to kill empty block mutants', function () {
+test('it strips empty string associative arguments', function () {
     $vcard = new VCard;
     $vcard->create([[
         'name' => 'Khaled Sadek',
@@ -141,7 +140,7 @@ test('it strips empty string associative arguments to kill empty block mutants',
     expect((string) $vcard)->toBe($expected);
 });
 
-test('it accurately escapes special characters and newlines to kill strtr mutants', function () {
+test('it accurately escapes special characters and newlines', function () {
     $vcard = new VCard;
 
     $chaosString = "Name\\With;Special,Chars\nHere";
@@ -156,8 +155,22 @@ test('it accurately escapes special characters and newlines to kill strtr mutant
     ]);
 
     expect((string) $vcard)->toBe($expected);
+
+    $vcard2 = new VCard;
+
+    $chaoticString = "Line1\r\nLine2\rLine3\nLine4";
+
+    $vcard2->create([[
+        'name' => 'John Doe',
+        'note' => $chaoticString,
+    ]]);
+
+    $result = (string) $vcard2;
+
+    expect($result)->toContain('NOTE:Line1\nLine2\nLine3\nLine4');
 });
-test('it gracefully handles missing first or last names independently to kill logic and cast mutants', function () {
+
+test('it gracefully handles missing first or last names independently', function () {
     $vcard1 = new VCard;
     $vcard1->create([
         'name' => 'Khaled',

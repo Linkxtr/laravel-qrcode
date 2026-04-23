@@ -31,12 +31,12 @@ final class Telegram implements DataTypeInterface
             throw new InvalidArgumentException('Telegram username must be a string.');
         }
 
-        $username = trim($arguments[0]);
+        $username = ltrim(trim($arguments[0]), '@');
 
         if ($username === '') {
             throw new InvalidArgumentException('Telegram username cannot be empty.');
         }
 
-        $this->username = ltrim($username, '@');
+        $this->username = $username;
     }
 }

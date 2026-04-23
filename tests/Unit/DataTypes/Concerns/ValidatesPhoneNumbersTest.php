@@ -21,14 +21,14 @@ test('it successfully strips visual formatting characters', function () use ($tr
     expect($result)->toBe('+1555123456789');
 });
 
-test('it mathematically enforces the 15-digit maximum boundary to kill {1,16} mutants', function () use ($traitTester) {
+test('it mathematically enforces the 15-digit maximum boundary', function () use ($traitTester) {
     expect($traitTester->test('+123456789012345'))->toBe('+123456789012345');
 
     expect(fn () => $traitTester->test('+1234567890123456'))
         ->toThrow(InvalidArgumentException::class);
 });
 
-test('it mathematically enforces the 1-digit minimum boundary to kill {2,15} and {0,15} mutants', function () use ($traitTester) {
+test('it mathematically enforces the 1-digit minimum boundary', function () use ($traitTester) {
     expect($traitTester->test('1'))->toBe('1');
     expect($traitTester->test('+1'))->toBe('+1');
 
@@ -39,7 +39,7 @@ test('it mathematically enforces the 1-digit minimum boundary to kill {2,15} and
         ->toThrow(InvalidArgumentException::class);
 });
 
-test('it strictly enforces the plus sign positioning to kill prefix mutants', function () use ($traitTester) {
+test('it strictly enforces the plus sign positioning', function () use ($traitTester) {
     expect($traitTester->test('+123'))->toBe('+123');
 
     expect(fn () => $traitTester->test('++123'))
@@ -49,7 +49,16 @@ test('it strictly enforces the plus sign positioning to kill prefix mutants', fu
         ->toThrow(InvalidArgumentException::class);
 });
 
-test('it throws exception if string contains only letters', function () use ($traitTester) {
+test('it throws exception if string contains letters or symbols', function () use ($traitTester) {
     expect(fn () => $traitTester->test('invalid-phone-string'))
-        ->toThrow(InvalidArgumentException::class);
+        ->toThrow(InvalidArgumentException::class, 'Phone number contains invalid characters');
+
+    expect(fn () => $traitTester->test('abc1234567'))
+        ->toThrow(InvalidArgumentException::class, 'Phone number contains invalid characters');
+
+    expect(fn () => $traitTester->test('15551234567 ext 123'))
+        ->toThrow(InvalidArgumentException::class, 'Phone number contains invalid characters');
+
+    expect(fn () => $traitTester->test('+1-555-123-4567@'))
+        ->toThrow(InvalidArgumentException::class, 'Phone number contains invalid characters');
 });

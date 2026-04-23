@@ -31,9 +31,18 @@ test('it throws exception if latitude or longitude are not numeric', function ()
 
 test('it generates full geo string from standard floats', function () {
     $geo = new Geo;
+
     $geo->create([37.7749, -122.4194]);
 
     expect((string) $geo)->toBe('geo:37.7749,-122.4194');
+
+    $geo->create([-90, -180]);
+
+    expect((string) $geo)->toBe('geo:-90,-180');
+
+    $geo->create([90, 180]);
+
+    expect((string) $geo)->toBe('geo:90,180');
 });
 
 test('it safely casts numeric strings to floats to kill cast mutants', function () {
@@ -58,17 +67,33 @@ test('it throws exception if name is not a string', function () {
         ->toThrow(InvalidArgumentException::class, 'Geo name must be a string.');
 });
 
-test('it intercepts and ignores empty string names to kill empty block mutants', function () {
+test('it intercepts and ignores empty string names', function () {
     $geo = new Geo;
     $geo->create([37.7749, -122.4194, '']);
 
     expect((string) $geo)->toBe('geo:37.7749,-122.4194');
 });
 
-test('it appends optional name and strictly encodes spaces to kill concatenation mutants', function () {
+test('it appends optional name and strictly encodes spaces', function () {
     $geo = new Geo;
     $geo->create([37.7749, -122.4194, 'Golden Gate Bridge']);
 
     expect((string) $geo)->toBe('geo:37.7749,-122.4194?name=Golden%20Gate%20Bridge')
         ->and((string) $geo)->not->toContain('+');
+});
+
+test('it throws an exception for out-of-bounds latitude and longitude', function () {
+    $geo = new Geo;
+
+    expect(fn () => $geo->create([-90.000001, 0]))
+        ->toThrow(InvalidArgumentException::class, 'Latitude must be between -90 and 90.');
+
+    expect(fn () => $geo->create([90.000001, 0]))
+        ->toThrow(InvalidArgumentException::class, 'Latitude must be between -90 and 90.');
+
+    expect(fn () => $geo->create([0, -180.000001]))
+        ->toThrow(InvalidArgumentException::class, 'Longitude must be between -180 and 180.');
+
+    expect(fn () => $geo->create([0, 180.000001]))
+        ->toThrow(InvalidArgumentException::class, 'Longitude must be between -180 and 180.');
 });

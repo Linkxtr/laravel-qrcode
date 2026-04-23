@@ -27,6 +27,8 @@ test('the enum helper trait strictly extracts all scalar string values to kill a
     expect(Format::toArray())->toBe(['png', 'svg', 'eps', 'webp']);
     expect(Style::toArray())->toBe(['square', 'dot', 'round']);
     expect(EyeStyle::toArray())->toBe(['square', 'circle', 'pointy']);
+    expect(ErrorCorrectionLevel::toArray())->toBe(['L', 'M', 'Q', 'H']);
+    expect(GradientType::toArray())->toBe(['vertical', 'horizontal', 'diagonal', 'inverse_diagonal', 'radial']);
 });
 
 test('error correction level maps perfectly to the underlying bacon enum to kill match arm mutants', function () {

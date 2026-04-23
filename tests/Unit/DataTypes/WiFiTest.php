@@ -48,7 +48,7 @@ test('it maps associative arguments and falls back to smart defaults correctly',
     expect((string) $wifi3)->toBe('WIFI:S:OldRouter;T:WEP;P:12345;;');
 });
 
-test('it strips empty string parameters to kill boundary mutants', function () {
+test('it strips empty string parameters', function () {
     $wifi = new WiFi;
 
     $wifi->create(['HomeNetwork', '', '', false]);
@@ -56,7 +56,7 @@ test('it strips empty string parameters to kill boundary mutants', function () {
     expect((string) $wifi)->toBe('WIFI:S:HomeNetwork;T:NOPASS;;');
 });
 
-test('it safely escapes special characters in ssid and password to kill strtr mutants', function () {
+test('it safely escapes special characters in ssid and password', function () {
     $wifi = new WiFi;
 
     $chaosSsid = 'Net\\Work;Name';
@@ -69,7 +69,7 @@ test('it safely escapes special characters in ssid and password to kill strtr mu
     expect((string) $wifi)->toBe($expected);
 });
 
-test('it successfully unpacks a wrapped array from the facade pattern to kill wrapper mutants', function () {
+test('it successfully unpacks a wrapped array from the facade pattern', function () {
     $wifi = new WiFi;
 
     $wifi->create([[
@@ -82,7 +82,7 @@ test('it successfully unpacks a wrapped array from the facade pattern to kill wr
     expect((string) $wifi)->toBe('WIFI:S:WrappedWiFi;T:WPA;P:secret123;H:true;;');
 });
 
-test('it explicitly allows NOPASS encryption to kill RemoveArrayItem mutant', function () {
+test('it explicitly allows NOPASS encryption', function () {
     $wifi = new WiFi;
 
     $wifi->create(['ssid' => 'PublicNet', 'encryption' => 'NOPASS']);
@@ -90,10 +90,45 @@ test('it explicitly allows NOPASS encryption to kill RemoveArrayItem mutant', fu
     expect((string) $wifi)->toBe('WIFI:S:PublicNet;T:NOPASS;;');
 });
 
-test('it safely casts non-boolean hidden values to boolean to kill cast mutants', function () {
+test('it safely casts non-boolean hidden values to boolean', function () {
     $wifi = new WiFi;
 
     $wifi->create(['ssid' => 'HiddenNet', 'hidden' => 1]);
 
     expect((string) $wifi)->toBe('WIFI:S:HiddenNet;T:NOPASS;H:true;;');
+});
+
+it('strictly parses hidden flag values as boolean, rejecting invalid strings', function () {
+    $wifi = new WiFi;
+    $wifi->create(['ssid' => 'VisibleNet', 'hidden' => 'false']);
+
+    expect((string) $wifi)->toBe('WIFI:S:VisibleNet;T:NOPASS;;');
+
+    $wifi2 = new WiFi;
+    $wifi2->create([['ssid' => 'VisibleNet', 'hidden' => 'yes']]);
+
+    expect((string) $wifi2)->toBe('WIFI:S:VisibleNet;T:NOPASS;H:true;;');
+
+    $wifi3 = new WiFi;
+    $wifi3->create([['ssid' => 'VisibleNet', 'hidden' => 'invalid-string']]);
+
+    expect((string) $wifi3)->toBe('WIFI:S:VisibleNet;T:NOPASS;;');
+});
+
+test('it mathematically enforces NOPASS encryption cannot have a password', function () {
+    $wifi = new WiFi;
+
+    expect(fn () => $wifi->create([['ssid' => 'MyNetwork', 'encryption' => 'NOPASS', 'password' => 'Secret123']]))
+        ->toThrow(InvalidArgumentException::class, 'WiFi password cannot be provided when encryption is NOPASS.');
+
+    $wifiPositional = new WiFi;
+    expect(fn () => $wifiPositional->create([['MyNetwork', 'NOPASS', 'Secret123']]))
+        ->toThrow(InvalidArgumentException::class, 'WiFi password cannot be provided when encryption is NOPASS.');
+});
+
+it('rejects malformed hidden flag values', function () {
+    $wifi = new WiFi;
+
+    expect(fn () => $wifi->create([['ssid' => 'MyNetwork', 'hidden' => ['nested_array']]]))
+        ->toThrow(InvalidArgumentException::class, 'WiFi hidden flag must be a boolean or a string representation of a boolean.');
 });

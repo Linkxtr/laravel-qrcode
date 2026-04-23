@@ -6,6 +6,7 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use LogicException;
 
 final class BTC implements DataTypeInterface
 {
@@ -13,7 +14,7 @@ final class BTC implements DataTypeInterface
 
     private string $address;
 
-    private float $amount;
+    private ?string $amount = null;
 
     private ?string $label = null;
 
@@ -23,6 +24,10 @@ final class BTC implements DataTypeInterface
 
     public function __toString(): string
     {
+        if (! isset($this->address)) {
+            throw new LogicException('BTC must be initialized via create() before rendering.');
+        }
+
         $params = [
             'amount' => $this->amount,
             'label' => $this->label,
@@ -42,20 +47,26 @@ final class BTC implements DataTypeInterface
             throw new InvalidArgumentException('Bitcoin address and amount are required.');
         }
 
-        if (! is_string($arguments[0])) {
-            throw new InvalidArgumentException('Bitcoin address must be a string.');
+        if (! is_string($arguments[0]) || trim($arguments[0]) === '') {
+            throw new InvalidArgumentException('Bitcoin address must be a non-empty string.');
         }
 
-        if (! is_numeric($arguments[1])) {
-            throw new InvalidArgumentException('Bitcoin amount must be a numeric value.');
+        if (! is_scalar($arguments[1])) {
+            throw new InvalidArgumentException('Bitcoin amount must be a scalar value.');
         }
 
-        if ($arguments[1] < 0) {
-            throw new InvalidArgumentException('Bitcoin amount must be non-negative.');
+        $amountStr = (string) $arguments[1];
+
+        if (preg_match('/^\d+(\.\d+)?$/', $amountStr) !== 1) {
+            throw new InvalidArgumentException('Bitcoin amount must be a positive decimal string. Small amounts must be passed as strings to avoid scientific notation loss.');
         }
 
-        $this->address = $arguments[0];
-        $this->amount = (float) $arguments[1];
+        $this->address = trim($arguments[0]);
+        $this->amount = $amountStr;
+
+        $this->label = null;
+        $this->message = null;
+        $this->returnAddress = null;
 
         if (! isset($arguments[2]) || ! is_array($arguments[2])) {
             return;

@@ -89,7 +89,7 @@ final class MeCard implements DataTypeInterface
         }
 
         if ($this->url !== null) {
-            $meCard .= 'URL:'.$this->url.';';
+            $meCard .= 'URL:'.$this->escapeUrlValue($this->url).';';
         }
 
         return $meCard.';';
@@ -156,6 +156,14 @@ final class MeCard implements DataTypeInterface
             ';' => '\\;',
             ':' => '\\:',
             ',' => '\\,',
+        ]);
+    }
+
+    private function escapeUrlValue(string $value): string
+    {
+        return strtr($value, [
+            '\\' => '\\\\',
+            ';' => '\\;',
         ]);
     }
 }

@@ -10,10 +10,14 @@ trait ValidatesPhoneNumbers
 {
     protected function validatePhoneNumber(string $phoneNumber): string
     {
-        $cleaned = sprintf('%s', preg_replace('/[^\d+]/', '', $phoneNumber));
+        if (! preg_match('/^\+?[\d\s().-]+$/', $phoneNumber)) {
+            throw new InvalidArgumentException('Phone number contains invalid characters. Only digits, spaces, hyphens, parentheses, dots, and a leading plus are allowed.');
+        }
+
+        $cleaned = (string) preg_replace('/[^\d+]/', '', $phoneNumber); // @pest-mutate-ignore
 
         if (! preg_match('/^\+?\d{1,15}$/', $cleaned)) {
-            throw new InvalidArgumentException('Invalid phone number format. Must be 1-15 digits, optionally starting with +');
+            throw new InvalidArgumentException('Invalid phone number length. Must be 1-15 digits, optionally starting with +');
         }
 
         return $cleaned;

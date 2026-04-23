@@ -38,11 +38,17 @@ final class WhatsApp implements DataTypeInterface
             throw new InvalidArgumentException('WhatsApp phone number is required.');
         }
 
-        if (! is_string($arguments[0]) && ! is_numeric($arguments[0])) {
+        if (! is_scalar($arguments[0])) {
             throw new InvalidArgumentException('WhatsApp phone number must be a string or numeric value.');
         }
 
-        $this->phoneNumber = $this->validatePhoneNumber((string) $arguments[0]);
+        $rawNumber = trim((string) $arguments[0]);
+
+        if ($rawNumber === '') {
+            throw new InvalidArgumentException('WhatsApp phone number cannot be empty.');
+        }
+
+        $this->phoneNumber = ltrim($this->validatePhoneNumber($rawNumber), '+');
 
         if (isset($arguments[1])) {
             if (! is_string($arguments[1])) {

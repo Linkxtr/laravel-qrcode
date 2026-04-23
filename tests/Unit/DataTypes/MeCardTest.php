@@ -61,7 +61,7 @@ test('it successfully maps all 13 associative array arguments', function () {
     expect((string) $meCard)->toBe($expected);
 });
 
-test('it ignores non-string associative arguments to kill type constraint mutants', function () {
+test('it ignores non-string associative arguments', function () {
     $meCard = new MeCard;
     $meCard->create([[
         'name' => 'Khaled Sadek',
@@ -82,7 +82,7 @@ test('it ignores non-string associative arguments to kill type constraint mutant
     expect((string) $meCard)->toBe('MECARD:N:Khaled Sadek;;');
 });
 
-test('it strips empty string associative arguments to kill empty block mutants', function () {
+test('it strips empty string associative arguments', function () {
     $meCard = new MeCard;
     $meCard->create([[
         'name' => 'Khaled Sadek',
@@ -103,7 +103,7 @@ test('it strips empty string associative arguments to kill empty block mutants',
     expect((string) $meCard)->toBe('MECARD:N:Khaled Sadek;;');
 });
 
-test('it accurately escapes special characters to kill strtr mutants', function () {
+test('it accurately escapes special characters', function () {
     $meCard = new MeCard;
 
     $chaosString = 'Name\\With;Special:Chars,Here';
@@ -112,4 +112,19 @@ test('it accurately escapes special characters to kill strtr mutants', function 
     $expected = 'MECARD:N:Name\\\\With\\;Special\\:Chars\\,Here;;';
 
     expect((string) $meCard)->toBe($expected);
+});
+
+test('it rigorously escapes semicolons and backslashes in URLs to prevent MeCard delimiter corruption', function () {
+    $meCard = new MeCard;
+
+    $meCard->create([[
+        'name' => 'John Doe',
+        'url' => 'https://example.com/path;session=123\\backup',
+    ]]);
+
+    $result = (string) $meCard;
+
+    expect($result)->toContain('URL:https://example.com/path\;session=123\\\\backup;');
+
+    expect($result)->not->toContain('path;session');
 });

@@ -43,6 +43,7 @@ final class SMS implements DataTypeInterface
         }
 
         $this->phoneNumber = $this->validatePhoneNumber((string) $arguments[0]);
+        $this->message = null;
 
         if (isset($arguments[1])) {
             if (! is_string($arguments[1])) {
