@@ -46,7 +46,7 @@ final readonly class BaconRenderer
      * The PNG compression level.
      * Only applicable to PNG format when using GDLibRenderer.
      */
-    private const PNG_COMPRESSION_LEVEL = 9; // @pest-mutate-ignore
+    private const PNG_COMPRESSION_LEVEL = 9;
 
     public function __construct(private Config $config) {}
 
@@ -73,8 +73,17 @@ final readonly class BaconRenderer
 
     private function getRenderer(): RendererInterface
     {
+        $format = $this->config->getFormat();
+
+        if ($format === Format::SVG || $format === Format::EPS) {
+            return new ImageRenderer(
+                $this->getRendererStyle(),
+                $this->getFormatter()
+            );
+        }
+
         if (! extension_loaded('imagick') && ! extension_loaded('gd')) {
-            throw new RuntimeException('The imagick or gd extension is required to generate QR codes.');
+            throw new RuntimeException('The imagick or gd extension is required to generate raster QR codes.');
         }
 
         if (extension_loaded('imagick')) {
@@ -85,7 +94,7 @@ final readonly class BaconRenderer
         }
 
         if ($this->config->getFormat() !== Format::PNG) {
-            throw new RuntimeException('The imagick extension is required to generate QR codes in '.$this->config->getFormat()->value.' format.');
+            throw new RuntimeException(sprintf('Format "%s" requires the Imagick extension.', $format->value));
         }
 
         return new GDLibRenderer(
@@ -125,6 +134,10 @@ final readonly class BaconRenderer
         $format = $this->config->getFormat();
         $imageMerge = $this->config->getImageMerge();
         $percentage = $this->config->getImagePercentage();
+
+        if ($format === Format::EPS && ! extension_loaded('gd')) {
+            throw new RuntimeException('The "gd" extension is required to merge images into EPS format.');
+        }
 
         return match ($format) {
             Format::EPS => new EpsMerger($qrCode, $imageMerge, $percentage),

@@ -94,3 +94,40 @@ test('it accurately calculates ratio for non-square images', function () {
     expect($result)->toContain('width="20"')
         ->and($result)->toContain('height="13"');
 });
+
+test('it strictly restrains tall images to the percentage limit on the Y-axis to protect error correction', function () {
+    $tallPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEElEQVQImWNgYGD4z8DAwAABiwEAqD4w+wAAAABJRU5ErkJggg==');
+
+    $svg = '<svg width="100" height="100"></svg>';
+
+    $merger = new SvgMerger($svg, $tallPng, 0.2);
+    $result = $merger->merge();
+    expect($result)->toContain('height="20"')
+        ->and($result)->toContain('width="10"')
+        ->and($result)->toContain('x="45"')
+        ->and($result)->toContain('y="40"');
+});
+
+test('it strictly validates image dimensions to prevent division by zero errors', function () {
+    $svg = '<svg width="100" height="100"></svg>';
+
+    $zeroDimensionGif = hex2bin('4749463839610000000000000021f90401000000002c00000000000000000000');
+
+    expect(fn () => (new SvgMerger($svg, $zeroDimensionGif, 0.2))->merge())
+        ->toThrow(InvalidArgumentException::class, 'Invalid image dimensions for merge.');
+});
+
+it('throws an exception when the merge image has zero width or zero height', function (int $width, int $height) {
+    $svgContent = '<svg width="100px" height="100px"></svg>';
+
+    $dummyGif = 'GIF89a'.pack('v', $width).pack('v', $height)."\x00\x00\x00";
+
+    $merger = new SvgMerger($svgContent, $dummyGif, 0.5);
+
+    expect(fn () => $merger->merge())
+        ->toThrow(InvalidArgumentException::class, 'Invalid image dimensions for merge.');
+})->with([
+    'zero width, valid height' => [0, 10],
+    'valid width, zero height' => [10, 0],
+    'zero width, zero height' => [0, 0],
+]);

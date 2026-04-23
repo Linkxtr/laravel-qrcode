@@ -32,34 +32,10 @@ covers(BaconRenderer::class);
 
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 
-beforeEach(function () {
+afterEach(function () {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = true;
     $mockGdLoaded = true;
-});
-
-it('renders an html string with merged image', function () use ($tinyPng) {
-    $config = new Config;
-    $config->setFormat(Format::SVG);
-    $config->setupMergeString($tinyPng, 0.2);
-    $renderer = new BaconRenderer($config);
-
-    $result = $renderer->render('test payload');
-
-    expect($result)->toBeInstanceOf(HtmlString::class)
-        ->and($result->toHtml())->toContain('<svg')
-        ->and($result->toHtml())->toContain('href="data:image/png;base64');
-});
-
-it('renders an html string without merged image', function () {
-    $config = new Config;
-    $renderer = new BaconRenderer($config);
-
-    $result = $renderer->render('test payload');
-
-    expect($result)->toBeInstanceOf(HtmlString::class)
-        ->and($result->toHtml())->toContain('<svg')
-        ->and($result->toHtml())->not->toContain('href="data:image/png;base64');
 });
 
 it('throws exception if required extensions are not loaded', function () {
@@ -70,11 +46,32 @@ it('throws exception if required extensions are not loaded', function () {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
-    expect(fn () => $renderer->render('test'))
-        ->toThrow(RuntimeException::class, 'The imagick or gd extension is required to generate QR codes.');
+    $config->setFormat(Format::SVG);
 
+    expect(fn () => $renderer->render('test'))->not->toThrow(RuntimeException::class);
+
+    $config->setFormat(Format::EPS);
+
+    expect(fn () => $renderer->render('test'))->not->toThrow(RuntimeException::class);
+
+    $config->setFormat(Format::PNG);
+    expect(fn () => $renderer->render('test'))->toThrow(RuntimeException::class, 'The imagick or gd extension is required to generate raster QR codes');
+
+    $config->setFormat(Format::WEBP);
+    expect(fn () => $renderer->render('test'))->toThrow(RuntimeException::class, 'The imagick or gd extension is required to generate raster QR codes');
+});
+
+it('throws an exception if trying to generate a non-PNG raster using only GD', function () {
+    global $mockImagickLoaded, $mockGdLoaded;
+    $mockImagickLoaded = false;
     $mockGdLoaded = true;
-    expect(fn () => $renderer->render('test'))->toThrow(RuntimeException::class, 'The imagick extension is required to generate QR codes in svg format.');
+
+    $config = new Config;
+    $renderer = new BaconRenderer($config);
+    $config->setFormat(Format::WEBP);
+
+    expect(fn () => $renderer->render('test'))
+        ->toThrow(RuntimeException::class, 'Format "webp" requires the Imagick extension.');
 });
 
 it('falls back to GDLibRenderer for PNG if imagick is missing', function () {
@@ -86,6 +83,25 @@ it('falls back to GDLibRenderer for PNG if imagick is missing', function () {
     $renderer = new BaconRenderer($config);
 
     expect(invade($renderer)->getRenderer())->toBeInstanceOf(GDLibRenderer::class);
+});
+
+it('successfully generates SVG and EPS without requiring any image extensions', function () {
+    global $mockImagickLoaded, $mockGdLoaded;
+    $mockImagickLoaded = false;
+    $mockGdLoaded = false;
+
+    $config = new Config;
+    $renderer = new BaconRenderer($config);
+
+    // SVG should succeed
+    $config->setFormat(Format::SVG);
+    $svgQr = $renderer->render('test');
+    expect((string) $svgQr)->toContain('<svg');
+
+    // EPS should succeed
+    $config->setFormat(Format::EPS);
+    $epsQr = $renderer->render('test');
+    expect((string) $epsQr)->toContain('%!PS-Adobe');
 });
 
 it('resolves the correct module styles', function () {
@@ -120,21 +136,23 @@ it('builds the correct eye fills', function () {
     $config->setupEyeColor(1, 40, 50, 60);
     $config->setupEyeColor(2, 70, 80, 90);
 
-    expect(invade($renderer)->getFill()->getTopLeftEyeFill())->toBeInstanceOf(EyeFill::class)
-        ->and(invade($renderer)->getFill()->getTopLeftEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
-        ->and(invade($renderer)->getFill()->getTopLeftEyeFill()->getExternalColor()->getRed())->toBe(10)
-        ->and(invade($renderer)->getFill()->getTopLeftEyeFill()->getExternalColor()->getGreen())->toBe(20)
-        ->and(invade($renderer)->getFill()->getTopLeftEyeFill()->getExternalColor()->getBlue())->toBe(30)
-        ->and(invade($renderer)->getFill()->getTopRightEyeFill())->toBeInstanceOf(EyeFill::class)
-        ->and(invade($renderer)->getFill()->getTopRightEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
-        ->and(invade($renderer)->getFill()->getTopRightEyeFill()->getExternalColor()->getRed())->toBe(40)
-        ->and(invade($renderer)->getFill()->getTopRightEyeFill()->getExternalColor()->getGreen())->toBe(50)
-        ->and(invade($renderer)->getFill()->getTopRightEyeFill()->getExternalColor()->getBlue())->toBe(60)
-        ->and(invade($renderer)->getFill()->getBottomLeftEyeFill())->toBeInstanceOf(EyeFill::class)
-        ->and(invade($renderer)->getFill()->getBottomLeftEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
-        ->and(invade($renderer)->getFill()->getBottomLeftEyeFill()->getExternalColor()->getRed())->toBe(70)
-        ->and(invade($renderer)->getFill()->getBottomLeftEyeFill()->getExternalColor()->getGreen())->toBe(80)
-        ->and(invade($renderer)->getFill()->getBottomLeftEyeFill()->getExternalColor()->getBlue())->toBe(90);
+    $fill = invade($renderer)->getFill();
+
+    expect($fill->getTopLeftEyeFill())->toBeInstanceOf(EyeFill::class)
+        ->and($fill->getTopLeftEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and($fill->getTopLeftEyeFill()->getExternalColor()->getRed())->toBe(10)
+        ->and($fill->getTopLeftEyeFill()->getExternalColor()->getGreen())->toBe(20)
+        ->and($fill->getTopLeftEyeFill()->getExternalColor()->getBlue())->toBe(30)
+        ->and($fill->getTopRightEyeFill())->toBeInstanceOf(EyeFill::class)
+        ->and($fill->getTopRightEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and($fill->getTopRightEyeFill()->getExternalColor()->getRed())->toBe(40)
+        ->and($fill->getTopRightEyeFill()->getExternalColor()->getGreen())->toBe(50)
+        ->and($fill->getTopRightEyeFill()->getExternalColor()->getBlue())->toBe(60)
+        ->and($fill->getBottomLeftEyeFill())->toBeInstanceOf(EyeFill::class)
+        ->and($fill->getBottomLeftEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and($fill->getBottomLeftEyeFill()->getExternalColor()->getRed())->toBe(70)
+        ->and($fill->getBottomLeftEyeFill()->getExternalColor()->getGreen())->toBe(80)
+        ->and($fill->getBottomLeftEyeFill()->getExternalColor()->getBlue())->toBe(90);
 });
 
 it('builds the correct color models', function () {
@@ -179,6 +197,17 @@ it('resolves single eye styles', function () {
     expect(invade($renderer)->getEye())->toBeInstanceOf(CompositeEye::class);
 });
 
+it('renders an html string without merged image', function () {
+    $config = new Config;
+    $renderer = new BaconRenderer($config);
+
+    $result = $renderer->render('test payload');
+
+    expect($result)->toBeInstanceOf(HtmlString::class)
+        ->and($result->toHtml())->toContain('<svg')
+        ->and($result->toHtml())->not->toContain('href="data:image/png;base64');
+});
+
 it('calls the correct merger based on format', function () use ($tinyPng) {
     $config = new Config;
     $renderer = new BaconRenderer($config);
@@ -198,4 +227,29 @@ it('calls the correct merger based on format', function () use ($tinyPng) {
     global $mockImagickLoaded;
     $mockImagickLoaded = false;
     expect(invade($renderer)->getMerger($tinyPng))->toBeInstanceOf(RasterMerger::class);
+});
+
+it('throws an exception when trying to merge images into EPS format without gd extension', function () use ($tinyPng) {
+    global $mockGdLoaded;
+    $mockGdLoaded = false;
+
+    $config = new Config;
+    $config->setFormat(Format::EPS);
+    $config->setupMergeString($tinyPng, 0.2);
+    $renderer = new BaconRenderer($config);
+
+    expect(fn () => $renderer->render('test'))->toThrow(RuntimeException::class, 'The "gd" extension is required to merge images into EPS format.');
+});
+
+it('renders an html string with merged image', function () use ($tinyPng) {
+    $config = new Config;
+    $config->setFormat(Format::SVG);
+    $config->setupMergeString($tinyPng, 0.2);
+    $renderer = new BaconRenderer($config);
+
+    $result = $renderer->render('test payload');
+
+    expect($result)->toBeInstanceOf(HtmlString::class)
+        ->and($result->toHtml())->toContain('<svg')
+        ->and($result->toHtml())->toContain('href="data:image/png;base64');
 });

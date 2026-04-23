@@ -40,9 +40,18 @@ final readonly class SvgMerger implements MergerInterface
         [$logoWidth, $logoHeight] = $imageInfo;
         $mimeType = $imageInfo['mime'];
 
+        if ($logoWidth <= 0 || $logoHeight <= 0) {
+            throw new InvalidArgumentException('Invalid image dimensions for merge.');
+        }
+
         $logoRatio = $logoWidth / $logoHeight;
-        $targetWidth = (int) ($svgWidth * $this->percentage);
-        $targetHeight = (int) ($targetWidth / $logoRatio); // @pest-mutate-ignore
+        $targetWidth = max(1, (int) ($svgWidth * $this->percentage)); // @pest-mutate-ignore
+        $targetHeight = max(1, (int) ($targetWidth / $logoRatio)); // @pest-mutate-ignore
+
+        if ($targetHeight > $svgHeight * $this->percentage) { // @pest-mutate-ignore
+            $targetHeight = max(1, (int) ($svgHeight * $this->percentage)); // @pest-mutate-ignore
+            $targetWidth = max(1, (int) ($targetHeight * $logoRatio)); // @pest-mutate-ignore
+        }
 
         $x = (int) (($svgWidth - $targetWidth) / 2); // @pest-mutate-ignore
         $y = (int) (($svgHeight - $targetHeight) / 2); // @pest-mutate-ignore

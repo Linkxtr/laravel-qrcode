@@ -119,7 +119,8 @@ final class RasterMerger implements MergerInterface
 
         $success = match ($this->format) {
             Format::WEBP => imagewebp($gdImage, null, 90), // @pest-mutate-ignore
-            default => imagepng($gdImage),
+            Format::PNG => imagepng($gdImage),
+            default => throw new InvalidArgumentException('RasterMerger only supports "png" or "webp" formats.'),
         };
 
         $content = ob_get_clean();

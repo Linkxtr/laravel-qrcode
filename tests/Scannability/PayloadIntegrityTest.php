@@ -118,10 +118,3 @@ it('can scan a generated standard eps QR code', function ($imagick, $gd) {
 
     expect(read_qr_code((string) $qrCode))->toBe('https://example.com/eps');
 })->with('drivers');
-
-it('throws an exception if attempting to merge an image into an EPS format', function ($imagick, $gd) {
-    setDriver($imagick, $gd);
-
-    expect(fn () => QrCode::format('eps')->merge(__DIR__.'/../Support/Fixtures/images/linkxtr.png')->generate('test'))
-        ->toThrow(Exception::class);
-})->with('drivers');

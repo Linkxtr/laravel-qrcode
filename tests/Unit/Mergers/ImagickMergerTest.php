@@ -7,6 +7,12 @@ use Linkxtr\QrCode\Mergers\ImagickMerger;
 
 covers(ImagickMerger::class);
 
+beforeEach(function () {
+    if (! extension_loaded('imagick')) {
+        $this->markTestSkipped('The imagick extension is required for ImagickMerger tests.');
+    }
+});
+
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 
 $getTallPng = function () {
@@ -41,6 +47,10 @@ test('it successfully merges two images as PNG', function () use ($tinyPng) {
 });
 
 test('it successfully merges and sets compression for WEBP format', function () use ($tinyPng) {
+    if (! in_array('WEBP', Imagick::queryFormats('WEBP'), true)) {
+        $this->markTestSkipped('ImageMagick WEBP support is required for this assertion.');
+    }
+
     $merger = new ImagickMerger($tinyPng, $tinyPng, 0.2);
     $merger->setFormat(Format::WEBP);
 

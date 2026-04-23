@@ -210,3 +210,15 @@ it('throws exception when output content is an empty string', function () use ($
     global $mock_imagepng_empty;
     $mock_imagepng_empty = null;
 });
+
+test('it throws a logic exception if an unsupported format bypasses validation', function () use ($tinyPng) {
+    $merger = new RasterMerger($tinyPng, $tinyPng, 0.2);
+    invade($merger)->format = Format::EPS;
+
+    expect(fn () => $merger->merge())
+        ->toThrow(LogicException::class, 'RasterMerger only supports "png" or "webp" formats.');
+})->after(function () {
+    if (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+});
