@@ -24,3 +24,14 @@ test('the blade component handles base64 image formats correctly', function () {
         ->toContain('class="my-qr-class"')
         ->toContain('src="data:image/png;base64,');
 });
+
+test('it supports the old tag syntax', function () {
+    $html = Blade::render(
+        '<x-qr-code data="https://linkxtr.com" size="150" color="255,0,0" style="round" />'
+    );
+
+    expect($html)->toContain('<svg')
+        ->toContain('width="150"')
+        ->toContain('height="150"')
+        ->toContain('#ff0000');
+});

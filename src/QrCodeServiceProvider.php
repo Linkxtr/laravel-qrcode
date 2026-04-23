@@ -25,6 +25,7 @@ final class QrCodeServiceProvider extends ServiceProvider
         }
 
         Blade::component('qrcode', QrCodeComponent::class);
+        Blade::component('qr-code', QrCodeComponent::class);
     }
 
     public function register(): void

@@ -26,11 +26,13 @@ test('it binds the generator to the container as a singleton', function () {
         ->and($generator1)->toBe($generator2);
 });
 
-test('it registers the blade component', function () {
+test('it registers the blade component with both tag syntaxes', function () {
     $aliases = Blade::getClassComponentAliases();
 
     expect($aliases)->toHaveKey('qrcode')
-        ->and($aliases['qrcode'])->toBe(QrCodeComponent::class);
+        ->and($aliases['qrcode'])->toBe(QrCodeComponent::class)
+        ->and($aliases)->toHaveKey('qr-code')
+        ->and($aliases['qr-code'])->toBe(QrCodeComponent::class);
 });
 
 test('it registers publishable assets when running in console', function () {
