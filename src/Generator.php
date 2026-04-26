@@ -20,10 +20,10 @@ use Stringable;
 use UnexpectedValueException;
 
 /**
- * @method HtmlString BTC(string $address, float $amount, array<mixed> $options = [])
+ * @method HtmlString BTC(string $address, string $amount, array<mixed> $options = [])
  * @method HtmlString CalendarEvent(array<mixed> $attributes)
  * @method HtmlString Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
- * @method HtmlString Ethereum(string $address, ?float $amount = null)
+ * @method HtmlString Ethereum(string $address, ?string $amount = null)
  * @method HtmlString Geo(float $latitude, float $longitude, string $name = '')
  * @method HtmlString MeCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
  * @method HtmlString PhoneNumber(string $phoneNumber)
@@ -85,16 +85,16 @@ final class Generator
 
         $htmlString = $baconRenderer->render($text);
 
-        if ($filename && file_put_contents($filename, $htmlString) === false) {
+        if ($filename !== null && file_put_contents($filename, $htmlString->toHtml()) === false) {
             throw new RuntimeException('Failed to write QR code to file: '.$filename);
         }
 
         return $htmlString;
     }
 
-    public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self
+    public function merge(string $filepath, float $percentage = .2): self
     {
-        $this->config->setupMergePath($filepath, $percentage, $absolute);
+        $this->config->setupMergePath($filepath, $percentage);
 
         return $this;
     }

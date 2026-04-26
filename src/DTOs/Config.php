@@ -402,20 +402,33 @@ final class Config
         return $this->gradient;
     }
 
-    public function setupMergePath(string $filepath, float $percentage, bool $absolute = false): void
+    public function setupMergePath(string $filepath, float $percentage): void
     {
-        if (function_exists('base_path') && ! $absolute) {
-            $filepath = base_path().DIRECTORY_SEPARATOR.ltrim($filepath, '\\/');
+        $baseDir = function_exists('base_path') ? base_path() : (getcwd() ?: ''); // @pest-mutate-ignore
+        $isAbsolute = preg_match('~^(/|[a-zA-Z]:[\\\\/])~', $filepath) === 1;
+        $targetPath = $isAbsolute
+            ? $filepath
+            : $baseDir.DIRECTORY_SEPARATOR.$filepath;
+        $resolvedPath = realpath($targetPath);
+
+        $displayPath = $resolvedPath !== false ? $resolvedPath : $filepath;
+
+        if ($resolvedPath === false || ! is_file($resolvedPath) || ! is_readable($resolvedPath)) {
+            throw new InvalidArgumentException('Image file does not exist or is not readable: '.$displayPath);
         }
 
-        if (! is_file($filepath) || ! is_readable($filepath)) {
-            throw new InvalidArgumentException('Image file does not exist or is not readable: '.$filepath);
+        if (! $isAbsolute) {
+            $realBaseDir = realpath($baseDir) ?: $baseDir;
+
+            if (! str_starts_with($resolvedPath, $realBaseDir.DIRECTORY_SEPARATOR)) {
+                throw new InvalidArgumentException('Image file path must be inside the application base path.');
+            }
         }
 
-        $content = file_get_contents($filepath);
+        $content = file_get_contents($resolvedPath);
 
         if ($content === false) {
-            throw new InvalidArgumentException('Failed to read image file: '.$filepath);
+            throw new InvalidArgumentException('Failed to read image file: '.$resolvedPath);
         }
 
         $this->setupMergeString($content, $percentage);

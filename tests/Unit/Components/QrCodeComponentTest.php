@@ -6,6 +6,7 @@ use Illuminate\View\ComponentAttributeBag;
 use Linkxtr\QrCode\Components\QrCodeComponent;
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
+use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 covers(QrCodeComponent::class);
 
@@ -68,7 +69,7 @@ test('it ignores incorrectly formatted hex colors safely', function () {
     expect($html)->toContain('fill="#000000"');
 });
 
-test('it generates base64 image tag for raster formats', function () {
+test('it generates base64 image tag for png format', function () {
     $component = new QrCodeComponent(
         data: 'test',
         format: 'png'
@@ -82,23 +83,46 @@ test('it generates base64 image tag for raster formats', function () {
         ->toContain('class="img-class"')
         ->toContain('alt="QR Code"')
         ->toContain('src="data:image/png;base64,');
+});
 
-    $component2 = new QrCodeComponent(
+test('it generates base64 image tag for webp format using a mocked facade', function () {
+    $fakeGenerator = new class
+    {
+        public array $calls = [];
+
+        public function __call(string $name, array $arguments): self
+        {
+            $this->calls[$name] = $arguments;
+
+            return $this;
+        }
+
+        public function generate(string $data): string
+        {
+            return '<svg></svg>';
+        }
+    };
+
+    QrCode::swap($fakeGenerator);
+
+    $component = new QrCodeComponent(
         data: 'test',
         format: 'webp'
     );
 
-    $closure2 = $component2->render();
-    $html2 = $closure2(['attributes' => new ComponentAttributeBag(['class' => 'img-class'])]);
+    $closure = $component->render();
+    $html = $closure(['attributes' => new ComponentAttributeBag(['class' => 'img-class'])]);
 
-    expect($html2)
+    $expectedBase64 = base64_encode('<svg></svg>');
+
+    expect($html)
         ->toStartWith('<img')
         ->toContain('class="img-class"')
         ->toContain('alt="QR Code"')
-        ->toContain('src="data:image/webp;base64,');
+        ->toContain('src="data:image/webp;base64,'.$expectedBase64.'"');
 });
 
-test('it strictly maps all 6 distinct gradient colors to kill array index swap mutants', function () {
+test('it strictly maps all 6 distinct gradient colors', function () {
     $fakeGenerator = new class
     {
         public array $calls = [];
@@ -172,7 +196,7 @@ test('it handles string merges', function () {
     expect($html)->toBeString()->not->toBeEmpty();
 });
 
-test('it handles visual and data modifiers correctly', function () {
+test('it handles visual and data modifiers', function () {
     $component = new QrCodeComponent(
         data: 'test',
         style: 'dot',
@@ -192,7 +216,6 @@ test('it handles merge with valid path and string absolute boolean', function ()
     $component = new QrCodeComponent(
         data: 'test',
         merge: realpath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png'),
-        mergeAbsolute: 'true'
     );
 
     $closure = $component->render();
@@ -218,7 +241,7 @@ test('it handles 4-part rgb csv colors with alpha', function () {
         ->toContain('fill-opacity="0.7"');
 });
 
-test('it ignores invalid csv color formats safely', function () {
+test('it ignores invalid csv color formats', function () {
     $component = new QrCodeComponent(
         data: 'test',
         color: '255, 0',
@@ -231,7 +254,7 @@ test('it ignores invalid csv color formats safely', function () {
     expect($html)->toContain('fill="#000000"');
 });
 
-test('it handles the style attribute correctly', function () {
+test('it handles the style attribute', function () {
     $component = new QrCodeComponent(
         data: 'test',
         style: 'dot',
@@ -247,7 +270,7 @@ test('it handles the style attribute correctly', function () {
     expect($html)->toBeString()->not->toBeEmpty();
 });
 
-test('it dynamically applies styles and modifies the SVG output to kill RemoveMethodCall mutants', function () {
+test('it dynamically applies styles and modifies the SVG output', function () {
     $defaultComponent = new QrCodeComponent(data: 'https://example.com');
     $defaultHtml = $defaultComponent->render()(['attributes' => new ComponentAttributeBag([])]);
 
@@ -304,7 +327,7 @@ test('it applies custom eye colors correctly to the SVG output', function () {
         ->toContain('#00ff00');
 });
 
-test('it dynamically delegates config methods to the generator via facade to kill RemoveMethodCall mutants', function () {
+test('it dynamically delegates config methods to the generator via facade', function () {
     $fakeGenerator = new class
     {
         public array $calls = [];
@@ -331,8 +354,7 @@ test('it dynamically delegates config methods to the generator via facade to kil
         style: 'round',
         encoding: 'ISO-8859-1',
         merge: '/path/to/logo.png',
-        mergePercentage: 0.3,
-        mergeAbsolute: true
+        mergePercentage: 0.3
     );
 
     $closure = $component->render();
@@ -352,8 +374,7 @@ test('it dynamically delegates config methods to the generator via facade to kil
 
     expect($fakeGenerator->calls)->toHaveKey('merge')
         ->and($fakeGenerator->calls['merge'][0])->toBe('/path/to/logo.png', 'The merge method was removed!')
-        ->and($fakeGenerator->calls['merge'][1])->toBe(0.3)
-        ->and($fakeGenerator->calls['merge'][2])->toBeTrue();
+        ->and($fakeGenerator->calls['merge'][1])->toBe(0.3);
 
     $componentMergeString = new QrCodeComponent(
         data: 'https://example.com',
@@ -368,7 +389,7 @@ test('it dynamically delegates config methods to the generator via facade to kil
         ->and($fakeGenerator->calls['mergeString'][1])->toBe(0.4);
 });
 
-test('it handles translation escaping and strictly limits svg injection to kill ternary and regex mutants', function () {
+test('it handles translation escaping and strictly limits svg injection', function () {
     app()->instance('translator', new class
     {
         public function get($key, array $replace = [], $locale = null)
@@ -416,7 +437,7 @@ test('it handles translation escaping and strictly limits svg injection to kill 
     expect($html)->not->toContain('<svg id="2"><title>');
 });
 
-test('it precisely formats the img tag for non-svg formats to kill concat mutants', function () {
+test('it precisely formats the img tag for non-svg formats', function () {
     $fakeGenerator = new class
     {
         public function __call(string $name, array $arguments)
@@ -439,7 +460,7 @@ test('it precisely formats the img tag for non-svg formats to kill concat mutant
     expect($html)->toBe('<img alt="QR Code" class="img-class" src="data:image/png;base64,'.$base64.'" />');
 });
 
-test('it safely resolves colors with spaces, 3-parameter csv, and explicit alphas to kill resolution mutants', function () {
+test('it safely resolves colors with spaces, 3-parameter csv, and explicit alphas', function () {
     $fakeGenerator = new class
     {
         public array $calls = [];
@@ -462,7 +483,7 @@ test('it safely resolves colors with spaces, 3-parameter csv, and explicit alpha
     $component1->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls)->toHaveKey('color')
-        ->and($fakeGenerator->calls['color'])->toBe([255, 0, 0, null]);
+        ->and($fakeGenerator->calls['color'])->toBe([255, 0, 0, 100]);
 
     $fakeGenerator->calls = [];
 
@@ -470,7 +491,7 @@ test('it safely resolves colors with spaces, 3-parameter csv, and explicit alpha
     $component2->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls)->toHaveKey('backgroundColor')
-        ->and($fakeGenerator->calls['backgroundColor'])->toBe([0, 255, 0, null]);
+        ->and($fakeGenerator->calls['backgroundColor'])->toBe([0, 255, 0, 100]);
 
     $fakeGenerator->calls = [];
 
@@ -478,10 +499,10 @@ test('it safely resolves colors with spaces, 3-parameter csv, and explicit alpha
     $component3->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls)->toHaveKey('color')
-        ->and($fakeGenerator->calls['color'])->toBe([0, 0, 255, null]);
+        ->and($fakeGenerator->calls['color'])->toBe([0, 0, 255, 100]);
 });
 
-test('it aggressively resolves multi-color strings across different delimiters to kill str_replace mutants', function () {
+test('it aggressively resolves multi-color strings across different delimiters', function () {
     $fakeGenerator = new class
     {
         public array $calls = [];
@@ -535,7 +556,7 @@ test('it aggressively resolves multi-color strings across different delimiters t
     expect($fakeGenerator->calls['eyeColor'][6])->toBe(6);
 });
 
-test('it duplicates single multi-colors and safely slices excess colors to kill logic mutants', function () {
+test('it duplicates single multi-colors and safely slices excess colors', function () {
     $fakeGenerator = new class
     {
         public array $calls = [];
@@ -567,7 +588,7 @@ test('it duplicates single multi-colors and safely slices excess colors to kill 
     expect($fakeGenerator->calls['gradient'])->toBe([1, 2, 3, 4, 5, 6, 'vertical']);
 });
 
-test('it returns null early if no valid colors could be parsed to cover the empty array return', function () {
+test('it returns null early if no valid colors could be parsed', function () {
     $fakeGenerator = new class
     {
         public array $calls = [];
@@ -595,5 +616,61 @@ test('it returns null early if no valid colors could be parsed to cover the empt
     $component->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls)->not->toHaveKey('gradient');
-    expect($fakeGenerator->calls)->not->toHaveKey('eyeColor0');
+    expect($fakeGenerator->calls)->not->toHaveKey('eyeColor');
+});
+
+test('it strictly validates CSV color tokens to prevent silent type coercion', function () {
+    $component = new QrCodeComponent('test');
+
+    $method = fn ($color) => invade($component)->resolveColor($color);
+
+    expect($method('255, 128, 0'))->toBeInstanceOf(Rgb::class)
+        ->and($method('255, 128, 0, 50'))->toBeInstanceOf(Rgb::class);
+
+    expect($method('255, nope, 0'))->toBeNull()
+        ->and($method('255, 128, 0, nope'))->toBeNull();
+    expect($method('-1, 128, 0'))->toBeNull();
+});
+
+test('it enforces RGB and Alpha upper bounds', function () {
+    $component = new QrCodeComponent('test');
+    $method = fn ($color) => invade($component)->resolveColor($color);
+
+    expect($method('256, 128, 0'))->toBeNull()
+        ->and($method('255, 256, 0'))->toBeNull()
+        ->and($method('255, 128, 256'))->toBeNull();
+    expect($method('255, 128, 0, 101'))->toBeNull();
+});
+
+test('it correctly maps inner red color for eyeColor2 to prevent index mutations', function () {
+    $fakeGenerator = new class
+    {
+        public array $calls = [];
+
+        public function __call(string $name, array $arguments): self
+        {
+            $this->calls[$name] = $arguments;
+
+            return $this;
+        }
+
+        public function generate(string $data): string
+        {
+            return '<svg></svg>';
+        }
+    };
+    QrCode::swap($fakeGenerator);
+
+    (new QrCodeComponent(data: 'test', eyeColor2: '#010203,#040506'))
+        ->render()(['attributes' => new ComponentAttributeBag([])]);
+
+    expect($fakeGenerator->calls['eyeColor'][1])->toBe(1);
+});
+
+test('it strips null bytes from CSV parts to survive UnwrapArrayMap mutation', function () {
+    $component = new QrCodeComponent('test');
+
+    $method = fn ($color) => invade($component)->resolveColor($color);
+
+    expect($method("255, \0 128, 0"))->toBeInstanceOf(Rgb::class);
 });

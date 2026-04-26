@@ -33,7 +33,6 @@ final class QrCodeComponent extends Component
         public ?string $merge = null,
         public ?string $mergeString = null,
         public float $mergePercentage = 0.2,
-        public bool|string $mergeAbsolute = false,
     ) {}
 
     public function render(): Closure
@@ -51,11 +50,11 @@ final class QrCodeComponent extends Component
         $generator = QrCode::size($this->size)->format($this->format)->margin($this->margin);
 
         if ($this->color !== null && $rgb = $this->resolveColor($this->color)) {
-            $generator->color($rgb[0], $rgb[1], $rgb[2], $rgb[3] ?? null);
+            $generator->color($rgb->red, $rgb->green, $rgb->blue, $rgb->alpha);
         }
 
         if ($this->backgroundColor !== null && $rgb = $this->resolveColor($this->backgroundColor)) {
-            $generator->backgroundColor($rgb[0], $rgb[1], $rgb[2], $rgb[3] ?? null);
+            $generator->backgroundColor($rgb->red, $rgb->green, $rgb->blue, $rgb->alpha);
         }
 
         if ($this->style !== null) {
@@ -75,31 +74,27 @@ final class QrCodeComponent extends Component
         }
 
         if ($this->eyeColor0 !== null && $colors = $this->resolveMultiColor($this->eyeColor0)) {
-            $generator->eyeColor(0, ...$colors);
+            $generator->eyeColor(0, $colors[0]->red, $colors[0]->green, $colors[0]->blue, $colors[1]->red, $colors[1]->green, $colors[1]->blue);
         }
 
         if ($this->eyeColor1 !== null && $colors = $this->resolveMultiColor($this->eyeColor1)) {
-            $generator->eyeColor(1, ...$colors);
+            $generator->eyeColor(1, $colors[0]->red, $colors[0]->green, $colors[0]->blue, $colors[1]->red, $colors[1]->green, $colors[1]->blue);
         }
 
         if ($this->eyeColor2 !== null && $colors = $this->resolveMultiColor($this->eyeColor2)) {
-            $generator->eyeColor(2, ...$colors);
+            $generator->eyeColor(2, $colors[0]->red, $colors[0]->green, $colors[0]->blue, $colors[1]->red, $colors[1]->green, $colors[1]->blue);
         }
 
         if ($this->gradient !== null && $colors = $this->resolveMultiColor($this->gradient)) {
-            $generator->gradient($colors[0], $colors[1], $colors[2], $colors[3], $colors[4], $colors[5], $this->gradientType ?? 'vertical');
+            $generator->gradient($colors[0]->red, $colors[0]->green, $colors[0]->blue, $colors[1]->red, $colors[1]->green, $colors[1]->blue, $this->gradientType ?? 'vertical');
         }
 
         if ($this->merge !== null) {
-            $absolute = is_string($this->mergeAbsolute)
-                ? filter_var($this->mergeAbsolute, FILTER_VALIDATE_BOOLEAN)
-                : $this->mergeAbsolute;
-
             if (str_contains($this->merge, '..')) {
                 throw new InvalidArgumentException('Invalid merge path, path traversal is not allowed.');
             }
 
-            $generator->merge($this->merge, $this->mergePercentage, $absolute);
+            $generator->merge($this->merge, $this->mergePercentage);
         } elseif ($this->mergeString !== null) {
             $generator->mergeString($this->mergeString, $this->mergePercentage);
         }
@@ -140,11 +135,9 @@ final class QrCodeComponent extends Component
     }
 
     /**
-     * Safely resolve Hex or CSV strings into an array of integers.
-     *
-     * @return array{0: int, 1: int, 2: int, 3?: int|null}|null
+     * Safely resolve Hex or CSV strings into an Rgb object.
      */
-    private function resolveColor(string $color): ?array
+    private function resolveColor(string $color): ?Rgb
     {
         $color = trim($color);
 
@@ -152,24 +145,35 @@ final class QrCodeComponent extends Component
             if (str_starts_with($color, '#')) {
                 $rgb = Rgb::fromHex($color);
             } elseif (str_contains($color, ',')) {
-                $parts = array_map(fn (string $p): int => (int) $p, explode(',', $color));
+                $parts = array_map(trim(...), explode(',', $color));
                 $count = count($parts);
 
                 if ($count !== 3 && $count !== 4) {
                     return null;
                 }
 
+                $values = [];
+                foreach ($parts as $part) {
+                    $value = filter_var($part, FILTER_VALIDATE_INT);
+
+                    if (! is_int($value)) {
+                        return null;
+                    }
+
+                    $values[] = $value;
+                }
+
                 $rgb = new Rgb(
-                    $parts[0],
-                    $parts[1],
-                    $parts[2],
-                    $count === 4 ? $parts[3] : 100
+                    $values[0],
+                    $values[1],
+                    $values[2],
+                    $count === 4 ? $values[3] : 100
                 );
             } else {
                 return null;
             }
 
-            return [$rgb->red, $rgb->green, $rgb->blue, $rgb->getAlpha() === 100 ? null : $rgb->getAlpha()];
+            return $rgb;
         } catch (InvalidArgumentException) {
             return null;
         }
@@ -179,7 +183,7 @@ final class QrCodeComponent extends Component
      * Resolve multiple colors separated by common delimiters into a flat array.
      * Guarantees returning exactly 6 integers if successful, preventing unpack errors.
      *
-     * @return array<int, int>|null
+     * @return array<int, Rgb>|null
      */
     private function resolveMultiColor(string $multiColor): ?array
     {
@@ -190,7 +194,7 @@ final class QrCodeComponent extends Component
         $colors = [];
         foreach ($parts as $part) {
             $resolved = $this->resolveColor($part);
-            if ($resolved !== null) {
+            if ($resolved instanceof Rgb) {
                 $colors[] = $resolved;
             }
         }
@@ -200,15 +204,11 @@ final class QrCodeComponent extends Component
         }
 
         if (count($colors) === 1) {
-            return [
-                $colors[0][0], $colors[0][1], $colors[0][2],
-                $colors[0][0], $colors[0][1], $colors[0][2],
-            ];
+            return [$colors[0], $colors[0]];
         }
 
         return [
-            $colors[0][0], $colors[0][1], $colors[0][2],
-            $colors[1][0], $colors[1][1], $colors[1][2],
+            $colors[0], $colors[1],
         ];
     }
 }

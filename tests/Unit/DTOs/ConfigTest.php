@@ -339,36 +339,36 @@ test('it throws exception when gradient colors are invalid', function () {
 test('it sets up image merge from absolute file path', function () {
     $config = new Config;
 
-    $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png', 0.1, true);
+    $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png', 0.1);
     expect($config->getImageMerge())->toBe(file_get_contents(__DIR__.'/../../Support/Fixtures/images/linkxtr.png'))
         ->and($config->getImagePercentage())->toBe(0.1);
 
-    expect(fn () => $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png', 0.0, true))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
-    expect(fn () => $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png', 1.0, true))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
+    expect(fn () => $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png', 0.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
+    expect(fn () => $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png', 1.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
 });
 
 test('it sets up image merge from relative file path', function () {
     $config = new Config;
 
-    $config->setupMergePath('Support/Fixtures/images/linkxtr.png', 0.1, false);
+    $config->setupMergePath('Support/Fixtures/images/linkxtr.png', 0.1);
     expect($config->getImageMerge())->toBe(file_get_contents(__DIR__.'/../../Support/Fixtures/images/linkxtr.png'))
         ->and($config->getImagePercentage())->toBe(0.1);
 
-    expect(fn () => $config->setupMergePath('/Support/Fixtures/images/linkxtr.png', 0.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
+    expect(fn () => $config->setupMergePath('Support/Fixtures/images/linkxtr.png', 0.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
     expect(fn () => $config->setupMergePath('Support/Fixtures/images/linkxtr.png', 1.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
 });
 
 test('it throws exception when path does not exist', function () {
     $config = new Config;
 
-    expect(fn () => $config->setupMergePath('non_existent_path', 0.1, false))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: '.\Linkxtr\QrCode\DTOs\base_path('non_existent_path'));
-    expect(fn () => $config->setupMergePath('/non_existent_path', 0.1, true))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: /non_existent_path');
+    expect(fn () => $config->setupMergePath('non_existent_path', 0.1))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: non_existent_path');
+    expect(fn () => $config->setupMergePath('/non_existent_path', 0.1))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: /non_existent_path');
 });
 
 test('it throws exception when path is a directory', function () {
     $config = new Config;
 
-    expect(fn () => $config->setupMergePath(__DIR__, 0.1, true))
+    expect(fn () => $config->setupMergePath(__DIR__, 0.1))
         ->toThrow(
             InvalidArgumentException::class,
             'Image file does not exist or is not readable: '.__DIR__
@@ -382,7 +382,9 @@ test('it throws exception when path is not readable', function () {
         file_put_contents($filePath, 'restricted');
         chmod($filePath, 000);
 
-        expect(fn () => $config->setupMergePath($filePath, 0.1, false))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: '.\Linkxtr\QrCode\DTOs\base_path($filePath));
+        $resolvedPath = realpath($filePath);
+
+        expect(fn () => $config->setupMergePath($filePath, 0.1))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: '.$resolvedPath);
     } finally {
         chmod($filePath, 0777);
         unlink($filePath);
@@ -397,8 +399,11 @@ test('it throws exception when file_get_contents returns false', function () {
 
     $path = __DIR__.'/../../Support/Fixtures/images/linkxtr.png';
 
-    expect(fn () => $config->setupMergePath($path, 0.1, true))->toThrow(InvalidArgumentException::class, 'Failed to read image file: '.$path);
+    $resolvedPath = realpath($path);
 
+    expect(fn () => $config->setupMergePath($path, 0.1))->toThrow(InvalidArgumentException::class, 'Failed to read image file: '.$resolvedPath);
+})->after(function () {
+    global $mockFileGetContents;
     $mockFileGetContents = null;
 });
 
@@ -504,4 +509,60 @@ test('it handles c4 parameter fallback and override in setupBackgroundColor acro
 
     $config->setupBackgroundColor(10, 0, 0, 50);
     expect($config->getBackgroundColorValue()->alpha)->toBe(50);
+});
+
+test('it mathematically blocks directory traversal attacks on relative merge paths', function () {
+    $config = new Config;
+
+    expect(fn () => $config->setupMergePath('../../../../../../../../../../../../../../../etc/passwd', 0.1))
+        ->toThrow(InvalidArgumentException::class, 'Image file path must be inside the application base path.');
+});
+
+test('it allows valid absolute paths outside the application root', function () {
+    $config = new Config;
+
+    $tempFile = tempnam(sys_get_temp_dir(), 'safe_absolute_');
+    file_put_contents($tempFile, 'safe data');
+
+    $config->setupMergePath($tempFile, 0.1);
+
+    expect(invade($config)->imageMerge)->toBe('safe data');
+
+    unlink($tempFile);
+});
+
+test('it prevents directory traversal into sibling directories that share the same prefix', function () {
+    $config = new Config;
+
+    // 1. Establish our actual testing directory
+    $actualBase = realpath(__DIR__.'/../../');
+
+    // 2. Create a "sibling" directory right next to our project
+    $siblingDir = $actualBase.'-secret-sibling';
+    if (! is_dir($siblingDir)) {
+        mkdir($siblingDir);
+    }
+
+    // 3. Create a dummy file inside that sibling directory
+    $filePath = $siblingDir.'/restricted.png';
+    file_put_contents($filePath, 'secret-data');
+
+    // 4. Force Laravel to think our app root is $actualBase
+    app()->setBasePath($actualBase);
+
+    try {
+        // 5. Attempt to use directory traversal to hop up and into the sibling dir
+        $siblingFolderName = basename($siblingDir);
+        $maliciousRelativePath = '../'.$siblingFolderName.'/restricted.png';
+
+        expect(fn () => $config->setupMergePath($maliciousRelativePath, 0.1))
+            ->toThrow(
+                InvalidArgumentException::class,
+                'Image file path must be inside the application base path.'
+            );
+    } finally {
+        // Cleanup
+        unlink($filePath);
+        rmdir($siblingDir);
+    }
 });
