@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use InvalidArgumentException;
+use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
@@ -74,19 +75,19 @@ final class QrCodeComponent extends Component
         }
 
         if ($this->eyeColor0 !== null && $colors = $this->resolveMultiColor($this->eyeColor0)) {
-            $generator->eyeColor(0, $colors[0]->red, $colors[0]->green, $colors[0]->blue, $colors[1]->red, $colors[1]->green, $colors[1]->blue);
+            $generator->eyeColor(0, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
         }
 
         if ($this->eyeColor1 !== null && $colors = $this->resolveMultiColor($this->eyeColor1)) {
-            $generator->eyeColor(1, $colors[0]->red, $colors[0]->green, $colors[0]->blue, $colors[1]->red, $colors[1]->green, $colors[1]->blue);
+            $generator->eyeColor(1, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
         }
 
         if ($this->eyeColor2 !== null && $colors = $this->resolveMultiColor($this->eyeColor2)) {
-            $generator->eyeColor(2, $colors[0]->red, $colors[0]->green, $colors[0]->blue, $colors[1]->red, $colors[1]->green, $colors[1]->blue);
+            $generator->eyeColor(2, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
         }
 
         if ($this->gradient !== null && $colors = $this->resolveMultiColor($this->gradient)) {
-            $generator->gradient($colors[0]->red, $colors[0]->green, $colors[0]->blue, $colors[1]->red, $colors[1]->green, $colors[1]->blue, $this->gradientType ?? 'vertical');
+            $generator->gradient([$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue], $this->gradientType ?? GradientType::VERTICAL);
         }
 
         if ($this->merge !== null) {
@@ -139,41 +140,8 @@ final class QrCodeComponent extends Component
      */
     private function resolveColor(string $color): ?Rgb
     {
-        $color = trim($color);
-
         try {
-            if (str_starts_with($color, '#')) {
-                $rgb = Rgb::fromHex($color);
-            } elseif (str_contains($color, ',')) {
-                $parts = array_map(trim(...), explode(',', $color));
-                $count = count($parts);
-
-                if ($count !== 3 && $count !== 4) {
-                    return null;
-                }
-
-                $values = [];
-                foreach ($parts as $part) {
-                    $value = filter_var($part, FILTER_VALIDATE_INT);
-
-                    if (! is_int($value)) {
-                        return null;
-                    }
-
-                    $values[] = $value;
-                }
-
-                $rgb = new Rgb(
-                    $values[0],
-                    $values[1],
-                    $values[2],
-                    $count === 4 ? $values[3] : 100
-                );
-            } else {
-                return null;
-            }
-
-            return $rgb;
+            return Rgb::parse($color);
         } catch (InvalidArgumentException) {
             return null;
         }
@@ -183,7 +151,7 @@ final class QrCodeComponent extends Component
      * Resolve multiple colors separated by common delimiters into a flat array.
      * Guarantees returning exactly 6 integers if successful, preventing unpack errors.
      *
-     * @return array<int, Rgb>|null
+     * @return array{0: Rgb, 1: Rgb}|null
      */
     private function resolveMultiColor(string $multiColor): ?array
     {
@@ -203,12 +171,9 @@ final class QrCodeComponent extends Component
             return null;
         }
 
-        if (count($colors) === 1) {
-            return [$colors[0], $colors[0]];
-        }
-
         return [
-            $colors[0], $colors[1],
+            $colors[0],
+            $colors[1] ?? $colors[0],
         ];
     }
 }

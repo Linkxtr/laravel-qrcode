@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\View\ComponentAttributeBag;
 use Linkxtr\QrCode\Components\QrCodeComponent;
+use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
@@ -151,13 +152,9 @@ test('it strictly maps all 6 distinct gradient colors', function () {
     $component->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls)->toHaveKey('gradient')
-        ->and($fakeGenerator->calls['gradient'][0])->toBe(1, 'Start Red swapped!')
-        ->and($fakeGenerator->calls['gradient'][1])->toBe(2, 'Start Green swapped!')
-        ->and($fakeGenerator->calls['gradient'][2])->toBe(3, 'Start Blue swapped!')
-        ->and($fakeGenerator->calls['gradient'][3])->toBe(4, 'End Red swapped!')
-        ->and($fakeGenerator->calls['gradient'][4])->toBe(5, 'End Green swapped!')
-        ->and($fakeGenerator->calls['gradient'][5])->toBe(6, 'End Blue swapped!')
-        ->and($fakeGenerator->calls['gradient'][6])->toBe('diagonal');
+        ->and($fakeGenerator->calls['gradient'][0])->toBe([1, 2, 3])
+        ->and($fakeGenerator->calls['gradient'][1])->toBe([4, 5, 6])
+        ->and($fakeGenerator->calls['gradient'][2])->toBe('diagonal');
 
     $fakeGenerator->calls = [];
 
@@ -168,7 +165,7 @@ test('it strictly maps all 6 distinct gradient colors', function () {
 
     $componentDefaultType->render()(['attributes' => new ComponentAttributeBag([])]);
 
-    expect($fakeGenerator->calls['gradient'][6])->toBe('vertical');
+    expect($fakeGenerator->calls['gradient'][2])->toBe(GradientType::VERTICAL);
 });
 
 test('it resolves multi color attributes correctly', function () {
@@ -525,35 +522,26 @@ test('it aggressively resolves multi-color strings across different delimiters',
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls['eyeColor'][0])->toBe(0);
-    expect($fakeGenerator->calls['eyeColor'][1])->toBe(1);
-    expect($fakeGenerator->calls['eyeColor'][2])->toBe(2);
-    expect($fakeGenerator->calls['eyeColor'][3])->toBe(3);
-    expect($fakeGenerator->calls['eyeColor'][4])->toBe(4);
-    expect($fakeGenerator->calls['eyeColor'][5])->toBe(5);
-    expect($fakeGenerator->calls['eyeColor'][6])->toBe(6);
+    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3]);
+    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6]);
 
     $fakeGenerator->calls = [];
 
     (new QrCodeComponent(data: 'test', eyeColor1: '#010203, #040506'))
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
-    expect($fakeGenerator->calls['eyeColor'][1])->toBe(1);
-    expect($fakeGenerator->calls['eyeColor'][2])->toBe(2);
-    expect($fakeGenerator->calls['eyeColor'][3])->toBe(3);
-    expect($fakeGenerator->calls['eyeColor'][4])->toBe(4);
-    expect($fakeGenerator->calls['eyeColor'][5])->toBe(5);
-    expect($fakeGenerator->calls['eyeColor'][6])->toBe(6);
+    expect($fakeGenerator->calls['eyeColor'][0])->toBe(1);
+    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3]);
+    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6]);
 
     $fakeGenerator->calls = [];
 
     (new QrCodeComponent(data: 'test', eyeColor2: '#010203,#040506'))
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
-    expect($fakeGenerator->calls['eyeColor'][2])->toBe(2);
-    expect($fakeGenerator->calls['eyeColor'][3])->toBe(3);
-    expect($fakeGenerator->calls['eyeColor'][4])->toBe(4);
-    expect($fakeGenerator->calls['eyeColor'][5])->toBe(5);
-    expect($fakeGenerator->calls['eyeColor'][6])->toBe(6);
+    expect($fakeGenerator->calls['eyeColor'][0])->toBe(2);
+    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3]);
+    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6]);
 });
 
 test('it duplicates single multi-colors and safely slices excess colors', function () {
@@ -578,14 +566,14 @@ test('it duplicates single multi-colors and safely slices excess colors', functi
     (new QrCodeComponent(data: 'test', gradient: '#010203'))
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
-    expect($fakeGenerator->calls['gradient'])->toBe([1, 2, 3, 1, 2, 3, 'vertical']);
+    expect($fakeGenerator->calls['gradient'])->toBe([[1, 2, 3], [1, 2, 3], GradientType::VERTICAL]);
 
     $fakeGenerator->calls = [];
 
     (new QrCodeComponent(data: 'test', gradient: '#010203|#040506|#070809'))
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
-    expect($fakeGenerator->calls['gradient'])->toBe([1, 2, 3, 4, 5, 6, 'vertical']);
+    expect($fakeGenerator->calls['gradient'])->toBe([[1, 2, 3], [4, 5, 6], GradientType::VERTICAL]);
 });
 
 test('it returns null early if no valid colors could be parsed', function () {
@@ -664,10 +652,12 @@ test('it correctly maps inner red color for eyeColor2 to prevent index mutations
     (new QrCodeComponent(data: 'test', eyeColor2: '#010203,#040506'))
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
-    expect($fakeGenerator->calls['eyeColor'][1])->toBe(1);
+    expect($fakeGenerator->calls['eyeColor'][0])->toBe(2);
+    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3]);
+    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6]);
 });
 
-test('it strips null bytes from CSV parts to survive UnwrapArrayMap mutation', function () {
+test('it strips null bytes from CSV parts', function () {
     $component = new QrCodeComponent('test');
 
     $method = fn ($color) => invade($component)->resolveColor($color);

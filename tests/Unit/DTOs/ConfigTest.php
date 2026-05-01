@@ -275,8 +275,8 @@ test('it handles grayscale configuration', function () {
 test('it handles eye color configuration and validates eye numbers and colors', function () {
     $config = new Config;
 
-    $config->setupEyeColor(0, 255, 0, 0, 0, 255, 0);
-    $config->setupEyeColor(2, 0, 0, 255);
+    $config->setupEyeColor(0, Rgb::fromArray([255, 0, 0]), Rgb::fromArray([0, 255, 0]));
+    $config->setupEyeColor(2, Rgb::fromArray([0, 0, 255]));
 
     expect($config->getEyeColors()[0])->toBeInstanceOf(EyeFill::class)
         ->and($config->getEyeColors()[0]->getExternalColor())->toBeInstanceOf(BaconRgb::class)
@@ -297,78 +297,79 @@ test('it handles eye color configuration and validates eye numbers and colors', 
         ->and($config->getEyeColors()[2]->getInternalColor()->getGreen())->toBe(0)
         ->and($config->getEyeColors()[2]->getInternalColor()->getBlue())->toBe(0);
 
-    expect(fn () => $config->setupEyeColor(-1, 0, 0, 0))->toThrow(InvalidArgumentException::class, 'Eye number must be 0, 1, or 2');
-    expect(fn () => $config->setupEyeColor(3, 0, 0, 0))->toThrow(InvalidArgumentException::class, 'Eye number must be 0, 1, or 2');
-    expect(fn () => $config->setupEyeColor(0, -1, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupEyeColor(0, 256, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupEyeColor(0, 0, -1, 0))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupEyeColor(0, 0, 256, 0))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupEyeColor(0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
-    expect(fn () => $config->setupEyeColor(0, 0, 0, 256))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(-1, Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Eye number must be 0, 1, or 2');
+    expect(fn () => $config->setupEyeColor(3, Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Eye number must be 0, 1, or 2');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([-1, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([256, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, -1, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, 256, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, 0, -1]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, 0, 256]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
 });
 
 test('it configures gradients from strings and enums', function () {
     $config = new Config;
 
-    $config->setupGradient(255, 0, 0, 0, 0, 255, 'Diagonal');
+    $config->setupGradient(Rgb::fromArray([255, 0, 0]), Rgb::fromArray([0, 0, 255]), 'Diagonal');
     expect($config->getGradient())->toBeInstanceOf(Gradient::class);
 
-    $config->setupGradient(255, 0, 0, 0, 0, 255, GradientType::RADIAL);
+    $config->setupGradient(Rgb::fromArray([255, 0, 0]), Rgb::fromArray([0, 0, 255]), GradientType::RADIAL);
     expect($config->getGradient())->toBeInstanceOf(Gradient::class);
 
-    expect(fn () => $config->setupGradient(0, 0, 0, 0, 0, 0, 'invalid'))->toThrow(InvalidArgumentException::class, '$type must be one of the following values: '.implode(', ', GradientType::toArray()));
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0]), 'invalid'))->toThrow(InvalidArgumentException::class, '$type must be one of the following values: '.implode(', ', GradientType::toArray()));
 });
 
 test('it throws exception when gradient colors are invalid', function () {
     $config = new Config;
 
-    expect(fn () => $config->setupGradient(-1, 0, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(256, 0, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(0, -1, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(0, 256, 0, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(0, 0, -1, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(0, 0, 256, 0, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(0, 0, 0, -1, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(0, 0, 0, 256, 0, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(0, 0, 0, 0, -1, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(0, 0, 0, 0, 256, 0, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(0, 0, 0, 0, 0, -1, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(0, 0, 0, 0, 0, 256, 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([-1, 0, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([256, 0, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, -1, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 256, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, -1]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 256]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([-1, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([256, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, -1, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 256, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, -1]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 256]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
 });
 
 test('it sets up image merge from absolute file path', function () {
     $config = new Config;
 
-    $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png', 0.1);
+    $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png');
+    $config->setImagePercentage(0.1);
+
     expect($config->getImageMerge())->toBe(file_get_contents(__DIR__.'/../../Support/Fixtures/images/linkxtr.png'))
         ->and($config->getImagePercentage())->toBe(0.1);
 
-    expect(fn () => $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png', 0.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
-    expect(fn () => $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png', 1.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
+    expect(fn () => $config->setImagePercentage(0.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
+    expect(fn () => $config->setImagePercentage(1.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
 });
 
 test('it sets up image merge from relative file path', function () {
     $config = new Config;
 
-    $config->setupMergePath('Support/Fixtures/images/linkxtr.png', 0.1);
+    $config->setupMergePath('Support/Fixtures/images/linkxtr.png');
+    $config->setImagePercentage(0.1);
+
     expect($config->getImageMerge())->toBe(file_get_contents(__DIR__.'/../../Support/Fixtures/images/linkxtr.png'))
         ->and($config->getImagePercentage())->toBe(0.1);
-
-    expect(fn () => $config->setupMergePath('Support/Fixtures/images/linkxtr.png', 0.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
-    expect(fn () => $config->setupMergePath('Support/Fixtures/images/linkxtr.png', 1.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
 });
 
 test('it throws exception when path does not exist', function () {
     $config = new Config;
 
-    expect(fn () => $config->setupMergePath('non_existent_path', 0.1))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: non_existent_path');
-    expect(fn () => $config->setupMergePath('/non_existent_path', 0.1))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: /non_existent_path');
+    expect(fn () => $config->setupMergePath('non_existent_path'))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: non_existent_path');
+    expect(fn () => $config->setupMergePath('/non_existent_path'))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: /non_existent_path');
 });
 
 test('it throws exception when path is a directory', function () {
     $config = new Config;
 
-    expect(fn () => $config->setupMergePath(__DIR__, 0.1))
+    expect(fn () => $config->setupMergePath(__DIR__))
         ->toThrow(
             InvalidArgumentException::class,
             'Image file does not exist or is not readable: '.__DIR__
@@ -384,7 +385,7 @@ test('it throws exception when path is not readable', function () {
 
         $resolvedPath = realpath($filePath);
 
-        expect(fn () => $config->setupMergePath($filePath, 0.1))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: '.$resolvedPath);
+        expect(fn () => $config->setupMergePath($filePath))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: '.$resolvedPath);
     } finally {
         chmod($filePath, 0777);
         unlink($filePath);
@@ -401,7 +402,7 @@ test('it throws exception when file_get_contents returns false', function () {
 
     $resolvedPath = realpath($path);
 
-    expect(fn () => $config->setupMergePath($path, 0.1))->toThrow(InvalidArgumentException::class, 'Failed to read image file: '.$resolvedPath);
+    expect(fn () => $config->setupMergePath($path))->toThrow(InvalidArgumentException::class, 'Failed to read image file: '.$resolvedPath);
 })->after(function () {
     global $mockFileGetContents;
     $mockFileGetContents = null;
@@ -410,14 +411,11 @@ test('it throws exception when file_get_contents returns false', function () {
 test('it sets up string image merges and validates percentages', function () {
     $config = new Config;
 
-    $config->setupMergeString('image_data', 0.1);
-    $config->setupMergeString('image_data', 0.99);
+    $config->setupMergeString('image_data');
+    $config->setImagePercentage(0.99);
 
     expect($config->getImageMerge())->toBe('image_data')
         ->and($config->getImagePercentage())->toBe(0.99);
-
-    expect(fn () => $config->setupMergeString('data', 0.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
-    expect(fn () => $config->setupMergeString('data', 1.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
 });
 
 test('it sets up color model and converts existing colors', function () {
@@ -514,7 +512,7 @@ test('it handles c4 parameter fallback and override in setupBackgroundColor acro
 test('it mathematically blocks directory traversal attacks on relative merge paths', function () {
     $config = new Config;
 
-    expect(fn () => $config->setupMergePath('../../../../../../../../../../../../../../../etc/passwd', 0.1))
+    expect(fn () => $config->setupMergePath('../../../../../../../../../../../../../../../etc/passwd'))
         ->toThrow(InvalidArgumentException::class, 'Image file path must be inside the application base path.');
 });
 
@@ -524,7 +522,7 @@ test('it allows valid absolute paths outside the application root', function () 
     $tempFile = tempnam(sys_get_temp_dir(), 'safe_absolute_');
     file_put_contents($tempFile, 'safe data');
 
-    $config->setupMergePath($tempFile, 0.1);
+    $config->setupMergePath($tempFile);
 
     expect(invade($config)->imageMerge)->toBe('safe data');
 
@@ -555,7 +553,7 @@ test('it prevents directory traversal into sibling directories that share the sa
         $siblingFolderName = basename($siblingDir);
         $maliciousRelativePath = '../'.$siblingFolderName.'/restricted.png';
 
-        expect(fn () => $config->setupMergePath($maliciousRelativePath, 0.1))
+        expect(fn () => $config->setupMergePath($maliciousRelativePath))
             ->toThrow(
                 InvalidArgumentException::class,
                 'Image file path must be inside the application base path.'

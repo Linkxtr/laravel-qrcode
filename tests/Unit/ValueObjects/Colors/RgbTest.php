@@ -220,3 +220,92 @@ test('it kills RoundToCeil mutations on magenta and yellow channels', function (
     expect($yellowKiller->cyan)->toBe(49)
         ->and($yellowKiller->yellow)->toBe(20);
 });
+
+test('parse array of integers', function () {
+    $color = Rgb::parse([0, 128, 255]);
+    expect($color->red)->toBe(0)
+        ->and($color->green)->toBe(128)
+        ->and($color->blue)->toBe(255)
+        ->and($color->getAlpha())->toBe(100);
+});
+
+test('parse array of integers with keys', function () {
+    $color = Rgb::parse(['r' => 0, 'g' => 128, 'b' => 255]);
+    expect($color->red)->toBe(0)
+        ->and($color->green)->toBe(128)
+        ->and($color->blue)->toBe(255)
+        ->and($color->getAlpha())->toBe(100);
+});
+
+test('parse array of integers and fallback to 0 when value is missing', function () {
+    $color = Rgb::parse([]);
+    expect($color->red)->toBe(0)
+        ->and($color->green)->toBe(0)
+        ->and($color->blue)->toBe(0)
+        ->and($color->getAlpha())->toBe(100);
+});
+
+test('parse array of integers with alpha', function () {
+    $color = Rgb::parse([0, 128, 255, 50]);
+    expect($color->red)->toBe(0)
+        ->and($color->green)->toBe(128)
+        ->and($color->blue)->toBe(255)
+        ->and($color->getAlpha())->toBe(50);
+});
+
+test('parse hex string', function () {
+    $color = Rgb::parse('#FF0000');
+    expect($color->red)->toBe(255)
+        ->and($color->green)->toBe(0)
+        ->and($color->blue)->toBe(0)
+        ->and($color->getAlpha())->toBe(100);
+
+    $color = Rgb::parse('  FF0000 ');
+
+    expect($color->red)->toBe(255)
+        ->and($color->green)->toBe(0)
+        ->and($color->blue)->toBe(0)
+        ->and($color->getAlpha())->toBe(100);
+});
+
+test('parse 3-char hex string', function () {
+    $color = Rgb::parse('#F00');
+    expect($color->red)->toBe(255)
+        ->and($color->green)->toBe(0)
+        ->and($color->blue)->toBe(0)
+        ->and($color->getAlpha())->toBe(100);
+});
+
+test('parse csv string', function () {
+    $color = Rgb::parse('255,0,0');
+    expect($color->red)->toBe(255)
+        ->and($color->green)->toBe(0)
+        ->and($color->blue)->toBe(0)
+        ->and($color->getAlpha())->toBe(100);
+
+    $color = Rgb::parse('255,0,0,50');
+    expect($color->red)->toBe(255)
+        ->and($color->green)->toBe(0)
+        ->and($color->blue)->toBe(0)
+        ->and($color->getAlpha())->toBe(50);
+
+    $color = Rgb::fromCsv(' 255 , 0, 0, 50, ');
+    expect($color->red)->toBe(255)
+        ->and($color->green)->toBe(0)
+        ->and($color->blue)->toBe(0)
+        ->and($color->getAlpha())->toBe(50);
+});
+
+test('it throw excetion on invalid color format', function () {
+    expect(fn () => Rgb::parse('invalid'))->toThrow(InvalidArgumentException::class, 'Unrecognized color format. Please use an array, a hex string, or a comma-separated RGB string.');
+
+    expect(fn () => Rgb::parse([1, 2, ['invalid']]))->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
+
+    expect(fn () => Rgb::parse('1, 2, 3, 4, 5'))->toThrow(InvalidArgumentException::class, 'CSV color string must contain exactly 3 or 4 numeric values.');
+});
+
+test('it routes strings starting with hash to hex parser and throws specific exception', function () {
+    expect(fn () => Rgb::parse('#XYZ123'))->toThrow(InvalidArgumentException::class, 'Invalid hex color string provided.');
+
+    expect(fn () => Rgb::parse('#12'))->toThrow(InvalidArgumentException::class, 'Invalid hex color format. Must be 3 or 6 characters.');
+});

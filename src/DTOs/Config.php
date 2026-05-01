@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DTOs;
 
-use BaconQrCode\Renderer\Color\Rgb as BaconRgb;
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
 use InvalidArgumentException;
@@ -352,18 +351,15 @@ final class Config
         return $this->backgroundColorValue ?? new Rgb(255, 255, 255);
     }
 
-    public function setupEyeColor(int $eyeNumber, int $innerRed, int $innerGreen, int $innerBlue, int $outerRed = 0, int $outerGreen = 0, int $outerBlue = 0): void
+    public function setupEyeColor(int $eyeNumber, Rgb $inner, ?Rgb $outer = null): void
     {
         if ($eyeNumber < 0 || $eyeNumber > 2) {
             throw new InvalidArgumentException('Eye number must be 0, 1, or 2.');
         }
 
-        $innerColor = new Rgb($innerRed, $innerGreen, $innerBlue);
-        $outerColor = new Rgb($outerRed, $outerGreen, $outerBlue);
-
         $this->setEyeColor($eyeNumber, new EyeFill(
-            new BaconRgb($innerColor->red, $innerColor->green, $innerColor->blue),
-            new BaconRgb($outerColor->red, $outerColor->green, $outerColor->blue)
+            $inner->toBaconColor(),
+            $outer?->toBaconColor() ?? Rgb::fromArray([])->toBaconColor()
         ));
     }
 
@@ -375,7 +371,7 @@ final class Config
         return $this->eyeColors;
     }
 
-    public function setupGradient(int $startRed, int $startGreen, int $startBlue, int $endRed, int $endGreen, int $endBlue, string|GradientType $type): void
+    public function setupGradient(Rgb $start, Rgb $end, string|GradientType $type): void
     {
         if (is_string($type)) {
             $type = GradientType::tryFrom(strtolower($type));
@@ -387,12 +383,9 @@ final class Config
             );
         }
 
-        $startColor = new Rgb($startRed, $startGreen, $startBlue);
-        $endColor = new Rgb($endRed, $endGreen, $endBlue);
-
         $this->setGradient(new Gradient(
-            new BaconRgb($startColor->red, $startColor->green, $startColor->blue),
-            new BaconRgb($endColor->red, $endColor->green, $endColor->blue),
+            $start->toBaconColor(),
+            $end->toBaconColor(),
             $type->toBaconGradientType()
         ));
     }
@@ -402,7 +395,7 @@ final class Config
         return $this->gradient;
     }
 
-    public function setupMergePath(string $filepath, float $percentage): void
+    public function setupMergePath(string $filepath): void
     {
         $baseDir = function_exists('base_path') ? base_path() : (getcwd() ?: ''); // @pest-mutate-ignore
         $isAbsolute = preg_match('~^(/|[a-zA-Z]:[\\\\/])~', $filepath) === 1;
@@ -431,16 +424,20 @@ final class Config
             throw new InvalidArgumentException('Failed to read image file: '.$resolvedPath);
         }
 
-        $this->setupMergeString($content, $percentage);
+        $this->imageMerge = $content;
     }
 
-    public function setupMergeString(string $content, float $percentage): void
+    public function setupMergeString(string $content): void
+    {
+        $this->imageMerge = $content;
+    }
+
+    public function setImagePercentage(float $percentage): void
     {
         if ($percentage <= 0 || $percentage >= 1) {
             throw new InvalidArgumentException('Image merge percentage must be between 0 and 1 (exclusive).');
         }
 
-        $this->imageMerge = $content;
         $this->imagePercentage = $percentage;
     }
 

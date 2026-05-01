@@ -15,6 +15,7 @@ use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
 use Linkxtr\QrCode\Renderers\BaconRenderer;
 use Linkxtr\QrCode\Support\DataTypeResolver;
+use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 use RuntimeException;
 use Stringable;
 use UnexpectedValueException;
@@ -94,14 +95,16 @@ final class Generator
 
     public function merge(string $filepath, float $percentage = .2): self
     {
-        $this->config->setupMergePath($filepath, $percentage);
+        $this->config->setupMergePath($filepath);
+        $this->config->setImagePercentage($percentage);
 
         return $this;
     }
 
     public function mergeString(string $content, float $percentage = .2): self
     {
-        $this->config->setupMergeString($content, $percentage);
+        $this->config->setupMergeString($content);
+        $this->config->setImagePercentage($percentage);
 
         return $this;
     }
@@ -155,16 +158,41 @@ final class Generator
         return $this;
     }
 
-    public function eyeColor(int $eyeNumber, int $innerRed, int $innerGreen, int $innerBlue, int $outerRed = 0, int $outerGreen = 0, int $outerBlue = 0): self
+    /**
+     * @param  string|array{0: int, 1: int, 2: int}  $inner
+     * @param  string|array{0: int, 1: int, 2: int}|null  $outer
+     */
+    public function eyeColor(int $eyeNumber, string|array $inner, string|array|null $outer = null): self
     {
-        $this->config->setupEyeColor($eyeNumber, $innerRed, $innerGreen, $innerBlue, $outerRed, $outerGreen, $outerBlue);
+        $innerRgb = Rgb::parse($inner);
+
+        if ($outer === null) {
+            $this->config->setupEyeColor($eyeNumber, $innerRgb);
+
+            return $this;
+        }
+
+        $outerRgb = Rgb::parse($outer);
+
+        $this->config->setupEyeColor(
+            $eyeNumber,
+            $innerRgb,
+            $outerRgb
+        );
 
         return $this;
     }
 
-    public function gradient(int $startRed, int $startGreen, int $startBlue, int $endRed, int $endGreen, int $endBlue, string|GradientType $type): self
+    /**
+     * @param  string|array<mixed>  $start
+     * @param  string|array<mixed>  $end
+     */
+    public function gradient(string|array $start, string|array $end, string|GradientType $type = GradientType::VERTICAL): self
     {
-        $this->config->setupGradient($startRed, $startGreen, $startBlue, $endRed, $endGreen, $endBlue, $type);
+        $startRgb = Rgb::parse($start);
+        $endRgb = Rgb::parse($end);
+
+        $this->config->setupGradient($startRgb, $endRgb, $type);
 
         return $this;
     }

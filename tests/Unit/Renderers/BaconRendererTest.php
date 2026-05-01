@@ -5,7 +5,7 @@ declare(strict_types=1);
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Cmyk;
 use BaconQrCode\Renderer\Color\Gray;
-use BaconQrCode\Renderer\Color\Rgb;
+use BaconQrCode\Renderer\Color\Rgb as BaconRgb;
 use BaconQrCode\Renderer\Eye\CompositeEye;
 use BaconQrCode\Renderer\Eye\ModuleEye;
 use BaconQrCode\Renderer\Eye\PointyEye;
@@ -27,6 +27,7 @@ use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Renderers\BaconRenderer;
+use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 covers(BaconRenderer::class);
 
@@ -124,7 +125,7 @@ it('builds the fill correctly with and without gradient', function () {
 
     expect(invade($renderer)->getFill()->hasGradientFill())->toBeFalse();
 
-    $config->setupGradient(255, 0, 0, 0, 255, 0, 'diagonal');
+    $config->setupGradient(Rgb::fromArray([255, 0, 0]), Rgb::fromArray([0, 255, 0]), 'diagonal');
     expect(invade($renderer)->getFill()->hasGradientFill())->toBeTrue();
 });
 
@@ -132,24 +133,24 @@ it('builds the correct eye fills', function () {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
-    $config->setupEyeColor(0, 10, 20, 30);
-    $config->setupEyeColor(1, 40, 50, 60);
-    $config->setupEyeColor(2, 70, 80, 90);
+    $config->setupEyeColor(0, Rgb::fromArray([10, 20, 30]));
+    $config->setupEyeColor(1, Rgb::fromArray([40, 50, 60]));
+    $config->setupEyeColor(2, Rgb::fromArray([70, 80, 90]));
 
     $fill = invade($renderer)->getFill();
 
     expect($fill->getTopLeftEyeFill())->toBeInstanceOf(EyeFill::class)
-        ->and($fill->getTopLeftEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and($fill->getTopLeftEyeFill()->getExternalColor())->toBeInstanceOf(BaconRgb::class)
         ->and($fill->getTopLeftEyeFill()->getExternalColor()->getRed())->toBe(10)
         ->and($fill->getTopLeftEyeFill()->getExternalColor()->getGreen())->toBe(20)
         ->and($fill->getTopLeftEyeFill()->getExternalColor()->getBlue())->toBe(30)
         ->and($fill->getTopRightEyeFill())->toBeInstanceOf(EyeFill::class)
-        ->and($fill->getTopRightEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and($fill->getTopRightEyeFill()->getExternalColor())->toBeInstanceOf(BaconRgb::class)
         ->and($fill->getTopRightEyeFill()->getExternalColor()->getRed())->toBe(40)
         ->and($fill->getTopRightEyeFill()->getExternalColor()->getGreen())->toBe(50)
         ->and($fill->getTopRightEyeFill()->getExternalColor()->getBlue())->toBe(60)
         ->and($fill->getBottomLeftEyeFill())->toBeInstanceOf(EyeFill::class)
-        ->and($fill->getBottomLeftEyeFill()->getExternalColor())->toBeInstanceOf(Rgb::class)
+        ->and($fill->getBottomLeftEyeFill()->getExternalColor())->toBeInstanceOf(BaconRgb::class)
         ->and($fill->getBottomLeftEyeFill()->getExternalColor()->getRed())->toBe(70)
         ->and($fill->getBottomLeftEyeFill()->getExternalColor()->getGreen())->toBe(80)
         ->and($fill->getBottomLeftEyeFill()->getExternalColor()->getBlue())->toBe(90);
@@ -163,7 +164,7 @@ it('builds the correct color models', function () {
     expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Alpha::class);
 
     $config->setupColor(255, 0, 0);
-    expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Rgb::class);
+    expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(BaconRgb::class);
 
     $config->setColorModel(ColorModel::CMYK);
     $config->setupColor(10, 20, 30, 40);

@@ -150,17 +150,25 @@ test('fluent configuration methods delegate to config and return self', function
     expect($generator->gray(50))->toBeInstanceOf(Generator::class)
         ->and(invade($generator)->config->getColorModel())->toBe(ColorModel::GRAY);
 
-    expect($generator->eyeColor(0, 20, 50, 70))->toBeInstanceOf(Generator::class)
+    expect($generator->eyeColor(0, [20, 50, 70]))->toBeInstanceOf(Generator::class)
         ->and(invade($generator)->config->getEyeColors()[0])->toBeInstanceOf(EyeFill::class);
 
-    expect($generator->gradient(10, 20, 30, 40, 50, 60, GradientType::DIAGONAL))->toBeInstanceOf(Generator::class)
+    expect($generator->eyeColor(1, [10, 20, 30], [40, 50, 60]))->toBeInstanceOf(Generator::class)
+        ->and(invade($generator)->config->getEyeColors()[1])->toBeInstanceOf(EyeFill::class);
+
+    expect($generator->eyeColor(2, '#1a2b3c', 'fff'))->toBeInstanceOf(Generator::class)
+        ->and(invade($generator)->config->getEyeColors()[2])->toBeInstanceOf(EyeFill::class);
+
+    expect($generator->gradient([10, 20, 30], [40, 50, 60], GradientType::DIAGONAL))->toBeInstanceOf(Generator::class)
         ->and(invade($generator)->config->getGradient())->toBeInstanceOf(Gradient::class);
 
-    expect($generator->mergeString('test'))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getImageMerge())->toBe('test');
+    expect($generator->mergeString('test', 0.1))->toBeInstanceOf(Generator::class)
+        ->and(invade($generator)->config->getImageMerge())->toBe('test')
+        ->and(invade($generator)->config->getImagePercentage())->toBe(0.1);
 
-    expect($generator->merge('Support/Fixtures/images/linkxtr.png'))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getImageMerge())->toBe(file_get_contents(__DIR__.'/../Support/Fixtures/images/linkxtr.png'));
+    expect($generator->merge('Support/Fixtures/images/linkxtr.png', 0.3))->toBeInstanceOf(Generator::class)
+        ->and(invade($generator)->config->getImageMerge())->toBe(file_get_contents(__DIR__.'/../Support/Fixtures/images/linkxtr.png'))
+        ->and(invade($generator)->config->getImagePercentage())->toBe(0.3);
 });
 
 test('generate throws exception if file_put_contents fails', function () {
@@ -174,4 +182,14 @@ test('generate throws exception if file_put_contents fails', function () {
 })->after(function () {
     global $mockFilePutContents;
     $mockFilePutContents = null;
+});
+
+test('it mathematically rejects arrays and objects inside color configurations', function () {
+    $generator = new Generator;
+
+    expect(fn () => $generator->eyeColor(0, [255, ['nested'], 0]))
+        ->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric.');
+
+    expect(fn () => $generator->gradient([255, 0, 0], [0, new stdClass, 0]))
+        ->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric.');
 });
