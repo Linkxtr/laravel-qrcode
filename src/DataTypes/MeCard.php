@@ -123,6 +123,19 @@ final class MeCard implements DataTypeInterface
 
         $this->name = $properties['name'];
 
+        $this->reading = null;
+        $this->nickname = null;
+        $this->phone = null;
+        $this->phone2 = null;
+        $this->phone3 = null;
+        $this->videoPhone = null;
+        $this->email = null;
+        $this->note = null;
+        $this->birthday = null;
+        $this->address = null;
+        $this->postOfficeBox = null;
+        $this->url = null;
+
         $this->assignStringProperty($properties, 'reading');
         $this->assignStringProperty($properties, 'nickname');
         $this->assignStringProperty($properties, 'phone');

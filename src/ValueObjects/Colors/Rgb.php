@@ -100,7 +100,7 @@ final readonly class Rgb implements ColorInterface
 
     public static function fromCsv(string $color): self
     {
-        $parts = array_filter(array_map(trim(...), explode(',', $color)), fn (string $val): bool => $val !== '');
+        $parts = explode(',', $color);
 
         $count = count($parts);
         if ($count !== 3 && $count !== 4) {

@@ -532,24 +532,20 @@ test('it allows valid absolute paths outside the application root', function () 
 test('it prevents directory traversal into sibling directories that share the same prefix', function () {
     $config = new Config;
 
-    // 1. Establish our actual testing directory
     $actualBase = realpath(__DIR__.'/../../');
 
-    // 2. Create a "sibling" directory right next to our project
     $siblingDir = $actualBase.'-secret-sibling';
     if (! is_dir($siblingDir)) {
         mkdir($siblingDir);
     }
 
-    // 3. Create a dummy file inside that sibling directory
     $filePath = $siblingDir.'/restricted.png';
     file_put_contents($filePath, 'secret-data');
 
-    // 4. Force Laravel to think our app root is $actualBase
+    $originalBasePath = app()->basePath();
     app()->setBasePath($actualBase);
 
     try {
-        // 5. Attempt to use directory traversal to hop up and into the sibling dir
         $siblingFolderName = basename($siblingDir);
         $maliciousRelativePath = '../'.$siblingFolderName.'/restricted.png';
 
@@ -560,6 +556,7 @@ test('it prevents directory traversal into sibling directories that share the sa
             );
     } finally {
         // Cleanup
+        app()->setBasePath($originalBasePath);
         unlink($filePath);
         rmdir($siblingDir);
     }

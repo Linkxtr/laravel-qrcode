@@ -37,7 +37,8 @@ final class Ethereum implements DataTypeInterface
             throw new InvalidArgumentException('Ethereum address must be a non-empty string.');
         }
 
-        $this->address = trim($arguments[0]);
+        $address = trim($arguments[0]);
+        $amount = null;
 
         if (isset($arguments[1])) {
             if (! is_scalar($arguments[1])) {
@@ -49,8 +50,9 @@ final class Ethereum implements DataTypeInterface
             if (! preg_match('/^(0|[1-9]\d*)(\.\d+)?$/', $amount)) {
                 throw new InvalidArgumentException('Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
             }
-
-            $this->amount = $amount;
         }
+
+        $this->address = $address;
+        $this->amount = $amount;
     }
 }

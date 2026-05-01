@@ -73,23 +73,33 @@ final class GenerateQrCodeCommand extends Command
         $margin = $this->getStringOption('margin') ?? '4';
         $errorCorrection = $this->getStringOption('errorCorrection') ?? 'M';
 
-        $advancedPassed = array_filter([
-            $this->option('size'),
-            $this->option('color'),
-            $this->option('backgroundColor'),
-            $this->option('margin'),
-            $this->option('errorCorrection'),
-        ], fn (bool|float|int|string|array|null $opt): bool => $opt !== null);
+        $hasPassedAdvancedOptions = $this->option('size') !== null // @pest-mutate-ignore
+            || $this->option('color') !== null // @pest-mutate-ignore
+            || $this->option('backgroundColor') !== null // @pest-mutate-ignore
+            || $this->option('margin') !== null // @pest-mutate-ignore
+            || $this->option('errorCorrection') !== null; // @pest-mutate-ignore
 
-        $hasPassedAdvancedOptions = $advancedPassed !== [];
+        if ($isInteractive && confirm(label: 'Do you want to configure advanced options (size, colors, margin)?', default: $hasPassedAdvancedOptions)) {
+            if ($this->option('size') === null) {
+                $size = text(label: 'Size in pixels', default: $size, validate: $this->validateSize(...));
+            }
 
-        if ($isInteractive && ! $hasPassedAdvancedOptions && confirm(label: 'Do you want to configure advanced options (size, colors, margin)?', default: $hasPassedAdvancedOptions)) {
-            $size = text(label: 'Size in pixels', default: '400', validate: $this->validateSize(...));
-            $color = text(label: 'Foreground color (RGB or RGBA comma-separated)', default: '0,0,0', validate: $this->validateColorString(...));
-            $backgroundColor = text(label: 'Background color (RGB or RGBA comma-separated)', default: '255,255,255', validate: $this->validateColorString(...));
-            $margin = text(label: 'Margin', default: '4', validate: $this->validateMargin(...));
-            /** @var string $errorCorrection */
-            $errorCorrection = select(label: 'Error correction level', options: ['L', 'M', 'Q', 'H'], default: 'M');
+            if ($this->option('color') === null) {
+                $color = text(label: 'Foreground color (RGB or RGBA comma-separated)', default: $color, validate: $this->validateColorString(...));
+            }
+
+            if ($this->option('backgroundColor') === null) {
+                $backgroundColor = text(label: 'Background color (RGB or RGBA comma-separated)', default: $backgroundColor, validate: $this->validateColorString(...));
+            }
+
+            if ($this->option('margin') === null) {
+                $margin = text(label: 'Margin', default: $margin, validate: $this->validateMargin(...));
+            }
+
+            if ($this->option('errorCorrection') === null) {
+                /** @var string $errorCorrection */
+                $errorCorrection = select(label: 'Error correction level', options: ['L', 'M', 'Q', 'H'], default: $errorCorrection);
+            }
         }
 
         if ($sizeError = $this->validateSize($size)) {

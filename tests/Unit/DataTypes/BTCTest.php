@@ -108,6 +108,9 @@ test('it mathematically enforces format', function () {
 
     expect(fn () => $btc->create(['1Address', ['amount' => 1.5]]))
         ->toThrow(InvalidArgumentException::class);
+
+    expect(fn () => $btc->create(['1Address', true]))
+        ->toThrow(InvalidArgumentException::class);
 });
 
 test('it mathematically rejects empty addresses to prevent broken URIs', function () {

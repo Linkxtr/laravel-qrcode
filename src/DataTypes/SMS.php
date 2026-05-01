@@ -38,14 +38,14 @@ final class SMS implements DataTypeInterface
             throw new InvalidArgumentException('SMS phone number is required.');
         }
 
-        if (! is_string($arguments[0]) && ! is_numeric($arguments[0])) {
-            throw new InvalidArgumentException('SMS phone number must be a string or numeric value.');
+        if (! is_string($arguments[0]) && ! is_int($arguments[0])) {
+            throw new InvalidArgumentException('SMS phone number must be a string or integer value.');
         }
 
         $this->phoneNumber = $this->validatePhoneNumber((string) $arguments[0]);
         $this->message = null;
 
-        if (isset($arguments[1])) {
+        if (array_key_exists(1, $arguments)) {
             if (! is_string($arguments[1])) {
                 throw new InvalidArgumentException('SMS message must be a string.');
             }

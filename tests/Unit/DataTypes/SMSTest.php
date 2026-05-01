@@ -15,7 +15,7 @@ test('it throws exception if phone number is missing', function () {
 test('it throws exception if phone number is an invalid type', function () {
     $sms = new SMS;
     expect(fn () => $sms->create([['invalid array']]))
-        ->toThrow(InvalidArgumentException::class, 'SMS phone number must be a string or numeric value.');
+        ->toThrow(InvalidArgumentException::class, 'SMS phone number must be a string or integer value.');
 });
 
 test('it throws exception if message is not a string', function () {

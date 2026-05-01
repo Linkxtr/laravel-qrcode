@@ -60,7 +60,10 @@ test('it converts to bacon rgb color', function () {
 
     expect($baconColorWithAlpha)->toBeInstanceOf(Alpha::class)
         ->and($baconColorWithAlpha->getAlpha())->toBe(50)
-        ->and($baconColorWithAlpha->getBaseColor())->toBeInstanceOf(BaconRgb::class);
+        ->and($baconColorWithAlpha->getBaseColor())->toBeInstanceOf(BaconRgb::class)
+        ->and($baconColorWithAlpha->getBaseColor()->getRed())->toBe(255)
+        ->and($baconColorWithAlpha->getBaseColor()->getGreen())->toBe(255)
+        ->and($baconColorWithAlpha->getBaseColor()->getBlue())->toBe(255);
 });
 
 test('toRgb returns itself', function () {
@@ -289,7 +292,7 @@ test('parse csv string', function () {
         ->and($color->blue)->toBe(0)
         ->and($color->getAlpha())->toBe(50);
 
-    $color = Rgb::fromCsv(' 255 , 0, 0, 50, ');
+    $color = Rgb::fromCsv(' 255 , 0, 0, 50');
     expect($color->red)->toBe(255)
         ->and($color->green)->toBe(0)
         ->and($color->blue)->toBe(0)
@@ -302,6 +305,8 @@ test('it throw excetion on invalid color format', function () {
     expect(fn () => Rgb::parse([1, 2, ['invalid']]))->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
 
     expect(fn () => Rgb::parse('1, 2, 3, 4, 5'))->toThrow(InvalidArgumentException::class, 'CSV color string must contain exactly 3 or 4 numeric values.');
+
+    expect(fn () => Rgb::parse('1, 2, 3, '))->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
 });
 
 test('it routes strings starting with hash to hex parser and throws specific exception', function () {

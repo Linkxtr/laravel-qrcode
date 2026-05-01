@@ -166,8 +166,10 @@ test('fluent configuration methods delegate to config and return self', function
         ->and(invade($generator)->config->getImageMerge())->toBe('test')
         ->and(invade($generator)->config->getImagePercentage())->toBe(0.1);
 
-    expect($generator->merge('Support/Fixtures/images/linkxtr.png', 0.3))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getImageMerge())->toBe(file_get_contents(__DIR__.'/../Support/Fixtures/images/linkxtr.png'))
+    $expectedContent = file_get_contents(realpath(__DIR__.'/../Support/Fixtures/images/linkxtr.png'));
+
+    expect($generator->merge(realpath(__DIR__.'/../Support/Fixtures/images/linkxtr.png'), 0.3))->toBeInstanceOf(Generator::class)
+        ->and(invade($generator)->config->getImageMerge())->toBe($expectedContent)
         ->and(invade($generator)->config->getImagePercentage())->toBe(0.3);
 });
 

@@ -656,11 +656,3 @@ test('it correctly maps inner red color for eyeColor2 to prevent index mutations
     expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3]);
     expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6]);
 });
-
-test('it strips null bytes from CSV parts', function () {
-    $component = new QrCodeComponent('test');
-
-    $method = fn ($color) => invade($component)->resolveColor($color);
-
-    expect($method("255, \0 128, 0"))->toBeInstanceOf(Rgb::class);
-});

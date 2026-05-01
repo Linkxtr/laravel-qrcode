@@ -214,15 +214,15 @@ it('calls the correct merger based on format', function () use ($tinyPng) {
     $renderer = new BaconRenderer($config);
 
     $config->setFormat(Format::SVG);
-    $config->setupMergeString($tinyPng, 0.2);
+    $config->setupMergeString($tinyPng);
     expect(invade($renderer)->getMerger('test'))->toBeInstanceOf(SvgMerger::class);
 
     $config->setFormat(Format::EPS);
-    $config->setupMergeString($tinyPng, 0.2);
+    $config->setupMergeString($tinyPng);
     expect(invade($renderer)->getMerger('test'))->toBeInstanceOf(EpsMerger::class);
 
     $config->setFormat(Format::PNG);
-    $config->setupMergeString($tinyPng, 0.2);
+    $config->setupMergeString($tinyPng);
     expect(invade($renderer)->getMerger($tinyPng))->toBeInstanceOf(ImagickMerger::class);
 
     global $mockImagickLoaded;
@@ -236,7 +236,7 @@ it('throws an exception when trying to merge images into EPS format without gd e
 
     $config = new Config;
     $config->setFormat(Format::EPS);
-    $config->setupMergeString($tinyPng, 0.2);
+    $config->setupMergeString($tinyPng);
     $renderer = new BaconRenderer($config);
 
     expect(fn () => $renderer->render('test'))->toThrow(RuntimeException::class, 'The "gd" extension is required to merge images into EPS format.');

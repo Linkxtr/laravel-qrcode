@@ -97,3 +97,15 @@ test('it throws an exception for out-of-bounds latitude and longitude', function
     expect(fn () => $geo->create([0, 180.000001]))
         ->toThrow(InvalidArgumentException::class, 'Longitude must be between -180 and 180.');
 });
+
+test('it clears the name if null is passed as the third argument', function () {
+    $geo = new Geo;
+
+    $geo->create([10.0, 20.0, 'Initial Name']);
+    expect((string) $geo)->toContain('Initial%20Name');
+
+    $geo->create([15.0, 25.0, null]);
+
+    expect((string) $geo)->not->toContain('Initial%20Name')
+        ->and((string) $geo)->toBe('geo:15,25');
+});

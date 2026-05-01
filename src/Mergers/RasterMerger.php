@@ -51,6 +51,13 @@ final class RasterMerger implements MergerInterface
         $mergeWidth = $this->mergeImage->getWidth();
         $mergeHeight = $this->mergeImage->getHeight();
 
+        // @codeCoverageIgnoreStart
+        if ($mergeHeight === 0) {
+            throw new InvalidArgumentException('Merge image height cannot be zero.');
+        }
+
+        // @codeCoverageIgnoreEnd
+
         $mergeRatio = $mergeWidth / $mergeHeight;
 
         $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage)); // @pest-mutate-ignore

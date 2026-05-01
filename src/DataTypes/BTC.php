@@ -55,6 +55,10 @@ final class BTC implements DataTypeInterface
             throw new InvalidArgumentException('Bitcoin amount must be a scalar value.');
         }
 
+        if (is_bool($arguments[1])) {
+            throw new InvalidArgumentException('Bitcoin amount cannot be a boolean.');
+        }
+
         $amountStr = (string) $arguments[1];
 
         if (preg_match('/^\d+(\.\d+)?$/', $amountStr) !== 1) {
