@@ -189,7 +189,7 @@ it('preserves full alpha transparency on the canvas to kill alpha blending and s
     \imagepng($logo);
     $blackLogo = \ob_get_clean();
 
-    $result = new RasterMerger($transparentSource, $blackLogo, 0.2)->merge();
+    $result = (new RasterMerger($transparentSource, $blackLogo, 0.2))->merge();
 
     $resultImage = \imagecreatefromstring($result);
 
