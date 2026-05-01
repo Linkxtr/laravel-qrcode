@@ -36,9 +36,9 @@
     "chillerlan/php-qrcode": "^5.0",
     "laravel/pint": "^1.0",
     "orchestra/testbench": "^9.0|^10.0|^11.0",
-    "pestphp/pest": "^2.0|^3.0|^4.0",
-    "pestphp/pest-plugin-laravel": "^2.0|^3.0|^4.0",
-    "pestphp/pest-plugin-type-coverage": "^2.0|^3.0|^4.0",
+    "pestphp/pest": "^3.0|^4.0",
+    "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+    "pestphp/pest-plugin-type-coverage": "^3.0|^4.0",
     "phpstan/phpstan": "^2.0",
     "rector/rector": "^1.0|^2.0",
     "spatie/invade": "^2.1"
