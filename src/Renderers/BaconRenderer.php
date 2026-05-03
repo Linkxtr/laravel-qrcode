@@ -143,8 +143,8 @@ final readonly class BaconRenderer
             Format::EPS => new EpsMerger($qrCode, $imageMerge, $percentage),
             Format::SVG => new SvgMerger($qrCode, $imageMerge, $percentage),
             default => extension_loaded('imagick')
-                ? new ImagickMerger($qrCode, $imageMerge, $percentage)->setFormat($format)
-                : new RasterMerger($qrCode, $imageMerge, $percentage)->setFormat($format),
+                ? (new ImagickMerger($qrCode, $imageMerge, $percentage))->setFormat($format)
+                : (new RasterMerger($qrCode, $imageMerge, $percentage))->setFormat($format),
         };
     }
 
