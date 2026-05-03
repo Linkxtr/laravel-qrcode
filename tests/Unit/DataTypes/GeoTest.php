@@ -29,21 +29,17 @@ test('it throws exception if latitude or longitude are not numeric', function ()
         ->toThrow(InvalidArgumentException::class, 'Latitude and longitude must be numeric.');
 });
 
-test('it generates full geo string from standard floats', function () {
+it('generates full geo string from standard floats', function (float $lat, float $lng, string $expected) {
     $geo = new Geo;
 
-    $geo->create([37.7749, -122.4194]);
+    $geo->create([$lat, $lng]);
 
-    expect((string) $geo)->toBe('geo:37.7749,-122.4194');
-
-    $geo->create([-90, -180]);
-
-    expect((string) $geo)->toBe('geo:-90,-180');
-
-    $geo->create([90, 180]);
-
-    expect((string) $geo)->toBe('geo:90,180');
-});
+    expect((string) $geo)->toBe($expected);
+})->with([
+    'standard' => [37.7749, -122.4194, 'geo:37.7749,-122.4194'],
+    'south-west' => [-90.0, -180.0, 'geo:-90,-180'],
+    'north-east' => [90.0, 180.0, 'geo:90,180'],
+]);
 
 test('it safely casts numeric strings to floats to kill cast mutants', function () {
     $geo = new Geo;
@@ -108,4 +104,14 @@ test('it clears the name if null is passed as the third argument', function () {
 
     expect((string) $geo)->not->toContain('Initial%20Name')
         ->and((string) $geo)->toBe('geo:15,25');
+});
+
+test('it throws a required exception when null is passed as latitude or longitude', function () {
+    $geo = new Geo;
+
+    expect(fn () => $geo->create([null, -122.4194]))
+        ->toThrow(InvalidArgumentException::class, 'Latitude and longitude are required.');
+
+    expect(fn () => $geo->create([37.7749, null]))
+        ->toThrow(InvalidArgumentException::class, 'Latitude and longitude are required.');
 });

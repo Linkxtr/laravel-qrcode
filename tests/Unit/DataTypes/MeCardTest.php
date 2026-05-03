@@ -109,7 +109,7 @@ test('it accurately escapes special characters', function () {
     $chaosString = 'Name\\With;Special:Chars,Here';
 
     $meCard->create([$chaosString]);
-    $expected = 'MECARD:N:Name\\\\With\\;Special\\:Chars\\,Here;;';
+    $expected = 'MECARD:N:Name\\\\With\\;Special\\:Chars,Here;;';
 
     expect((string) $meCard)->toBe($expected);
 });

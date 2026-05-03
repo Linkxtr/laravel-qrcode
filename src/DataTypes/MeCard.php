@@ -42,7 +42,7 @@ final class MeCard implements DataTypeInterface
             throw new LogicException('MeCard must be initialized via create() before rendering.');
         }
 
-        $meCard = 'MECARD:N:'.$this->escapeValue($this->name).';';
+        $meCard = 'MECARD:N:'.$this->escapeNameValue($this->name).';';
 
         if ($this->reading !== null) {
             $meCard .= 'SOUND:'.$this->escapeValue($this->reading).';';
@@ -160,6 +160,15 @@ final class MeCard implements DataTypeInterface
         if (isset($properties[$key]) && is_string($properties[$key]) && $properties[$key] !== '') {
             $this->{$key} = $properties[$key];
         }
+    }
+
+    private function escapeNameValue(string $value): string
+    {
+        return strtr($value, [
+            '\\' => '\\\\',
+            ';' => '\\;',
+            ':' => '\\:',
+        ]);
     }
 
     private function escapeValue(string $value): string

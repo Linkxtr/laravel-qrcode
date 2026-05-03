@@ -43,6 +43,12 @@ final class BTC implements DataTypeInterface
      */
     public function create(array $arguments): void
     {
+        unset($this->address);
+        $this->amount = null;
+        $this->label = null;
+        $this->message = null;
+        $this->returnAddress = null;
+
         if (count($arguments) < 2) {
             throw new InvalidArgumentException('Bitcoin address and amount are required.');
         }
@@ -67,10 +73,6 @@ final class BTC implements DataTypeInterface
 
         $this->address = trim($arguments[0]);
         $this->amount = $amountStr;
-
-        $this->label = null;
-        $this->message = null;
-        $this->returnAddress = null;
 
         if (! isset($arguments[2]) || ! is_array($arguments[2])) {
             return;

@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Support\Image;
+use LogicException;
 use RuntimeException;
 
 final class RasterMerger implements MergerInterface
@@ -52,8 +53,8 @@ final class RasterMerger implements MergerInterface
         $mergeHeight = $this->mergeImage->getHeight();
 
         // @codeCoverageIgnoreStart
-        if ($mergeHeight === 0) {
-            throw new InvalidArgumentException('Merge image height cannot be zero.');
+        if ($mergeWidth === 0 || $mergeHeight === 0) {
+            throw new InvalidArgumentException('Merge image dimensions cannot be zero.');
         }
 
         // @codeCoverageIgnoreEnd
@@ -127,7 +128,7 @@ final class RasterMerger implements MergerInterface
         $success = match ($this->format) {
             Format::WEBP => imagewebp($gdImage, null, 90), // @pest-mutate-ignore
             Format::PNG => imagepng($gdImage),
-            default => throw new InvalidArgumentException('RasterMerger only supports "png" or "webp" formats.'),
+            default => throw new LogicException('RasterMerger only supports "png" or "webp" formats.'),
         };
 
         $content = ob_get_clean();
