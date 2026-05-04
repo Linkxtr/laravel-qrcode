@@ -254,3 +254,40 @@ it('renders an html string with merged image', function () use ($tinyPng) {
         ->and($result->toHtml())->toContain('<svg')
         ->and($result->toHtml())->toContain('href="data:image/png;base64');
 });
+
+it('throws a RuntimeException when using GD library with a non-square style', function () {
+    global $mockImagickLoaded, $mockGdLoaded;
+    $mockImagickLoaded = false;
+    $mockGdLoaded = true;
+
+    $config = new Config;
+    $config->setFormat(Format::PNG);
+
+    $config->setupStyle(Style::DOT);
+
+    $renderer = new BaconRenderer($config);
+
+    expect(fn () => $renderer->render('https://linkxtr.com'))
+        ->toThrow(
+            RuntimeException::class,
+            'The GD library does not support non-square module styles (e.g., DOT, ROUND). Please enable the Imagick extension or use the SQUARE style.'
+        );
+});
+
+it('throws a RuntimeException when using GD library with a gradient', function () {
+    global $mockImagickLoaded, $mockGdLoaded;
+    $mockImagickLoaded = false;
+    $mockGdLoaded = true;
+
+    $config = new Config;
+    $config->setFormat(Format::PNG);
+
+    $config->setupGradient(new Rgb(255, 0, 0), new Rgb(0, 0, 255));
+
+    $renderer = new BaconRenderer($config);
+
+    expect(fn () => $renderer->render('https://linkxtr.com'))->toThrow(
+        RuntimeException::class,
+        'The GD library does not support gradients. Please enable the Imagick extension or use solid colors.'
+    );
+});

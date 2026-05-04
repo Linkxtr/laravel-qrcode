@@ -97,6 +97,14 @@ final readonly class BaconRenderer
             throw new RuntimeException(sprintf('Format "%s" requires the Imagick extension.', $format->value));
         }
 
+        if ($this->config->getStyle() !== Style::SQUARE) {
+            throw new RuntimeException('The GD library does not support non-square module styles (e.g., DOT, ROUND). Please enable the Imagick extension or use the SQUARE style.');
+        }
+
+        if ($this->config->getGradient() instanceof Gradient) {
+            throw new RuntimeException('The GD library does not support gradients. Please enable the Imagick extension or use solid colors.');
+        }
+
         return new GDLibRenderer(
             $this->config->getSize(),
             $this->config->getMargin(),

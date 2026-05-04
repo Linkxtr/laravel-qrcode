@@ -371,7 +371,7 @@ final class Config
         return $this->eyeColors;
     }
 
-    public function setupGradient(Rgb $start, Rgb $end, string|GradientType $type): void
+    public function setupGradient(Rgb $start, Rgb $end, string|GradientType $type = GradientType::VERTICAL): void
     {
         if (is_string($type)) {
             $type = GradientType::tryFrom(strtolower($type));
