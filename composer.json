@@ -73,7 +73,8 @@
       "@test:types",
       "@test:type-coverage",
       "@test:unit"
-    ]
+    ],
+    "mutate": "pest --parallel --mutate --covered-only"
   },
   "config": {
     "sort-packages": true,
