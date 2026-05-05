@@ -80,6 +80,11 @@ final class Generator
         ));
     }
 
+    public function __clone()
+    {
+        $this->config = clone $this->config;
+    }
+
     public function generate(string $text, ?string $filename = null): HtmlString
     {
         $baconRenderer = new BaconRenderer($this->config);
@@ -95,67 +100,85 @@ final class Generator
 
     public function merge(string $filepath, float $percentage = .2): self
     {
-        $this->config->setupMergePath($filepath);
-        $this->config->setImagePercentage($percentage);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setupMergePath($filepath);
+        $instance->config->setImagePercentage($percentage);
+
+        return $instance;
     }
 
     public function mergeString(string $content, float $percentage = .2): self
     {
-        $this->config->setupMergeString($content);
-        $this->config->setImagePercentage($percentage);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setupMergeString($content);
+        $instance->config->setImagePercentage($percentage);
+
+        return $instance;
     }
 
     public function size(int $size): self
     {
-        $this->config->setSize($size);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setSize($size);
+
+        return $instance;
     }
 
     public function format(string|Format $format): self
     {
-        $this->config->setFormat($format);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setFormat($format);
+
+        return $instance;
     }
 
     public function cmyk(): self
     {
-        $this->config->setColorModel(ColorModel::CMYK);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setColorModel(ColorModel::CMYK);
+
+        return $instance;
     }
 
     public function rgb(): self
     {
-        $this->config->setColorModel(ColorModel::RGB);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setColorModel(ColorModel::RGB);
+
+        return $instance;
     }
 
     public function gray(int $gray, ?int $backgroundGray = null): self
     {
-        $this->config->setGrayscale($gray, $backgroundGray);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setGrayscale($gray, $backgroundGray);
+
+        return $instance;
     }
 
     public function color(int $c1, int $c2, int $c3, ?int $c4 = null): self
     {
-        $this->config->setupColor($c1, $c2, $c3, $c4);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setupColor($c1, $c2, $c3, $c4);
+
+        return $instance;
     }
 
     public function backgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null): self
     {
-        $this->config->setupBackgroundColor($c1, $c2, $c3, $c4);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setupBackgroundColor($c1, $c2, $c3, $c4);
+
+        return $instance;
     }
 
     /**
@@ -164,23 +187,24 @@ final class Generator
      */
     public function eyeColor(int $eyeNumber, string|array $inner, string|array|null $outer = null): self
     {
+        $instance = clone $this;
         $innerRgb = Rgb::parse($inner);
 
         if ($outer === null) {
-            $this->config->setupEyeColor($eyeNumber, $innerRgb);
+            $instance->config->setupEyeColor($eyeNumber, $innerRgb);
 
-            return $this;
+            return $instance;
         }
 
         $outerRgb = Rgb::parse($outer);
 
-        $this->config->setupEyeColor(
+        $instance->config->setupEyeColor(
             $eyeNumber,
             $innerRgb,
             $outerRgb
         );
 
-        return $this;
+        return $instance;
     }
 
     /**
@@ -191,51 +215,64 @@ final class Generator
     {
         $startRgb = Rgb::parse($start);
         $endRgb = Rgb::parse($end);
+        $instance = clone $this;
 
-        $this->config->setupGradient($startRgb, $endRgb, $type);
+        $instance->config->setupGradient($startRgb, $endRgb, $type);
 
-        return $this;
+        return $instance;
     }
 
     public function eye(string|EyeStyle $style): self
     {
-        $this->config->setEyeStyle($style);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setEyeStyle($style);
+
+        return $instance;
     }
 
     public function internalEye(string|EyeStyle $style): self
     {
-        $this->config->setInternalEyeStyle($style);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setInternalEyeStyle($style);
+
+        return $instance;
     }
 
     public function style(string|Style $style, ?float $size = null): self
     {
-        $this->config->setupStyle($style, $size);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setupStyle($style, $size);
+
+        return $instance;
     }
 
     public function encoding(string $encoding): self
     {
-        $this->config->setEncoding($encoding);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setEncoding($encoding);
+
+        return $instance;
     }
 
     public function errorCorrection(string|ErrorCorrectionLevel $errorCorrection): self
     {
-        $this->config->setErrorCorrectionLevel($errorCorrection);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setErrorCorrectionLevel($errorCorrection);
+
+        return $instance;
     }
 
     public function margin(int $margin): self
     {
-        $this->config->setMargin($margin);
+        $instance = clone $this;
 
-        return $this;
+        $instance->config->setMargin($margin);
+
+        return $instance;
     }
 }

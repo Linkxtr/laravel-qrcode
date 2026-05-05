@@ -51,43 +51,43 @@ final class QrCodeComponent extends Component
         $generator = QrCode::size($this->size)->format($this->format)->margin($this->margin);
 
         if ($this->color !== null && $rgb = $this->resolveColor($this->color)) {
-            $generator->color($rgb->red, $rgb->green, $rgb->blue, $rgb->alpha);
+            $generator = $generator->color($rgb->red, $rgb->green, $rgb->blue, $rgb->alpha);
         }
 
         if ($this->backgroundColor !== null && $rgb = $this->resolveColor($this->backgroundColor)) {
-            $generator->backgroundColor($rgb->red, $rgb->green, $rgb->blue, $rgb->alpha);
+            $generator = $generator->backgroundColor($rgb->red, $rgb->green, $rgb->blue, $rgb->alpha);
         }
 
         if ($this->style !== null) {
-            $generator->style($this->style);
+            $generator = $generator->style($this->style);
         }
 
         if ($this->errorCorrection !== null) {
-            $generator->errorCorrection($this->errorCorrection);
+            $generator = $generator->errorCorrection($this->errorCorrection);
         }
 
         if ($this->encoding !== null) {
-            $generator->encoding($this->encoding);
+            $generator = $generator->encoding($this->encoding);
         }
 
         if ($this->eye !== null) {
-            $generator->eye($this->eye);
+            $generator = $generator->eye($this->eye);
         }
 
         if ($this->eyeColor0 !== null && $colors = $this->resolveMultiColor($this->eyeColor0)) {
-            $generator->eyeColor(0, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
+            $generator = $generator->eyeColor(0, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
         }
 
         if ($this->eyeColor1 !== null && $colors = $this->resolveMultiColor($this->eyeColor1)) {
-            $generator->eyeColor(1, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
+            $generator = $generator->eyeColor(1, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
         }
 
         if ($this->eyeColor2 !== null && $colors = $this->resolveMultiColor($this->eyeColor2)) {
-            $generator->eyeColor(2, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
+            $generator = $generator->eyeColor(2, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
         }
 
         if ($this->gradient !== null && $colors = $this->resolveMultiColor($this->gradient)) {
-            $generator->gradient([$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue], $this->gradientType ?? GradientType::VERTICAL);
+            $generator = $generator->gradient([$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue], $this->gradientType ?? GradientType::VERTICAL);
         }
 
         if ($this->merge !== null) {
@@ -95,9 +95,9 @@ final class QrCodeComponent extends Component
                 throw new InvalidArgumentException('Invalid merge path, path traversal is not allowed.');
             }
 
-            $generator->merge($this->merge, $this->mergePercentage);
+            $generator = $generator->merge($this->merge, $this->mergePercentage);
         } elseif ($this->mergeString !== null) {
-            $generator->mergeString($this->mergeString, $this->mergePercentage);
+            $generator = $generator->mergeString($this->mergeString, $this->mergePercentage);
         }
 
         $htmlString = (string) $generator->generate($this->data);

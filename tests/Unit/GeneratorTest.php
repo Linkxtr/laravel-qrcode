@@ -107,70 +107,90 @@ it('still delegates to data types if macro is not registered', function () {
     expect((string) $result)->toContain('<svg');
 });
 
-test('fluent configuration methods delegate to config and return self', function () {
+test('fluent configuration methods return a cloned instance with updated config', function () {
     $generator = new Generator;
 
-    expect($generator->size(500))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getSize())->toBe(500);
+    $sized = $generator->size(500);
+    expect($sized)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($sized)->config->getSize())->toBe(500);
 
-    expect($generator->margin(10))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getMargin())->toBe(10);
+    $margined = $generator->margin(10);
+    expect($margined)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($margined)->config->getMargin())->toBe(10);
 
-    expect($generator->format('png'))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getFormat())->toBe(Format::PNG);
+    $formatted = $generator->format('png');
+    expect($formatted)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($formatted)->config->getFormat())->toBe(Format::PNG);
 
-    expect($generator->errorCorrection('H'))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getErrorCorrectionLevel())->toBe(ErrorCorrectionLevel::H);
+    $errored = $generator->errorCorrection('H');
+    expect($errored)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($errored)->config->getErrorCorrectionLevel())->toBe(ErrorCorrectionLevel::H);
 
-    expect($generator->encoding('ISO-8859-1'))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getEncoding())->toBe('ISO-8859-1');
+    $encoded = $generator->encoding('ISO-8859-1');
+    expect($encoded)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($encoded)->config->getEncoding())->toBe('ISO-8859-1');
 
-    expect($generator->style('dot', 0.8))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getStyle())->toBe(Style::DOT)
-        ->and(invade($generator)->config->getStyleSize())->toBe(0.8);
+    $styled = $generator->style('dot', 0.8);
+    expect($styled)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($styled)->config->getStyle())->toBe(Style::DOT)
+        ->and(invade($styled)->config->getStyleSize())->toBe(0.8);
 
-    expect($generator->eye('circle'))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getEyeStyle())->toBe(EyeStyle::CIRCLE);
+    $eyed = $generator->eye('circle');
+    expect($eyed)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($eyed)->config->getEyeStyle())->toBe(EyeStyle::CIRCLE);
 
-    expect($generator->internalEye('square'))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getInternalEyeStyle())->toBe(EyeStyle::SQUARE);
+    $internalEyed = $generator->internalEye('square');
+    expect($internalEyed)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($internalEyed)->config->getInternalEyeStyle())->toBe(EyeStyle::SQUARE);
 
-    expect($generator->color(10, 20, 30))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getColorValue()->red)->toBe(10);
+    $colored = $generator->color(10, 20, 30);
+    expect($colored)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($colored)->config->getColorValue()->red)->toBe(10);
 
-    expect($generator->backgroundColor(10, 20, 30))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getBackgroundColorValue()->red)->toBe(10);
+    $bgColored = $generator->backgroundColor(10, 20, 30);
+    expect($bgColored)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($bgColored)->config->getBackgroundColorValue()->red)->toBe(10);
 
-    expect($generator->cmyk())->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getColorModel())->toBe(ColorModel::CMYK);
+    $cmyk = $generator->cmyk();
+    expect($cmyk)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($cmyk)->config->getColorModel())->toBe(ColorModel::CMYK);
 
-    expect($generator->rgb())->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getColorModel())->toBe(ColorModel::RGB);
+    $rgb = $cmyk->rgb();
+    expect($rgb)->toBeInstanceOf(Generator::class)->not->toBe($cmyk)
+        ->and(invade($rgb)->config->getColorModel())->toBe(ColorModel::RGB);
 
-    expect($generator->gray(50))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getColorModel())->toBe(ColorModel::GRAY);
+    $gray = $generator->gray(50);
+    expect($gray)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($gray)->config->getColorModel())->toBe(ColorModel::GRAY);
 
-    expect($generator->eyeColor(0, [20, 50, 70]))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getEyeColors()[0])->toBeInstanceOf(EyeFill::class);
+    $eyeColor0 = $generator->eyeColor(0, [20, 50, 70]);
+    expect($eyeColor0)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($eyeColor0)->config->getEyeColors()[0])->toBeInstanceOf(EyeFill::class);
 
-    expect($generator->eyeColor(1, [10, 20, 30], [40, 50, 60]))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getEyeColors()[1])->toBeInstanceOf(EyeFill::class);
+    $eyeColor1 = $generator->eyeColor(1, [10, 20, 30], [40, 50, 60]);
+    expect($eyeColor1)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($eyeColor1)->config->getEyeColors()[1])->toBeInstanceOf(EyeFill::class);
 
-    expect($generator->eyeColor(2, '#1a2b3c', 'fff'))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getEyeColors()[2])->toBeInstanceOf(EyeFill::class);
+    $eyeColor2 = $generator->eyeColor(2, '#1a2b3c', 'fff');
+    expect($eyeColor2)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($eyeColor2)->config->getEyeColors()[2])->toBeInstanceOf(EyeFill::class);
 
-    expect($generator->gradient([10, 20, 30], [40, 50, 60], GradientType::DIAGONAL))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getGradient())->toBeInstanceOf(Gradient::class);
+    $gradient = $generator->gradient([10, 20, 30], [40, 50, 60], GradientType::DIAGONAL);
+    expect($gradient)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($gradient)->config->getGradient())->toBeInstanceOf(Gradient::class);
 
-    expect($generator->mergeString('test', 0.1))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getImageMerge())->toBe('test')
-        ->and(invade($generator)->config->getImagePercentage())->toBe(0.1);
+    $mergeString = $generator->mergeString('test', 0.1);
+    expect($mergeString)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($mergeString)->config->getImageMerge())->toBe('test')
+        ->and(invade($mergeString)->config->getImagePercentage())->toBe(0.1);
 
     $expectedContent = file_get_contents(realpath(__DIR__.'/../Support/Fixtures/images/linkxtr.png'));
+    $merged = $generator->merge(realpath(__DIR__.'/../Support/Fixtures/images/linkxtr.png'), 0.3);
+    expect($merged)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($merged)->config->getImageMerge())->toBe($expectedContent)
+        ->and(invade($merged)->config->getImagePercentage())->toBe(0.3);
 
-    expect($generator->merge(realpath(__DIR__.'/../Support/Fixtures/images/linkxtr.png'), 0.3))->toBeInstanceOf(Generator::class)
-        ->and(invade($generator)->config->getImageMerge())->toBe($expectedContent)
-        ->and(invade($generator)->config->getImagePercentage())->toBe(0.3);
+    expect(invade($generator)->config->getSize())->toBe(400);
 });
 
 test('generate throws exception if file_put_contents fails', function () {
