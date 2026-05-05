@@ -118,8 +118,9 @@ final class VCard implements DataTypeInterface
         }
 
         $lines[] = 'END:VCARD';
+        $lines[] = '';
 
-        return implode("\n", $lines);
+        return implode("\r\n", $lines);
     }
 
     /**

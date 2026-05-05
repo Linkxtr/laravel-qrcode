@@ -36,7 +36,7 @@ test('it successfully maps the 5 common positional arguments', function () {
         'Developer',
     ]);
 
-    $expected = implode("\n", [
+    $expected = implode("\r\n", [
         'BEGIN:VCARD',
         'VERSION:3.0',
         'FN:Khaled Sadek',
@@ -45,6 +45,7 @@ test('it successfully maps the 5 common positional arguments', function () {
         'EMAIL;type=INTERNET:test@example.com',
         'TEL:+123456789',
         'END:VCARD',
+        '',
     ]);
 
     expect((string) $vcard)->toBe($expected);
@@ -72,7 +73,7 @@ test('it successfully maps massive associative array arguments', function () {
         'birthday' => '1990-01-01',
     ]]);
 
-    $expected = implode("\n", [
+    $expected = implode("\r\n", [
         'BEGIN:VCARD',
         'VERSION:3.0',
         'FN:Khaled Sadek',
@@ -92,6 +93,7 @@ test('it successfully maps massive associative array arguments', function () {
         'NOTE:Creator',
         'BDAY:1990-01-01',
         'END:VCARD',
+        '',
     ]);
 
     expect((string) $vcard)->toBe($expected);
@@ -108,11 +110,12 @@ test('it ignores non-string associative arguments', function () {
         'job' => 456.7,
     ]]);
 
-    $expected = implode("\n", [
+    $expected = implode("\r\n", [
         'BEGIN:VCARD',
         'VERSION:3.0',
         'FN:Khaled Sadek',
         'END:VCARD',
+        '',
     ]);
 
     expect((string) $vcard)->toBe($expected);
@@ -130,11 +133,12 @@ test('it strips empty string associative arguments', function () {
         'job' => '',
     ]]);
 
-    $expected = implode("\n", [
+    $expected = implode("\r\n", [
         'BEGIN:VCARD',
         'VERSION:3.0',
         'FN:Khaled Sadek',
         'END:VCARD',
+        '',
     ]);
 
     expect((string) $vcard)->toBe($expected);
@@ -147,11 +151,12 @@ test('it accurately escapes special characters and newlines', function () {
 
     $vcard->create([$chaosString]);
 
-    $expected = implode("\n", [
+    $expected = implode("\r\n", [
         'BEGIN:VCARD',
         'VERSION:3.0',
         'FN:Name\\\\With\\;Special\\,Chars\\nHere',
         'END:VCARD',
+        '',
     ]);
 
     expect((string) $vcard)->toBe($expected);
@@ -177,12 +182,13 @@ test('it gracefully handles missing first or last names independently', function
         'firstName' => 'Khaled',
     ]);
 
-    $expected1 = implode("\n", [
+    $expected1 = implode("\r\n", [
         'BEGIN:VCARD',
         'VERSION:3.0',
         'FN:Khaled',
         'N:;Khaled;;;',
         'END:VCARD',
+        '',
     ]);
 
     expect((string) $vcard1)->toBe($expected1);
@@ -193,12 +199,13 @@ test('it gracefully handles missing first or last names independently', function
         'lastName' => 'Sadek',
     ]);
 
-    $expected2 = implode("\n", [
+    $expected2 = implode("\r\n", [
         'BEGIN:VCARD',
         'VERSION:3.0',
         'FN:Sadek',
         'N:Sadek;;;;',
         'END:VCARD',
+        '',
     ]);
 
     expect((string) $vcard2)->toBe($expected2);
