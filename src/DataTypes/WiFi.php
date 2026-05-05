@@ -74,6 +74,11 @@ final class WiFi implements DataTypeInterface
 
         if (isset($properties['encryption']) && is_string($properties['encryption']) && $properties['encryption'] !== '') {
             $encryption = strtoupper($properties['encryption']);
+
+            if (in_array($encryption, ['WPA2', 'WPA3'], true)) {
+                $encryption = 'WPA';
+            }
+
             if (! in_array($encryption, ['WEP', 'WPA', 'NOPASS'], true)) {
                 throw new InvalidArgumentException('WiFi encryption must be WEP, WPA, or NOPASS.');
             }

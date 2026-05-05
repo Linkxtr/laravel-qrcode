@@ -132,3 +132,14 @@ it('rejects malformed hidden flag values', function () {
     expect(fn () => $wifi->create([['ssid' => 'MyNetwork', 'hidden' => ['nested_array']]]))
         ->toThrow(InvalidArgumentException::class, 'WiFi hidden flag must be a boolean or a string representation of a boolean.');
 });
+
+it('converts WPA2 and WPA3 to WPA', function () {
+    $wifi = new WiFi;
+
+    $wifi->create(['ssid' => 'HomeNetwork', 'encryption' => 'WPA2']);
+    expect((string) $wifi)->toBe('WIFI:S:HomeNetwork;T:WPA;;');
+
+    $wifi2 = new WiFi;
+    $wifi2->create(['ssid' => 'HomeNetwork', 'encryption' => 'WPA3']);
+    expect((string) $wifi2)->toBe('WIFI:S:HomeNetwork;T:WPA;;');
+});
