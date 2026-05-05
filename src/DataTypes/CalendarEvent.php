@@ -88,10 +88,13 @@ final class CalendarEvent implements DataTypeInterface
             throw new InvalidArgumentException('End date must be after start date.');
         }
 
-        $this->uid = uniqid('', true).'@linkxtr-qrcode';
         $this->summary = $attributes['summary'];
         $this->start = $start;
         $this->end = $end;
+
+        $this->uid = (isset($attributes['uid']) && is_string($attributes['uid']) && $attributes['uid'] !== '')
+            ? $attributes['uid']
+            : sha1($this->summary.$this->start->timestamp.$this->end->timestamp).'@linkxtr-qrcode';
 
         $this->description = (isset($attributes['description']) && is_string($attributes['description']))
             ? $attributes['description']

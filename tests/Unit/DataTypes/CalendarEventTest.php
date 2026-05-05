@@ -160,7 +160,7 @@ test('it generates a valid structured UID', function () {
         ->and($uid)->not->toStartWith('@linkxtr-qrcode');
     $uniquePart = str_replace('@linkxtr-qrcode', '', $uid);
 
-    expect(strlen($uniquePart))->toBe(23);
+    expect(strlen($uniquePart))->toBe(40);
 });
 
 test('it clears stale optional data and applies state atomically on object reuse', function () {
@@ -208,4 +208,89 @@ test('it does not mutate instance state if validation fails', function () {
 
     expect(invade($event)->summary)->toBe('Meeting 1')
         ->and(invade($event)->uid)->toBe($originalUid);
+});
+
+test('it generates deterministic UIDs for identical events', function () {
+    $data = [[
+        'summary' => 'Team Sync',
+        'start' => '2024-01-01 10:00:00',
+        'end' => '2024-01-01 11:00:00',
+    ]];
+
+    $event1 = new CalendarEvent;
+    $event1->create($data);
+
+    $event2 = new CalendarEvent;
+    $event2->create($data);
+
+    expect(invade($event1)->uid)->toBe(invade($event2)->uid);
+});
+
+test('it allows custom UIDs to be passed', function () {
+    $event = new CalendarEvent;
+    $event->create([[
+        'summary' => 'Meeting',
+        'start' => '2023-12-01 12:00:00',
+        'end' => '2023-12-01 14:00:00',
+        'uid' => 'custom-uuid-12345',
+    ]]);
+
+    expect(invade($event)->uid)->toBe('custom-uuid-12345');
+});
+
+test('the generated UID changes if any core event detail changes', function () {
+    $baseData = [
+        'summary' => 'Core Meeting',
+        'start' => '2024-01-01 10:00:00',
+        'end' => '2024-01-01 11:00:00',
+    ];
+
+    $baseEvent = new CalendarEvent;
+    $baseEvent->create([$baseData]);
+    $baseUid = invade($baseEvent)->uid;
+
+    $diffSummary = new CalendarEvent;
+    $diffSummary->create([array_merge($baseData, ['summary' => 'Different Meeting'])]);
+    expect(invade($diffSummary)->uid)->not->toBe($baseUid);
+
+    $diffStart = new CalendarEvent;
+    $diffStart->create([array_merge($baseData, ['start' => '2024-01-01 09:00:00'])]);
+    expect(invade($diffStart)->uid)->not->toBe($baseUid);
+
+    $diffEnd = new CalendarEvent;
+    $diffEnd->create([array_merge($baseData, ['end' => '2024-01-01 12:00:00'])]);
+    expect(invade($diffEnd)->uid)->not->toBe($baseUid);
+});
+
+test('it ignores an empty string custom UID and falls back to generated hash', function () {
+    $event = new CalendarEvent;
+    $event->create([[
+        'summary' => 'Meeting',
+        'start' => '2023-12-01 12:00:00',
+        'end' => '2023-12-01 14:00:00',
+        'uid' => '',
+    ]]);
+
+    $uid = invade($event)->uid;
+
+    expect($uid)->not->toBe('')
+        ->and($uid)->toEndWith('@linkxtr-qrcode')
+        ->and(strlen(str_replace('@linkxtr-qrcode', '', $uid)))->toBe(40);
+});
+
+test('the generated UID uses the exact concatenation order of summary, start, and end', function () {
+    $event = new CalendarEvent;
+
+    $event->create([[
+        'summary' => 'ExactOrderTest',
+        'start' => '2024-01-01 10:00:00',
+        'end' => '2024-01-01 11:00:00',
+    ]]);
+
+    $invaded = invade($event);
+
+    $expectedStringToHash = 'ExactOrderTest'.$invaded->start->timestamp.$invaded->end->timestamp;
+
+    $expectedUid = sha1($expectedStringToHash).'@linkxtr-qrcode';
+    expect($invaded->uid)->toBe($expectedUid);
 });
