@@ -6,6 +6,7 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use LogicException;
 
 final class Ethereum implements DataTypeInterface
 {
@@ -17,6 +18,10 @@ final class Ethereum implements DataTypeInterface
 
     public function __toString(): string
     {
+        if (! isset($this->address)) {
+            throw new LogicException('Ethereum must be initialized via create() before rendering.');
+        }
+
         if ($this->amount !== null) {
             return self::PREFIX.$this->address.'?'.http_build_query(['amount' => $this->amount], encoding_type: PHP_QUERY_RFC3986);
         }

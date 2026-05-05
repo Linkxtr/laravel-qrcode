@@ -6,6 +6,11 @@ use Linkxtr\QrCode\DataTypes\Ethereum;
 
 covers(Ethereum::class);
 
+it('throws exception if rendered before creation', function () {
+    expect(fn () => (string) new Ethereum)
+        ->toThrow(LogicException::class, 'Ethereum must be initialized via create() before rendering.');
+});
+
 test('it throws exception if address is missing', function () {
     $eth = new Ethereum;
     expect(fn () => $eth->create([]))
