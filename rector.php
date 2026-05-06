@@ -26,7 +26,7 @@ return RectorConfig::configure()
         symfonyCodeQuality: true,
         symfonyConfigs: true
     )
-    ->withPhpSets(php85: true)
+    ->withPhpSets(php82: true)
     ->withAttributesSets()
     ->withImportNames(removeUnusedImports: true)
     ->withTreatClassesAsFinal()
