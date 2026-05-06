@@ -5,10 +5,39 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode\Support;
 
 use BadMethodCallException;
-use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\DataTypes\BTC;
+use Linkxtr\QrCode\DataTypes\CalendarEvent;
+use Linkxtr\QrCode\DataTypes\Email;
+use Linkxtr\QrCode\DataTypes\Ethereum;
+use Linkxtr\QrCode\DataTypes\Geo;
+use Linkxtr\QrCode\DataTypes\MeCard;
+use Linkxtr\QrCode\DataTypes\PhoneNumber;
+use Linkxtr\QrCode\DataTypes\SMS;
+use Linkxtr\QrCode\DataTypes\Telegram;
+use Linkxtr\QrCode\DataTypes\VCard;
+use Linkxtr\QrCode\DataTypes\WhatsApp;
+use Linkxtr\QrCode\DataTypes\WiFi;
 
 final class DataTypeResolver
 {
+    /**
+     * Map of normalized method names to their concrete DataType classes.
+     */
+    private const MAP = [
+        'btc' => BTC::class,
+        'calendarevent' => CalendarEvent::class,
+        'email' => Email::class,
+        'ethereum' => Ethereum::class,
+        'geo' => Geo::class,
+        'mecard' => MeCard::class,
+        'phonenumber' => PhoneNumber::class,
+        'sms' => SMS::class,
+        'telegram' => Telegram::class,
+        'vcard' => VCard::class,
+        'whatsapp' => WhatsApp::class,
+        'wifi' => WiFi::class,
+    ];
+
     /**
      * Resolve a data type method call into its string payload.
      *
@@ -18,35 +47,21 @@ final class DataTypeResolver
      */
     public static function resolve(string $method, array $arguments): string
     {
-        $className = self::formatClass($method);
+        $normalizedMethod = strtolower($method);
 
-        if (! class_exists($className)) {
+        if (! array_key_exists($normalizedMethod, self::MAP)) {
             throw new BadMethodCallException(sprintf(
                 'Method "%s" does not exist on the QrCode Generator. It is not a registered macro or a valid Data Type.',
                 $method
             ));
         }
 
-        if (! is_subclass_of($className, DataTypeInterface::class, true)) {
-            throw new BadMethodCallException(sprintf('Class "%s" must implement DataTypeInterface.', $className));
-        }
+        $className = self::MAP[$normalizedMethod];
 
         $dataType = new $className;
-
-        if ($dataType::class !== $className) {
-            throw new BadMethodCallException(sprintf(
-                'Method "%s" does not exist on the QrCode Generator. It is not a registered macro or a valid Data Type.',
-                $method
-            ));
-        }
 
         $dataType->create($arguments);
 
         return (string) $dataType;
-    }
-
-    public static function formatClass(string $method): string
-    {
-        return 'Linkxtr\\QrCode\\DataTypes\\'.$method;
     }
 }
