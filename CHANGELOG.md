@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - Unreleased
+
+### Added
+
+- Static mapping for DataType resolution via `DataTypeResolver::MAP`.
+- Safe payload decoding and strict property initialization for Ethereum.
+- Deterministic UID generation for Calendar Events.
+
+### Changed
+
+- **Breaking:** `MergerInterface` no longer enforces a `__construct` signature.
+- **Breaking:** Fluent methods on the Generator now return a cloned instance (Immutable Builder) to prevent state leakage.
+- Unified configuration colors to use single comma-separated strings instead of split RGBA env vars.
+
 ## [2.0.0]
 
 ### Added
