@@ -182,8 +182,8 @@ final class Generator
     }
 
     /**
-     * @param  string|array{0: int, 1: int, 2: int}  $inner
-     * @param  string|array{0: int, 1: int, 2: int}|null  $outer
+     * @param  string|array<mixed>  $inner
+     * @param  string|array<mixed>|null  $outer
      */
     public function eyeColor(int $eyeNumber, string|array $inner, string|array|null $outer = null): self
     {
