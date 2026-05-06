@@ -111,7 +111,12 @@ final class QrCodeComponent extends Component
                     $translatedTitle = __('QR Code');
                     $title = e(is_string($translatedTitle) ? $translatedTitle : 'QR Code');
 
-                    $replacedSvg = preg_replace('/(<svg[^>]*>)/i', '$1<title>'.$title.'</title>', $svg, 1);
+                    $replacedSvg = preg_replace_callback(
+                        '/<svg[^>]*>/i',
+                        static fn (array $m): string => $m[0].'<title>'.$title.'</title>',
+                        $svg,
+                        1
+                    );
                     $svg = is_string($replacedSvg) ? $replacedSvg : $svg;
                 }
 
@@ -146,8 +151,9 @@ final class QrCodeComponent extends Component
     }
 
     /**
-     * Resolve multiple colors separated by common delimiters into a flat array.
-     * Guarantees returning exactly 6 integers if successful, preventing unpack errors.
+     * Resolve a string containing one or two colors (separated by `;`, `,#`, or `, #`)
+     * into a pair of Rgb value objects. If only one color is parsable, it is reused
+     * for both slots. Returns null when no color can be parsed.
      *
      * @return array{0: Rgb, 1: Rgb}|null
      */
