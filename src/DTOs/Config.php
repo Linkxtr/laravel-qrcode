@@ -156,7 +156,7 @@ final class Config
     public function setFormat(string|Format $format): void
     {
         if (is_string($format)) {
-            $format = Format::tryFrom($format);
+            $format = Format::tryFrom(strtolower($format));
         }
 
         if (! $format) {

@@ -69,12 +69,19 @@ final readonly class SvgMerger implements MergerInterface
             $imageUri
         );
 
-        $closingTagPos = strrpos($this->svgContent, '</svg>');
+        $svgContent = $this->svgContent;
+
+        if (! str_contains($svgContent, 'xmlns:xlink=')) {
+            $replaced = preg_replace('/<svg\s/i', '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ', $svgContent, 1);
+            $svgContent = (string) $replaced; // @pest-mutate-ignore
+        }
+
+        $closingTagPos = strrpos($svgContent, '</svg>');
 
         if ($closingTagPos === false) {
             throw new InvalidArgumentException('Invalid SVG content: closing tag not found.');
         }
 
-        return substr_replace($this->svgContent, $imageTag.'</svg>', $closingTagPos, strlen('</svg>'));
+        return substr_replace($svgContent, $imageTag.'</svg>', $closingTagPos, strlen('</svg>'));
     }
 }

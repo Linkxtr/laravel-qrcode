@@ -131,3 +131,21 @@ it('throws an exception when the merge image has zero width or zero height', fun
     'valid width, zero height' => [10, 0],
     'zero width, zero height' => [0, 0],
 ]);
+
+test('it does not inject xmlns:xlink if it already exists', function () use ($tinyPng): void {
+    $svg = '<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="100px" height="100px"></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.2);
+    $result = $merger->merge();
+
+    expect(substr_count($result, 'xmlns:xlink='))->toBe(1);
+});
+
+test('it only injects xmlns:xlink into the first svg tag', function () use ($tinyPng): void {
+    $svg = '<svg width="100px" height="100px"><svg width="50px" height="50px"></svg></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.2);
+    $result = $merger->merge();
+
+    expect(substr_count($result, 'xmlns:xlink='))->toBe(1);
+});

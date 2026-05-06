@@ -106,6 +106,10 @@ it('can scan a generated standard eps QR code', function ($imagick, bool $gd): v
         $this->markTestSkipped('eps convert to png to scan requires imagick.');
     }
 
+    if (! function_exists('exec')) {
+        $this->markTestSkipped('exec() is disabled; cannot verify Ghostscript availability.');
+    }
+
     $gsCommand = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'gswin64c -v' : 'gs --version';
     exec($gsCommand, $output, $returnVar);
     if ($returnVar !== 0) {

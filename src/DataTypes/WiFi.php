@@ -47,8 +47,10 @@ final class WiFi implements DataTypeInterface
             $arguments = $arguments[0];
         }
 
-        $this->password = null;
-        $this->hidden = false;
+        $ssid = null;
+        $encryption = 'NOPASS';
+        $password = null;
+        $hidden = false;
 
         $properties = $arguments;
 
@@ -68,7 +70,7 @@ final class WiFi implements DataTypeInterface
             throw new InvalidArgumentException('WiFi SSID is mandatory.');
         }
 
-        $this->ssid = $properties['ssid'];
+        $ssid = $properties['ssid'];
 
         $hasPassword = isset($properties['password']) && is_string($properties['password']) && $properties['password'] !== '';
 
@@ -83,17 +85,17 @@ final class WiFi implements DataTypeInterface
                 throw new InvalidArgumentException('WiFi encryption must be WEP, WPA, or NOPASS.');
             }
 
-            $this->encryption = $encryption;
+            $resolvedEncryption = $encryption;
         } else {
-            $this->encryption = $hasPassword ? 'WPA' : 'NOPASS';
+            $resolvedEncryption = $hasPassword ? 'WPA' : 'NOPASS';
         }
 
-        if ($this->encryption === 'NOPASS' && $hasPassword) {
+        if ($resolvedEncryption === 'NOPASS' && $hasPassword) {
             throw new InvalidArgumentException('WiFi password cannot be provided when encryption is NOPASS.');
         }
 
         if ($hasPassword) {
-            $this->password = $properties['password'];
+            $password = $properties['password'];
         }
 
         if (isset($properties['hidden'])) {
@@ -101,8 +103,13 @@ final class WiFi implements DataTypeInterface
                 throw new InvalidArgumentException('WiFi hidden flag must be a boolean or a string representation of a boolean.');
             }
 
-            $this->hidden = filter_var($properties['hidden'], FILTER_VALIDATE_BOOLEAN);
+            $hidden = filter_var($properties['hidden'], FILTER_VALIDATE_BOOLEAN);
         }
+
+        $this->ssid = $ssid;
+        $this->encryption = $resolvedEncryption;
+        $this->password = $password;
+        $this->hidden = $hidden;
     }
 
     private function escapeValue(string $value): string

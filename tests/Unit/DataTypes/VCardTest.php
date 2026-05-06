@@ -210,3 +210,20 @@ test('it gracefully handles missing first or last names independently', function
 
     expect((string) $vcard2)->toBe($expected2);
 });
+
+test('it clears stale optional data on object reuse', function (): void {
+    $vcard = new VCard;
+    $vcard->create([[
+        'name' => 'Alice',
+        'email' => 'alice@example.com',
+        'phoneCell' => '+1',
+        'note' => 'Old note',
+    ]]);
+
+    $vcard->create([['name' => 'Bob']]);
+
+    $output = (string) $vcard;
+    expect($output)->not->toContain('EMAIL')
+        ->and($output)->not->toContain('TEL')
+        ->and($output)->not->toContain('NOTE');
+});

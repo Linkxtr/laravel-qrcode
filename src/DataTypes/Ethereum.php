@@ -46,7 +46,7 @@ final class Ethereum implements DataTypeInterface
         $amount = null;
 
         if (isset($arguments[1])) {
-            if (! is_scalar($arguments[1])) {
+            if (is_bool($arguments[1]) || ! is_scalar($arguments[1])) {
                 throw new InvalidArgumentException('Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
             }
 

@@ -84,4 +84,7 @@ test('it mathematically rejects negatives and scientific notation to comply with
 
     expect(fn () => $eth->create(['0x123', '1e-18']))
         ->toThrow(InvalidArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
+
+    expect(fn () => $eth->create(['0x123', true]))
+        ->toThrow(InvalidArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
 });

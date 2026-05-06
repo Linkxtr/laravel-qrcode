@@ -119,6 +119,9 @@ test('it resolves format from string or enum', function (): void {
     $config->setFormat('webp');
     expect($config->getFormat())->toBe(Format::WEBP);
 
+    $config->setFormat('SVG');
+    expect($config->getFormat())->toBe(Format::SVG);
+
     expect(fn () => $config->setFormat('invalid_format'))->toThrow(InvalidArgumentException::class, '$format must be one of the following values: '.implode(', ', Format::toArray()));
 });
 
@@ -491,8 +494,26 @@ test('it handles c4 parameter fallback and override in setupBackgroundColor acro
 test('it mathematically blocks directory traversal attacks on relative merge paths', function (): void {
     $config = new Config;
 
-    expect(fn () => $config->setupMergePath('../../../../../../../../../../../../../../../etc/passwd'))
-        ->toThrow(InvalidArgumentException::class, 'Image file path must be inside the application base path.');
+    $actualBase = realpath(__DIR__.'/../../');
+    $parentDir = dirname($actualBase);
+
+    $tempFile = tempnam($parentDir, 'traversal_');
+    file_put_contents($tempFile, 'data');
+
+    $originalBasePath = app()->basePath();
+    app()->setBasePath($actualBase);
+
+    try {
+        $relativePath = '../../'.basename($parentDir).'/'.basename($tempFile);
+
+        expect(fn () => $config->setupMergePath($relativePath))
+            ->toThrow(InvalidArgumentException::class, 'Image file path must be inside the application base path.');
+    } finally {
+        app()->setBasePath($originalBasePath);
+        if (file_exists($tempFile)) {
+            unlink($tempFile);
+        }
+    }
 });
 
 test('it allows valid absolute paths outside the application root', function (): void {
