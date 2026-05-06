@@ -44,7 +44,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option controls the default foreground color of the QR code.
-    | Format: [R, G, B, A] where R, G, B are 0-255 and A is optional between 0-100.
+    | Format: comma-separated string. Examples:
+    | RGB (csv string): "R,G,B" (each 0-255) e.g. "0,0,0"
+    | RGBA (csv string): "R,G,B,A" (each 0-255 and A 0-100) e.g. "0,0,0,100"
+    | RGB (array): [R, G, B] (each 0-255) e.g. [0, 0, 0]
+    | RGBA (array): [R, G, B, A] (each 0-255 and A 0-100) e.g. [0, 0, 0, 100]
+    | Hex: "#RRGGBB" (each 0-F) e.g. "#000000"
     | Note: While PHP GD uses 0-127 for transparency, this package automatically scales the 0-100 alpha value.
     |
     */
@@ -56,7 +61,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option controls the default background color of the QR code.
-    | Format: [R, G, B, A] where R, G, B are 0-255 and A is optional between 0-100.
+    | Format: comma-separated string. Examples:
+    | RGB (csv string): "R,G,B" (each 0-255) e.g. "0,0,0"
+    | RGBA (csv string): "R,G,B,A" (each 0-255 and A 0-100) e.g. "0,0,0,100"
+    | RGB (array): [R, G, B] (each 0-255) e.g. [0, 0, 0]
+    | RGBA (array): [R, G, B, A] (each 0-255 and A 0-100) e.g. [0, 0, 0, 100]
+    | Hex: "#RRGGBB" (each 0-F) e.g. "#000000"
     | Note: While PHP GD uses 0-127 for transparency, this package automatically scales the 0-100 alpha value.
     |
     */

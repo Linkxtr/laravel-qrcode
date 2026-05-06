@@ -126,29 +126,29 @@ final class Config
             $this->margin = $config['margin'] >= 0 ? $config['margin'] : $this->margin;
         }
 
-        if (isset($config['format']) && \is_string($config['format'])) {
+        if (isset($config['format']) && is_string($config['format'])) {
             $format = Format::tryFrom(strtolower($config['format']));
             if ($format !== null) {
                 $this->format = $format;
             }
         }
 
-        if (isset($config['error_correction']) && \is_string($config['error_correction'])) {
+        if (isset($config['error_correction']) && is_string($config['error_correction'])) {
             $level = ErrorCorrectionLevel::tryFrom(strtoupper($config['error_correction']));
             if ($level !== null) {
                 $this->errorCorrectionLevel = $level;
             }
         }
 
-        if (isset($config['encoding']) && \is_string($config['encoding'])) {
+        if (isset($config['encoding']) && is_string($config['encoding'])) {
             $this->encoding = strtoupper($config['encoding']);
         }
 
-        if (isset($config['color']) && \is_string($config['color'])) {
+        if (isset($config['color']) && (is_string($config['color']) || is_array($config['color']))) {
             $this->colorValue = Rgb::parse($config['color']);
         }
 
-        if (isset($config['background_color']) && \is_string($config['background_color'])) {
+        if (isset($config['background_color']) && (is_string($config['background_color']) || is_array($config['background_color']))) {
             $this->backgroundColorValue = Rgb::parse($config['background_color']);
         }
     }

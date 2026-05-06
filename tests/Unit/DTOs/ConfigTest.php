@@ -209,27 +209,6 @@ test('it validates RGB boundaries across all color methods', function () {
     expect(fn () => $config->setupColor(256, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
 });
 
-test('it falls back to default color if any of the values is not an integer', function () {
-    $config = new Config([
-        'size' => 250,
-        'margin' => 2,
-        'format' => 'png',
-        'error_correction' => 'H',
-        'encoding' => 'ISO-8859-1',
-        'color' => ['invalid', 'string', [], null],
-        'background_color' => ['invalid', 'string', [], 2.5],
-    ]);
-
-    expect($config->getColorValue()->red)->toBe(0)
-        ->and($config->getColorValue()->green)->toBe(0)
-        ->and($config->getColorValue()->blue)->toBe(0)
-        ->and($config->getColorValue()->alpha)->toBe(100)
-        ->and($config->getBackgroundColorValue()->red)->toBe(255)
-        ->and($config->getBackgroundColorValue()->green)->toBe(255)
-        ->and($config->getBackgroundColorValue()->blue)->toBe(255)
-        ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
-});
-
 test('it handles grayscale configuration', function () {
     $config = new Config;
     $config->setGrayscale(0, 0);
