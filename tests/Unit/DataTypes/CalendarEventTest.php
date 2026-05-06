@@ -243,6 +243,8 @@ test('the generated UID changes if any core event detail changes', function (): 
         'summary' => 'Core Meeting',
         'start' => '2024-01-01 10:00:00',
         'end' => '2024-01-01 11:00:00',
+        'description' => 'Core Description',
+        'location' => 'Core Location',
     ];
 
     $baseEvent = new CalendarEvent;
@@ -264,6 +266,16 @@ test('the generated UID changes if any core event detail changes', function (): 
     $diffEnd->create([array_merge($baseData, ['end' => '2024-01-01 12:00:00'])]);
 
     expect(invade($diffEnd)->uid)->not->toBe($baseUid);
+
+    $diffDesc = new CalendarEvent;
+    $diffDesc->create([array_merge($baseData, ['description' => 'Different Description'])]);
+
+    expect(invade($diffDesc)->uid)->not->toBe($baseUid);
+
+    $diffLoc = new CalendarEvent;
+    $diffLoc->create([array_merge($baseData, ['location' => 'Different Location'])]);
+
+    expect(invade($diffLoc)->uid)->not->toBe($baseUid);
 });
 
 test('it ignores an empty string custom UID and falls back to generated hash', function (): void {
@@ -289,11 +301,13 @@ test('the generated UID uses the exact concatenation order of summary, start, an
         'summary' => 'ExactOrderTest',
         'start' => '2024-01-01 10:00:00',
         'end' => '2024-01-01 11:00:00',
+        'description' => 'Core Description',
+        'location' => 'Core Location',
     ]]);
 
     $invaded = invade($event);
 
-    $expectedStringToHash = 'ExactOrderTest'.$invaded->start->timestamp.$invaded->end->timestamp;
+    $expectedStringToHash = 'ExactOrderTest'.$invaded->start->timestamp.$invaded->end->timestamp.$invaded->description.$invaded->location;
 
     $expectedUid = sha1($expectedStringToHash).'@linkxtr-qrcode';
     expect($invaded->uid)->toBe($expectedUid);

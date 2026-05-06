@@ -92,10 +92,6 @@ final class CalendarEvent implements DataTypeInterface
         $this->start = $start;
         $this->end = $end;
 
-        $this->uid = (isset($attributes['uid']) && is_string($attributes['uid']) && $attributes['uid'] !== '')
-            ? $attributes['uid']
-            : sha1($this->summary.$this->start->timestamp.$this->end->timestamp).'@linkxtr-qrcode';
-
         $this->description = (isset($attributes['description']) && is_string($attributes['description']))
             ? $attributes['description']
             : null;
@@ -103,6 +99,10 @@ final class CalendarEvent implements DataTypeInterface
         $this->location = (isset($attributes['location']) && is_string($attributes['location']))
             ? $attributes['location']
             : null;
+
+        $this->uid = (isset($attributes['uid']) && is_string($attributes['uid']) && $attributes['uid'] !== '')
+            ? $attributes['uid']
+            : sha1($this->summary.$this->start->timestamp.$this->end->timestamp.$this->description.$this->location).'@linkxtr-qrcode';
     }
 
     private function parseDate(mixed $date): Carbon
