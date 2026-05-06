@@ -144,12 +144,12 @@ final class Config
             $this->encoding = strtoupper($config['encoding']);
         }
 
-        if (isset($config['color']) && is_array($config['color'])) {
-            $this->colorValue = new Rgb(...$this->readRgb($config['color'], 0));
+        if (isset($config['color']) && \is_string($config['color'])) {
+            $this->colorValue = Rgb::parse($config['color']);
         }
 
-        if (isset($config['background_color']) && is_array($config['background_color'])) {
-            $this->backgroundColorValue = new Rgb(...$this->readRgb($config['background_color'], 255));
+        if (isset($config['background_color']) && \is_string($config['background_color'])) {
+            $this->backgroundColorValue = Rgb::parse($config['background_color']);
         }
     }
 
@@ -491,38 +491,5 @@ final class Config
     private function setGradient(Gradient $gradient): void
     {
         $this->gradient = $gradient;
-    }
-
-    /**
-     * Read a RGB colour from a config array that may use either a positional index
-     * or a named key.  Returns $default when the value is absent or not an int.
-     *
-     * @param  array<mixed>  $raw
-     * @return array<int>
-     */
-    private function readRgb(array $raw, int $default): array
-    {
-        $red = $raw['r'] ?? $raw[0] ?? $default;
-        $green = $raw['g'] ?? $raw[1] ?? $default;
-        $blue = $raw['b'] ?? $raw[2] ?? $default;
-        $alpha = $raw['a'] ?? $raw[3] ?? 100;
-
-        if (! is_int($red)) {
-            $red = $default;
-        }
-
-        if (! is_int($green)) {
-            $green = $default;
-        }
-
-        if (! is_int($blue)) {
-            $blue = $default;
-        }
-
-        if (! is_int($alpha)) {
-            $alpha = 100;
-        }
-
-        return [$red, $green, $blue, $alpha];
     }
 }

@@ -53,8 +53,8 @@ test('it seeds configuration from array payload', function () {
         'format' => 'PNG',
         'error_correction' => 'h',
         'encoding' => 'iso-8859-1',
-        'color' => [10, 20, 30, 40],
-        'background_color' => [0, 255, 0],
+        'color' => '10, 20, 30, 40',
+        'background_color' => '0, 255, 0',
     ]);
 
     expect($config->getSize())->toBe(1)
@@ -70,22 +70,6 @@ test('it seeds configuration from array payload', function () {
         ->and($config->getBackgroundColorValue()->green)->toBe(255)
         ->and($config->getBackgroundColorValue()->blue)->toBe(0)
         ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
-});
-
-test('it seeds color config with keyed array', function () {
-    $config = new Config([
-        'color' => ['r' => 255, 'g' => 0, 'b' => 40, 'a' => 50],
-        'background_color' => ['r' => 0, 'g' => 200, 'b' => 0, 'a' => 50],
-    ]);
-
-    expect($config->getColorValue()->red)->toBe(255)
-        ->and($config->getColorValue()->green)->toBe(0)
-        ->and($config->getColorValue()->blue)->toBe(40)
-        ->and($config->getColorValue()->alpha)->toBe(50)
-        ->and($config->getBackgroundColorValue()->red)->toBe(0)
-        ->and($config->getBackgroundColorValue()->green)->toBe(200)
-        ->and($config->getBackgroundColorValue()->blue)->toBe(0)
-        ->and($config->getBackgroundColorValue()->alpha)->toBe(50);
 });
 
 test('it falls back to default size when provide invalid size and margin', function () {
