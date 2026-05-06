@@ -6,13 +6,13 @@ use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
 
-test('qrcode helper resolves the generator from the container when no argument is provided', function () {
+test('qrcode helper resolves the generator from the container when no argument is provided', function (): void {
     $generator = qrcode();
 
     expect($generator)->toBeInstanceOf(Generator::class);
 });
 
-test('qrcode helper delegates directly to the facade when text is provided to kill parameter mutants', function () {
+test('qrcode helper delegates directly to the facade when text is provided to kill parameter mutants', function (): void {
     $fakeGenerator = new class
     {
         public ?string $receivedData = null;
@@ -27,9 +27,9 @@ test('qrcode helper delegates directly to the facade when text is provided to ki
 
     QrCode::swap($fakeGenerator);
 
-    $result = qrcode('https://linkxtr.com');
+    $htmlString = qrcode('https://linkxtr.com');
 
-    expect($result)->toBeInstanceOf(HtmlString::class)
-        ->and((string) $result)->toBe('<svg>helper-test</svg>');
+    expect($htmlString)->toBeInstanceOf(HtmlString::class)
+        ->and((string) $htmlString)->toBe('<svg>helper-test</svg>');
     expect($fakeGenerator->receivedData)->toBe('https://linkxtr.com');
 });

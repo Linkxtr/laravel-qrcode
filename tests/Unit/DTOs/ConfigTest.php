@@ -20,7 +20,7 @@ require_once __DIR__.'/../../Support/Overrides.php';
 
 covers(Config::class);
 
-test('it initializes with default values', function () {
+test('it initializes with default values', function (): void {
     $config = new Config;
 
     expect($config->getSize())->toBe(400)
@@ -46,7 +46,7 @@ test('it initializes with default values', function () {
         ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
 });
 
-test('it seeds configuration from array payload', function () {
+test('it seeds configuration from array payload', function (): void {
     $config = new Config([
         'size' => 1,
         'margin' => 0,
@@ -72,7 +72,7 @@ test('it seeds configuration from array payload', function () {
         ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
 });
 
-test('it falls back to default size when provide invalid size and margin', function () {
+test('it falls back to default size when provide invalid size and margin', function (): void {
     $config = new Config([
         'size' => -1,
         'margin' => -1,
@@ -88,29 +88,32 @@ test('it falls back to default size when provide invalid size and margin', funct
     expect($config->getSize())->toBe(400);
 });
 
-test('it sets valid sizes and throws on boundaries', function () {
+test('it sets valid sizes and throws on boundaries', function (): void {
     $config = new Config;
 
     $config->setSize(1);
+
     expect($config->getSize())->toBe(1);
 
     expect(fn () => $config->setSize(0))->toThrow(InvalidArgumentException::class, 'Size must be greater than 0');
     expect(fn () => $config->setSize(-1))->toThrow(InvalidArgumentException::class, 'Size must be greater than 0');
 });
 
-test('it sets valid margins and throws on boundaries', function () {
+test('it sets valid margins and throws on boundaries', function (): void {
     $config = new Config;
 
     $config->setMargin(0);
+
     expect($config->getMargin())->toBe(0);
 
     expect(fn () => $config->setMargin(-1))->toThrow(InvalidArgumentException::class, 'Margin cannot be negative');
 });
 
-test('it resolves format from string or enum', function () {
+test('it resolves format from string or enum', function (): void {
     $config = new Config;
 
     $config->setFormat(Format::EPS);
+
     expect($config->getFormat())->toBe(Format::EPS);
 
     $config->setFormat('webp');
@@ -119,10 +122,11 @@ test('it resolves format from string or enum', function () {
     expect(fn () => $config->setFormat('invalid_format'))->toThrow(InvalidArgumentException::class, '$format must be one of the following values: '.implode(', ', Format::toArray()));
 });
 
-test('it sets error correction level from string or enum', function () {
+test('it sets error correction level from string or enum', function (): void {
     $config = new Config;
 
     $config->setErrorCorrectionLevel(ErrorCorrectionLevel::H);
+
     expect($config->getErrorCorrectionLevel())->toBe(ErrorCorrectionLevel::H);
 
     $config->setErrorCorrectionLevel('l');
@@ -131,10 +135,11 @@ test('it sets error correction level from string or enum', function () {
     expect(fn () => $config->setErrorCorrectionLevel('invalid'))->toThrow(InvalidArgumentException::class, '$level must be one of the following values: '.implode(', ', ErrorCorrectionLevel::toArray()));
 });
 
-test('it sets style from string or enum', function () {
+test('it sets style from string or enum', function (): void {
     $config = new Config;
 
     $config->setupStyle(Style::DOT, 0.5);
+
     expect($config->getStyle())->toBe(Style::DOT);
     expect($config->getStyleSize())->toBe(0.5);
 
@@ -145,21 +150,23 @@ test('it sets style from string or enum', function () {
     expect(fn () => $config->setupStyle('invalid', 0.1))->toThrow(InvalidArgumentException::class, '$style must be one of the following values: '.implode(', ', Style::toArray()));
 });
 
-test('it sets style size and validates percentages', function () {
+test('it sets style size and validates percentages', function (): void {
     $config = new Config;
 
     $config->setupStyle(Style::DOT, 0.1);
     $config->setupStyle(Style::DOT, 1.0);
+
     expect($config->getStyle())->toBe(Style::DOT);
     expect($config->getStyleSize())->toBe(1.0);
     expect(fn () => $config->setupStyle(Style::DOT, 0.0))->toThrow(InvalidArgumentException::class, 'Style size must be between 0 and 1');
     expect(fn () => $config->setupStyle(Style::DOT, 1.1))->toThrow(InvalidArgumentException::class, 'Style size must be between 0 and 1');
 });
 
-test('it sets eye style from string or enum', function () {
+test('it sets eye style from string or enum', function (): void {
     $config = new Config;
 
     $config->setEyeStyle(EyeStyle::SQUARE);
+
     expect($config->getEyeStyle())->toBe(EyeStyle::SQUARE);
 
     $config->setEyeStyle('circle');
@@ -168,10 +175,11 @@ test('it sets eye style from string or enum', function () {
     expect(fn () => $config->setEyeStyle('invalid'))->toThrow(InvalidArgumentException::class, '$style must be one of the following values: '.implode(', ', EyeStyle::toArray()));
 });
 
-test('it sets internal eye style from string or enum', function () {
+test('it sets internal eye style from string or enum', function (): void {
     $config = new Config;
 
     $config->setInternalEyeStyle(EyeStyle::SQUARE);
+
     expect($config->getInternalEyeStyle())->toBe(EyeStyle::SQUARE);
 
     $config->setInternalEyeStyle('circle');
@@ -180,17 +188,18 @@ test('it sets internal eye style from string or enum', function () {
     expect(fn () => $config->setInternalEyeStyle('invalid'))->toThrow(InvalidArgumentException::class, '$style must be one of the following values: '.implode(', ', EyeStyle::toArray()));
 });
 
-test('it sets encoding', function () {
+test('it sets encoding', function (): void {
     $config = new Config;
 
     $config->setEncoding('ISO-8859-1');
+
     expect($config->getEncoding())->toBe('ISO-8859-1');
 
     $config->setEncoding('utf-8');
     expect($config->getEncoding())->toBe('UTF-8');
 });
 
-test('it validates RGB boundaries across all color methods', function () {
+test('it validates RGB boundaries across all color methods', function (): void {
     $config = new Config;
 
     $config->setupColor(255, 255, 255);
@@ -209,7 +218,7 @@ test('it validates RGB boundaries across all color methods', function () {
     expect(fn () => $config->setupColor(256, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
 });
 
-test('it handles grayscale configuration', function () {
+test('it handles grayscale configuration', function (): void {
     $config = new Config;
     $config->setGrayscale(0, 0);
 
@@ -235,7 +244,7 @@ test('it handles grayscale configuration', function () {
     expect(fn () => $config->setGrayscale(50, -1))->toThrow(InvalidArgumentException::class, 'Background gray value must be between 0 and 100');
 });
 
-test('it handles eye color configuration and validates eye numbers and colors', function () {
+test('it handles eye color configuration and validates eye numbers and colors', function (): void {
     $config = new Config;
 
     $config->setupEyeColor(0, Rgb::fromArray([255, 0, 0]), Rgb::fromArray([0, 255, 0]));
@@ -270,10 +279,11 @@ test('it handles eye color configuration and validates eye numbers and colors', 
     expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, 0, 256]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
 });
 
-test('it configures gradients from strings and enums', function () {
+test('it configures gradients from strings and enums', function (): void {
     $config = new Config;
 
     $config->setupGradient(Rgb::fromArray([255, 0, 0]), Rgb::fromArray([0, 0, 255]), 'Diagonal');
+
     expect($config->getGradient())->toBeInstanceOf(Gradient::class);
 
     $config->setupGradient(Rgb::fromArray([255, 0, 0]), Rgb::fromArray([0, 0, 255]), GradientType::RADIAL);
@@ -282,7 +292,7 @@ test('it configures gradients from strings and enums', function () {
     expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0]), 'invalid'))->toThrow(InvalidArgumentException::class, '$type must be one of the following values: '.implode(', ', GradientType::toArray()));
 });
 
-test('it throws exception when gradient colors are invalid', function () {
+test('it throws exception when gradient colors are invalid', function (): void {
     $config = new Config;
 
     expect(fn () => $config->setupGradient(Rgb::fromArray([-1, 0, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
@@ -299,7 +309,7 @@ test('it throws exception when gradient colors are invalid', function () {
     expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 256]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
 });
 
-test('it sets up image merge from absolute file path', function () {
+test('it sets up image merge from absolute file path', function (): void {
     $config = new Config;
 
     $config->setupMergePath(__DIR__.'/../../Support/Fixtures/images/linkxtr.png');
@@ -312,7 +322,7 @@ test('it sets up image merge from absolute file path', function () {
     expect(fn () => $config->setImagePercentage(1.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
 });
 
-test('it sets up image merge from relative file path', function () {
+test('it sets up image merge from relative file path', function (): void {
     $config = new Config;
 
     $config->setupMergePath('Support/Fixtures/images/linkxtr.png');
@@ -322,14 +332,14 @@ test('it sets up image merge from relative file path', function () {
         ->and($config->getImagePercentage())->toBe(0.1);
 });
 
-test('it throws exception when path does not exist', function () {
+test('it throws exception when path does not exist', function (): void {
     $config = new Config;
 
     expect(fn () => $config->setupMergePath('non_existent_path'))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: non_existent_path');
     expect(fn () => $config->setupMergePath('/non_existent_path'))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: /non_existent_path');
 });
 
-test('it throws exception when path is a directory', function () {
+test('it throws exception when path is a directory', function (): void {
     $config = new Config;
 
     expect(fn () => $config->setupMergePath(__DIR__))
@@ -339,7 +349,7 @@ test('it throws exception when path is a directory', function () {
         );
 });
 
-test('it throws exception when path is not readable', function () {
+test('it throws exception when path is not readable', function (): void {
     $config = new Config;
     try {
         $filePath = __DIR__.'/../../Support/Fixtures/restricted.png';
@@ -355,7 +365,7 @@ test('it throws exception when path is not readable', function () {
     }
 });
 
-test('it throws exception when file_get_contents returns false', function () {
+test('it throws exception when file_get_contents returns false', function (): void {
     $config = new Config;
 
     global $mockFileGetContents;
@@ -366,12 +376,12 @@ test('it throws exception when file_get_contents returns false', function () {
     $resolvedPath = realpath($path);
 
     expect(fn () => $config->setupMergePath($path))->toThrow(InvalidArgumentException::class, 'Failed to read image file: '.$resolvedPath);
-})->after(function () {
+})->after(function (): void {
     global $mockFileGetContents;
     $mockFileGetContents = null;
 });
 
-test('it sets up string image merges and validates percentages', function () {
+test('it sets up string image merges and validates percentages', function (): void {
     $config = new Config;
 
     $config->setupMergeString('image_data');
@@ -381,7 +391,7 @@ test('it sets up string image merges and validates percentages', function () {
         ->and($config->getImagePercentage())->toBe(0.99);
 });
 
-test('it sets up color model and converts existing colors', function () {
+test('it sets up color model and converts existing colors', function (): void {
     $config = new Config;
 
     $config->setupColor(255, 0, 0);
@@ -417,12 +427,13 @@ test('it sets up color model and converts existing colors', function () {
         ->and($config->getBackgroundColorValue()->gray)->toBe(0);
 });
 
-test('it handles c4 parameter fallback and override in setupColor across all color models', function () {
+test('it handles c4 parameter fallback and override in setupColor across all color models', function (): void {
     $config = new Config;
 
     $config->setColorModel(ColorModel::RGB);
 
     $config->setupColor(10, 20, 30);
+
     expect($config->getColorValue()->alpha)->toBe(100);
 
     $config->setupColor(10, 20, 30, 50);
@@ -431,6 +442,7 @@ test('it handles c4 parameter fallback and override in setupColor across all col
     $config->setColorModel(ColorModel::CMYK);
 
     $config->setupColor(10, 20, 30);
+
     expect($config->getColorValue()->black)->toBe(100);
 
     $config->setupColor(10, 20, 30, 50);
@@ -438,18 +450,20 @@ test('it handles c4 parameter fallback and override in setupColor across all col
 
     $config->setColorModel(ColorModel::GRAY);
     $config->setupColor(10, 0, 0);
+
     expect($config->getColorValue()->alpha)->toBe(100);
 
     $config->setupColor(10, 0, 0, 50);
     expect($config->getColorValue()->alpha)->toBe(50);
 });
 
-test('it handles c4 parameter fallback and override in setupBackgroundColor across all color models', function () {
+test('it handles c4 parameter fallback and override in setupBackgroundColor across all color models', function (): void {
     $config = new Config;
 
     $config->setColorModel(ColorModel::RGB);
 
     $config->setupBackgroundColor(10, 20, 30);
+
     expect($config->getBackgroundColorValue()->alpha)->toBe(100);
 
     $config->setupBackgroundColor(10, 20, 30, 50);
@@ -458,6 +472,7 @@ test('it handles c4 parameter fallback and override in setupBackgroundColor acro
     $config->setColorModel(ColorModel::CMYK);
 
     $config->setupBackgroundColor(10, 20, 30);
+
     expect($config->getBackgroundColorValue()->black)->toBe(100);
 
     $config->setupBackgroundColor(10, 20, 30, 50);
@@ -466,20 +481,21 @@ test('it handles c4 parameter fallback and override in setupBackgroundColor acro
     $config->setColorModel(ColorModel::GRAY);
 
     $config->setupBackgroundColor(10, 0, 0);
+
     expect($config->getBackgroundColorValue()->alpha)->toBe(100);
 
     $config->setupBackgroundColor(10, 0, 0, 50);
     expect($config->getBackgroundColorValue()->alpha)->toBe(50);
 });
 
-test('it mathematically blocks directory traversal attacks on relative merge paths', function () {
+test('it mathematically blocks directory traversal attacks on relative merge paths', function (): void {
     $config = new Config;
 
     expect(fn () => $config->setupMergePath('../../../../../../../../../../../../../../../etc/passwd'))
         ->toThrow(InvalidArgumentException::class, 'Image file path must be inside the application base path.');
 });
 
-test('it allows valid absolute paths outside the application root', function () {
+test('it allows valid absolute paths outside the application root', function (): void {
     $config = new Config;
 
     $tempFile = tempnam(sys_get_temp_dir(), 'safe_absolute_');
@@ -492,7 +508,7 @@ test('it allows valid absolute paths outside the application root', function () 
     unlink($tempFile);
 });
 
-test('it prevents directory traversal into sibling directories that share the same prefix', function () {
+test('it prevents directory traversal into sibling directories that share the same prefix', function (): void {
     $config = new Config;
 
     $actualBase = realpath(__DIR__.'/../../');

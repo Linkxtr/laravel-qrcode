@@ -11,27 +11,27 @@ covers(EpsMerger::class);
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 $epsBase = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 100 100\nshowpage";
 
-test('it throws exception for invalid percentages', function () use ($tinyPng, $epsBase) {
-    expect(fn () => new EpsMerger($epsBase, $tinyPng, 0))
+test('it throws exception for invalid percentages', function () use ($tinyPng, $epsBase): void {
+    expect(fn (): EpsMerger => new EpsMerger($epsBase, $tinyPng, 0))
         ->toThrow(InvalidArgumentException::class, '$percentage must be between 0 and 1');
 
-    expect(fn () => new EpsMerger($epsBase, $tinyPng, 1))
+    expect(fn (): EpsMerger => new EpsMerger($epsBase, $tinyPng, 1))
         ->toThrow(InvalidArgumentException::class, '$percentage must be between 0 and 1');
 });
 
-test('it throws exception if eps is missing bounding box', function () use ($tinyPng) {
+test('it throws exception if eps is missing bounding box', function () use ($tinyPng): void {
     $epsInvalid = "%!PS-Adobe-3.0 EPSF-3.0\n%%Creator: Test\nshowpage";
 
-    expect(fn () => (new EpsMerger($epsInvalid, $tinyPng, 0.2))->merge())
+    expect(fn (): string => (new EpsMerger($epsInvalid, $tinyPng, 0.2))->merge())
         ->toThrow(InvalidArgumentException::class, 'Could not determine EPS dimensions');
 });
 
-test('it properly propagates InvalidArgumentException for invalid raster image data', function () use ($epsBase) {
-    expect(fn () => (new EpsMerger($epsBase, 'not-an-image', 0.2))->merge())
+test('it properly propagates InvalidArgumentException for invalid raster image data', function () use ($epsBase): void {
+    expect(fn (): string => (new EpsMerger($epsBase, 'not-an-image', 0.2))->merge())
         ->toThrow(InvalidArgumentException::class, 'Invalid merge image provided.');
 });
 
-test('it successfully merges an image into an eps with a showpage tag', function () use ($tinyPng, $epsBase) {
+test('it successfully merges an image into an eps with a showpage tag', function () use ($tinyPng, $epsBase): void {
     $result = (new EpsMerger($epsBase, $tinyPng, 0.2))->merge();
 
     expect($result)->toContain('% MERGED LOGO START')
@@ -40,7 +40,7 @@ test('it successfully merges an image into an eps with a showpage tag', function
         ->and(strpos($result, '% MERGED LOGO END'))->toBeLessThan(strpos($result, 'showpage'));
 });
 
-test('it successfully appends to eps if showpage tag is missing', function () use ($tinyPng) {
+test('it successfully appends to eps if showpage tag is missing', function () use ($tinyPng): void {
     $epsNoShowpage = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 100 100";
     $result = (new EpsMerger($epsNoShowpage, $tinyPng, 0.2))->merge();
 
@@ -50,7 +50,7 @@ test('it successfully appends to eps if showpage tag is missing', function () us
         ->and($result)->toEndWith('% MERGED LOGO END');
 });
 
-test('it accurately renders hex data from pixels', function () use ($epsBase) {
+test('it accurately renders hex data from pixels', function () use ($epsBase): void {
     $logo = imagecreatetruecolor(10, 10);
     $red = imagecolorallocate($logo, 255, 0, 0);
     imagefill($logo, 0, 0, $red);
@@ -64,7 +64,7 @@ test('it accurately renders hex data from pixels', function () use ($epsBase) {
     expect($result)->toContain('ff0000');
 });
 
-it('strictly maintains aspect ratio without triggering vertical constraints', function () use ($epsBase) {
+it('strictly maintains aspect ratio without triggering vertical constraints', function () use ($epsBase): void {
     $logo = imagecreatetruecolor(100, 10);
     $black = imagecolorallocate($logo, 0, 0, 0);
     imagefill($logo, 0, 0, $black);
@@ -79,7 +79,7 @@ it('strictly maintains aspect ratio without triggering vertical constraints', fu
     expect($result20)->not->toBe($result80);
 });
 
-it('constrains merge image if it exceeds vertical bounds', function () use ($epsBase) {
+it('constrains merge image if it exceeds vertical bounds', function () use ($epsBase): void {
     $logo = imagecreatetruecolor(10, 100);
     $black = imagecolorallocate($logo, 0, 0, 0);
     imagefill($logo, 0, 0, $black);
@@ -96,35 +96,35 @@ it('constrains merge image if it exceeds vertical bounds', function () use ($eps
         ->and($output)->not->toContain('200 scale');
 });
 
-it('throws exception if image canvas cannot be created', function () use ($tinyPng, $epsBase) {
+it('throws exception if image canvas cannot be created', function () use ($tinyPng, $epsBase): void {
     global $mockImageCreateTrueColor;
     $mockImageCreateTrueColor = false;
 
-    expect(fn () => (new EpsMerger($epsBase, $tinyPng, 0.2))->merge())
+    expect(fn (): string => (new EpsMerger($epsBase, $tinyPng, 0.2))->merge())
         ->toThrow(RuntimeException::class, 'Failed to create resized logo canvas.');
-})->after(function () {
+})->after(function (): void {
     global $mockImageCreateTrueColor;
     $mockImageCreateTrueColor = null;
 });
 
-it('throws exception if white color cannot be allocated', function () use ($tinyPng, $epsBase) {
+it('throws exception if white color cannot be allocated', function () use ($tinyPng, $epsBase): void {
     global $mockImageColorAllocate;
     $mockImageColorAllocate = false;
 
-    expect(fn () => (new EpsMerger($epsBase, $tinyPng, 0.2))->merge())
+    expect(fn (): string => (new EpsMerger($epsBase, $tinyPng, 0.2))->merge())
         ->toThrow(RuntimeException::class, 'Could not allocate white color for the logo.');
-})->after(function () {
+})->after(function (): void {
     global $mockImageColorAllocate;
     $mockImageColorAllocate = null;
 });
 
-it('throws exception if output buffer capture fails', function () use ($tinyPng, $epsBase) {
+it('throws exception if output buffer capture fails', function () use ($tinyPng, $epsBase): void {
     global $mockObGetClean;
     $mockObGetClean = false;
 
-    expect(fn () => (new EpsMerger($epsBase, $tinyPng, 0.2))->merge())
+    expect(fn (): string => (new EpsMerger($epsBase, $tinyPng, 0.2))->merge())
         ->toThrow(RuntimeException::class, 'Failed to capture hex data from output buffer.');
-})->after(function () {
+})->after(function (): void {
     global $mockObGetClean;
     $mockObGetClean = null;
     if (ob_get_level() > 0) {
@@ -132,7 +132,7 @@ it('throws exception if output buffer capture fails', function () use ($tinyPng,
     }
 });
 
-test('it strictly loops and calculates accurate bitwise hex data for every pixel', function () {
+test('it strictly loops and calculates accurate bitwise hex data for every pixel', function (): void {
     $tinyEps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 10 10\nshowpage";
 
     $logo = \imagecreatetruecolor(2, 2);
@@ -148,7 +148,7 @@ test('it strictly loops and calculates accurate bitwise hex data for every pixel
     expect($result)->toContain("colorimage\nabbbcdabbbcdabbbcdabbbcd\ngrestore");
 });
 
-test('it strictly fills the background with white to preserve transparent logos', function () {
+test('it strictly fills the background with white to preserve transparent logos', function (): void {
     $tinyEps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 10 10\nshowpage";
 
     $logo = \imagecreatetruecolor(2, 2);
@@ -166,7 +166,7 @@ test('it strictly fills the background with white to preserve transparent logos'
     expect($result)->toContain("colorimage\nffffffffffffffffffffffff\ngrestore");
 });
 
-it('strictly calculates qr dimensions from shifted bounding boxes to kill math mutants', function () {
+it('strictly calculates qr dimensions from shifted bounding boxes to kill math mutants', function (): void {
     $epsShifted = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 10 20 110 120\nshowpage";
 
     $logo = imagecreatetruecolor(10, 10);

@@ -8,7 +8,7 @@ use Linkxtr\QrCode\Facades\QrCode;
 
 covers(GenerateQrCodeCommand::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->fakeGenerator = new class
     {
         public array $calls = [];
@@ -31,7 +31,7 @@ beforeEach(function () {
     QrCode::swap($this->fakeGenerator);
 });
 
-test('it can generate a qr code purely through cli arguments and options', function () {
+test('it can generate a qr code purely through cli arguments and options', function (): void {
     $this->artisan('qr:generate', [
         'data' => 'https://example.com',
         '--output' => 'public/qr.png',
@@ -53,7 +53,7 @@ test('it can generate a qr code purely through cli arguments and options', funct
     expect($this->fakeGenerator->calls['generate'])->toBe(['https://example.com', 'public/qr.png']);
 });
 
-test('it falls back to interactive prompts if no arguments are provided', function () {
+test('it falls back to interactive prompts if no arguments are provided', function (): void {
     $this->artisan('qr:generate')
         ->expectsQuestion('What data/payload should be encoded in the QR code?', 'https://interactive.com')
         ->expectsQuestion('Where should the QR code be saved?', '') // Empty string forces console output
@@ -75,7 +75,7 @@ test('it falls back to interactive prompts if no arguments are provided', functi
     expect($this->fakeGenerator->calls['generate'])->toBe(['https://interactive.com', null]);
 });
 
-test('it correctly skips advanced interactive prompts if the user declines', function () {
+test('it correctly skips advanced interactive prompts if the user declines', function (): void {
     $this->artisan('qr:generate')
         ->expectsQuestion('What data/payload should be encoded in the QR code?', 'https://test.com')
         ->expectsQuestion('Where should the QR code be saved?', 'test.svg')
@@ -88,7 +88,7 @@ test('it correctly skips advanced interactive prompts if the user declines', fun
     expect($this->fakeGenerator->calls['color'])->toBe([0, 0, 0, null]);
 });
 
-test('it fails explicitly if size boundary is violated to kill validation mutants', function () {
+test('it fails explicitly if size boundary is violated to kill validation mutants', function (): void {
     $this->artisan('qr:generate', ['data' => 'test', '--size' => '0'])
         ->assertFailed()
         ->expectsOutputToContain('Size must be a positive integer.');
@@ -98,7 +98,7 @@ test('it fails explicitly if size boundary is violated to kill validation mutant
         ->expectsOutputToContain('Size must be a positive integer.');
 });
 
-test('it fails explicitly if margin boundary is violated to kill validation mutants', function () {
+test('it fails explicitly if margin boundary is violated to kill validation mutants', function (): void {
     $this->artisan('qr:generate', ['data' => 'test', '--margin' => '-1'])
         ->assertFailed()
         ->expectsOutputToContain('Margin must be a positive integer or zero.');
@@ -108,13 +108,13 @@ test('it fails explicitly if margin boundary is violated to kill validation muta
         ->expectsOutputToContain('Margin must be a positive integer or zero.');
 });
 
-test('it fails explicitly if error correction is invalid', function () {
+test('it fails explicitly if error correction is invalid', function (): void {
     $this->artisan('qr:generate', ['data' => 'test', '--errorCorrection' => 'Z'])
         ->assertFailed()
         ->expectsOutputToContain('Invalid error correction level. Please use L, M, Q, or H.');
 });
 
-test('it strictly validates color format length to kill array length mutants', function () {
+test('it strictly validates color format length to kill array length mutants', function (): void {
     // Length 2
     $this->artisan('qr:generate', ['data' => 'test', '--color' => '255,0'])
         ->assertFailed()
@@ -126,14 +126,14 @@ test('it strictly validates color format length to kill array length mutants', f
         ->expectsOutputToContain('Invalid format. Please use RGB or RGBA comma-separated values');
 });
 
-test('it strictly validates numeric color constraints to kill string cast mutants', function () {
+test('it strictly validates numeric color constraints to kill string cast mutants', function (): void {
     // Non numeric
     $this->artisan('qr:generate', ['data' => 'test', '--color' => '255,A,0'])
         ->assertFailed()
         ->expectsOutputToContain('All color values must be numeric.');
 });
 
-test('it enforces strict RGB boundary checks to kill integer boundary mutants', function () {
+test('it enforces strict RGB boundary checks to kill integer boundary mutants', function (): void {
     // Less than 0
     $this->artisan('qr:generate', ['data' => 'test', '--color' => '-1,0,0'])
         ->assertFailed()
@@ -145,7 +145,7 @@ test('it enforces strict RGB boundary checks to kill integer boundary mutants', 
         ->expectsOutputToContain('RGB values must be between 0 and 255.');
 });
 
-test('it enforces strict Alpha boundary checks to kill integer boundary mutants', function () {
+test('it enforces strict Alpha boundary checks to kill integer boundary mutants', function (): void {
     // Less than 0
     $this->artisan('qr:generate', ['data' => 'test', '--color' => '0,0,0,-1'])
         ->assertFailed()
@@ -157,7 +157,7 @@ test('it enforces strict Alpha boundary checks to kill integer boundary mutants'
         ->expectsOutputToContain('Alpha value must be between 0 and 100.');
 });
 
-test('it gracefully catches Generator exceptions and returns failure', function () {
+test('it gracefully catches Generator exceptions and returns failure', function (): void {
     $crashingGenerator = new class
     {
         public function __call(string $name, array $arguments): self
@@ -165,7 +165,7 @@ test('it gracefully catches Generator exceptions and returns failure', function 
             return $this;
         }
 
-        public function generate(string $data, ?string $output = null): string
+        public function generate(): string
         {
             throw new Exception('Simulated crash');
         }
@@ -188,7 +188,7 @@ test('it gracefully catches Generator exceptions and returns failure', function 
 //     expect($this->fakeGenerator->calls['size'][0])->toBe(500);
 // });
 
-test('it successfully normalizes lowercase error correction levels to kill strtoupper mutants', function () {
+test('it successfully normalizes lowercase error correction levels to kill strtoupper mutants', function (): void {
     $this->artisan('qr:generate', [
         'data' => 'test',
         '--errorCorrection' => 'h', // Lowercase 'h' forces strtoupper to execute
@@ -197,7 +197,7 @@ test('it successfully normalizes lowercase error correction levels to kill strto
     expect($this->fakeGenerator->calls['errorCorrection'][0])->toBe(ErrorCorrectionLevel::H);
 });
 
-test('it validates exact integer boundaries for size and margin to kill increment mutants', function () {
+test('it validates exact integer boundaries for size and margin to kill increment mutants', function (): void {
     // 1 is the absolute minimum for size (> 0)
     // 0 is the absolute minimum for margin (>= 0)
     $this->artisan('qr:generate', [
@@ -210,7 +210,7 @@ test('it validates exact integer boundaries for size and margin to kill incremen
     expect($this->fakeGenerator->calls['margin'][0])->toBe(0);
 });
 
-test('it strictly rejects floating point sizes and margins to kill integer casting mutants', function () {
+test('it strictly rejects floating point sizes and margins to kill integer casting mutants', function (): void {
     $this->artisan('qr:generate', [
         'data' => 'test',
         '--size' => '1.5', // Without filter_var, (int) '1.5' > 0 evaluates to true and bypasses validation!
@@ -241,7 +241,7 @@ test('it strictly rejects floating point sizes and margins to kill integer casti
 //     ['--errorCorrection', 'H'],
 // ]);
 
-test('it strictly validates the blue channel boundary to kill index mutants', function () {
+test('it strictly validates the blue channel boundary to kill index mutants', function (): void {
     // Kills the `$index < 3` to `< 2` mutant!
     // If the loop stops checking at index 2, the blue channel (256) will slip through and crash the test.
     $this->artisan('qr:generate', ['data' => 'test', '--color' => '0,0,256'])
@@ -249,7 +249,7 @@ test('it strictly validates the blue channel boundary to kill index mutants', fu
         ->expectsOutputToContain('RGB values must be between 0 and 255.');
 });
 
-test('it enforces exact alpha channel boundaries to kill boolean boundary mutants', function () {
+test('it enforces exact alpha channel boundaries to kill boolean boundary mutants', function (): void {
     // Test exactly 0 (Kills < 1 and <= 0 mutants)
     $this->artisan('qr:generate', ['data' => 'test', '--color' => '0,0,0,0'])
         ->assertSuccessful();

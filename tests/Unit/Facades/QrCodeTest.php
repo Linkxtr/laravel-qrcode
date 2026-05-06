@@ -7,7 +7,7 @@ use Linkxtr\QrCode\Generator;
 
 covers(QrCode::class);
 
-test('the facade resolves the generator instance from the container', function () {
+test('the facade resolves the generator instance from the container', function (): void {
     $instance = QrCode::getFacadeRoot();
 
     expect($instance)->toBeInstanceOf(Generator::class);

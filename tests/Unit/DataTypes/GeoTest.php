@@ -6,7 +6,7 @@ use Linkxtr\QrCode\DataTypes\Geo;
 
 covers(Geo::class);
 
-test('it throws exception if arguments are missing', function () {
+test('it throws exception if arguments are missing', function (): void {
     $geo = new Geo;
 
     expect(fn () => $geo->create([]))
@@ -19,7 +19,7 @@ test('it throws exception if arguments are missing', function () {
         ->toThrow(InvalidArgumentException::class, 'Latitude and longitude are required.');
 });
 
-test('it throws exception if latitude or longitude are not numeric', function () {
+test('it throws exception if latitude or longitude are not numeric', function (): void {
     $geo = new Geo;
 
     expect(fn () => $geo->create(['invalid', -122.4194]))
@@ -29,7 +29,7 @@ test('it throws exception if latitude or longitude are not numeric', function ()
         ->toThrow(InvalidArgumentException::class, 'Latitude and longitude must be numeric.');
 });
 
-it('generates full geo string from standard floats', function (float $lat, float $lng, string $expected) {
+it('generates full geo string from standard floats', function (float $lat, float $lng, string $expected): void {
     $geo = new Geo;
 
     $geo->create([$lat, $lng]);
@@ -41,7 +41,7 @@ it('generates full geo string from standard floats', function (float $lat, float
     'north-east' => [90.0, 180.0, 'geo:90,180'],
 ]);
 
-test('it safely casts numeric strings to floats to kill cast mutants', function () {
+test('it safely casts numeric strings to floats to kill cast mutants', function (): void {
     $geo = new Geo;
 
     $geo->create(['37.7749', '-122.4194']);
@@ -49,7 +49,7 @@ test('it safely casts numeric strings to floats to kill cast mutants', function 
     expect((string) $geo)->toBe('geo:37.7749,-122.4194');
 });
 
-test('it accurately renders zero coordinates without stripping them', function () {
+test('it accurately renders zero coordinates without stripping them', function (): void {
     $geo = new Geo;
 
     $geo->create([0, 0]);
@@ -57,20 +57,20 @@ test('it accurately renders zero coordinates without stripping them', function (
     expect((string) $geo)->toBe('geo:0,0');
 });
 
-test('it throws exception if name is not a string', function () {
+test('it throws exception if name is not a string', function (): void {
     $geo = new Geo;
     expect(fn () => $geo->create([37.7749, -122.4194, 12345]))
         ->toThrow(InvalidArgumentException::class, 'Geo name must be a string.');
 });
 
-test('it intercepts and ignores empty string names', function () {
+test('it intercepts and ignores empty string names', function (): void {
     $geo = new Geo;
     $geo->create([37.7749, -122.4194, '']);
 
     expect((string) $geo)->toBe('geo:37.7749,-122.4194');
 });
 
-test('it appends optional name and strictly encodes spaces', function () {
+test('it appends optional name and strictly encodes spaces', function (): void {
     $geo = new Geo;
     $geo->create([37.7749, -122.4194, 'Golden Gate Bridge']);
 
@@ -78,7 +78,7 @@ test('it appends optional name and strictly encodes spaces', function () {
         ->and((string) $geo)->not->toContain('+');
 });
 
-test('it throws an exception for out-of-bounds latitude and longitude', function () {
+test('it throws an exception for out-of-bounds latitude and longitude', function (): void {
     $geo = new Geo;
 
     expect(fn () => $geo->create([-90.000001, 0]))
@@ -94,10 +94,11 @@ test('it throws an exception for out-of-bounds latitude and longitude', function
         ->toThrow(InvalidArgumentException::class, 'Longitude must be between -180 and 180.');
 });
 
-test('it clears the name if null is passed as the third argument', function () {
+test('it clears the name if null is passed as the third argument', function (): void {
     $geo = new Geo;
 
     $geo->create([10.0, 20.0, 'Initial Name']);
+
     expect((string) $geo)->toContain('Initial%20Name');
 
     $geo->create([15.0, 25.0, null]);
@@ -106,7 +107,7 @@ test('it clears the name if null is passed as the third argument', function () {
         ->and((string) $geo)->toBe('geo:15,25');
 });
 
-test('it throws a required exception when null is passed as latitude or longitude', function () {
+test('it throws a required exception when null is passed as latitude or longitude', function (): void {
     $geo = new Geo;
 
     expect(fn () => $geo->create([null, -122.4194]))

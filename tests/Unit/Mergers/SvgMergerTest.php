@@ -8,7 +8,7 @@ covers(SvgMerger::class);
 
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 
-test('it successfully merges a raster image into an svg', function () use ($tinyPng) {
+test('it successfully merges a raster image into an svg', function () use ($tinyPng): void {
     $svg = '<svg width="100px" height="100px" viewBox="0 0 100 100"></svg>';
 
     $merger = new SvgMerger($svg, $tinyPng, 0.2);
@@ -20,7 +20,7 @@ test('it successfully merges a raster image into an svg', function () use ($tiny
         ->and(strpos($result, '<image'))->toBeLessThan(strpos($result, '</svg>'));
 });
 
-test('it calculates correct image coordinates and sizes', function () use ($tinyPng) {
+test('it calculates correct image coordinates and sizes', function () use ($tinyPng): void {
     $svg = '<svg width="100" height="100"></svg>';
 
     $merger = new SvgMerger($svg, $tinyPng, 0.2);
@@ -32,46 +32,46 @@ test('it calculates correct image coordinates and sizes', function () use ($tiny
         ->and($result)->toContain('height="20"');
 });
 
-test('it throws exception for invalid percentages', function () use ($tinyPng) {
+test('it throws exception for invalid percentages', function () use ($tinyPng): void {
     $svg = '<svg width="100" height="100"></svg>';
 
-    expect(fn () => (new SvgMerger($svg, $tinyPng, 0))->merge())
+    expect(fn (): string => (new SvgMerger($svg, $tinyPng, 0))->merge())
         ->toThrow(InvalidArgumentException::class, '$percentage must be between 0 and 1');
 
-    expect(fn () => (new SvgMerger($svg, $tinyPng, 1))->merge())
+    expect(fn (): string => (new SvgMerger($svg, $tinyPng, 1))->merge())
         ->toThrow(InvalidArgumentException::class, '$percentage must be between 0 and 1');
 });
 
-test('it throws exception if svg is missing dimensions', function () use ($tinyPng) {
+test('it throws exception if svg is missing dimensions', function () use ($tinyPng): void {
     $svg = '<svg viewBox="0 0 100 100"></svg>';
 
-    expect(fn () => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
+    expect(fn (): string => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
         ->toThrow(InvalidArgumentException::class, 'Could not determine SVG dimensions.');
 
     $svg = '<svg height="100"></svg>';
-    expect(fn () => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
+    expect(fn (): string => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
         ->toThrow(InvalidArgumentException::class, 'Could not determine SVG dimensions.');
 
     $svg = '<svg width="100"></svg>';
-    expect(fn () => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
+    expect(fn (): string => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
         ->toThrow(InvalidArgumentException::class, 'Could not determine SVG dimensions.');
 });
 
-test('it throws exception for invalid image data', function () {
+test('it throws exception for invalid image data', function (): void {
     $svg = '<svg width="100" height="100"></svg>';
 
-    expect(fn () => (new SvgMerger($svg, 'not-an-image', 0.2))->merge())
+    expect(fn (): string => (new SvgMerger($svg, 'not-an-image', 0.2))->merge())
         ->toThrow(InvalidArgumentException::class, 'Invalid image data provided for merge.');
 });
 
-test('it throws exception if svg is missing closing tag', function () use ($tinyPng) {
+test('it throws exception if svg is missing closing tag', function () use ($tinyPng): void {
     $svg = '<svg width="100" height="100">';
 
-    expect(fn () => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
+    expect(fn (): string => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
         ->toThrow(InvalidArgumentException::class, 'Invalid SVG content: closing tag not found.');
 });
 
-test('it strictly truncates float dimensions before calculating percentages', function () use ($tinyPng) {
+test('it strictly truncates float dimensions before calculating percentages', function () use ($tinyPng): void {
     $svg = '<svg width="11.9" height="22.9"></svg>';
 
     $merger = new SvgMerger($svg, $tinyPng, 0.9);
@@ -83,7 +83,7 @@ test('it strictly truncates float dimensions before calculating percentages', fu
         ->and($result)->toContain('height="9"');
 });
 
-test('it accurately calculates ratio for non-square images', function () {
+test('it accurately calculates ratio for non-square images', function (): void {
     $rectPng = file_get_contents(__DIR__.'/../../Support/Fixtures/images/300X200.png');
 
     $svg = '<svg width="100" height="100"></svg>';
@@ -95,7 +95,7 @@ test('it accurately calculates ratio for non-square images', function () {
         ->and($result)->toContain('height="13"');
 });
 
-test('it strictly restrains tall images to the percentage limit on the Y-axis to protect error correction', function () {
+test('it strictly restrains tall images to the percentage limit on the Y-axis to protect error correction', function (): void {
     $tallPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEElEQVQImWNgYGD4z8DAwAABiwEAqD4w+wAAAABJRU5ErkJggg==');
 
     $svg = '<svg width="100" height="100"></svg>';
@@ -108,23 +108,23 @@ test('it strictly restrains tall images to the percentage limit on the Y-axis to
         ->and($result)->toContain('y="40"');
 });
 
-test('it strictly validates image dimensions to prevent division by zero errors', function () {
+test('it strictly validates image dimensions to prevent division by zero errors', function (): void {
     $svg = '<svg width="100" height="100"></svg>';
 
     $zeroDimensionGif = hex2bin('4749463839610000000000000021f90401000000002c00000000000000000000');
 
-    expect(fn () => (new SvgMerger($svg, $zeroDimensionGif, 0.2))->merge())
+    expect(fn (): string => (new SvgMerger($svg, $zeroDimensionGif, 0.2))->merge())
         ->toThrow(InvalidArgumentException::class, 'Invalid image dimensions for merge.');
 });
 
-it('throws an exception when the merge image has zero width or zero height', function (int $width, int $height) {
+it('throws an exception when the merge image has zero width or zero height', function (int $width, int $height): void {
     $svgContent = '<svg width="100px" height="100px"></svg>';
 
     $dummyGif = 'GIF89a'.pack('v', $width).pack('v', $height)."\x00\x00\x00";
 
     $merger = new SvgMerger($svgContent, $dummyGif, 0.5);
 
-    expect(fn () => $merger->merge())
+    expect(fn (): string => $merger->merge())
         ->toThrow(InvalidArgumentException::class, 'Invalid image dimensions for merge.');
 })->with([
     'zero width, valid height' => [0, 10],

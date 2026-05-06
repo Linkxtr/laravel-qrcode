@@ -22,7 +22,7 @@ covers([
     EnumHelper::class,
 ]);
 
-test('the enum helper trait strictly extracts all scalar string values to kill array_map mutants', function () {
+test('the enum helper trait strictly extracts all scalar string values to kill array_map mutants', function (): void {
     expect(ColorModel::toArray())->toBe(['rgb', 'cmyk', 'gray']);
     expect(Format::toArray())->toBe(['png', 'svg', 'eps', 'webp']);
     expect(Style::toArray())->toBe(['square', 'dot', 'round']);
@@ -31,14 +31,14 @@ test('the enum helper trait strictly extracts all scalar string values to kill a
     expect(GradientType::toArray())->toBe(['vertical', 'horizontal', 'diagonal', 'inverse_diagonal', 'radial']);
 });
 
-test('error correction level maps perfectly to the underlying bacon enum to kill match arm mutants', function () {
+test('error correction level maps perfectly to the underlying bacon enum to kill match arm mutants', function (): void {
     expect(ErrorCorrectionLevel::L->toBaconErrorCorrectionLevel())->toBe(BaconErrorCorrectionLevel::L());
     expect(ErrorCorrectionLevel::M->toBaconErrorCorrectionLevel())->toBe(BaconErrorCorrectionLevel::M());
     expect(ErrorCorrectionLevel::Q->toBaconErrorCorrectionLevel())->toBe(BaconErrorCorrectionLevel::Q());
     expect(ErrorCorrectionLevel::H->toBaconErrorCorrectionLevel())->toBe(BaconErrorCorrectionLevel::H());
 });
 
-test('gradient type maps perfectly to the underlying bacon enum to kill match arm mutants', function () {
+test('gradient type maps perfectly to the underlying bacon enum to kill match arm mutants', function (): void {
     expect(GradientType::VERTICAL->toBaconGradientType())->toBe(BaconGradientType::VERTICAL());
     expect(GradientType::HORIZONTAL->toBaconGradientType())->toBe(BaconGradientType::HORIZONTAL());
     expect(GradientType::DIAGONAL->toBaconGradientType())->toBe(BaconGradientType::DIAGONAL());

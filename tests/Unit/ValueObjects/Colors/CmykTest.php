@@ -10,7 +10,7 @@ use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 covers(Cmyk::class);
 
-test('it creates valid cmyk color and respects default alpha', function () {
+test('it creates valid cmyk color and respects default alpha', function (): void {
     $color = new Cmyk(0, 25, 50, 100);
     expect($color->cyan)->toBe(0)
         ->and($color->magenta)->toBe(25)
@@ -22,23 +22,23 @@ test('it creates valid cmyk color and respects default alpha', function () {
     expect($colorWithAlpha->getAlpha())->toBe(50);
 });
 
-test('it throws exception on boundary violations for cmyk channels', function () {
-    expect(fn () => new Cmyk(-1, 0, 0, 0))->toThrow(InvalidArgumentException::class, 'Cyan must be between 0 and 100.')
-        ->and(fn () => new Cmyk(101, 0, 0, 0))->toThrow(InvalidArgumentException::class, 'Cyan must be between 0 and 100.')
-        ->and(fn () => new Cmyk(0, -1, 0, 0))->toThrow(InvalidArgumentException::class, 'Magenta must be between 0 and 100.')
-        ->and(fn () => new Cmyk(0, 101, 0, 0))->toThrow(InvalidArgumentException::class, 'Magenta must be between 0 and 100.')
-        ->and(fn () => new Cmyk(0, 0, -1, 0))->toThrow(InvalidArgumentException::class, 'Yellow must be between 0 and 100.')
-        ->and(fn () => new Cmyk(0, 0, 101, 0))->toThrow(InvalidArgumentException::class, 'Yellow must be between 0 and 100.')
-        ->and(fn () => new Cmyk(0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Black must be between 0 and 100.')
-        ->and(fn () => new Cmyk(0, 0, 0, 101))->toThrow(InvalidArgumentException::class, 'Black must be between 0 and 100.');
+test('it throws exception on boundary violations for cmyk channels', function (): void {
+    expect(fn (): Cmyk => new Cmyk(-1, 0, 0, 0))->toThrow(InvalidArgumentException::class, 'Cyan must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(101, 0, 0, 0))->toThrow(InvalidArgumentException::class, 'Cyan must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, -1, 0, 0))->toThrow(InvalidArgumentException::class, 'Magenta must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 101, 0, 0))->toThrow(InvalidArgumentException::class, 'Magenta must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 0, -1, 0))->toThrow(InvalidArgumentException::class, 'Yellow must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 0, 101, 0))->toThrow(InvalidArgumentException::class, 'Yellow must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Black must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 0, 0, 101))->toThrow(InvalidArgumentException::class, 'Black must be between 0 and 100.');
 });
 
-test('it throws exception on boundary violations for alpha', function () {
-    expect(fn () => new Cmyk(0, 0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.')
-        ->and(fn () => new Cmyk(0, 0, 0, 0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
+test('it throws exception on boundary violations for alpha', function (): void {
+    expect(fn (): Cmyk => new Cmyk(0, 0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 0, 0, 0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
 });
 
-test('it converts to bacon cmyk color', function () {
+test('it converts to bacon cmyk color', function (): void {
     $color = new Cmyk(10, 20, 30, 40);
     $baconColor = $color->toBaconColor();
 
@@ -56,18 +56,18 @@ test('it converts to bacon cmyk color', function () {
         ->and($baconColorWithAlpha->getBaseColor())->toBeInstanceOf(BaconCmyk::class);
 });
 
-test('toCmyk returns itself', function () {
+test('toCmyk returns itself', function (): void {
     $color = new Cmyk(0, 0, 0, 0);
     expect($color->toCmyk())->toBe($color);
 });
 
-test('it converts to rgb accurately', function () {
-    $white = (new Cmyk(0, 0, 0, 0, 75))->toRgb();
-    expect($white)->toBeInstanceOf(Rgb::class)
-        ->and($white->red)->toBe(255)
-        ->and($white->green)->toBe(255)
-        ->and($white->blue)->toBe(255)
-        ->and($white->getAlpha())->toBe(75);
+test('it converts to rgb accurately', function (): void {
+    $rgb = (new Cmyk(0, 0, 0, 0, 75))->toRgb();
+    expect($rgb)->toBeInstanceOf(Rgb::class)
+        ->and($rgb->red)->toBe(255)
+        ->and($rgb->green)->toBe(255)
+        ->and($rgb->blue)->toBe(255)
+        ->and($rgb->getAlpha())->toBe(75);
 
     $black = (new Cmyk(0, 0, 0, 100))->toRgb();
     expect($black->red)->toBe(0)
@@ -80,11 +80,11 @@ test('it converts to rgb accurately', function () {
         ->and($cyan->blue)->toBe(255);
 });
 
-test('it converts to gray accurately using luminance', function () {
-    $white = (new Cmyk(0, 0, 0, 0, 0))->toGray();
-    expect($white)->toBeInstanceOf(Gray::class)
-        ->and($white->gray)->toBe(100)
-        ->and($white->getAlpha())->toBe(0);
+test('it converts to gray accurately using luminance', function (): void {
+    $gray = (new Cmyk(0, 0, 0, 0, 0))->toGray();
+    expect($gray)->toBeInstanceOf(Gray::class)
+        ->and($gray->gray)->toBe(100)
+        ->and($gray->getAlpha())->toBe(0);
 
     $black = (new Cmyk(0, 0, 0, 100))->toGray();
     expect($black->gray)->toBe(0);
@@ -92,18 +92,18 @@ test('it converts to gray accurately using luminance', function () {
     $mixed = (new Cmyk(50, 50, 50, 0))->toGray();
     expect($mixed->gray)->toBe(50);
 });
-test('it validates exactly 99 alpha boundary for bacon color to kill DecrementInteger', function () {
+test('it validates exactly 99 alpha boundary for bacon color to kill DecrementInteger', function (): void {
     $color = new Cmyk(0, 0, 0, 0, 99);
     $baconColor = $color->toBaconColor();
 
     expect($baconColor)->toBeInstanceOf(Alpha::class)
         ->and($baconColor->getAlpha())->toBe(99);
 });
-test('it securely calculates rgb from cmyk to kill denominator, arithmetic, and rounding mutations', function () {
-    $midTone = (new Cmyk(50, 50, 50, 0))->toRgb();
-    expect($midTone->red)->toBe(128)
-        ->and($midTone->green)->toBe(128)
-        ->and($midTone->blue)->toBe(128);
+test('it securely calculates rgb from cmyk to kill denominator, arithmetic, and rounding mutations', function (): void {
+    $rgb = (new Cmyk(50, 50, 50, 0))->toRgb();
+    expect($rgb->red)->toBe(128)
+        ->and($rgb->green)->toBe(128)
+        ->and($rgb->blue)->toBe(128);
 
     $floorKiller = (new Cmyk(20, 20, 20, 10))->toRgb();
     expect($floorKiller->red)->toBe(184)
@@ -115,9 +115,9 @@ test('it securely calculates rgb from cmyk to kill denominator, arithmetic, and 
         ->and($ceilKiller->green)->toBe(99)
         ->and($ceilKiller->blue)->toBe(99);
 });
-test('it securely calculates gray to kill denominator and rounding mutations', function () {
-    $cyan99Killer = (new Cmyk(51, 100, 100, 0))->toGray();
-    expect($cyan99Killer->gray)->toBe(15);
+test('it securely calculates gray to kill denominator and rounding mutations', function (): void {
+    $gray = (new Cmyk(51, 100, 100, 0))->toGray();
+    expect($gray->gray)->toBe(15);
 
     $cyan101Killer = (new Cmyk(52, 100, 100, 0))->toGray();
     expect($cyan101Killer->gray)->toBe(14);

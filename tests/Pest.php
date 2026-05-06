@@ -27,9 +27,7 @@ uses(TestCase::class)->in('Unit', 'Scannability', 'Feature', 'Scalability');
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
+expect()->extend('toBeOne', fn () => $this->toBe(1));
 
 /*
 |--------------------------------------------------------------------------
@@ -61,10 +59,10 @@ function read_qr_code(string $imageContent): string
         $imagick->readImageBlob($imageContent);
         $imagick->setImageFormat('png');
         $imageContent = $imagick->getImageBlob();
-    } catch (Throwable $e) {
+    } catch (Throwable $throwable) {
         $format = $isSvg ? 'SVG' : 'EPS';
 
-        return "ERROR: Could not rasterize {$format}. ".$e->getMessage();
+        return sprintf('ERROR: Could not rasterize %s. ', $format).$throwable->getMessage();
     }
 
     return (string) (new QRCodeDecoder)->readFromBlob($imageContent);

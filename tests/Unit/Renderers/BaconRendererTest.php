@@ -33,13 +33,13 @@ covers(BaconRenderer::class);
 
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 
-afterEach(function () {
+afterEach(function (): void {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = true;
     $mockGdLoaded = true;
 });
 
-it('throws exception if required extensions are not loaded', function () {
+it('throws exception if required extensions are not loaded', function (): void {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = false;
     $mockGdLoaded = false;
@@ -49,20 +49,20 @@ it('throws exception if required extensions are not loaded', function () {
 
     $config->setFormat(Format::SVG);
 
-    expect(fn () => $renderer->render('test'))->not->toThrow(RuntimeException::class);
+    expect(fn (): HtmlString => $renderer->render('test'))->not->toThrow(RuntimeException::class);
 
     $config->setFormat(Format::EPS);
 
-    expect(fn () => $renderer->render('test'))->not->toThrow(RuntimeException::class);
+    expect(fn (): HtmlString => $renderer->render('test'))->not->toThrow(RuntimeException::class);
 
     $config->setFormat(Format::PNG);
-    expect(fn () => $renderer->render('test'))->toThrow(RuntimeException::class, 'The imagick or gd extension is required to generate raster QR codes');
+    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(RuntimeException::class, 'The imagick or gd extension is required to generate raster QR codes');
 
     $config->setFormat(Format::WEBP);
-    expect(fn () => $renderer->render('test'))->toThrow(RuntimeException::class, 'The imagick or gd extension is required to generate raster QR codes');
+    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(RuntimeException::class, 'The imagick or gd extension is required to generate raster QR codes');
 });
 
-it('throws an exception if trying to generate a non-PNG raster using only GD', function () {
+it('throws an exception if trying to generate a non-PNG raster using only GD', function (): void {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = false;
     $mockGdLoaded = true;
@@ -71,22 +71,23 @@ it('throws an exception if trying to generate a non-PNG raster using only GD', f
     $renderer = new BaconRenderer($config);
     $config->setFormat(Format::WEBP);
 
-    expect(fn () => $renderer->render('test'))
+    expect(fn (): HtmlString => $renderer->render('test'))
         ->toThrow(RuntimeException::class, 'Format "webp" requires the Imagick extension.');
 });
 
-it('falls back to GDLibRenderer for PNG if imagick is missing', function () {
+it('falls back to GDLibRenderer for PNG if imagick is missing', function (): void {
     global $mockImagickLoaded;
     $mockImagickLoaded = false;
 
     $config = new Config;
     $config->setFormat(Format::PNG);
+
     $renderer = new BaconRenderer($config);
 
     expect(invade($renderer)->getRenderer())->toBeInstanceOf(GDLibRenderer::class);
 });
 
-it('successfully generates SVG and EPS without requiring any image extensions', function () {
+it('successfully generates SVG and EPS without requiring any image extensions', function (): void {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = false;
     $mockGdLoaded = false;
@@ -96,8 +97,8 @@ it('successfully generates SVG and EPS without requiring any image extensions', 
 
     // SVG should succeed
     $config->setFormat(Format::SVG);
-    $svgQr = $renderer->render('test');
-    expect((string) $svgQr)->toContain('<svg');
+    $htmlString = $renderer->render('test');
+    expect((string) $htmlString)->toContain('<svg');
 
     // EPS should succeed
     $config->setFormat(Format::EPS);
@@ -105,7 +106,7 @@ it('successfully generates SVG and EPS without requiring any image extensions', 
     expect((string) $epsQr)->toContain('%!PS-Adobe');
 });
 
-it('resolves the correct module styles', function () {
+it('resolves the correct module styles', function (): void {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
@@ -119,7 +120,7 @@ it('resolves the correct module styles', function () {
     expect(invade($renderer)->getModule())->toBeInstanceOf(SquareModule::class);
 });
 
-it('builds the fill correctly with and without gradient', function () {
+it('builds the fill correctly with and without gradient', function (): void {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
@@ -129,7 +130,7 @@ it('builds the fill correctly with and without gradient', function () {
     expect(invade($renderer)->getFill()->hasGradientFill())->toBeTrue();
 });
 
-it('builds the correct eye fills', function () {
+it('builds the correct eye fills', function (): void {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
@@ -156,7 +157,7 @@ it('builds the correct eye fills', function () {
         ->and($fill->getBottomLeftEyeFill()->getExternalColor()->getBlue())->toBe(90);
 });
 
-it('builds the correct color models', function () {
+it('builds the correct color models', function (): void {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
@@ -179,7 +180,7 @@ it('builds the correct color models', function () {
     expect(invade($renderer)->buildColor($config->getColorValue()))->toBeInstanceOf(Gray::class);
 });
 
-it('resolves single eye styles', function () {
+it('resolves single eye styles', function (): void {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
@@ -198,31 +199,34 @@ it('resolves single eye styles', function () {
     expect(invade($renderer)->getEye())->toBeInstanceOf(CompositeEye::class);
 });
 
-it('renders an html string without merged image', function () {
+it('renders an html string without merged image', function (): void {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
-    $result = $renderer->render('test payload');
+    $htmlString = $renderer->render('test payload');
 
-    expect($result)->toBeInstanceOf(HtmlString::class)
-        ->and($result->toHtml())->toContain('<svg')
-        ->and($result->toHtml())->not->toContain('href="data:image/png;base64');
+    expect($htmlString)->toBeInstanceOf(HtmlString::class)
+        ->and($htmlString->toHtml())->toContain('<svg')
+        ->and($htmlString->toHtml())->not->toContain('href="data:image/png;base64');
 });
 
-it('calls the correct merger based on format', function () use ($tinyPng) {
+it('calls the correct merger based on format', function () use ($tinyPng): void {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
     $config->setFormat(Format::SVG);
     $config->setupMergeString($tinyPng);
+
     expect(invade($renderer)->getMerger('test'))->toBeInstanceOf(SvgMerger::class);
 
     $config->setFormat(Format::EPS);
     $config->setupMergeString($tinyPng);
+
     expect(invade($renderer)->getMerger('test'))->toBeInstanceOf(EpsMerger::class);
 
     $config->setFormat(Format::PNG);
     $config->setupMergeString($tinyPng);
+
     expect(invade($renderer)->getMerger($tinyPng))->toBeInstanceOf(ImagickMerger::class);
 
     global $mockImagickLoaded;
@@ -230,32 +234,34 @@ it('calls the correct merger based on format', function () use ($tinyPng) {
     expect(invade($renderer)->getMerger($tinyPng))->toBeInstanceOf(RasterMerger::class);
 });
 
-it('throws an exception when trying to merge images into EPS format without gd extension', function () use ($tinyPng) {
+it('throws an exception when trying to merge images into EPS format without gd extension', function () use ($tinyPng): void {
     global $mockGdLoaded;
     $mockGdLoaded = false;
 
     $config = new Config;
     $config->setFormat(Format::EPS);
     $config->setupMergeString($tinyPng);
+
     $renderer = new BaconRenderer($config);
 
-    expect(fn () => $renderer->render('test'))->toThrow(RuntimeException::class, 'The "gd" extension is required to merge images into EPS format.');
+    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(RuntimeException::class, 'The "gd" extension is required to merge images into EPS format.');
 });
 
-it('renders an html string with merged image', function () use ($tinyPng) {
+it('renders an html string with merged image', function () use ($tinyPng): void {
     $config = new Config;
     $config->setFormat(Format::SVG);
-    $config->setupMergeString($tinyPng, 0.2);
+    $config->setupMergeString($tinyPng);
+
     $renderer = new BaconRenderer($config);
 
-    $result = $renderer->render('test payload');
+    $htmlString = $renderer->render('test payload');
 
-    expect($result)->toBeInstanceOf(HtmlString::class)
-        ->and($result->toHtml())->toContain('<svg')
-        ->and($result->toHtml())->toContain('href="data:image/png;base64');
+    expect($htmlString)->toBeInstanceOf(HtmlString::class)
+        ->and($htmlString->toHtml())->toContain('<svg')
+        ->and($htmlString->toHtml())->toContain('href="data:image/png;base64');
 });
 
-it('throws a RuntimeException when using GD library with a non-square style', function () {
+it('throws a RuntimeException when using GD library with a non-square style', function (): void {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = false;
     $mockGdLoaded = true;
@@ -267,14 +273,14 @@ it('throws a RuntimeException when using GD library with a non-square style', fu
 
     $renderer = new BaconRenderer($config);
 
-    expect(fn () => $renderer->render('https://linkxtr.com'))
+    expect(fn (): HtmlString => $renderer->render('https://linkxtr.com'))
         ->toThrow(
             RuntimeException::class,
             'The GD library does not support non-square module styles (e.g., DOT, ROUND). Please enable the Imagick extension or use the SQUARE style.'
         );
 });
 
-it('throws a RuntimeException when using GD library with a gradient', function () {
+it('throws a RuntimeException when using GD library with a gradient', function (): void {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = false;
     $mockGdLoaded = true;
@@ -286,7 +292,7 @@ it('throws a RuntimeException when using GD library with a gradient', function (
 
     $renderer = new BaconRenderer($config);
 
-    expect(fn () => $renderer->render('https://linkxtr.com'))->toThrow(
+    expect(fn (): HtmlString => $renderer->render('https://linkxtr.com'))->toThrow(
         RuntimeException::class,
         'The GD library does not support gradients. Please enable the Imagick extension or use solid colors.'
     );

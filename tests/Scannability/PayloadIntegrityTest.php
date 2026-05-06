@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Linkxtr\QrCode\Facades\QrCode;
 
-beforeEach(function () {
+beforeEach(function (): void {
     QrCode::setFacadeApplication(app());
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = extension_loaded('imagick');
@@ -32,76 +32,76 @@ if (extension_loaded('imagick') && extension_loaded('gd')) {
 
 dataset('drivers', $drivers);
 
-function setDriver(bool $imagick, bool $gd)
+function setDriver(bool $imagick, bool $gd): void
 {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = $imagick;
     $mockGdLoaded = $gd;
 }
 
-it('can scan a generated QR code with simple text', function ($imagick, $gd) {
+it('can scan a generated QR code with simple text', function (bool $imagick, bool $gd): void {
     setDriver($imagick, $gd);
-    $qrCode = QrCode::format('png')->generate('Hello World');
+    $htmlString = QrCode::format('png')->generate('Hello World');
 
-    expect(read_qr_code((string) $qrCode))->toBe('Hello World');
+    expect(read_qr_code((string) $htmlString))->toBe('Hello World');
 })->with('drivers');
 
-it('can scan a generated QR code with url', function ($imagick, $gd) {
+it('can scan a generated QR code with url', function (bool $imagick, bool $gd): void {
     setDriver($imagick, $gd);
-    $qrCode = QrCode::format('png')->generate('https://example.com/path?query=param&another=value');
+    $htmlString = QrCode::format('png')->generate('https://example.com/path?query=param&another=value');
 
-    expect(read_qr_code((string) $qrCode))->toBe('https://example.com/path?query=param&another=value');
+    expect(read_qr_code((string) $htmlString))->toBe('https://example.com/path?query=param&another=value');
 })->with('drivers');
 
-it('can scan a generated QR code with email', function ($imagick, $gd) {
+it('can scan a generated QR code with email', function (bool $imagick, bool $gd): void {
     setDriver($imagick, $gd);
-    $qrCode = QrCode::format('png')->Email('mail@example.tld', 'Subject', 'Body');
+    $htmlString = QrCode::format('png')->Email('mail@example.tld', 'Subject', 'Body');
 
-    expect(read_qr_code((string) $qrCode))->toBe('mailto:mail@example.tld?subject=Subject&body=Body');
+    expect(read_qr_code((string) $htmlString))->toBe('mailto:mail@example.tld?subject=Subject&body=Body');
 })->with('drivers');
 
-it('can scan a generated QR code with complex WiFi payload', function ($imagick, $gd) {
+it('can scan a generated QR code with complex WiFi payload', function (bool $imagick, bool $gd): void {
     setDriver($imagick, $gd);
-    $qrCode = QrCode::format('png')->WiFi([
+    $htmlString = QrCode::format('png')->WiFi([
         'encryption' => 'WPA',
         'ssid' => 'MyNetwork',
         'password' => 'SuperSecret',
         'hidden' => 'true',
     ]);
 
-    expect(read_qr_code((string) $qrCode))->toBe('WIFI:S:MyNetwork;T:WPA;P:SuperSecret;H:true;;');
+    expect(read_qr_code((string) $htmlString))->toBe('WIFI:S:MyNetwork;T:WPA;P:SuperSecret;H:true;;');
 })->with('drivers');
 
-it('can scan a generated png QR code with merged image', function ($imagick, $gd) {
+it('can scan a generated png QR code with merged image', function (bool $imagick, bool $gd): void {
     setDriver($imagick, $gd);
-    $qrCode = QrCode::format('png')->merge(__DIR__.'/../Support/Fixtures/images/linkxtr.png', .2, true)->generate('https://example.com/merged');
+    $htmlString = QrCode::format('png')->merge(__DIR__.'/../Support/Fixtures/images/linkxtr.png', .2)->generate('https://example.com/merged');
 
-    expect(read_qr_code((string) $qrCode))->toBe('https://example.com/merged');
+    expect(read_qr_code((string) $htmlString))->toBe('https://example.com/merged');
 })->with('drivers');
 
-it('can scan a generated svg QR code with merged image', function ($imagick, $gd) {
+it('can scan a generated svg QR code with merged image', function ($imagick, bool $gd): void {
     if (! $imagick) {
         $this->markTestSkipped('svg convert to png to scan requires imagick.');
     }
 
     setDriver($imagick, $gd);
-    $qrCode = QrCode::format('svg')->merge(__DIR__.'/../Support/Fixtures/images/linkxtr.png', .2, true)->generate('https://example.com/merged');
+    $htmlString = QrCode::format('svg')->merge(__DIR__.'/../Support/Fixtures/images/linkxtr.png', .2)->generate('https://example.com/merged');
 
-    expect(read_qr_code((string) $qrCode))->toBe('https://example.com/merged');
+    expect(read_qr_code((string) $htmlString))->toBe('https://example.com/merged');
 })->with('drivers');
 
-it('can scan a generated webp QR code with merged image', function ($imagick, $gd) {
+it('can scan a generated webp QR code with merged image', function ($imagick, bool $gd): void {
     if (! $imagick) {
         $this->markTestSkipped('webp merge requires imagick.');
     }
 
     setDriver($imagick, $gd);
-    $qrCode = QrCode::format('webp')->merge(__DIR__.'/../Support/Fixtures/images/linkxtr.png', .2, true)->generate('https://example.com/merged');
+    $htmlString = QrCode::format('webp')->merge(__DIR__.'/../Support/Fixtures/images/linkxtr.png', .2)->generate('https://example.com/merged');
 
-    expect(read_qr_code((string) $qrCode))->toBe('https://example.com/merged');
+    expect(read_qr_code((string) $htmlString))->toBe('https://example.com/merged');
 })->with('drivers');
 
-it('can scan a generated standard eps QR code', function ($imagick, $gd) {
+it('can scan a generated standard eps QR code', function ($imagick, bool $gd): void {
     if (! $imagick) {
         $this->markTestSkipped('eps convert to png to scan requires imagick.');
     }
@@ -114,7 +114,7 @@ it('can scan a generated standard eps QR code', function ($imagick, $gd) {
 
     setDriver($imagick, $gd);
 
-    $qrCode = QrCode::format('eps')->generate('https://example.com/eps');
+    $htmlString = QrCode::format('eps')->generate('https://example.com/eps');
 
-    expect(read_qr_code((string) $qrCode))->toBe('https://example.com/eps');
+    expect(read_qr_code((string) $htmlString))->toBe('https://example.com/eps');
 })->with('drivers');

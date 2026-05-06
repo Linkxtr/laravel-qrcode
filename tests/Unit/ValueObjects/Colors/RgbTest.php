@@ -10,7 +10,7 @@ use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 covers(Rgb::class);
 
-it('creates valid rgb color and respects default alpha', function () {
+it('creates valid rgb color and respects default alpha', function (): void {
     $color = new Rgb(0, 128, 255);
     expect($color->red)->toBe(0)
         ->and($color->green)->toBe(128)
@@ -21,23 +21,23 @@ it('creates valid rgb color and respects default alpha', function () {
     expect($colorWithAlpha->getAlpha())->toBe(50);
 });
 
-it('throws exception on boundary violations for rgb channels', function () {
-    expect(fn () => new Rgb(-1, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.')
-        ->and(fn () => new Rgb(256, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.')
-        ->and(fn () => new Rgb(0, -1, 0))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.')
-        ->and(fn () => new Rgb(0, 256, 0))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.')
-        ->and(fn () => new Rgb(0, 0, -1))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.')
-        ->and(fn () => new Rgb(0, 0, 256))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+it('throws exception on boundary violations for rgb channels', function (): void {
+    expect(fn (): Rgb => new Rgb(-1, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.')
+        ->and(fn (): Rgb => new Rgb(256, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.')
+        ->and(fn (): Rgb => new Rgb(0, -1, 0))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.')
+        ->and(fn (): Rgb => new Rgb(0, 256, 0))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.')
+        ->and(fn (): Rgb => new Rgb(0, 0, -1))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.')
+        ->and(fn (): Rgb => new Rgb(0, 0, 256))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
 });
 
-it('throws exception on boundary violations for alpha', function () {
-    expect(fn () => new Rgb(0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.')
-        ->and(fn () => new Rgb(0, 0, 0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
+it('throws exception on boundary violations for alpha', function (): void {
+    expect(fn (): Rgb => new Rgb(0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.')
+        ->and(fn (): Rgb => new Rgb(0, 0, 0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
 });
 
-it('converts from hex string properly', function () {
-    $color1 = Rgb::fromHex('#FF0000');
-    expect($color1->red)->toBe(255)->and($color1->green)->toBe(0)->and($color1->blue)->toBe(0)->and($color1->getAlpha())->toBe(100);
+it('converts from hex string properly', function (): void {
+    $rgb = Rgb::fromHex('#FF0000');
+    expect($rgb->red)->toBe(255)->and($rgb->green)->toBe(0)->and($rgb->blue)->toBe(0)->and($rgb->getAlpha())->toBe(100);
 
     $color2 = Rgb::fromHex('0F0', 50);
     expect($color2->red)->toBe(0)->and($color2->green)->toBe(255)->and($color2->blue)->toBe(0)->and($color2->getAlpha())->toBe(50);
@@ -52,11 +52,11 @@ it('converts from hex string properly', function () {
         ->and($color6->green)->toBe(43)
         ->and($color6->blue)->toBe(60);
 
-    expect(fn () => Rgb::fromHex('#FFFF'))->toThrow(InvalidArgumentException::class, 'Invalid hex color format. Must be 3 or 6 characters.')
-        ->and(fn () => Rgb::fromHex('ZZZZZZ'))->toThrow(InvalidArgumentException::class, 'Invalid hex color string provided.');
+    expect(fn (): Rgb => Rgb::fromHex('#FFFF'))->toThrow(InvalidArgumentException::class, 'Invalid hex color format. Must be 3 or 6 characters.')
+        ->and(fn (): Rgb => Rgb::fromHex('ZZZZZZ'))->toThrow(InvalidArgumentException::class, 'Invalid hex color string provided.');
 });
 
-it('converts to bacon rgb color', function () {
+it('converts to bacon rgb color', function (): void {
     $color = new Rgb(10, 20, 30);
     $baconColor = $color->toBaconColor();
 
@@ -76,12 +76,12 @@ it('converts to bacon rgb color', function () {
         ->and($baconColorWithAlpha->getBaseColor()->getBlue())->toBe(255);
 });
 
-test('toRgb returns itself', function () {
+test('toRgb returns itself', function (): void {
     $color = new Rgb(0, 0, 0);
     expect($color->toRgb())->toBe($color);
 });
 
-it('converts to cmyk accurately', function () {
+it('converts to cmyk accurately', function (): void {
     $black = (new Rgb(0, 0, 0, 50))->toCmyk();
     expect($black)->toBeInstanceOf(Cmyk::class)
         ->and($black->cyan)->toBe(0)
@@ -115,11 +115,11 @@ it('converts to cmyk accurately', function () {
         ->and($cmyk->black)->toBe(29);
 });
 
-it('converts to gray accurately using luminance', function () {
-    $white = (new Rgb(255, 255, 255, 75))->toGray();
-    expect($white)->toBeInstanceOf(Gray::class)
-        ->and($white->gray)->toBe(100)
-        ->and($white->getAlpha())->toBe(75);
+it('converts to gray accurately using luminance', function (): void {
+    $gray = (new Rgb(255, 255, 255, 75))->toGray();
+    expect($gray)->toBeInstanceOf(Gray::class)
+        ->and($gray->gray)->toBe(100)
+        ->and($gray->getAlpha())->toBe(75);
     $black = (new Rgb(0, 0, 0))->toGray();
     expect($black->gray)->toBe(0);
 
@@ -127,7 +127,7 @@ it('converts to gray accurately using luminance', function () {
     expect($mixed->gray)->toBe(55);
 });
 
-it('allows exact boundary values for alpha without throwing exceptions', function () {
+it('allows exact boundary values for alpha without throwing exceptions', function (): void {
     $colorMinAlpha = new Rgb(50, 50, 50, 0);
     expect($colorMinAlpha->getAlpha())->toBe(0);
 
@@ -138,15 +138,15 @@ it('allows exact boundary values for alpha without throwing exceptions', functio
     expect($color99->getAlpha())->toBe(99);
 });
 
-it('converts to gray accurately', function () {
-    $lighter = (new Rgb(200, 100, 50))->toGray();
-    expect($lighter->gray)->toBe(49);
+it('converts to gray accurately', function (): void {
+    $gray = (new Rgb(200, 100, 50))->toGray();
+    expect($gray->gray)->toBe(49);
 });
 
-it('strictly calculates cmyk accurately', function () {
-    $color1 = (new Rgb(100, 150, 50))->toCmyk();
-    expect($color1->cyan)->toBe(33)
-        ->and($color1->yellow)->toBe(67);
+it('strictly calculates cmyk accurately', function (): void {
+    $cmyk = (new Rgb(100, 150, 50))->toCmyk();
+    expect($cmyk->cyan)->toBe(33)
+        ->and($cmyk->yellow)->toBe(67);
 
     $color2 = (new Rgb(75, 130, 20))->toCmyk();
     expect($color2->cyan)->toBe(42)
@@ -155,7 +155,7 @@ it('strictly calculates cmyk accurately', function () {
         ->and($color2->black)->toBe(49);
 });
 
-it('kills denominator mutations in gray conversion', function () {
+it('kills denominator mutations in gray conversion', function (): void {
     $gray254Killer = (new Rgb(126, 126, 126))->toGray();
     expect($gray254Killer->gray)->toBe(49);
 
@@ -163,7 +163,7 @@ it('kills denominator mutations in gray conversion', function () {
     expect($gray256Killer->gray)->toBe(51);
 });
 
-it('converts to bacon color with alpha properly', function () {
+it('converts to bacon color with alpha properly', function (): void {
     $color = new Rgb(0, 0, 0, 99);
     $baconColor = $color->toBaconColor();
 
@@ -175,13 +175,13 @@ it('converts to bacon color with alpha properly', function () {
     expect($solidBacon)->toBeInstanceOf(BaconRgb::class);
 });
 
-it('accurately calculates cmyk', function () {
-    $color1 = (new Rgb(12, 175, 230))->toCmyk();
+it('accurately calculates cmyk', function (): void {
+    $cmyk = (new Rgb(12, 175, 230))->toCmyk();
 
-    expect($color1->cyan)->toBe(95)
-        ->and($color1->magenta)->toBe(24)
-        ->and($color1->yellow)->toBe(0)
-        ->and($color1->black)->toBe(10);
+    expect($cmyk->cyan)->toBe(95)
+        ->and($cmyk->magenta)->toBe(24)
+        ->and($cmyk->yellow)->toBe(0)
+        ->and($cmyk->black)->toBe(10);
 
     $color2 = (new Rgb(254, 254, 254))->toCmyk();
     expect($color2->cyan)->toBe(0)
@@ -190,56 +190,56 @@ it('accurately calculates cmyk', function () {
         ->and($color2->black)->toBe(0);
 });
 
-it('kills denominator mutations on red and green channels', function () {
-    $redKiller = (new Rgb(253, 0, 0))->toCmyk();
-    expect($redKiller->black)->toBe(1);
+it('kills denominator mutations on red and green channels', function (): void {
+    $cmyk = (new Rgb(253, 0, 0))->toCmyk();
+    expect($cmyk->black)->toBe(1);
     $greenKiller = (new Rgb(0, 254, 0))->toCmyk();
     expect($greenKiller->black)->toBe(0);
 });
 
-it('kills RoundToCeil mutations on magenta and yellow channels', function () {
-    $magentaKiller = (new Rgb(100, 158, 198))->toCmyk();
-    expect($magentaKiller->cyan)->toBe(49)
-        ->and($magentaKiller->magenta)->toBe(20);
+it('kills RoundToCeil mutations on magenta and yellow channels', function (): void {
+    $cmyk = (new Rgb(100, 158, 198))->toCmyk();
+    expect($cmyk->cyan)->toBe(49)
+        ->and($cmyk->magenta)->toBe(20);
 
     $yellowKiller = (new Rgb(100, 198, 158))->toCmyk();
     expect($yellowKiller->cyan)->toBe(49)
         ->and($yellowKiller->yellow)->toBe(20);
 });
 
-test('parse array of integers', function () {
-    $color = Rgb::parse([0, 128, 255]);
-    expect($color->red)->toBe(0)
-        ->and($color->green)->toBe(128)
-        ->and($color->blue)->toBe(255)
-        ->and($color->getAlpha())->toBe(100);
+test('parse array of integers', function (): void {
+    $rgb = Rgb::parse([0, 128, 255]);
+    expect($rgb->red)->toBe(0)
+        ->and($rgb->green)->toBe(128)
+        ->and($rgb->blue)->toBe(255)
+        ->and($rgb->getAlpha())->toBe(100);
 });
 
-test('parse array of integers with keys', function () {
-    $color = Rgb::parse(['r' => 0, 'g' => 128, 'b' => 255]);
-    expect($color->red)->toBe(0)
-        ->and($color->green)->toBe(128)
-        ->and($color->blue)->toBe(255)
-        ->and($color->getAlpha())->toBe(100);
+test('parse array of integers with keys', function (): void {
+    $rgb = Rgb::parse(['r' => 0, 'g' => 128, 'b' => 255]);
+    expect($rgb->red)->toBe(0)
+        ->and($rgb->green)->toBe(128)
+        ->and($rgb->blue)->toBe(255)
+        ->and($rgb->getAlpha())->toBe(100);
 });
 
-test('parse array of integers and fallback to 0 when value is missing', function () {
-    $color = Rgb::parse([]);
-    expect($color->red)->toBe(0)
-        ->and($color->green)->toBe(0)
-        ->and($color->blue)->toBe(0)
-        ->and($color->getAlpha())->toBe(100);
+test('parse array of integers and fallback to 0 when value is missing', function (): void {
+    $rgb = Rgb::parse([]);
+    expect($rgb->red)->toBe(0)
+        ->and($rgb->green)->toBe(0)
+        ->and($rgb->blue)->toBe(0)
+        ->and($rgb->getAlpha())->toBe(100);
 });
 
-test('parse array of integers with alpha', function () {
-    $color = Rgb::parse([0, 128, 255, 50]);
-    expect($color->red)->toBe(0)
-        ->and($color->green)->toBe(128)
-        ->and($color->blue)->toBe(255)
-        ->and($color->getAlpha())->toBe(50);
+test('parse array of integers with alpha', function (): void {
+    $rgb = Rgb::parse([0, 128, 255, 50]);
+    expect($rgb->red)->toBe(0)
+        ->and($rgb->green)->toBe(128)
+        ->and($rgb->blue)->toBe(255)
+        ->and($rgb->getAlpha())->toBe(50);
 });
 
-test('parse hex string', function () {
+test('parse hex string', function (): void {
     $color = Rgb::parse('#FF0000');
     expect($color->red)->toBe(255)
         ->and($color->green)->toBe(0)
@@ -254,15 +254,15 @@ test('parse hex string', function () {
         ->and($color->getAlpha())->toBe(100);
 });
 
-test('parse 3-char hex string', function () {
-    $color = Rgb::parse('#F00');
-    expect($color->red)->toBe(255)
-        ->and($color->green)->toBe(0)
-        ->and($color->blue)->toBe(0)
-        ->and($color->getAlpha())->toBe(100);
+test('parse 3-char hex string', function (): void {
+    $rgb = Rgb::parse('#F00');
+    expect($rgb->red)->toBe(255)
+        ->and($rgb->green)->toBe(0)
+        ->and($rgb->blue)->toBe(0)
+        ->and($rgb->getAlpha())->toBe(100);
 });
 
-test('parse csv string', function () {
+test('parse csv string', function (): void {
     $color = Rgb::parse('255,0,0');
     expect($color->red)->toBe(255)
         ->and($color->green)->toBe(0)
@@ -282,18 +282,18 @@ test('parse csv string', function () {
         ->and($color->getAlpha())->toBe(50);
 });
 
-it('throws excetion on invalid color format', function () {
-    expect(fn () => Rgb::parse('invalid'))->toThrow(InvalidArgumentException::class, 'Unrecognized color format. Please use an array, a hex string, or a comma-separated RGB string.');
+it('throws excetion on invalid color format', function (): void {
+    expect(fn (): Rgb => Rgb::parse('invalid'))->toThrow(InvalidArgumentException::class, 'Unrecognized color format. Please use an array, a hex string, or a comma-separated RGB string.');
 
-    expect(fn () => Rgb::parse([1, 2, ['invalid']]))->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
+    expect(fn (): Rgb => Rgb::parse([1, 2, ['invalid']]))->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
 
-    expect(fn () => Rgb::parse('1, 2, 3, 4, 5'))->toThrow(InvalidArgumentException::class, 'CSV color string must contain exactly 3 or 4 numeric values.');
+    expect(fn (): Rgb => Rgb::parse('1, 2, 3, 4, 5'))->toThrow(InvalidArgumentException::class, 'CSV color string must contain exactly 3 or 4 numeric values.');
 
-    expect(fn () => Rgb::parse('1, 2, 3, '))->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
+    expect(fn (): Rgb => Rgb::parse('1, 2, 3, '))->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
 });
 
-it('routes strings starting with hash to hex parser and throws specific exception', function () {
-    expect(fn () => Rgb::parse('#XYZ123'))->toThrow(InvalidArgumentException::class, 'Invalid hex color string provided.');
+it('routes strings starting with hash to hex parser and throws specific exception', function (): void {
+    expect(fn (): Rgb => Rgb::parse('#XYZ123'))->toThrow(InvalidArgumentException::class, 'Invalid hex color string provided.');
 
-    expect(fn () => Rgb::parse('#12'))->toThrow(InvalidArgumentException::class, 'Invalid hex color format. Must be 3 or 6 characters.');
+    expect(fn (): Rgb => Rgb::parse('#12'))->toThrow(InvalidArgumentException::class, 'Invalid hex color format. Must be 3 or 6 characters.');
 });

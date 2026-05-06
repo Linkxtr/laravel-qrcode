@@ -16,49 +16,49 @@ $traitTester = new class
     }
 };
 
-test('it successfully strips visual formatting characters', function () use ($traitTester) {
+test('it successfully strips visual formatting characters', function () use ($traitTester): void {
     $result = $traitTester->test('+1 (555) 123-4567.89');
     expect($result)->toBe('+1555123456789');
 });
 
-test('it mathematically enforces the 15-digit maximum boundary', function () use ($traitTester) {
+test('it mathematically enforces the 15-digit maximum boundary', function () use ($traitTester): void {
     expect($traitTester->test('+123456789012345'))->toBe('+123456789012345');
 
-    expect(fn () => $traitTester->test('+1234567890123456'))
+    expect(fn (): string => $traitTester->test('+1234567890123456'))
         ->toThrow(InvalidArgumentException::class);
 });
 
-test('it mathematically enforces the 1-digit minimum boundary', function () use ($traitTester) {
+test('it mathematically enforces the 1-digit minimum boundary', function () use ($traitTester): void {
     expect($traitTester->test('1'))->toBe('1');
     expect($traitTester->test('+1'))->toBe('+1');
 
-    expect(fn () => $traitTester->test(''))
+    expect(fn (): string => $traitTester->test(''))
         ->toThrow(InvalidArgumentException::class);
 
-    expect(fn () => $traitTester->test('() - '))
+    expect(fn (): string => $traitTester->test('() - '))
         ->toThrow(InvalidArgumentException::class);
 });
 
-test('it strictly enforces the plus sign positioning', function () use ($traitTester) {
+test('it strictly enforces the plus sign positioning', function () use ($traitTester): void {
     expect($traitTester->test('+123'))->toBe('+123');
 
-    expect(fn () => $traitTester->test('++123'))
+    expect(fn (): string => $traitTester->test('++123'))
         ->toThrow(InvalidArgumentException::class);
 
-    expect(fn () => $traitTester->test('12+3'))
+    expect(fn (): string => $traitTester->test('12+3'))
         ->toThrow(InvalidArgumentException::class);
 });
 
-test('it throws exception if string contains letters or symbols', function () use ($traitTester) {
-    expect(fn () => $traitTester->test('invalid-phone-string'))
+test('it throws exception if string contains letters or symbols', function () use ($traitTester): void {
+    expect(fn (): string => $traitTester->test('invalid-phone-string'))
         ->toThrow(InvalidArgumentException::class, 'Phone number contains invalid characters');
 
-    expect(fn () => $traitTester->test('abc1234567'))
+    expect(fn (): string => $traitTester->test('abc1234567'))
         ->toThrow(InvalidArgumentException::class, 'Phone number contains invalid characters');
 
-    expect(fn () => $traitTester->test('15551234567 ext 123'))
+    expect(fn (): string => $traitTester->test('15551234567 ext 123'))
         ->toThrow(InvalidArgumentException::class, 'Phone number contains invalid characters');
 
-    expect(fn () => $traitTester->test('+1-555-123-4567@'))
+    expect(fn (): string => $traitTester->test('+1-555-123-4567@'))
         ->toThrow(InvalidArgumentException::class, 'Phone number contains invalid characters');
 });

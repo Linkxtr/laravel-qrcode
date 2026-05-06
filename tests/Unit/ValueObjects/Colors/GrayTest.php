@@ -10,7 +10,7 @@ use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 covers(Gray::class);
 
-test('it creates valid gray color and respects default alpha', function () {
+test('it creates valid gray color and respects default alpha', function (): void {
     $color = new Gray(50);
     expect($color->gray)->toBe(50)
         ->and($color->getAlpha())->toBe(100);
@@ -19,17 +19,17 @@ test('it creates valid gray color and respects default alpha', function () {
     expect($colorWithAlpha->getAlpha())->toBe(25);
 });
 
-test('it throws exception on boundary violations for gray channel', function () {
-    expect(fn () => new Gray(-1))->toThrow(InvalidArgumentException::class, 'Gray must be between 0 and 100.')
-        ->and(fn () => new Gray(101))->toThrow(InvalidArgumentException::class, 'Gray must be between 0 and 100.');
+test('it throws exception on boundary violations for gray channel', function (): void {
+    expect(fn (): Gray => new Gray(-1))->toThrow(InvalidArgumentException::class, 'Gray must be between 0 and 100.')
+        ->and(fn (): Gray => new Gray(101))->toThrow(InvalidArgumentException::class, 'Gray must be between 0 and 100.');
 });
 
-test('it throws exception on boundary violations for alpha', function () {
-    expect(fn () => new Gray(0, -1))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.')
-        ->and(fn () => new Gray(0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
+test('it throws exception on boundary violations for alpha', function (): void {
+    expect(fn (): Gray => new Gray(0, -1))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.')
+        ->and(fn (): Gray => new Gray(0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
 });
 
-test('it converts to bacon gray color', function () {
+test('it converts to bacon gray color', function (): void {
     $color = new Gray(75, 100);
     $baconColor = $color->toBaconColor();
 
@@ -44,18 +44,18 @@ test('it converts to bacon gray color', function () {
         ->and($baconColorWithAlpha->getBaseColor())->toBeInstanceOf(BaconGray::class);
 });
 
-test('toGray returns itself', function () {
+test('toGray returns itself', function (): void {
     $color = new Gray(50);
     expect($color->toGray())->toBe($color);
 });
 
-test('it converts to rgb accurately', function () {
-    $white = (new Gray(100, 60))->toRgb();
-    expect($white)->toBeInstanceOf(Rgb::class)
-        ->and($white->red)->toBe(255)
-        ->and($white->green)->toBe(255)
-        ->and($white->blue)->toBe(255)
-        ->and($white->getAlpha())->toBe(60);
+test('it converts to rgb accurately', function (): void {
+    $rgb = (new Gray(100, 60))->toRgb();
+    expect($rgb)->toBeInstanceOf(Rgb::class)
+        ->and($rgb->red)->toBe(255)
+        ->and($rgb->green)->toBe(255)
+        ->and($rgb->blue)->toBe(255)
+        ->and($rgb->getAlpha())->toBe(60);
 
     $black = (new Gray(0))->toRgb();
     expect($black->red)->toBe(0)
@@ -73,14 +73,14 @@ test('it converts to rgb accurately', function () {
         ->and($dark->blue)->toBe(5);
 });
 
-test('it converts to cmyk accurately', function () {
-    $white = (new Gray(100, 90))->toCmyk();
-    expect($white)->toBeInstanceOf(Cmyk::class)
-        ->and($white->cyan)->toBe(0)
-        ->and($white->magenta)->toBe(0)
-        ->and($white->yellow)->toBe(0)
-        ->and($white->black)->toBe(0)
-        ->and($white->getAlpha())->toBe(90);
+test('it converts to cmyk accurately', function (): void {
+    $cmyk = (new Gray(100, 90))->toCmyk();
+    expect($cmyk)->toBeInstanceOf(Cmyk::class)
+        ->and($cmyk->cyan)->toBe(0)
+        ->and($cmyk->magenta)->toBe(0)
+        ->and($cmyk->yellow)->toBe(0)
+        ->and($cmyk->black)->toBe(0)
+        ->and($cmyk->getAlpha())->toBe(90);
 
     $black = (new Gray(0))->toCmyk();
     expect($black->cyan)->toBe(0)
@@ -95,7 +95,7 @@ test('it converts to cmyk accurately', function () {
         ->and($mid->black)->toBe(50);
 });
 
-test('it allows exact boundary values for alpha without throwing exceptions', function () {
+test('it allows exact boundary values for alpha without throwing exceptions', function (): void {
     $colorMinAlpha = new Gray(50, 0);
     expect($colorMinAlpha->getAlpha())->toBe(0);
 

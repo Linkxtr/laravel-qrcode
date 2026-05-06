@@ -9,19 +9,19 @@ covers(CalendarEvent::class);
 
 afterEach(fn () => Carbon::setTestNow());
 
-test('it throws exception if rendered before creation', function () {
+test('it throws exception if rendered before creation', function (): void {
     $event = new CalendarEvent;
-    expect(fn () => (string) $event)
+    expect(fn (): string => (string) $event)
         ->toThrow(LogicException::class, 'CalendarEvent must be initialized via create() before rendering.');
 });
 
-test('it throws exception if arguments are not an array', function () {
+test('it throws exception if arguments are not an array', function (): void {
     $event = new CalendarEvent;
     expect(fn () => $event->create(['not-an-array']))
         ->toThrow(InvalidArgumentException::class, 'Invalid CalendarEvent arguments.');
 });
 
-test('it throws exception if summary is missing, invalid type, or empty', function () {
+test('it throws exception if summary is missing, invalid type, or empty', function (): void {
     $event = new CalendarEvent;
 
     expect(fn () => $event->create([[]]))
@@ -34,19 +34,19 @@ test('it throws exception if summary is missing, invalid type, or empty', functi
         ->toThrow(InvalidArgumentException::class, 'Summary is required and must be a string.');
 });
 
-test('it throws exception if start date is missing', function () {
+test('it throws exception if start date is missing', function (): void {
     $event = new CalendarEvent;
     expect(fn () => $event->create([['summary' => 'Meeting']]))
         ->toThrow(InvalidArgumentException::class, 'Start date is required.');
 });
 
-test('it throws exception if end date is missing', function () {
+test('it throws exception if end date is missing', function (): void {
     $event = new CalendarEvent;
     expect(fn () => $event->create([['summary' => 'Meeting', 'start' => '2023-01-01']]))
         ->toThrow(InvalidArgumentException::class, 'End date is required.');
 });
 
-test('it strictly enforces end date must be after start date', function () {
+test('it strictly enforces end date must be after start date', function (): void {
     $event = new CalendarEvent;
 
     expect(fn () => $event->create([
@@ -58,9 +58,9 @@ test('it strictly enforces end date must be after start date', function () {
     ]))->toThrow(InvalidArgumentException::class, 'End date must be after start date.');
 });
 
-test('it successfully parses numeric timestamps and DateTimeInterfaces', function () {
+test('it successfully parses numeric timestamps and DateTimeInterfaces', function (): void {
     $event = new CalendarEvent;
-    $dateTime = new DateTime('2023-01-01 14:00:00');
+    $dateTime = Carbon::parse('2023-01-01 14:00:00');
 
     $event->create([
         ['summary' => 'Meeting', 'start' => 1672574400, 'end' => $dateTime],
@@ -70,14 +70,14 @@ test('it successfully parses numeric timestamps and DateTimeInterfaces', functio
         ->and(invade($event)->end->format('Y-m-d H:i:s'))->toBe('2023-01-01 14:00:00');
 });
 
-test('it throws exception for invalid date types', function () {
+test('it throws exception for invalid date types', function (): void {
     $event = new CalendarEvent;
     expect(fn () => $event->create([
         ['summary' => 'Meeting', 'start' => ['invalid-type'], 'end' => '2023-01-01'],
     ]))->toThrow(InvalidArgumentException::class, 'Date must be a string, numeric or DateTimeInterface.');
 });
 
-test('it generates full formatted calendar string and strictly preserves timezones', function () {
+test('it generates full formatted calendar string and strictly preserves timezones', function (): void {
     Carbon::setTestNow(Carbon::parse('2023-10-15 08:30:00', 'UTC'));
 
     $event = new CalendarEvent;
@@ -113,7 +113,7 @@ test('it generates full formatted calendar string and strictly preserves timezon
     expect(invade($event)->start->getTimezone()->getName())->toBe('+02:00');
 });
 
-test('it ignores optional parameters if they are not strings', function () {
+test('it ignores optional parameters if they are not strings', function (): void {
     $event = new CalendarEvent;
     $event->create([[
         'summary' => 'Meeting',
@@ -128,7 +128,7 @@ test('it ignores optional parameters if they are not strings', function () {
         ->and($result)->not->toContain('LOCATION:');
 });
 
-test('it rigorously escapes special characters in strings', function () {
+test('it rigorously escapes special characters in strings', function (): void {
     $event = new CalendarEvent;
 
     $chaosString = "Line1\\Line2,Line3;Line4\r\nLine5\nLine6\rLine7";
@@ -146,7 +146,7 @@ test('it rigorously escapes special characters in strings', function () {
     expect($result)->toContain($expectedSummary);
 });
 
-test('it generates a valid structured UID', function () {
+test('it generates a valid structured UID', function (): void {
     $event = new CalendarEvent;
     $event->create([[
         'summary' => 'Meeting',
@@ -163,7 +163,7 @@ test('it generates a valid structured UID', function () {
     expect(strlen($uniquePart))->toBe(40);
 });
 
-test('it clears stale optional data and applies state atomically on object reuse', function () {
+test('it clears stale optional data and applies state atomically on object reuse', function (): void {
     $event = new CalendarEvent;
 
     $event->create([[
@@ -187,7 +187,7 @@ test('it clears stale optional data and applies state atomically on object reuse
         ->and((string) $event)->not->toContain('LOCATION:');
 });
 
-test('it does not mutate instance state if validation fails', function () {
+test('it does not mutate instance state if validation fails', function (): void {
     $event = new CalendarEvent;
 
     $event->create([[
@@ -203,14 +203,14 @@ test('it does not mutate instance state if validation fails', function () {
             'summary' => 'Meeting 2',
             'start' => '2023-12-02 12:00:00',
         ]]);
-    } catch (InvalidArgumentException $e) {
+    } catch (InvalidArgumentException) {
     }
 
     expect(invade($event)->summary)->toBe('Meeting 1')
         ->and(invade($event)->uid)->toBe($originalUid);
 });
 
-test('it generates deterministic UIDs for identical events', function () {
+test('it generates deterministic UIDs for identical events', function (): void {
     $data = [[
         'summary' => 'Team Sync',
         'start' => '2024-01-01 10:00:00',
@@ -226,7 +226,7 @@ test('it generates deterministic UIDs for identical events', function () {
     expect(invade($event1)->uid)->toBe(invade($event2)->uid);
 });
 
-test('it allows custom UIDs to be passed', function () {
+test('it allows custom UIDs to be passed', function (): void {
     $event = new CalendarEvent;
     $event->create([[
         'summary' => 'Meeting',
@@ -238,7 +238,7 @@ test('it allows custom UIDs to be passed', function () {
     expect(invade($event)->uid)->toBe('custom-uuid-12345');
 });
 
-test('the generated UID changes if any core event detail changes', function () {
+test('the generated UID changes if any core event detail changes', function (): void {
     $baseData = [
         'summary' => 'Core Meeting',
         'start' => '2024-01-01 10:00:00',
@@ -247,22 +247,26 @@ test('the generated UID changes if any core event detail changes', function () {
 
     $baseEvent = new CalendarEvent;
     $baseEvent->create([$baseData]);
+
     $baseUid = invade($baseEvent)->uid;
 
     $diffSummary = new CalendarEvent;
     $diffSummary->create([array_merge($baseData, ['summary' => 'Different Meeting'])]);
+
     expect(invade($diffSummary)->uid)->not->toBe($baseUid);
 
     $diffStart = new CalendarEvent;
     $diffStart->create([array_merge($baseData, ['start' => '2024-01-01 09:00:00'])]);
+
     expect(invade($diffStart)->uid)->not->toBe($baseUid);
 
     $diffEnd = new CalendarEvent;
     $diffEnd->create([array_merge($baseData, ['end' => '2024-01-01 12:00:00'])]);
+
     expect(invade($diffEnd)->uid)->not->toBe($baseUid);
 });
 
-test('it ignores an empty string custom UID and falls back to generated hash', function () {
+test('it ignores an empty string custom UID and falls back to generated hash', function (): void {
     $event = new CalendarEvent;
     $event->create([[
         'summary' => 'Meeting',
@@ -278,7 +282,7 @@ test('it ignores an empty string custom UID and falls back to generated hash', f
         ->and(strlen(str_replace('@linkxtr-qrcode', '', $uid)))->toBe(40);
 });
 
-test('the generated UID uses the exact concatenation order of summary, start, and end', function () {
+test('the generated UID uses the exact concatenation order of summary, start, and end', function (): void {
     $event = new CalendarEvent;
 
     $event->create([[

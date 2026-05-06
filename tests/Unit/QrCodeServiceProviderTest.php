@@ -12,12 +12,12 @@ use Linkxtr\QrCode\QrCodeServiceProvider;
 
 covers(QrCodeServiceProvider::class);
 
-test('it merges the default configuration', function () {
+test('it merges the default configuration', function (): void {
     expect(config('qrcode'))->toBeArray()
         ->and(config('qrcode'))->not->toBeEmpty();
 });
 
-test('it binds the generator to the container as a singleton', function () {
+test('it binds the generator to the container as a singleton', function (): void {
     $generator1 = app('qrcode');
     $generator2 = app(Generator::class);
 
@@ -26,7 +26,7 @@ test('it binds the generator to the container as a singleton', function () {
         ->and($generator1)->toBe($generator2);
 });
 
-test('it registers the blade component with both tag syntaxes', function () {
+test('it registers the blade component with both tag syntaxes', function (): void {
     $aliases = Blade::getClassComponentAliases();
 
     expect($aliases)->toHaveKey('qrcode')
@@ -35,7 +35,7 @@ test('it registers the blade component with both tag syntaxes', function () {
         ->and($aliases['qr-code'])->toBe(QrCodeComponent::class);
 });
 
-test('it registers publishable assets when running in console', function () {
+test('it registers publishable assets when running in console', function (): void {
     $publishGroups = ServiceProvider::publishableGroups();
     expect($publishGroups)->toContain('qrcode-config');
 
@@ -56,10 +56,10 @@ test('it registers publishable assets when running in console', function () {
         ->and($actualDestinationPath)->toBe(config_path('qrcode.php'));
 });
 
-test('it registers the generate qr code command', function () {
+test('it registers the generate qr code command', function (): void {
     $commands = Artisan::all();
 
     expect($commands)->toHaveKey('qr:generate');
 
-    expect(get_class($commands['qr:generate']))->toBe(GenerateQrCodeCommand::class);
+    expect($commands['qr:generate']::class)->toBe(GenerateQrCodeCommand::class);
 });

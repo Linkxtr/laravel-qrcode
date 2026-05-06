@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 use Linkxtr\QrCode\Support\DataTypeResolver;
 
-it('throws an exception for an unregistered method', function () {
+it('throws an exception for an unregistered method', function (): void {
     DataTypeResolver::resolve('unknownMethod', []);
 })->throws(
     BadMethodCallException::class,
     'Method "unknownMethod" does not exist on the QrCode Generator. It is not a registered macro or a valid Data Type.'
 );
 
-it('resolves valid data types and executes them case-insensitively', function (string $method) {
+it('resolves valid data types and executes them case-insensitively', function (string $method): void {
     $result = DataTypeResolver::resolve($method, ['test@example.com']);
 
     expect($result)->toBe('mailto:test@example.com');
@@ -22,7 +22,7 @@ it('resolves valid data types and executes them case-insensitively', function (s
     'eMaIl',
 ]);
 
-it('correctly maps classes and passes complex arguments to the data type', function () {
+it('correctly maps classes and passes complex arguments to the data type', function (): void {
     $result = DataTypeResolver::resolve('wifi', [
         [
             'ssid' => 'MyNetwork',
@@ -34,7 +34,7 @@ it('correctly maps classes and passes complex arguments to the data type', funct
     expect($result)->toBe('WIFI:S:MyNetwork;T:WPA;P:secret123;;');
 });
 
-it('can resolve all mapped data types without instantiating unknown classes', function () {
+it('can resolve all mapped data types without instantiating unknown classes', function (): void {
     $geo = DataTypeResolver::resolve('geo', [37.7749, -122.4194]);
     expect($geo)->toBe('geo:37.7749,-122.4194');
 

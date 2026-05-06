@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Blade;
 
-test('the blade component renders a real SVG directly from a view', function () {
+test('the blade component renders a real SVG directly from a view', function (): void {
     $html = Blade::render(
         '<x-qrcode data="https://linkxtr.com" size="150" color="255,0,0" style="round" />'
     );
@@ -15,7 +15,7 @@ test('the blade component renders a real SVG directly from a view', function () 
         ->toContain('#ff0000');
 });
 
-test('the blade component handles base64 image formats correctly', function () {
+test('the blade component handles base64 image formats correctly', function (): void {
     $html = Blade::render(
         '<x-qrcode data="test" format="png" class="my-qr-class" />'
     );
@@ -25,7 +25,7 @@ test('the blade component handles base64 image formats correctly', function () {
         ->toContain('src="data:image/png;base64,');
 });
 
-test('it supports the old tag syntax', function () {
+test('it supports the old tag syntax', function (): void {
     $html = Blade::render(
         '<x-qr-code data="https://linkxtr.com" size="150" color="255,0,0" style="round" />'
     );

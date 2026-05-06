@@ -17,7 +17,7 @@ require_once __DIR__.'/../Support/Overrides.php';
 
 covers(Generator::class);
 
-it('passes array config from constructor to the underlying DTO', function () {
+it('passes array config from constructor to the underlying DTO', function (): void {
     $generator = new Generator(['size' => 350, 'margin' => 2]);
     $config = invade($generator)->config;
 
@@ -25,55 +25,47 @@ it('passes array config from constructor to the underlying DTO', function () {
         ->and($config->getMargin())->toBe(2);
 });
 
-it('can register and call custom macros that return a string payload', function () {
-    Generator::macro('myMacro', function (string $data) {
-        return 'dummy:'.$data;
-    });
+it('can register and call custom macros that return a string payload', function (): void {
+    Generator::macro('myMacro', fn (string $data): string => 'dummy:'.$data);
 
     $generator = new Generator([]);
 
     expect($generator->myMacro('hello-world'))->toBeInstanceOf(HtmlString::class);
-})->after(function () {
+})->after(function (): void {
     Generator::flushMacros();
 });
 
-it('can register and call custom macros that return pre-styled generation', function () {
-    Generator::macro('myStyledMacro', function (string $data) {
-        return $this->size(500)->generate($data);
-    });
+it('can register and call custom macros that return pre-styled generation', function (): void {
+    Generator::macro('myStyledMacro', fn (string $data) => $this->size(500)->generate($data));
 
     $generator = new Generator([]);
 
     expect($generator->myStyledMacro('hello-world'))->toBeInstanceOf(HtmlString::class);
-})->after(function () {
+})->after(function (): void {
     Generator::flushMacros();
 });
 
-test('macro returning HtmlString is returned directly without regeneration', function () {
+test('macro returning HtmlString is returned directly without regeneration', function (): void {
     $expectedHtml = new HtmlString('<svg id="exact-macro-match"></svg>');
 
-    Generator::macro('returnsHtml', function () use ($expectedHtml) {
-        return $expectedHtml;
-    });
+    Generator::macro('returnsHtml', fn (): HtmlString => $expectedHtml);
 
     $generator = new Generator;
     $result = $generator->returnsHtml();
 
     expect($result)->toBe($expectedHtml)
         ->and($result->toHtml())->toBe('<svg id="exact-macro-match"></svg>');
-})->after(function () {
+})->after(function (): void {
     Generator::flushMacros();
 });
 
-test('macro returning a Stringable object is successfully generated', function () {
-    Generator::macro('returnsStringable', function () {
-        return new class implements Stringable
+test('macro returning a Stringable object is successfully generated', function (): void {
+    Generator::macro('returnsStringable', fn (): Stringable => new class implements Stringable
+    {
+        public function __toString(): string
         {
-            public function __toString(): string
-            {
-                return 'stringable-payload';
-            }
-        };
+            return 'stringable-payload';
+        }
     });
 
     $generator = new Generator;
@@ -81,33 +73,31 @@ test('macro returning a Stringable object is successfully generated', function (
 
     expect($result)->toBeInstanceOf(HtmlString::class)
         ->and($result->toHtml())->toContain('<svg');
-})->after(function () {
+})->after(function (): void {
     Generator::flushMacros();
 });
 
-it('throws an exception for unsupported type returns from macro', function () {
-    Generator::macro('returnArray', function () {
-        return ['an' => 'array'];
-    });
+it('throws an exception for unsupported type returns from macro', function (): void {
+    Generator::macro('returnArray', fn (): array => ['an' => 'array']);
 
     $generator = new Generator([]);
 
     $generator->returnArray();
 })->throws(UnexpectedValueException::class, 'Macro "returnArray" must return a string, Stringable, or HtmlString. array returned.')
-    ->after(function () {
+    ->after(function (): void {
         Generator::flushMacros();
     });
 
-it('still delegates to data types if macro is not registered', function () {
+it('still delegates to data types if macro is not registered', function (): void {
     $generator = new Generator([]);
 
-    $result = $generator->Email('test@example.com');
+    $htmlString = $generator->Email('test@example.com');
 
-    expect($result)->toBeInstanceOf(HtmlString::class);
-    expect((string) $result)->toContain('<svg');
+    expect($htmlString)->toBeInstanceOf(HtmlString::class);
+    expect((string) $htmlString)->toContain('<svg');
 });
 
-test('fluent configuration methods return a cloned instance with updated config', function () {
+test('fluent configuration methods return a cloned instance with updated config', function (): void {
     $generator = new Generator;
 
     $sized = $generator->size(500);
@@ -193,25 +183,25 @@ test('fluent configuration methods return a cloned instance with updated config'
     expect(invade($generator)->config->getSize())->toBe(400);
 });
 
-test('generate throws exception if file_put_contents fails', function () {
+test('generate throws exception if file_put_contents fails', function (): void {
     $generator = new Generator;
 
     global $mockFilePutContents;
     $mockFilePutContents = true;
 
-    expect(fn () => $generator->generate('fail-test', 'fail-test.svg'))
+    expect(fn (): HtmlString => $generator->generate('fail-test', 'fail-test.svg'))
         ->toThrow(RuntimeException::class, 'Failed to write QR code to file: fail-test.svg');
-})->after(function () {
+})->after(function (): void {
     global $mockFilePutContents;
     $mockFilePutContents = null;
 });
 
-test('it mathematically rejects arrays and objects inside color configurations', function () {
+test('it mathematically rejects arrays and objects inside color configurations', function (): void {
     $generator = new Generator;
 
-    expect(fn () => $generator->eyeColor(0, [255, ['nested'], 0]))
+    expect(fn (): Generator => $generator->eyeColor(0, [255, ['nested'], 0]))
         ->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric.');
 
-    expect(fn () => $generator->gradient([255, 0, 0], [0, new stdClass, 0]))
+    expect(fn (): Generator => $generator->gradient([255, 0, 0], [0, new stdClass, 0]))
         ->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric.');
 });

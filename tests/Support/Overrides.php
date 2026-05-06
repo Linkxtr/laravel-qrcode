@@ -8,7 +8,7 @@ namespace Linkxtr\QrCode\DTOs {
         {
             $baseDiff = '/..';
 
-            return $path === '' ? __DIR__.$baseDiff : __DIR__.$baseDiff.'/'.ltrim($path, '/');
+            return $path === '' ? __DIR__.$baseDiff : __DIR__.$baseDiff.'/'.ltrim((string) $path, '/');
         }
     }
 

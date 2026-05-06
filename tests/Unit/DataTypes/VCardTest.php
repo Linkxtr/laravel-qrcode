@@ -6,13 +6,13 @@ use Linkxtr\QrCode\DataTypes\VCard;
 
 covers(VCard::class);
 
-test('it throws exception if rendered before creation', function () {
+test('it throws exception if rendered before creation', function (): void {
     $vcard = new VCard;
-    expect(fn () => (string) $vcard)
+    expect(fn (): string => (string) $vcard)
         ->toThrow(LogicException::class, 'VCard must be initialized via create() before rendering.');
 });
 
-test('it throws exception if name is missing or invalid', function () {
+test('it throws exception if name is missing or invalid', function (): void {
     $vcard = new VCard;
 
     expect(fn () => $vcard->create([]))
@@ -25,7 +25,7 @@ test('it throws exception if name is missing or invalid', function () {
         ->toThrow(InvalidArgumentException::class, 'VCard Name is mandatory.');
 });
 
-test('it successfully maps the 5 common positional arguments', function () {
+test('it successfully maps the 5 common positional arguments', function (): void {
     $vcard = new VCard;
     // Maps: Name, Phone, Email, Company, Job
     $vcard->create([
@@ -51,7 +51,7 @@ test('it successfully maps the 5 common positional arguments', function () {
     expect((string) $vcard)->toBe($expected);
 });
 
-test('it successfully maps massive associative array arguments', function () {
+test('it successfully maps massive associative array arguments', function (): void {
     $vcard = new VCard;
     $vcard->create([[
         'name' => 'Khaled Sadek',
@@ -99,7 +99,7 @@ test('it successfully maps massive associative array arguments', function () {
     expect((string) $vcard)->toBe($expected);
 });
 
-test('it ignores non-string associative arguments', function () {
+test('it ignores non-string associative arguments', function (): void {
     $vcard = new VCard;
     $vcard->create([[
         'name' => 'Khaled Sadek',
@@ -121,7 +121,7 @@ test('it ignores non-string associative arguments', function () {
     expect((string) $vcard)->toBe($expected);
 });
 
-test('it strips empty string associative arguments', function () {
+test('it strips empty string associative arguments', function (): void {
     $vcard = new VCard;
     $vcard->create([[
         'name' => 'Khaled Sadek',
@@ -144,7 +144,7 @@ test('it strips empty string associative arguments', function () {
     expect((string) $vcard)->toBe($expected);
 });
 
-test('it accurately escapes special characters and newlines', function () {
+test('it accurately escapes special characters and newlines', function (): void {
     $vcard = new VCard;
 
     $chaosString = "Name\\With;Special,Chars\nHere";
@@ -175,7 +175,7 @@ test('it accurately escapes special characters and newlines', function () {
     expect($result)->toContain('NOTE:Line1\nLine2\nLine3\nLine4');
 });
 
-test('it gracefully handles missing first or last names independently', function () {
+test('it gracefully handles missing first or last names independently', function (): void {
     $vcard1 = new VCard;
     $vcard1->create([
         'name' => 'Khaled',

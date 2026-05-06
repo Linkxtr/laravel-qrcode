@@ -8,6 +8,7 @@ return RectorConfig::configure()
     ->withPaths([
         __DIR__.'/config',
         __DIR__.'/src',
+        __DIR__.'/tests',
     ])
     ->withPreparedSets(
         deadCode: true,
