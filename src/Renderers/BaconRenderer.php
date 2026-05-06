@@ -93,7 +93,7 @@ final readonly class BaconRenderer
             );
         }
 
-        if ($this->config->getFormat() !== Format::PNG) {
+        if ($format !== Format::PNG) {
             throw new RuntimeException(sprintf('Format "%s" requires the Imagick extension.', $format->value));
         }
 
@@ -108,7 +108,7 @@ final readonly class BaconRenderer
         return new GDLibRenderer(
             $this->config->getSize(),
             $this->config->getMargin(),
-            $this->config->getFormat()->value,
+            $format->value,
             self::PNG_COMPRESSION_LEVEL,
             $this->getFill()
         );
