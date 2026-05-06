@@ -150,35 +150,26 @@ final class VCard implements DataTypeInterface
             throw new InvalidArgumentException('VCard Name is mandatory.');
         }
 
+        $optionalKeys = [
+            'firstName', 'lastName',
+            'email', 'emailWork', 'emailHome',
+            'phone', 'phoneWork', 'phoneHome', 'phoneCell',
+            'company', 'job', 'role',
+            'address', 'url', 'note', 'birthday',
+        ];
+
+        $resolved = [];
+
+        foreach ($optionalKeys as $key) {
+            $resolved[$key] = (isset($properties[$key]) && is_string($properties[$key]) && $properties[$key] !== '')
+                ? $properties[$key]
+                : null;
+        }
+
         $this->name = $properties['name'];
 
-        $this->assignStringProperty($properties, 'firstName');
-        $this->assignStringProperty($properties, 'lastName');
-        $this->assignStringProperty($properties, 'email');
-        $this->assignStringProperty($properties, 'emailWork');
-        $this->assignStringProperty($properties, 'emailHome');
-        $this->assignStringProperty($properties, 'phone');
-        $this->assignStringProperty($properties, 'phoneWork');
-        $this->assignStringProperty($properties, 'phoneHome');
-        $this->assignStringProperty($properties, 'phoneCell');
-        $this->assignStringProperty($properties, 'company');
-        $this->assignStringProperty($properties, 'job');
-        $this->assignStringProperty($properties, 'role');
-        $this->assignStringProperty($properties, 'address');
-        $this->assignStringProperty($properties, 'url');
-        $this->assignStringProperty($properties, 'note');
-        $this->assignStringProperty($properties, 'birthday');
-    }
-
-    /**
-     * Helper to safely map optional properties and ignore empty/invalid values.
-     *
-     * @param  array<int|string, mixed>  $properties
-     */
-    private function assignStringProperty(array $properties, string $key): void
-    {
-        if (isset($properties[$key]) && is_string($properties[$key]) && $properties[$key] !== '') {
-            $this->{$key} = $properties[$key];
+        foreach ($resolved as $key => $value) {
+            $this->{$key} = $value;
         }
     }
 
