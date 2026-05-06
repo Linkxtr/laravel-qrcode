@@ -15,10 +15,10 @@ it('can generate multiple qr codes in a loop without state leakage', function ()
 it('can handle bulk generation without memory exhaustion', function () {
     $results = [];
 
-    for ($i = 0; $i < 50; $i++) {
+    for ($i = 0; $i < 50; ++$i) {
         $results[] = (string) QrCode::format('svg')
             ->errorCorrection('L')
-            ->generate('Batch Item ' . $i);
+            ->generate('Batch Item '.$i);
     }
 
     expect($results)->toHaveCount(50);
