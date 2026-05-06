@@ -160,6 +160,12 @@ final readonly class Rgb implements ColorInterface
         return new Gray($grayValue, $this->alpha);
     }
 
+    /** @return array{0: int, 1: int, 2: int, 3: int} */
+    public function toArray(): array
+    {
+        return [$this->red, $this->green, $this->blue, $this->alpha];
+    }
+
     private function validate(int $value, string $name): void
     {
         if ($value < 0 || $value > 255) {

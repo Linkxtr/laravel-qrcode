@@ -152,8 +152,8 @@ test('it strictly maps all 6 distinct gradient colors', function (): void {
     $component->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls)->toHaveKey('gradient')
-        ->and($fakeGenerator->calls['gradient'][0])->toBe([1, 2, 3])
-        ->and($fakeGenerator->calls['gradient'][1])->toBe([4, 5, 6])
+        ->and($fakeGenerator->calls['gradient'][0])->toBe([1, 2, 3, 100])
+        ->and($fakeGenerator->calls['gradient'][1])->toBe([4, 5, 6, 100])
         ->and($fakeGenerator->calls['gradient'][2])->toBe('diagonal');
 
     $fakeGenerator->calls = [];
@@ -522,8 +522,8 @@ test('it aggressively resolves multi-color strings across different delimiters',
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls['eyeColor'][0])->toBe(0);
-    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3]);
-    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6]);
+    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3, 100]);
+    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6, 100]);
 
     $fakeGenerator->calls = [];
 
@@ -531,8 +531,8 @@ test('it aggressively resolves multi-color strings across different delimiters',
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls['eyeColor'][0])->toBe(1);
-    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3]);
-    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6]);
+    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3, 100]);
+    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6, 100]);
 
     $fakeGenerator->calls = [];
 
@@ -540,8 +540,8 @@ test('it aggressively resolves multi-color strings across different delimiters',
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls['eyeColor'][0])->toBe(2);
-    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3]);
-    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6]);
+    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3, 100]);
+    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6, 100]);
 });
 
 test('it duplicates single multi-colors and safely slices excess colors', function (): void {
@@ -566,14 +566,14 @@ test('it duplicates single multi-colors and safely slices excess colors', functi
     (new QrCodeComponent(data: 'test', gradient: '#010203'))
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
-    expect($fakeGenerator->calls['gradient'])->toBe([[1, 2, 3], [1, 2, 3], GradientType::VERTICAL]);
+    expect($fakeGenerator->calls['gradient'])->toBe([[1, 2, 3, 100], [1, 2, 3, 100], GradientType::VERTICAL]);
 
     $fakeGenerator->calls = [];
 
     (new QrCodeComponent(data: 'test', gradient: '#010203|#040506|#070809'))
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
-    expect($fakeGenerator->calls['gradient'])->toBe([[1, 2, 3], [4, 5, 6], GradientType::VERTICAL]);
+    expect($fakeGenerator->calls['gradient'])->toBe([[1, 2, 3, 100], [4, 5, 6, 100], GradientType::VERTICAL]);
 });
 
 test('it returns null early if no valid colors could be parsed', function (): void {
@@ -653,6 +653,6 @@ test('it correctly maps inner red color for eyeColor2 to prevent index mutations
         ->render()(['attributes' => new ComponentAttributeBag([])]);
 
     expect($fakeGenerator->calls['eyeColor'][0])->toBe(2);
-    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3]);
-    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6]);
+    expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3, 100]);
+    expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6, 100]);
 });

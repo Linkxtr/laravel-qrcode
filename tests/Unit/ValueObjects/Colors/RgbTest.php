@@ -212,7 +212,8 @@ test('parse array of integers', function (): void {
     expect($rgb->red)->toBe(0)
         ->and($rgb->green)->toBe(128)
         ->and($rgb->blue)->toBe(255)
-        ->and($rgb->getAlpha())->toBe(100);
+        ->and($rgb->getAlpha())->toBe(100)
+        ->and($rgb->toArray())->toBe([0, 128, 255, 100]);
 });
 
 test('parse array of integers with keys', function (): void {
@@ -220,7 +221,8 @@ test('parse array of integers with keys', function (): void {
     expect($rgb->red)->toBe(0)
         ->and($rgb->green)->toBe(128)
         ->and($rgb->blue)->toBe(255)
-        ->and($rgb->getAlpha())->toBe(100);
+        ->and($rgb->getAlpha())->toBe(100)
+        ->and($rgb->toArray())->toBe([0, 128, 255, 100]);
 });
 
 test('parse array of integers and fallback to 0 when value is missing', function (): void {
@@ -228,7 +230,8 @@ test('parse array of integers and fallback to 0 when value is missing', function
     expect($rgb->red)->toBe(0)
         ->and($rgb->green)->toBe(0)
         ->and($rgb->blue)->toBe(0)
-        ->and($rgb->getAlpha())->toBe(100);
+        ->and($rgb->getAlpha())->toBe(100)
+        ->and($rgb->toArray())->toBe([0, 0, 0, 100]);
 });
 
 test('parse array of integers with alpha', function (): void {
@@ -236,7 +239,8 @@ test('parse array of integers with alpha', function (): void {
     expect($rgb->red)->toBe(0)
         ->and($rgb->green)->toBe(128)
         ->and($rgb->blue)->toBe(255)
-        ->and($rgb->getAlpha())->toBe(50);
+        ->and($rgb->getAlpha())->toBe(50)
+        ->and($rgb->toArray())->toBe([0, 128, 255, 50]);
 });
 
 test('parse hex string', function (): void {
@@ -244,14 +248,16 @@ test('parse hex string', function (): void {
     expect($color->red)->toBe(255)
         ->and($color->green)->toBe(0)
         ->and($color->blue)->toBe(0)
-        ->and($color->getAlpha())->toBe(100);
+        ->and($color->getAlpha())->toBe(100)
+        ->and($color->toArray())->toBe([255, 0, 0, 100]);
 
     $color = Rgb::parse('  FF0000 ');
 
     expect($color->red)->toBe(255)
         ->and($color->green)->toBe(0)
         ->and($color->blue)->toBe(0)
-        ->and($color->getAlpha())->toBe(100);
+        ->and($color->getAlpha())->toBe(100)
+        ->and($color->toArray())->toBe([255, 0, 0, 100]);
 });
 
 test('parse 3-char hex string', function (): void {
@@ -259,7 +265,8 @@ test('parse 3-char hex string', function (): void {
     expect($rgb->red)->toBe(255)
         ->and($rgb->green)->toBe(0)
         ->and($rgb->blue)->toBe(0)
-        ->and($rgb->getAlpha())->toBe(100);
+        ->and($rgb->getAlpha())->toBe(100)
+        ->and($rgb->toArray())->toBe([255, 0, 0, 100]);
 });
 
 test('parse csv string', function (): void {
@@ -267,19 +274,22 @@ test('parse csv string', function (): void {
     expect($color->red)->toBe(255)
         ->and($color->green)->toBe(0)
         ->and($color->blue)->toBe(0)
-        ->and($color->getAlpha())->toBe(100);
+        ->and($color->getAlpha())->toBe(100)
+        ->and($color->toArray())->toBe([255, 0, 0, 100]);
 
     $color = Rgb::parse('255,0,0,50');
     expect($color->red)->toBe(255)
         ->and($color->green)->toBe(0)
         ->and($color->blue)->toBe(0)
-        ->and($color->getAlpha())->toBe(50);
+        ->and($color->getAlpha())->toBe(50)
+        ->and($color->toArray())->toBe([255, 0, 0, 50]);
 
     $color = Rgb::fromCsv(' 255 , 0, 0, 50');
     expect($color->red)->toBe(255)
         ->and($color->green)->toBe(0)
         ->and($color->blue)->toBe(0)
-        ->and($color->getAlpha())->toBe(50);
+        ->and($color->getAlpha())->toBe(50)
+        ->and($color->toArray())->toBe([255, 0, 0, 50]);
 });
 
 it('throws excetion on invalid color format', function (): void {

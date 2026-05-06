@@ -74,20 +74,18 @@ final class QrCodeComponent extends Component
             $generator = $generator->eye($this->eye);
         }
 
-        if ($this->eyeColor0 !== null && $colors = $this->resolveMultiColor($this->eyeColor0)) {
-            $generator = $generator->eyeColor(0, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
-        }
-
-        if ($this->eyeColor1 !== null && $colors = $this->resolveMultiColor($this->eyeColor1)) {
-            $generator = $generator->eyeColor(1, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
-        }
-
-        if ($this->eyeColor2 !== null && $colors = $this->resolveMultiColor($this->eyeColor2)) {
-            $generator = $generator->eyeColor(2, [$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue]);
+        foreach ([0 => $this->eyeColor0, 1 => $this->eyeColor1, 2 => $this->eyeColor2] as $index => $eyeColor) {
+            if ($eyeColor !== null && $colors = $this->resolveMultiColor($eyeColor)) {
+                $generator = $generator->eyeColor($index, $colors[0]->toArray(), $colors[1]->toArray());
+            }
         }
 
         if ($this->gradient !== null && $colors = $this->resolveMultiColor($this->gradient)) {
-            $generator = $generator->gradient([$colors[0]->red, $colors[0]->green, $colors[0]->blue], [$colors[1]->red, $colors[1]->green, $colors[1]->blue], $this->gradientType ?? GradientType::VERTICAL);
+            $generator = $generator->gradient(
+                $colors[0]->toArray(),
+                $colors[1]->toArray(),
+                $this->gradientType ?? GradientType::VERTICAL
+            );
         }
 
         if ($this->merge !== null) {
