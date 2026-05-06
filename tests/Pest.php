@@ -14,7 +14,7 @@ use Tests\Support\TestCase;
 |
 */
 
-uses(TestCase::class)->in('Unit', 'Scannability', 'Feature');
+uses(TestCase::class)->in('Unit', 'Scannability', 'Feature', 'Scalability');
 
 /*
 |--------------------------------------------------------------------------
