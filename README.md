@@ -163,7 +163,7 @@ QrCode::SMS('+1234567890', 'Message body');
 // WiFi
 QrCode::WiFi([
     'ssid' => 'Network',
-    'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, nopass
+    'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, NOPASS
     'password' => 'Password'
 ]);
 
@@ -324,7 +324,7 @@ QrCode::size(300)
 ```php
 QrCode::WiFi([
     'ssid' => 'MyWiFi',
-    'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, nopass
+    'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, NOPASS
     'password' => 'my-password'
 ]);
 ```
