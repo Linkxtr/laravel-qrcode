@@ -60,11 +60,12 @@ final readonly class SvgMerger implements MergerInterface
         $imageUri = sprintf('data:%s;base64,%s', $mimeType, $base64Image);
 
         $imageTag = sprintf(
-            '<image x="%d" y="%d" width="%d" height="%d" href="%s" />',
+            '<image x="%d" y="%d" width="%d" height="%d" href="%s" xlink:href="%s" />',
             $x,
             $y,
             $targetWidth,
             $targetHeight,
+            $imageUri,
             $imageUri
         );
 
