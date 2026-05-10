@@ -6,9 +6,9 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use Carbon\Carbon;
 use DateTimeInterface;
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
-use LogicException;
+use Linkxtr\QrCode\Exceptions\InvalidCalenderEventArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class CalendarEvent implements DataTypeInterface
 {
@@ -27,7 +27,7 @@ final class CalendarEvent implements DataTypeInterface
     public function __toString(): string
     {
         if ($this->uid === '') {
-            throw new LogicException('CalendarEvent must be initialized via create() before rendering.');
+            throw UninitializedDataTypeException::forType('Calendar event');
         }
 
         $lines = [
@@ -65,27 +65,31 @@ final class CalendarEvent implements DataTypeInterface
         $attributes = $arguments[0] ?? [];
 
         if (! is_array($attributes)) {
-            throw new InvalidArgumentException('Invalid CalendarEvent arguments.');
+            throw InvalidCalenderEventArgumentException::invalidArgument('Invalid CalendarEvent arguments.');
         }
 
-        if (! isset($attributes['summary']) || ! is_string($attributes['summary']) || $attributes['summary'] === '') {
-            throw new InvalidArgumentException('Summary is required and must be a string.');
+        if (! isset($attributes['summary'])) {
+            throw InvalidCalenderEventArgumentException::missingArguments('Summary is required.');
+        }
+
+        if (! is_string($attributes['summary']) || $attributes['summary'] === '') {
+            throw InvalidCalenderEventArgumentException::invalidSummary(gettype($attributes['summary']));
         }
 
         if (! isset($attributes['start'])) {
-            throw new InvalidArgumentException('Start date is required.');
+            throw InvalidCalenderEventArgumentException::missingArguments('Start date is required.');
         }
 
         $start = $this->parseDate($attributes['start']);
 
         if (! isset($attributes['end'])) {
-            throw new InvalidArgumentException('End date is required.');
+            throw InvalidCalenderEventArgumentException::missingArguments('End date is required.');
         }
 
         $end = $this->parseDate($attributes['end']);
 
         if ($end <= $start) {
-            throw new InvalidArgumentException('End date must be after start date.');
+            throw InvalidCalenderEventArgumentException::endDateMustBeAfterStartDate();
         }
 
         $this->summary = $attributes['summary'];
@@ -111,7 +115,7 @@ final class CalendarEvent implements DataTypeInterface
             return Carbon::parse($date);
         }
 
-        throw new InvalidArgumentException('Date must be a string, numeric or DateTimeInterface.');
+        throw InvalidCalenderEventArgumentException::invalidDate(gettype($date));
     }
 
     private function formatProperty(string $value): string

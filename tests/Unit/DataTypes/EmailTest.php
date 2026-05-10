@@ -3,43 +3,51 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\Email;
+use Linkxtr\QrCode\Exceptions\InvalidEmailArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(Email::class);
+
+test('it throws exception if rendered before creation', function (): void {
+    $email = new Email;
+    expect(fn (): string => (string) $email)
+        ->toThrow(UninitializedDataTypeException::class, 'Email must be initialized via create() before rendering.');
+});
 
 test('it throws exception if email address is missing', function (): void {
     $email = new Email;
     expect(fn () => $email->create([]))
-        ->toThrow(InvalidArgumentException::class, 'Email address is required.');
+        ->toThrow(InvalidEmailArgumentException::class, 'Email address is required.');
 });
 
 test('it throws exception if main email address is invalid', function (): void {
     $email = new Email;
     expect(fn () => $email->create(['not-an-email']))
-        ->toThrow(InvalidArgumentException::class, 'Invalid email address provided to Email.');
+        ->toThrow(InvalidEmailArgumentException::class, 'Invalid email address provided to Email.');
 });
 
 test('it throws exception if subject is not a string', function (): void {
     $email = new Email;
     expect(fn () => $email->create(['test@example.com', 12345]))
-        ->toThrow(InvalidArgumentException::class, 'Invalid subject provided to Email.');
+        ->toThrow(InvalidEmailArgumentException::class, 'Email subject must be a string. Provided type: integer');
 });
 
 test('it throws exception if body is not a string', function (): void {
     $email = new Email;
     expect(fn () => $email->create(['test@example.com', 'Subject', ['invalid array']]))
-        ->toThrow(InvalidArgumentException::class, 'Invalid body provided to Email.');
+        ->toThrow(InvalidEmailArgumentException::class, 'Email body must be a string. Provided type: array');
 });
 
 test('it throws exception if cc email is invalid', function (): void {
     $email = new Email;
     expect(fn () => $email->create(['test@example.com', 'Sub', 'Body', 'invalid-cc']))
-        ->toThrow(InvalidArgumentException::class, 'Invalid email address provided to Email.');
+        ->toThrow(InvalidEmailArgumentException::class, 'Invalid email address provided to Email.');
 });
 
 test('it throws exception if bcc email is invalid', function (): void {
     $email = new Email;
     expect(fn () => $email->create(['test@example.com', 'Sub', 'Body', 'cc@example.com', 'invalid-bcc']))
-        ->toThrow(InvalidArgumentException::class, 'Invalid email address provided to Email.');
+        ->toThrow(InvalidEmailArgumentException::class, 'Invalid email address provided to Email.');
 });
 
 test('it generates simple mailto link with only an address', function (): void {

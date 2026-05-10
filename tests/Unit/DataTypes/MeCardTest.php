@@ -3,26 +3,28 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\MeCard;
+use Linkxtr\QrCode\Exceptions\InvalidMeCardArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(MeCard::class);
 
 it('throws exception if rendered before creation', function (): void {
     $meCard = new MeCard;
     expect(fn (): string => (string) $meCard)
-        ->toThrow(LogicException::class, 'MeCard must be initialized via create() before rendering.');
+        ->toThrow(UninitializedDataTypeException::class, 'MeCard must be initialized via create() before rendering.');
 });
 
 it('throws exception if name is missing or invalid', function (): void {
     $meCard = new MeCard;
 
     expect(fn () => $meCard->create([]))
-        ->toThrow(InvalidArgumentException::class, 'MeCard Name is mandatory.');
+        ->toThrow(InvalidMeCardArgumentException::class, 'MeCard Name is mandatory.');
 
     expect(fn () => $meCard->create([123]))
-        ->toThrow(InvalidArgumentException::class, 'MeCard Name is mandatory.');
+        ->toThrow(InvalidMeCardArgumentException::class, 'MeCard name must be a non-empty string. Provided type: integer');
 
     expect(fn () => $meCard->create(['name' => '']))
-        ->toThrow(InvalidArgumentException::class, 'MeCard Name is mandatory.');
+        ->toThrow(InvalidMeCardArgumentException::class, 'MeCard name must be a non-empty string. Provided type: empty string');
 });
 
 it('successfully maps the 5 common positional arguments', function (): void {

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
-use LogicException;
+use Linkxtr\QrCode\Exceptions\InvalidMeCardArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class MeCard implements DataTypeInterface
 {
@@ -39,7 +39,7 @@ final class MeCard implements DataTypeInterface
     public function __toString(): string
     {
         if ($this->name === '') {
-            throw new LogicException('MeCard must be initialized via create() before rendering.');
+            throw UninitializedDataTypeException::forType('MeCard');
         }
 
         $meCard = 'MECARD:N:'.$this->escapeNameValue($this->name).';';
@@ -117,8 +117,12 @@ final class MeCard implements DataTypeInterface
             }
         }
 
-        if (! isset($properties['name']) || ! is_string($properties['name']) || $properties['name'] === '') {
-            throw new InvalidArgumentException('MeCard Name is mandatory.');
+        if (! isset($properties['name'])) {
+            throw InvalidMeCardArgumentException::missingArguments('MeCard Name is mandatory.');
+        }
+
+        if (! is_string($properties['name']) || $properties['name'] === '') {
+            throw InvalidMeCardArgumentException::invalidNameType(gettype($properties['name']));
         }
 
         $this->name = $properties['name'];

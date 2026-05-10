@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
-use LogicException;
+use Linkxtr\QrCode\Exceptions\InvalidEthereumArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class Ethereum implements DataTypeInterface
 {
@@ -19,7 +19,7 @@ final class Ethereum implements DataTypeInterface
     public function __toString(): string
     {
         if (! isset($this->address)) {
-            throw new LogicException('Ethereum must be initialized via create() before rendering.');
+            throw UninitializedDataTypeException::forType('Ethereum');
         }
 
         if ($this->amount !== null) {
@@ -35,11 +35,11 @@ final class Ethereum implements DataTypeInterface
     public function create(array $arguments): void
     {
         if (! isset($arguments[0])) {
-            throw new InvalidArgumentException('Ethereum address is required.');
+            throw InvalidEthereumArgumentException::missingArguments('Ethereum address is required.');
         }
 
         if (! is_string($arguments[0]) || trim($arguments[0]) === '') {
-            throw new InvalidArgumentException('Ethereum address must be a non-empty string.');
+            throw InvalidEthereumArgumentException::invalidAddress(gettype($arguments[0]));
         }
 
         $address = trim($arguments[0]);
@@ -47,13 +47,13 @@ final class Ethereum implements DataTypeInterface
 
         if (isset($arguments[1])) {
             if (is_bool($arguments[1]) || ! is_scalar($arguments[1])) {
-                throw new InvalidArgumentException('Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
+                throw InvalidEthereumArgumentException::invalidAmountType(gettype($arguments[1]));
             }
 
             $amount = (string) $arguments[1];
 
             if (! preg_match('/^(0|[1-9]\d*)(\.\d+)?$/', $amount)) {
-                throw new InvalidArgumentException('Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
+                throw InvalidEthereumArgumentException::invalidAmount($amount);
             }
         }
 

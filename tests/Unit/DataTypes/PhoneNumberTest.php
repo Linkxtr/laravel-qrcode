@@ -3,25 +3,33 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\PhoneNumber;
+use Linkxtr\QrCode\Exceptions\InvalidPhoneNumberArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(PhoneNumber::class);
+
+it('throws exception if rendered before creation', function (): void {
+    $phone = new PhoneNumber;
+    expect(fn (): string => (string) $phone)
+        ->toThrow(UninitializedDataTypeException::class, 'Phone number must be initialized via create() before rendering.');
+});
 
 test('it throws exception if phone number is missing', function (): void {
     $phone = new PhoneNumber;
     expect(fn () => $phone->create([]))
-        ->toThrow(InvalidArgumentException::class, 'Phone number is required.');
+        ->toThrow(InvalidPhoneNumberArgumentException::class, 'Phone number is required.');
 });
 
 test('it throws exception if phone number is an invalid type', function (): void {
     $phone = new PhoneNumber;
     expect(fn () => $phone->create([['invalid array']]))
-        ->toThrow(InvalidArgumentException::class, 'Phone number must be a string or numeric value.');
+        ->toThrow(InvalidPhoneNumberArgumentException::class, 'Phone number must be a string or numeric value.');
 });
 
 test('it throws exception if phone number is an empty string', function (): void {
     $phone = new PhoneNumber;
     expect(fn () => $phone->create(['']))
-        ->toThrow(InvalidArgumentException::class, 'Phone number contains invalid characters. Only digits, spaces, hyphens, parentheses, dots, and a leading plus are allowed.');
+        ->toThrow(InvalidPhoneNumberArgumentException::class, 'Phone number contains invalid characters. Only digits, spaces, hyphens, parentheses, dots, and a leading plus are allowed.');
 });
 
 test('it formats string phone numbers correctly and strips spaces to kill string mutants', function (): void {

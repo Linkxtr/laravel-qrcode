@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
+use Linkxtr\QrCode\Exceptions\InvalidSMSArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class SMS implements DataTypeInterface
 {
@@ -20,6 +21,10 @@ final class SMS implements DataTypeInterface
 
     public function __toString(): string
     {
+        if (! isset($this->phoneNumber)) {
+            throw UninitializedDataTypeException::forType('SMS');
+        }
+
         $uri = self::PREFIX.$this->phoneNumber;
 
         if ($this->message !== null) {
@@ -35,11 +40,11 @@ final class SMS implements DataTypeInterface
     public function create(array $arguments): void
     {
         if (! isset($arguments[0])) {
-            throw new InvalidArgumentException('SMS phone number is required.');
+            throw InvalidSMSArgumentException::missingArguments('SMS phone number is required.');
         }
 
         if (! is_string($arguments[0]) && ! is_int($arguments[0])) {
-            throw new InvalidArgumentException('SMS phone number must be a string or integer value.');
+            throw InvalidSMSArgumentException::invalidPhoneNumberType(gettype($arguments[0]));
         }
 
         $this->phoneNumber = $this->validatePhoneNumber((string) $arguments[0]);
@@ -47,7 +52,7 @@ final class SMS implements DataTypeInterface
 
         if (array_key_exists(1, $arguments)) {
             if (! is_string($arguments[1])) {
-                throw new InvalidArgumentException('SMS message must be a string.');
+                throw InvalidSMSArgumentException::invalidMessageType(gettype($arguments[1]));
             }
 
             if ($arguments[1] !== '') {

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Exceptions\InvalidTelegramArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class Telegram implements DataTypeInterface
 {
@@ -15,6 +16,10 @@ final class Telegram implements DataTypeInterface
 
     public function __toString(): string
     {
+        if (! isset($this->username)) {
+            throw UninitializedDataTypeException::forType('Telegram');
+        }
+
         return self::PREFIX.$this->username;
     }
 
@@ -24,17 +29,17 @@ final class Telegram implements DataTypeInterface
     public function create(array $arguments): void
     {
         if (! isset($arguments[0])) {
-            throw new InvalidArgumentException('Telegram username is required.');
+            throw InvalidTelegramArgumentException::missingArguments('Telegram username is required.');
         }
 
         if (! is_string($arguments[0])) {
-            throw new InvalidArgumentException('Telegram username must be a string.');
+            throw InvalidTelegramArgumentException::invalidUsernameType(gettype($arguments[0]));
         }
 
         $username = ltrim(trim($arguments[0]), '@');
 
         if ($username === '') {
-            throw new InvalidArgumentException('Telegram username cannot be empty.');
+            throw InvalidTelegramArgumentException::invalidUsername();
         }
 
         $this->username = $username;

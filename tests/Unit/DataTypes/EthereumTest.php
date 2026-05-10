@@ -3,40 +3,42 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\Ethereum;
+use Linkxtr\QrCode\Exceptions\InvalidEthereumArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(Ethereum::class);
 
 it('throws exception if rendered before creation', function (): void {
     expect(fn (): string => (string) new Ethereum)
-        ->toThrow(LogicException::class, 'Ethereum must be initialized via create() before rendering.');
+        ->toThrow(UninitializedDataTypeException::class, 'Ethereum must be initialized via create() before rendering.');
 });
 
 test('it throws exception if address is missing', function (): void {
     $eth = new Ethereum;
     expect(fn () => $eth->create([]))
-        ->toThrow(InvalidArgumentException::class, 'Ethereum address is required.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum address is required.');
 });
 
 test('it throws exception if address is not a string', function (): void {
     $eth = new Ethereum;
     expect(fn () => $eth->create([12345]))
-        ->toThrow(InvalidArgumentException::class, 'Ethereum address must be a non-empty string.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum address must be a non-empty string.');
 });
 
 test('it throws exception if amount is not numeric', function (): void {
     $eth = new Ethereum;
     expect(fn () => $eth->create(['0x71C7656EC7ab88b098defB751B7401B5f6d8976F', 'not-a-number']))
-        ->toThrow(InvalidArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation. Provided value: not-a-number');
 
     $eth = new Ethereum;
     expect(fn () => $eth->create(['0x71C7656EC7ab88b098defB751B7401B5f6d8976F', []]))
-        ->toThrow(InvalidArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum amount must be a positive decimal string. Provided type: array');
 });
 
 test('it strictly bounds negative amounts to kill boundary mutants', function (): void {
     $eth = new Ethereum;
     expect(fn () => $eth->create(['0x71C7656EC7ab88b098defB751B7401B5f6d8976F', -0.5]))
-        ->toThrow(InvalidArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation. Provided value: -0.5');
 });
 
 test('it generates basic ethereum uri without amount', function (): void {
@@ -70,21 +72,21 @@ test('it mathematically rejects empty addresses', function (): void {
     $eth = new Ethereum;
 
     expect(fn () => $eth->create(['   ']))
-        ->toThrow(InvalidArgumentException::class, 'Ethereum address must be a non-empty string.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum address must be a non-empty string.');
 
     expect(fn () => $eth->create(['']))
-        ->toThrow(InvalidArgumentException::class, 'Ethereum address must be a non-empty string.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum address must be a non-empty string.');
 });
 
 test('it mathematically rejects negatives and scientific notation to comply with EIP-681', function (): void {
     $eth = new Ethereum;
 
     expect(fn () => $eth->create(['0x123', '-1']))
-        ->toThrow(InvalidArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
 
     expect(fn () => $eth->create(['0x123', '1e-18']))
-        ->toThrow(InvalidArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
 
     expect(fn () => $eth->create(['0x123', true]))
-        ->toThrow(InvalidArgumentException::class, 'Ethereum amount must be a valid, non-negative numeric string without scientific notation.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum amount must be a positive decimal string. Provided type: boolean');
 });

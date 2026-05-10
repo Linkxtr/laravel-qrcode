@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Exceptions\InvalidEmailArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class Email implements DataTypeInterface
 {
@@ -23,6 +24,10 @@ final class Email implements DataTypeInterface
 
     public function __toString(): string
     {
+        if (! isset($this->address)) {
+            throw UninitializedDataTypeException::forType('Email');
+        }
+
         $params = [];
 
         if ($this->subject !== null) {
@@ -54,14 +59,14 @@ final class Email implements DataTypeInterface
     public function create(array $arguments): void
     {
         if (! isset($arguments[0])) {
-            throw new InvalidArgumentException('Email address is required.');
+            throw InvalidEmailArgumentException::missingArguments('Email address is required.');
         }
 
         $this->address = $this->validateAddress($arguments[0]);
 
         if (isset($arguments[1])) {
             if (! is_string($arguments[1])) {
-                throw new InvalidArgumentException('Invalid subject provided to Email.');
+                throw InvalidEmailArgumentException::invalidSubjectType(gettype($arguments[1]));
             }
 
             if ($arguments[1] !== '') {
@@ -71,7 +76,7 @@ final class Email implements DataTypeInterface
 
         if (isset($arguments[2])) {
             if (! is_string($arguments[2])) {
-                throw new InvalidArgumentException('Invalid body provided to Email.');
+                throw InvalidEmailArgumentException::invalidBodyType(gettype($arguments[2]));
             }
 
             if ($arguments[2] !== '') {
@@ -91,7 +96,7 @@ final class Email implements DataTypeInterface
     private function validateAddress(mixed $address): string
     {
         if (! filter_var($address, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidArgumentException('Invalid email address provided to Email.');
+            throw InvalidEmailArgumentException::invalidAddress();
         }
 
         /** @var string $address */

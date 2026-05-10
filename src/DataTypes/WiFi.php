@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
-use LogicException;
+use Linkxtr\QrCode\Exceptions\InvalidWiFiArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class WiFi implements DataTypeInterface
 {
@@ -21,7 +21,7 @@ final class WiFi implements DataTypeInterface
     public function __toString(): string
     {
         if ($this->ssid === '') {
-            throw new LogicException('WiFi must be initialized via create() before rendering.');
+            throw UninitializedDataTypeException::forType('WiFi');
         }
 
         $wifi = 'WIFI:S:'.$this->escapeValue($this->ssid).';';
@@ -66,8 +66,12 @@ final class WiFi implements DataTypeInterface
             }
         }
 
-        if (! isset($properties['ssid']) || ! is_string($properties['ssid']) || $properties['ssid'] === '') {
-            throw new InvalidArgumentException('WiFi SSID is mandatory.');
+        if (! isset($properties['ssid'])) {
+            throw InvalidWiFiArgumentException::missingArguments('WiFi SSID is mandatory.');
+        }
+
+        if (! is_string($properties['ssid']) || $properties['ssid'] === '') {
+            throw InvalidWiFiArgumentException::invalidSsidValue(gettype($properties['ssid']));
         }
 
         $ssid = $properties['ssid'];
@@ -82,7 +86,7 @@ final class WiFi implements DataTypeInterface
             }
 
             if (! in_array($encryption, ['WEP', 'WPA', 'NOPASS'], true)) {
-                throw new InvalidArgumentException('WiFi encryption must be WEP, WPA, or NOPASS.');
+                throw InvalidWiFiArgumentException::invalidEncryptionValue($encryption);
             }
 
             $resolvedEncryption = $encryption;
@@ -91,7 +95,7 @@ final class WiFi implements DataTypeInterface
         }
 
         if ($resolvedEncryption === 'NOPASS' && $hasPassword) {
-            throw new InvalidArgumentException('WiFi password cannot be provided when encryption is NOPASS.');
+            throw InvalidWiFiArgumentException::passwordWithNopassEncryption();
         }
 
         if ($hasPassword) {
@@ -100,7 +104,7 @@ final class WiFi implements DataTypeInterface
 
         if (isset($properties['hidden'])) {
             if (! is_scalar($properties['hidden'])) {
-                throw new InvalidArgumentException('WiFi hidden flag must be a boolean or a string representation of a boolean.');
+                throw InvalidWiFiArgumentException::invalidHiddenType(gettype($properties['hidden']));
             }
 
             $hidden = filter_var($properties['hidden'], FILTER_VALIDATE_BOOLEAN);

@@ -3,30 +3,37 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\Geo;
+use Linkxtr\QrCode\Exceptions\InvalidGeoArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(Geo::class);
+
+it('throws exception if rendered before creation', function (): void {
+    expect(fn (): string => (string) new Geo)
+        ->toThrow(UninitializedDataTypeException::class, 'Geo must be initialized via create() before rendering.');
+});
 
 test('it throws exception if arguments are missing', function (): void {
     $geo = new Geo;
 
     expect(fn () => $geo->create([]))
-        ->toThrow(InvalidArgumentException::class, 'Latitude and longitude are required.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Latitude and longitude are required.');
 
     expect(fn () => $geo->create([37.7749]))
-        ->toThrow(InvalidArgumentException::class, 'Latitude and longitude are required.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Latitude and longitude are required.');
 
     expect(fn () => $geo->create([1 => -122.4194]))
-        ->toThrow(InvalidArgumentException::class, 'Latitude and longitude are required.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Latitude and longitude are required.');
 });
 
 test('it throws exception if latitude or longitude are not numeric', function (): void {
     $geo = new Geo;
 
     expect(fn () => $geo->create(['invalid', -122.4194]))
-        ->toThrow(InvalidArgumentException::class, 'Latitude and longitude must be numeric.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Latitude and longitude must be numeric. Provided types: string, double');
 
     expect(fn () => $geo->create([37.7749, 'invalid']))
-        ->toThrow(InvalidArgumentException::class, 'Latitude and longitude must be numeric.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Latitude and longitude must be numeric. Provided types: double, string');
 });
 
 it('generates full geo string from standard floats', function (float $lat, float $lng, string $expected): void {
@@ -60,7 +67,7 @@ test('it accurately renders zero coordinates without stripping them', function (
 test('it throws exception if name is not a string', function (): void {
     $geo = new Geo;
     expect(fn () => $geo->create([37.7749, -122.4194, 12345]))
-        ->toThrow(InvalidArgumentException::class, 'Geo name must be a string.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Geo name must be a string. Provided type: integer');
 });
 
 test('it intercepts and ignores empty string names', function (): void {
@@ -82,16 +89,16 @@ test('it throws an exception for out-of-bounds latitude and longitude', function
     $geo = new Geo;
 
     expect(fn () => $geo->create([-90.000001, 0]))
-        ->toThrow(InvalidArgumentException::class, 'Latitude must be between -90 and 90.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Latitude must be between -90 and 90.');
 
     expect(fn () => $geo->create([90.000001, 0]))
-        ->toThrow(InvalidArgumentException::class, 'Latitude must be between -90 and 90.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Latitude must be between -90 and 90.');
 
     expect(fn () => $geo->create([0, -180.000001]))
-        ->toThrow(InvalidArgumentException::class, 'Longitude must be between -180 and 180.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Longitude must be between -180 and 180.');
 
     expect(fn () => $geo->create([0, 180.000001]))
-        ->toThrow(InvalidArgumentException::class, 'Longitude must be between -180 and 180.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Longitude must be between -180 and 180.');
 });
 
 test('it clears the name if null is passed as the third argument', function (): void {
@@ -111,8 +118,8 @@ test('it throws a required exception when null is passed as latitude or longitud
     $geo = new Geo;
 
     expect(fn () => $geo->create([null, -122.4194]))
-        ->toThrow(InvalidArgumentException::class, 'Latitude and longitude are required.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Latitude and longitude are required.');
 
     expect(fn () => $geo->create([37.7749, null]))
-        ->toThrow(InvalidArgumentException::class, 'Latitude and longitude are required.');
+        ->toThrow(InvalidGeoArgumentException::class, 'Latitude and longitude are required.');
 });

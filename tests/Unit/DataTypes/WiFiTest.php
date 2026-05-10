@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\WiFi;
+use Linkxtr\QrCode\Exceptions\InvalidWiFiArgumentException;
 
 covers(WiFi::class);
 
@@ -16,17 +17,17 @@ test('it throws exception if ssid is missing or empty', function (): void {
     $wifi = new WiFi;
 
     expect(fn () => $wifi->create([]))
-        ->toThrow(InvalidArgumentException::class, 'WiFi SSID is mandatory.');
+        ->toThrow(InvalidWiFiArgumentException::class, 'WiFi SSID is mandatory.');
 
     expect(fn () => $wifi->create(['']))
-        ->toThrow(InvalidArgumentException::class, 'WiFi SSID is mandatory.');
+        ->toThrow(InvalidWiFiArgumentException::class, 'WiFi SSID must be a non-empty string. Provided type: empty string');
 });
 
 test('it throws exception if encryption is invalid', function (): void {
     $wifi = new WiFi;
 
     expect(fn () => $wifi->create(['MyWiFi', 'INVALID_ENCRYPTION']))
-        ->toThrow(InvalidArgumentException::class, 'WiFi encryption must be WEP, WPA, or NOPASS.');
+        ->toThrow(InvalidWiFiArgumentException::class, 'WiFi encryption must be WEP, WPA, WPA2, WPA3 or NOPASS. Provided encryption: INVALID_ENCRYPTION');
 });
 
 test('it maps positional arguments and normalizes encryption case', function (): void {
@@ -122,18 +123,18 @@ test('it mathematically enforces NOPASS encryption cannot have a password', func
     $wifi = new WiFi;
 
     expect(fn () => $wifi->create([['ssid' => 'MyNetwork', 'encryption' => 'NOPASS', 'password' => 'Secret123']]))
-        ->toThrow(InvalidArgumentException::class, 'WiFi password cannot be provided when encryption is NOPASS.');
+        ->toThrow(InvalidWiFiArgumentException::class, 'WiFi password cannot be provided when encryption is NOPASS.');
 
     $wifiPositional = new WiFi;
     expect(fn () => $wifiPositional->create([['MyNetwork', 'NOPASS', 'Secret123']]))
-        ->toThrow(InvalidArgumentException::class, 'WiFi password cannot be provided when encryption is NOPASS.');
+        ->toThrow(InvalidWiFiArgumentException::class, 'WiFi password cannot be provided when encryption is NOPASS.');
 });
 
 it('rejects malformed hidden flag values', function (): void {
     $wifi = new WiFi;
 
     expect(fn () => $wifi->create([['ssid' => 'MyNetwork', 'hidden' => ['nested_array']]]))
-        ->toThrow(InvalidArgumentException::class, 'WiFi hidden flag must be a boolean or a string representation of a boolean.');
+        ->toThrow(InvalidWiFiArgumentException::class, 'WiFi hidden flag must be a boolean or a string representation of a boolean.');
 });
 
 it('converts WPA2 and WPA3 to WPA', function (): void {

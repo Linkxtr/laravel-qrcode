@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
+use Linkxtr\QrCode\Exceptions\InvalidWhatsAppArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class WhatsApp implements DataTypeInterface
 {
@@ -20,6 +21,10 @@ final class WhatsApp implements DataTypeInterface
 
     public function __toString(): string
     {
+        if (! isset($this->phoneNumber)) {
+            throw UninitializedDataTypeException::forType('WhatsApp');
+        }
+
         $uri = self::PREFIX.$this->phoneNumber;
 
         if ($this->message !== null) {
@@ -35,24 +40,24 @@ final class WhatsApp implements DataTypeInterface
     public function create(array $arguments): void
     {
         if (! isset($arguments[0])) {
-            throw new InvalidArgumentException('WhatsApp phone number is required.');
+            throw InvalidWhatsAppArgumentException::missingArguments('WhatsApp phone number is required.');
         }
 
         if (! is_scalar($arguments[0])) {
-            throw new InvalidArgumentException('WhatsApp phone number must be a string or numeric value.');
+            throw InvalidWhatsAppArgumentException::invalidPhoneNumberType(gettype($arguments[0]));
         }
 
         $rawNumber = trim((string) $arguments[0]);
 
         if ($rawNumber === '') {
-            throw new InvalidArgumentException('WhatsApp phone number cannot be empty.');
+            throw InvalidWhatsAppArgumentException::emptyPhoneNumber();
         }
 
         $this->phoneNumber = ltrim($this->validatePhoneNumber($rawNumber), '+');
 
         if (isset($arguments[1])) {
             if (! is_string($arguments[1])) {
-                throw new InvalidArgumentException('WhatsApp message must be a string.');
+                throw InvalidWhatsAppArgumentException::invalidMessageType(gettype($arguments[1]));
             }
 
             if ($arguments[1] !== '') {

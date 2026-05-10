@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
-use LogicException;
+use Linkxtr\QrCode\Exceptions\InvalidVCardArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class VCard implements DataTypeInterface
 {
@@ -47,7 +47,7 @@ final class VCard implements DataTypeInterface
     public function __toString(): string
     {
         if ($this->name === '') {
-            throw new LogicException('VCard must be initialized via create() before rendering.');
+            throw UninitializedDataTypeException::forType('VCard');
         }
 
         $lines = [
@@ -146,8 +146,12 @@ final class VCard implements DataTypeInterface
             }
         }
 
-        if (! isset($properties['name']) || ! is_string($properties['name']) || $properties['name'] === '') {
-            throw new InvalidArgumentException('VCard Name is mandatory.');
+        if (! isset($properties['name'])) {
+            throw InvalidVCardArgumentException::missingArguments('VCard Name is mandatory.');
+        }
+
+        if (! is_string($properties['name']) || $properties['name'] === '') {
+            throw InvalidVCardArgumentException::invalidNameType(gettype($properties['name']));
         }
 
         $optionalKeys = [

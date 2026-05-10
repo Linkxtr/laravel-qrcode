@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Exceptions\InvalidGeoArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class Geo implements DataTypeInterface
 {
@@ -19,6 +20,10 @@ final class Geo implements DataTypeInterface
 
     public function __toString(): string
     {
+        if (! isset($this->latitude, $this->longitude)) {
+            throw UninitializedDataTypeException::forType('Geo');
+        }
+
         $baseUri = self::PREFIX.$this->latitude.','.$this->longitude;
 
         if ($this->name !== null) {
@@ -34,29 +39,29 @@ final class Geo implements DataTypeInterface
     public function create(array $arguments): void
     {
         if (! isset($arguments[0], $arguments[1])) {
-            throw new InvalidArgumentException('Latitude and longitude are required.');
+            throw InvalidGeoArgumentException::missingArguments('Latitude and longitude are required.');
         }
 
         if (! is_numeric($arguments[0]) || ! is_numeric($arguments[1])) {
-            throw new InvalidArgumentException('Latitude and longitude must be numeric.');
+            throw InvalidGeoArgumentException::invalidCoordinatesType(gettype($arguments[0]), gettype($arguments[1]));
         }
 
         $latitude = (float) $arguments[0];
         $longitude = (float) $arguments[1];
 
         if ($latitude < -90 || $latitude > 90) {
-            throw new InvalidArgumentException('Latitude must be between -90 and 90.');
+            throw InvalidGeoArgumentException::invalidLatitude();
         }
 
         if ($longitude < -180 || $longitude > 180) {
-            throw new InvalidArgumentException('Longitude must be between -180 and 180.');
+            throw InvalidGeoArgumentException::invalidLongitude();
         }
 
         $name = null;
 
         if (array_key_exists(2, $arguments) && $arguments[2] !== null) {
             if (! is_string($arguments[2])) {
-                throw new InvalidArgumentException('Geo name must be a string.');
+                throw InvalidGeoArgumentException::invalidNameType(gettype($arguments[2]));
             }
 
             if ($arguments[2] !== '') {

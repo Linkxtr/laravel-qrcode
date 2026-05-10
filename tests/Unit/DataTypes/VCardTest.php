@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\VCard;
+use Linkxtr\QrCode\Exceptions\InvalidVCardArgumentException;
 
 covers(VCard::class);
 
@@ -16,13 +17,13 @@ test('it throws exception if name is missing or invalid', function (): void {
     $vcard = new VCard;
 
     expect(fn () => $vcard->create([]))
-        ->toThrow(InvalidArgumentException::class, 'VCard Name is mandatory.');
+        ->toThrow(InvalidVCardArgumentException::class, 'VCard Name is mandatory.');
 
     expect(fn () => $vcard->create([123]))
-        ->toThrow(InvalidArgumentException::class, 'VCard Name is mandatory.');
+        ->toThrow(InvalidVCardArgumentException::class, 'VCard name must be a non-empty string. Provided type: integer');
 
     expect(fn () => $vcard->create(['name' => '']))
-        ->toThrow(InvalidArgumentException::class, 'VCard Name is mandatory.');
+        ->toThrow(InvalidVCardArgumentException::class, 'VCard name must be a non-empty string. Provided type: empty string');
 });
 
 test('it successfully maps the 5 common positional arguments', function (): void {

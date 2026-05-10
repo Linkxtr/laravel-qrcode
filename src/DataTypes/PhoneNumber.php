@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
+use Linkxtr\QrCode\Exceptions\InvalidPhoneNumberArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class PhoneNumber implements DataTypeInterface
 {
@@ -18,6 +19,10 @@ final class PhoneNumber implements DataTypeInterface
 
     public function __toString(): string
     {
+        if (! isset($this->phoneNumber)) {
+            throw UninitializedDataTypeException::forType('Phone number');
+        }
+
         return self::PREFIX.$this->phoneNumber;
     }
 
@@ -27,11 +32,11 @@ final class PhoneNumber implements DataTypeInterface
     public function create(array $arguments): void
     {
         if (! isset($arguments[0])) {
-            throw new InvalidArgumentException('Phone number is required.');
+            throw InvalidPhoneNumberArgumentException::missingArguments('Phone number is required.');
         }
 
         if (! is_string($arguments[0]) && ! is_numeric($arguments[0])) {
-            throw new InvalidArgumentException('Phone number must be a string or numeric value.');
+            throw InvalidPhoneNumberArgumentException::invalidPhoneNumberType(gettype($arguments[0]));
         }
 
         $this->phoneNumber = $this->validatePhoneNumber((string) $arguments[0]);

@@ -3,37 +3,41 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\BTC;
+use Linkxtr\QrCode\Exceptions\InvalidBTCArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(BTC::class);
 
 test('it throws exception if rendered before creation', function (): void {
     $btc = new BTC;
     expect(fn (): string => (string) $btc)
-        ->toThrow(LogicException::class, 'BTC must be initialized via create() before rendering.');
+        ->toThrow(UninitializedDataTypeException::class, 'BTC must be initialized via create() before rendering.');
 });
 
 test('it throws exception if address or amount is missing', function (): void {
     $btc = new BTC;
     expect(fn () => $btc->create(['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa']))
-        ->toThrow(InvalidArgumentException::class, 'Bitcoin address and amount are required.');
+        ->toThrow(InvalidBTCArgumentException::class, 'Bitcoin address and amount are required.');
 });
 
 test('it throws exception if address is not a string', function (): void {
     $btc = new BTC;
     expect(fn () => $btc->create([12345, 1.5]))
-        ->toThrow(InvalidArgumentException::class, 'Bitcoin address must be a non-empty string.');
+        ->toThrow(InvalidBTCArgumentException::class, 'Bitcoin address must be a non-empty string.');
 });
 
 test('it throws exception if amount is not numeric', function (): void {
     $btc = new BTC;
     expect(fn () => $btc->create(['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', 'not-a-number']))
-        ->toThrow(InvalidArgumentException::class, 'Bitcoin amount must be a positive decimal string. Small amounts must be passed as strings to avoid scientific notation loss.');
+        ->toThrow(InvalidBTCArgumentException::class, 'Bitcoin amount must be a positive decimal string. Provided value: not-a-number');
+    expect(fn () => $btc->create(['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', [1.5]]))
+        ->toThrow(InvalidBTCArgumentException::class, 'Bitcoin amount must be a positive decimal string. Provided type: array');
 });
 
 test('it throws exception if amount is negative', function (): void {
     $btc = new BTC;
     expect(fn () => $btc->create(['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', -0.5]))
-        ->toThrow(InvalidArgumentException::class, 'Bitcoin amount must be a positive decimal string. Small amounts must be passed as strings to avoid scientific notation loss.');
+        ->toThrow(InvalidBTCArgumentException::class, 'Bitcoin amount must be a positive decimal string. Provided value: -0.5');
 });
 
 test('it generates basic bitcoin uri with positive amount', function (): void {
@@ -92,7 +96,7 @@ test('it throws an exception if amount is converted to scientific notation to pr
     $btc = new BTC;
 
     expect(fn () => $btc->create(['1Address', 0.00000001]))
-        ->toThrow(InvalidArgumentException::class, 'Bitcoin amount must be a positive decimal string');
+        ->toThrow(InvalidBTCArgumentException::class, 'Bitcoin amount must be a positive decimal string');
     $btcSafe = new BTC;
     $btcSafe->create(['1Address', '0.00000001']);
 
@@ -103,26 +107,26 @@ test('it mathematically enforces format', function (): void {
     $btc = new BTC;
 
     expect(fn () => $btc->create(['1Address', '-1.5']))
-        ->toThrow(InvalidArgumentException::class);
+        ->toThrow(InvalidBTCArgumentException::class);
 
     expect(fn () => $btc->create(['1Address', '1.5abc']))
-        ->toThrow(InvalidArgumentException::class);
+        ->toThrow(InvalidBTCArgumentException::class);
 
     expect(fn () => $btc->create(['1Address', ['amount' => 1.5]]))
-        ->toThrow(InvalidArgumentException::class);
+        ->toThrow(InvalidBTCArgumentException::class);
 
     expect(fn () => $btc->create(['1Address', true]))
-        ->toThrow(InvalidArgumentException::class);
+        ->toThrow(InvalidBTCArgumentException::class);
 });
 
 test('it mathematically rejects empty addresses to prevent broken URIs', function (): void {
     $btc = new BTC;
 
-    expect(fn () => $btc->create(['   ', '0.5']))
-        ->toThrow(InvalidArgumentException::class, 'Bitcoin address must be a non-empty string.');
+    expect(fn () => $btc->create(['   ', 0.5]))
+        ->toThrow(InvalidBTCArgumentException::class, 'Bitcoin address must be a non-empty string. Provided type: empty string');
 
     expect(fn () => $btc->create(['', '0.5']))
-        ->toThrow(InvalidArgumentException::class, 'Bitcoin address must be a non-empty string.');
+        ->toThrow(InvalidBTCArgumentException::class, 'Bitcoin address must be a non-empty string. Provided type: empty string');
 });
 
 it('trims whitespace from the bitcoin address', function (): void {

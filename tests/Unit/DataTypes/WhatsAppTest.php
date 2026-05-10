@@ -3,31 +3,39 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\WhatsApp;
+use Linkxtr\QrCode\Exceptions\InvalidWhatsAppArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(WhatsApp::class);
+
+it('throws exception if rendered before creation', function (): void {
+    $wa = new WhatsApp;
+    expect(fn (): string => (string) $wa)
+        ->toThrow(UninitializedDataTypeException::class, 'WhatsApp must be initialized via create() before rendering.');
+});
 
 test('it throws exception if phone number is missing', function (): void {
     $wa = new WhatsApp;
     expect(fn () => $wa->create([]))
-        ->toThrow(InvalidArgumentException::class, 'WhatsApp phone number is required.');
+        ->toThrow(InvalidWhatsAppArgumentException::class, 'WhatsApp phone number is required.');
 });
 
 test('it throws exception if phone number is an invalid type', function (): void {
     $wa = new WhatsApp;
     expect(fn () => $wa->create([['invalid_array_payload']]))
-        ->toThrow(InvalidArgumentException::class, 'WhatsApp phone number must be a string or numeric value.');
+        ->toThrow(InvalidWhatsAppArgumentException::class, 'WhatsApp phone number must be a string or numeric value.');
 });
 
 test('it throws exception if phone number is an empty string', function (): void {
     $wa = new WhatsApp;
     expect(fn () => $wa->create(['']))
-        ->toThrow(InvalidArgumentException::class, 'WhatsApp phone number cannot be empty.');
+        ->toThrow(InvalidWhatsAppArgumentException::class, 'WhatsApp phone number cannot be empty.');
 });
 
 test('it throws exception if message is not a string', function (): void {
     $wa = new WhatsApp;
     expect(fn () => $wa->create(['+15551234567', 12345]))
-        ->toThrow(InvalidArgumentException::class, 'WhatsApp message must be a string.');
+        ->toThrow(InvalidWhatsAppArgumentException::class, 'WhatsApp message must be a string. Provided type: integer');
 });
 
 test('it safely casts numeric phone numbers to string', function (): void {

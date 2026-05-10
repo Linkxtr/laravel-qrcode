@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
-use LogicException;
+use Linkxtr\QrCode\Exceptions\InvalidBTCArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class BTC implements DataTypeInterface
 {
@@ -25,7 +25,7 @@ final class BTC implements DataTypeInterface
     public function __toString(): string
     {
         if (! isset($this->address)) {
-            throw new LogicException('BTC must be initialized via create() before rendering.');
+            throw UninitializedDataTypeException::forType('BTC');
         }
 
         $params = [
@@ -50,25 +50,21 @@ final class BTC implements DataTypeInterface
         $this->returnAddress = null;
 
         if (count($arguments) < 2) {
-            throw new InvalidArgumentException('Bitcoin address and amount are required.');
+            throw InvalidBTCArgumentException::missingArguments('Bitcoin address and amount are required.');
         }
 
         if (! is_string($arguments[0]) || trim($arguments[0]) === '') {
-            throw new InvalidArgumentException('Bitcoin address must be a non-empty string.');
+            throw InvalidBTCArgumentException::invalidAddress(gettype($arguments[0]));
         }
 
-        if (! is_scalar($arguments[1])) {
-            throw new InvalidArgumentException('Bitcoin amount must be a scalar value.');
-        }
-
-        if (is_bool($arguments[1])) {
-            throw new InvalidArgumentException('Bitcoin amount cannot be a boolean.');
+        if (! is_scalar($arguments[1]) || is_bool($arguments[1])) {
+            throw InvalidBTCArgumentException::invalidAmountType(gettype($arguments[1]));
         }
 
         $amountStr = (string) $arguments[1];
 
         if (preg_match('/^\d+(\.\d+)?$/', $amountStr) !== 1) {
-            throw new InvalidArgumentException('Bitcoin amount must be a positive decimal string. Small amounts must be passed as strings to avoid scientific notation loss.');
+            throw InvalidBTCArgumentException::invalidAmount($amountStr);
         }
 
         $this->address = trim($arguments[0]);

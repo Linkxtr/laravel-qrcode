@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Carbon\Carbon;
 use Linkxtr\QrCode\DataTypes\CalendarEvent;
+use Linkxtr\QrCode\Exceptions\InvalidCalenderEventArgumentException;
+use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(CalendarEvent::class);
 
@@ -12,38 +14,38 @@ afterEach(fn () => Carbon::setTestNow());
 test('it throws exception if rendered before creation', function (): void {
     $event = new CalendarEvent;
     expect(fn (): string => (string) $event)
-        ->toThrow(LogicException::class, 'CalendarEvent must be initialized via create() before rendering.');
+        ->toThrow(UninitializedDataTypeException::class, 'Calendar event must be initialized via create() before rendering.');
 });
 
 test('it throws exception if arguments are not an array', function (): void {
     $event = new CalendarEvent;
     expect(fn () => $event->create(['not-an-array']))
-        ->toThrow(InvalidArgumentException::class, 'Invalid CalendarEvent arguments.');
+        ->toThrow(InvalidCalenderEventArgumentException::class, 'Invalid CalendarEvent arguments.');
 });
 
 test('it throws exception if summary is missing, invalid type, or empty', function (): void {
     $event = new CalendarEvent;
 
     expect(fn () => $event->create([[]]))
-        ->toThrow(InvalidArgumentException::class, 'Summary is required and must be a string.');
+        ->toThrow(InvalidCalenderEventArgumentException::class, 'Summary is required.');
 
     expect(fn () => $event->create([['summary' => 123]]))
-        ->toThrow(InvalidArgumentException::class, 'Summary is required and must be a string.');
+        ->toThrow(InvalidCalenderEventArgumentException::class, 'The summary must be a non-empty string.');
 
     expect(fn () => $event->create([['summary' => '']]))
-        ->toThrow(InvalidArgumentException::class, 'Summary is required and must be a string.');
+        ->toThrow(InvalidCalenderEventArgumentException::class, 'The summary must be a non-empty string.');
 });
 
 test('it throws exception if start date is missing', function (): void {
     $event = new CalendarEvent;
     expect(fn () => $event->create([['summary' => 'Meeting']]))
-        ->toThrow(InvalidArgumentException::class, 'Start date is required.');
+        ->toThrow(InvalidCalenderEventArgumentException::class, 'Start date is required.');
 });
 
 test('it throws exception if end date is missing', function (): void {
     $event = new CalendarEvent;
     expect(fn () => $event->create([['summary' => 'Meeting', 'start' => '2023-01-01']]))
-        ->toThrow(InvalidArgumentException::class, 'End date is required.');
+        ->toThrow(InvalidCalenderEventArgumentException::class, 'End date is required.');
 });
 
 test('it strictly enforces end date must be after start date', function (): void {
@@ -51,11 +53,11 @@ test('it strictly enforces end date must be after start date', function (): void
 
     expect(fn () => $event->create([
         ['summary' => 'Meeting', 'start' => '2023-01-01 12:00:00', 'end' => '2023-01-01 12:00:00'],
-    ]))->toThrow(InvalidArgumentException::class, 'End date must be after start date.');
+    ]))->toThrow(InvalidCalenderEventArgumentException::class, 'The end date must be after the start date.');
 
     expect(fn () => $event->create([
         ['summary' => 'Meeting', 'start' => '2023-01-01 12:00:00', 'end' => '2023-01-01 11:59:59'],
-    ]))->toThrow(InvalidArgumentException::class, 'End date must be after start date.');
+    ]))->toThrow(InvalidCalenderEventArgumentException::class, 'The end date must be after the start date.');
 });
 
 test('it successfully parses numeric timestamps and DateTimeInterfaces', function (): void {
@@ -74,7 +76,7 @@ test('it throws exception for invalid date types', function (): void {
     $event = new CalendarEvent;
     expect(fn () => $event->create([
         ['summary' => 'Meeting', 'start' => ['invalid-type'], 'end' => '2023-01-01'],
-    ]))->toThrow(InvalidArgumentException::class, 'Date must be a string, numeric or DateTimeInterface.');
+    ]))->toThrow(InvalidCalenderEventArgumentException::class, 'The date must be a string, numeric, or DateTimeInterface.');
 });
 
 test('it generates full formatted calendar string and strictly preserves timezones', function (): void {
@@ -203,7 +205,7 @@ test('it does not mutate instance state if validation fails', function (): void 
             'summary' => 'Meeting 2',
             'start' => '2023-12-02 12:00:00',
         ]]);
-    } catch (InvalidArgumentException) {
+    } catch (InvalidCalenderEventArgumentException) {
     }
 
     expect(invade($event)->summary)->toBe('Meeting 1')
