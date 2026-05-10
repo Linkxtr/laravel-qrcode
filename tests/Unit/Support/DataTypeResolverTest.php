@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
+use Linkxtr\QrCode\Exceptions\UnknownMethodException;
 use Linkxtr\QrCode\Support\DataTypeResolver;
 
 it('throws an exception for an unregistered method', function (): void {
     DataTypeResolver::resolve('unknownMethod', []);
 })->throws(
-    BadMethodCallException::class,
-    'Method "unknownMethod" does not exist on the QrCode Generator. It is not a registered macro or a valid Data Type.'
+    UnknownMethodException::class,
+    'Method "unknownMethod" does not exist on the QrCode Generator.'
 );
 
 it('resolves valid data types and executes them case-insensitively', function (string $method): void {

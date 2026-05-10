@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Support;
 
-use BadMethodCallException;
 use Linkxtr\QrCode\DataTypes\BTC;
 use Linkxtr\QrCode\DataTypes\CalendarEvent;
 use Linkxtr\QrCode\DataTypes\Email;
@@ -17,6 +16,7 @@ use Linkxtr\QrCode\DataTypes\Telegram;
 use Linkxtr\QrCode\DataTypes\VCard;
 use Linkxtr\QrCode\DataTypes\WhatsApp;
 use Linkxtr\QrCode\DataTypes\WiFi;
+use Linkxtr\QrCode\Exceptions\UnknownMethodException;
 
 final class DataTypeResolver
 {
@@ -43,17 +43,14 @@ final class DataTypeResolver
      *
      * @param  array<mixed>  $arguments
      *
-     * @throws BadMethodCallException
+     * @throws UnknownMethodException
      */
     public static function resolve(string $method, array $arguments): string
     {
         $normalizedMethod = strtolower($method);
 
         if (! array_key_exists($normalizedMethod, self::MAP)) {
-            throw new BadMethodCallException(sprintf(
-                'Method "%s" does not exist on the QrCode Generator. It is not a registered macro or a valid Data Type.',
-                $method
-            ));
+            throw UnknownMethodException::methodNotFound($method);
         }
 
         $className = self::MAP[$normalizedMethod];
