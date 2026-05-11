@@ -22,7 +22,11 @@ test('it throws exception if address is missing', function (): void {
 test('it throws exception if address is not a string', function (): void {
     $eth = new Ethereum;
     expect(fn () => $eth->create([12345]))
-        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum address must be a non-empty string.');
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum address must be a non-empty string. Provided type: integer');
+
+    $eth = new Ethereum;
+    expect(fn () => $eth->create(['']))
+        ->toThrow(InvalidEthereumArgumentException::class, 'Ethereum address must be a non-empty string. Provided type: empty string');
 });
 
 test('it throws exception if amount is not numeric', function (): void {
