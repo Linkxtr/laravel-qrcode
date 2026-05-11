@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\View\ComponentAttributeBag;
 use Linkxtr\QrCode\Components\QrCodeComponent;
 use Linkxtr\QrCode\Enums\GradientType;
+use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
@@ -17,15 +18,15 @@ beforeEach(function (): void {
 
 test('it throws exceptions for invalid formats', function (): void {
     $component1 = new QrCodeComponent(data: 'test', format: 'invalid');
-    expect(fn (): Closure => $component1->render())->toThrow(InvalidArgumentException::class, 'Format "invalid" is not supported in the Blade component. Supported HTML embed formats are: svg, png, webp.');
+    expect(fn (): Closure => $component1->render())->toThrow(InvalidConfigurationException::class, 'Format must be one of the following values: svg, png, webp. Got: invalid');
 
     $component2 = new QrCodeComponent(data: 'test', format: 'eps');
-    expect(fn (): Closure => $component2->render())->toThrow(InvalidArgumentException::class, 'Format "eps" is not supported in the Blade component. Supported HTML embed formats are: svg, png, webp.');
+    expect(fn (): Closure => $component2->render())->toThrow(InvalidConfigurationException::class, 'Format must be one of the following values: svg, png, webp. Got: eps');
 });
 
 test('it throws exception for path traversal attempts in merge', function (): void {
     $component = new QrCodeComponent(data: 'test', merge: '../malicious.png');
-    expect(fn (): Closure => $component->render())->toThrow(InvalidArgumentException::class, 'Invalid merge path, path traversal is not allowed.');
+    expect(fn (): Closure => $component->render())->toThrow(InvalidConfigurationException::class, 'Image file path must be inside the application base path.');
 });
 
 test('it generates default svg with injected title and accessibility attributes', function (): void {

@@ -8,8 +8,8 @@ use Closure;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
-use InvalidArgumentException;
 use Linkxtr\QrCode\Enums\GradientType;
+use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
@@ -39,12 +39,9 @@ final class QrCodeComponent extends Component
     public function render(): Closure
     {
         if (! in_array($this->format, ['svg', 'png', 'webp'], true)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Format "%s" is not supported in the Blade component. Supported HTML embed formats are: %s.',
-                    $this->format,
-                    implode(', ', ['svg', 'png', 'webp'])
-                )
+            throw InvalidConfigurationException::unsupportedFormat(
+                $this->format,
+                ['svg', 'png', 'webp']
             );
         }
 
@@ -90,7 +87,7 @@ final class QrCodeComponent extends Component
 
         if ($this->merge !== null) {
             if (str_contains($this->merge, '..')) {
-                throw new InvalidArgumentException('Invalid merge path, path traversal is not allowed.');
+                throw InvalidConfigurationException::imagePathOutsideApplication();
             }
 
             $generator = $generator->merge($this->merge, $this->mergePercentage);
@@ -145,7 +142,7 @@ final class QrCodeComponent extends Component
     {
         try {
             return Rgb::parse($color);
-        } catch (InvalidArgumentException) {
+        } catch (InvalidConfigurationException) {
             return null;
         }
     }
