@@ -6,10 +6,9 @@ namespace Linkxtr\QrCode\Mergers;
 
 use Imagick;
 use ImagickException;
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
 use Linkxtr\QrCode\Enums\Format;
-use RuntimeException;
+use Linkxtr\QrCode\Exceptions\ImageMergeException;
 
 final class ImagickMerger implements MergerInterface
 {
@@ -21,14 +20,14 @@ final class ImagickMerger implements MergerInterface
         private readonly float $percentage = 0.2
     ) {
         if ($this->percentage <= 0 || $this->percentage >= 1) {
-            throw new InvalidArgumentException('$percentage must be between 0 and 1');
+            throw ImageMergeException::invalidPercentage();
         }
     }
 
     public function setFormat(Format $format): self
     {
         if (! in_array($format, [Format::PNG, Format::WEBP], true)) {
-            throw new InvalidArgumentException('ImagickMerger only supports "png" or "webp" formats.');
+            throw ImageMergeException::unsupportedFormat('ImagickMerger only supports "png" or "webp" formats.');
         }
 
         $this->format = $format;
@@ -81,7 +80,7 @@ final class ImagickMerger implements MergerInterface
             return $source->getImageBlob();
 
         } catch (ImagickException $imagickException) {
-            throw new RuntimeException('Imagick merge failed: '.$imagickException->getMessage(), $imagickException->getCode(), $imagickException);
+            throw ImageMergeException::imagickException($imagickException);
         } finally {
             $source?->clear(); // @pest-mutate-ignore
             $source?->destroy(); // @pest-mutate-ignore

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Linkxtr\QrCode\Exceptions\ImageMergeException;
 use Linkxtr\QrCode\Mergers\SvgMerger;
 
 covers(SvgMerger::class);
@@ -36,39 +37,39 @@ test('it throws exception for invalid percentages', function () use ($tinyPng): 
     $svg = '<svg width="100" height="100"></svg>';
 
     expect(fn (): string => (new SvgMerger($svg, $tinyPng, 0))->merge())
-        ->toThrow(InvalidArgumentException::class, '$percentage must be between 0 and 1');
+        ->toThrow(ImageMergeException::class, 'Percentage for merging the image must be between 0 and 1.');
 
     expect(fn (): string => (new SvgMerger($svg, $tinyPng, 1))->merge())
-        ->toThrow(InvalidArgumentException::class, '$percentage must be between 0 and 1');
+        ->toThrow(ImageMergeException::class, 'Percentage for merging the image must be between 0 and 1.');
 });
 
 test('it throws exception if svg is missing dimensions', function () use ($tinyPng): void {
     $svg = '<svg viewBox="0 0 100 100"></svg>';
 
     expect(fn (): string => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
-        ->toThrow(InvalidArgumentException::class, 'Could not determine SVG dimensions.');
+        ->toThrow(ImageMergeException::class, 'Could not determine SVG dimensions.');
 
     $svg = '<svg height="100"></svg>';
     expect(fn (): string => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
-        ->toThrow(InvalidArgumentException::class, 'Could not determine SVG dimensions.');
+        ->toThrow(ImageMergeException::class, 'Could not determine SVG dimensions.');
 
     $svg = '<svg width="100"></svg>';
     expect(fn (): string => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
-        ->toThrow(InvalidArgumentException::class, 'Could not determine SVG dimensions.');
+        ->toThrow(ImageMergeException::class, 'Could not determine SVG dimensions.');
 });
 
 test('it throws exception for invalid image data', function (): void {
     $svg = '<svg width="100" height="100"></svg>';
 
     expect(fn (): string => (new SvgMerger($svg, 'not-an-image', 0.2))->merge())
-        ->toThrow(InvalidArgumentException::class, 'Invalid image data provided for merge.');
+        ->toThrow(ImageMergeException::class, 'Invalid image provided for merge.');
 });
 
 test('it throws exception if svg is missing closing tag', function () use ($tinyPng): void {
     $svg = '<svg width="100" height="100">';
 
     expect(fn (): string => (new SvgMerger($svg, $tinyPng, 0.2))->merge())
-        ->toThrow(InvalidArgumentException::class, 'Invalid SVG content: closing tag not found.');
+        ->toThrow(ImageMergeException::class, 'Invalid SVG content: closing tag not found.');
 });
 
 test('it strictly truncates float dimensions before calculating percentages', function () use ($tinyPng): void {
@@ -114,7 +115,7 @@ test('it strictly validates image dimensions to prevent division by zero errors'
     $zeroDimensionGif = hex2bin('4749463839610000000000000021f90401000000002c00000000000000000000');
 
     expect(fn (): string => (new SvgMerger($svg, $zeroDimensionGif, 0.2))->merge())
-        ->toThrow(InvalidArgumentException::class, 'Invalid image dimensions for merge.');
+        ->toThrow(ImageMergeException::class, 'Invalid image provided for merge.');
 });
 
 it('throws an exception when the merge image has zero width or zero height', function (int $width, int $height): void {
@@ -125,7 +126,7 @@ it('throws an exception when the merge image has zero width or zero height', fun
     $merger = new SvgMerger($svgContent, $dummyGif, 0.5);
 
     expect(fn (): string => $merger->merge())
-        ->toThrow(InvalidArgumentException::class, 'Invalid image dimensions for merge.');
+        ->toThrow(ImageMergeException::class, 'Invalid image provided for merge.');
 })->with([
     'zero width, valid height' => [0, 10],
     'valid width, zero height' => [10, 0],

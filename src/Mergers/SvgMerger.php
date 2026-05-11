@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Mergers;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
+use Linkxtr\QrCode\Exceptions\ImageMergeException;
 
 final readonly class SvgMerger implements MergerInterface
 {
@@ -18,14 +18,14 @@ final readonly class SvgMerger implements MergerInterface
     public function merge(): string
     {
         if ($this->percentage <= 0 || $this->percentage >= 1) {
-            throw new InvalidArgumentException('$percentage must be between 0 and 1');
+            throw ImageMergeException::invalidPercentage();
         }
 
         $widthFound = preg_match('/width=["\'](\d+(?:\.\d+)?)\s*(?:px)?["\']/i', $this->svgContent, $widthMatch);
         $heightFound = preg_match('/height=["\'](\d+(?:\.\d+)?)\s*(?:px)?["\']/i', $this->svgContent, $heightMatch);
 
         if (! $widthFound || ! $heightFound) {
-            throw new InvalidArgumentException('Could not determine SVG dimensions. Ensure the SVG has width and height attributes.');
+            throw ImageMergeException::couldNotDetermineSvgDimensions();
         }
 
         $svgWidth = (int) $widthMatch[1];
@@ -34,14 +34,14 @@ final readonly class SvgMerger implements MergerInterface
         $imageInfo = getimagesizefromstring($this->mergeImageContent);
 
         if ($imageInfo === false) {
-            throw new InvalidArgumentException('Invalid image data provided for merge. Could not determine image type/size.');
+            throw ImageMergeException::invalidImage();
         }
 
         [$logoWidth, $logoHeight] = $imageInfo;
         $mimeType = $imageInfo['mime'];
 
         if ($logoWidth <= 0 || $logoHeight <= 0) {
-            throw new InvalidArgumentException('Invalid image dimensions for merge.');
+            throw ImageMergeException::invalidImage();
         }
 
         $logoRatio = $logoWidth / $logoHeight;
@@ -79,7 +79,7 @@ final readonly class SvgMerger implements MergerInterface
         $closingTagPos = strrpos($svgContent, '</svg>');
 
         if ($closingTagPos === false) {
-            throw new InvalidArgumentException('Invalid SVG content: closing tag not found.');
+            throw ImageMergeException::invalidSvgContent();
         }
 
         return substr_replace($svgContent, $imageTag.'</svg>', $closingTagPos, strlen('</svg>'));

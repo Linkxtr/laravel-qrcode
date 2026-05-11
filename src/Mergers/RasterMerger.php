@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode\Mergers;
 
 use GdImage;
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
 use Linkxtr\QrCode\Enums\Format;
+use Linkxtr\QrCode\Exceptions\ImageMergeException;
 use Linkxtr\QrCode\Support\Image;
-use LogicException;
-use RuntimeException;
 
 final class RasterMerger implements MergerInterface
 {
@@ -26,7 +24,7 @@ final class RasterMerger implements MergerInterface
         private readonly float $percentage = 0.2
     ) {
         if ($this->percentage <= 0 || $this->percentage >= 1) {
-            throw new InvalidArgumentException('$percentage must be between 0 and 1');
+            throw ImageMergeException::invalidPercentage();
         }
 
         $this->sourceImage = new Image($sourceImage);
@@ -36,7 +34,7 @@ final class RasterMerger implements MergerInterface
     public function setFormat(Format $format): self
     {
         if (! in_array($format, [Format::PNG, Format::WEBP], true)) {
-            throw new InvalidArgumentException('RasterMerger only supports "png" or "webp" formats.');
+            throw ImageMergeException::unsupportedFormat('RasterMerger only supports "png" or "webp" formats.');
         }
 
         $this->format = $format;
@@ -54,7 +52,7 @@ final class RasterMerger implements MergerInterface
 
         // @codeCoverageIgnoreStart
         if ($mergeWidth === 0 || $mergeHeight === 0) {
-            throw new InvalidArgumentException('Merge image dimensions cannot be zero.');
+            throw ImageMergeException::mergeImageDimensionsCannotBeZero();
         }
 
         // @codeCoverageIgnoreEnd
@@ -76,7 +74,7 @@ final class RasterMerger implements MergerInterface
         $canvas = imagecreatetruecolor($sourceWidth, $sourceHeight);
 
         if (! $canvas) {
-            throw new RuntimeException('Failed to create image canvas.');
+            throw ImageMergeException::mergeCanvasCreationFailed();
         }
 
         imagealphablending($canvas, false); // @pest-mutate-ignore
@@ -84,11 +82,11 @@ final class RasterMerger implements MergerInterface
         $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127); // @pest-mutate-ignore
 
         if (! $transparent) {
-            throw new RuntimeException('Failed to create transparent color.');
+            throw ImageMergeException::transparentColorCannotBeCreated();
         }
 
         if (! imagefill($canvas, 0, 0, $transparent)) { // @pest-mutate-ignore
-            throw new RuntimeException('Failed to fill image with transparent color.');
+            throw ImageMergeException::mergeImageFillFailed();
         }
 
         imagealphablending($canvas, true); // @pest-mutate-ignore
@@ -100,7 +98,7 @@ final class RasterMerger implements MergerInterface
             $sourceWidth,
             $sourceHeight
         )) {
-            throw new RuntimeException(sprintf('Failed to copy source image to canvas (Source: %dx%d).', $sourceWidth, $sourceHeight));
+            throw ImageMergeException::failedToCopySourceImageToCanvas($sourceWidth, $sourceHeight);
         }
 
         if (! imagecopyresampled(
@@ -111,11 +109,11 @@ final class RasterMerger implements MergerInterface
             $targetLogoWidth, $targetLogoHeight,
             $mergeWidth, $mergeHeight
         )) {
-            throw new RuntimeException(sprintf('Failed to copy/resample merge image (Target: %dx%d, Source: %dx%d).', $targetLogoWidth, $targetLogoHeight, $mergeWidth, $mergeHeight));
+            throw ImageMergeException::failedToCopyResampleMergeImage($targetLogoWidth, $targetLogoHeight, $mergeWidth, $mergeHeight);
         }
 
         if (! imagesavealpha($canvas, true)) {
-            throw new RuntimeException('Failed to save alpha channel information.');
+            throw ImageMergeException::failedToSaveAlphaChannelInformation();
         }
 
         return $this->createOutput($canvas);
@@ -128,7 +126,7 @@ final class RasterMerger implements MergerInterface
         $success = match ($this->format) {
             Format::WEBP => imagewebp($gdImage, null, 90), // @pest-mutate-ignore
             Format::PNG => imagepng($gdImage),
-            default => throw new LogicException('RasterMerger only supports "png" or "webp" formats.'),
+            default => throw ImageMergeException::unsupportedFormat('RasterMerger only supports "png" or "webp" formats.'),
         };
 
         $content = ob_get_clean();
@@ -136,7 +134,7 @@ final class RasterMerger implements MergerInterface
         unset($gdImage);
 
         if (! $success || $content === false || $content === '') {
-            throw new RuntimeException('Failed to render image binary.');
+            throw ImageMergeException::failedToRenderImageBinary();
         }
 
         return $content;

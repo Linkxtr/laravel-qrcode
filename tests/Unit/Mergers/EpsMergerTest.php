@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Linkxtr\QrCode\Exceptions\ImageMergeException;
 use Linkxtr\QrCode\Mergers\EpsMerger;
 
 require_once __DIR__.'/../../Support/Overrides.php';
@@ -13,22 +14,22 @@ $epsBase = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 100 100\nshowpage";
 
 test('it throws exception for invalid percentages', function () use ($tinyPng, $epsBase): void {
     expect(fn (): EpsMerger => new EpsMerger($epsBase, $tinyPng, 0))
-        ->toThrow(InvalidArgumentException::class, '$percentage must be between 0 and 1');
+        ->toThrow(ImageMergeException::class, 'Percentage for merging the image must be between 0 and 1.');
 
     expect(fn (): EpsMerger => new EpsMerger($epsBase, $tinyPng, 1))
-        ->toThrow(InvalidArgumentException::class, '$percentage must be between 0 and 1');
+        ->toThrow(ImageMergeException::class, 'Percentage for merging the image must be between 0 and 1.');
 });
 
 test('it throws exception if eps is missing bounding box', function () use ($tinyPng): void {
     $epsInvalid = "%!PS-Adobe-3.0 EPSF-3.0\n%%Creator: Test\nshowpage";
 
     expect(fn (): string => (new EpsMerger($epsInvalid, $tinyPng, 0.2))->merge())
-        ->toThrow(InvalidArgumentException::class, 'Could not determine EPS dimensions');
+        ->toThrow(ImageMergeException::class, 'Could not determine EPS dimensions');
 });
 
 test('it properly propagates InvalidArgumentException for invalid raster image data', function () use ($epsBase): void {
     expect(fn (): string => (new EpsMerger($epsBase, 'not-an-image', 0.2))->merge())
-        ->toThrow(InvalidArgumentException::class, 'Invalid merge image provided.');
+        ->toThrow(ImageMergeException::class, 'Invalid image provided for merge.');
 });
 
 test('it successfully merges an image into an eps with a showpage tag', function () use ($tinyPng, $epsBase): void {

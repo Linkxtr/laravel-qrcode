@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Mergers;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
-use RuntimeException;
+use Linkxtr\QrCode\Exceptions\ImageMergeException;
 
 final readonly class EpsMerger implements MergerInterface
 {
@@ -16,14 +15,14 @@ final readonly class EpsMerger implements MergerInterface
         private float $percentage
     ) {
         if ($this->percentage <= 0 || $this->percentage >= 1) {
-            throw new InvalidArgumentException('$percentage must be between 0 and 1');
+            throw ImageMergeException::invalidPercentage();
         }
     }
 
     public function merge(): string
     {
         if (! preg_match('/%%BoundingBox:\s*(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)/', $this->epsContent, $matches)) {
-            throw new InvalidArgumentException('Could not determine EPS dimensions (Missing %%BoundingBox).');
+            throw ImageMergeException::couldNotDetermineEpsDimensions();
         }
 
         $llx = (int) $matches[1]; // @pest-mutate-ignore
@@ -37,7 +36,7 @@ final readonly class EpsMerger implements MergerInterface
         $logo = @imagecreatefromstring($this->mergeImageContent);
 
         if (! $logo) {
-            throw new InvalidArgumentException('Invalid merge image provided.');
+            throw ImageMergeException::invalidImage();
         }
 
         $logoW = imagesx($logo);
@@ -59,13 +58,13 @@ final readonly class EpsMerger implements MergerInterface
         $resizedLogo = imagecreatetruecolor($targetW, $targetH);
 
         if (! $resizedLogo) {
-            throw new RuntimeException('Failed to create resized logo canvas.');
+            throw ImageMergeException::failedToCreateResizedLogoCanvas();
         }
 
         $white = imagecolorallocate($resizedLogo, 255, 255, 255);
 
         if (! $white) {
-            throw new RuntimeException('Could not allocate white color for the logo.');
+            throw ImageMergeException::couldNotAllocateWhiteColor();
         }
 
         imagefill($resizedLogo, 0, 0, $white);
@@ -91,7 +90,7 @@ final readonly class EpsMerger implements MergerInterface
         $hexData = ob_get_clean();
 
         if ($hexData === false) {
-            throw new RuntimeException('Failed to capture hex data from output buffer.');
+            throw ImageMergeException::failedToCaptureHexDataFromOutputBuffer();
         }
 
         unset($logo);

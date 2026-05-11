@@ -6,7 +6,7 @@ namespace Linkxtr\QrCode\Support;
 
 use ErrorException;
 use GdImage;
-use InvalidArgumentException;
+use Linkxtr\QrCode\Exceptions\ImageMergeException;
 
 final readonly class Image
 {
@@ -19,12 +19,12 @@ final readonly class Image
     {
         try {
             $img = imagecreatefromstring($image);
-        } catch (ErrorException $errorException) {
-            throw new InvalidArgumentException('Invalid image data provided to Image.', $errorException->getCode(), previous: $errorException);
+        } catch (ErrorException) {
+            throw ImageMergeException::invalidImageData();
         }
 
         if ($img === false) {
-            throw new InvalidArgumentException('Invalid image data provided to Image.');
+            throw ImageMergeException::invalidImageData();
         }
 
         $this->gdImage = $img;

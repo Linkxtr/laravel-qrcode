@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\Enums\Format;
+use Linkxtr\QrCode\Exceptions\ImageMergeException;
 use Linkxtr\QrCode\Mergers\ImagickMerger;
 
 covers(ImagickMerger::class);
@@ -25,17 +26,17 @@ $getTallPng = function (): string {
 
 test('it throws exception for invalid percentages', function () use ($tinyPng): void {
     expect(fn (): ImagickMerger => new ImagickMerger($tinyPng, $tinyPng, 0))
-        ->toThrow(InvalidArgumentException::class, '$percentage must be between 0 and 1');
+        ->toThrow(ImageMergeException::class, 'Percentage for merging the image must be between 0 and 1.');
 
     expect(fn (): ImagickMerger => new ImagickMerger($tinyPng, $tinyPng, 1))
-        ->toThrow(InvalidArgumentException::class, '$percentage must be between 0 and 1');
+        ->toThrow(ImageMergeException::class, 'Percentage for merging the image must be between 0 and 1.');
 });
 
 test('it throws exception for unsupported formats', function () use ($tinyPng): void {
     $merger = new ImagickMerger($tinyPng, $tinyPng, 0.2);
 
     expect(fn (): ImagickMerger => $merger->setFormat(Format::SVG))
-        ->toThrow(InvalidArgumentException::class, 'ImagickMerger only supports "png" or "webp" formats.');
+        ->toThrow(ImageMergeException::class, 'ImagickMerger only supports "png" or "webp" formats.');
 });
 
 test('it successfully merges two images as PNG', function () use ($tinyPng): void {
