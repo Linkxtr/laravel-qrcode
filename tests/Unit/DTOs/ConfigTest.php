@@ -12,6 +12,7 @@ use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
+use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
 use Linkxtr\QrCode\ValueObjects\Colors\Gray;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
@@ -95,8 +96,8 @@ test('it sets valid sizes and throws on boundaries', function (): void {
 
     expect($config->getSize())->toBe(1);
 
-    expect(fn () => $config->setSize(0))->toThrow(InvalidArgumentException::class, 'Size must be greater than 0');
-    expect(fn () => $config->setSize(-1))->toThrow(InvalidArgumentException::class, 'Size must be greater than 0');
+    expect(fn () => $config->setSize(0))->toThrow(InvalidConfigurationException::class, 'Size must be greater than 0');
+    expect(fn () => $config->setSize(-1))->toThrow(InvalidConfigurationException::class, 'Size must be greater than 0');
 });
 
 test('it sets valid margins and throws on boundaries', function (): void {
@@ -106,7 +107,7 @@ test('it sets valid margins and throws on boundaries', function (): void {
 
     expect($config->getMargin())->toBe(0);
 
-    expect(fn () => $config->setMargin(-1))->toThrow(InvalidArgumentException::class, 'Margin cannot be negative');
+    expect(fn () => $config->setMargin(-1))->toThrow(InvalidConfigurationException::class, 'Margin cannot be negative. Got: -1');
 });
 
 test('it resolves format from string or enum', function (): void {
@@ -122,7 +123,7 @@ test('it resolves format from string or enum', function (): void {
     $config->setFormat('SVG');
     expect($config->getFormat())->toBe(Format::SVG);
 
-    expect(fn () => $config->setFormat('invalid_format'))->toThrow(InvalidArgumentException::class, '$format must be one of the following values: '.implode(', ', Format::toArray()));
+    expect(fn () => $config->setFormat('invalid_format'))->toThrow(InvalidConfigurationException::class, 'Format must be one of the following values: '.implode(', ', Format::toArray()).'. Got: invalid_format');
 });
 
 test('it sets error correction level from string or enum', function (): void {
@@ -135,7 +136,7 @@ test('it sets error correction level from string or enum', function (): void {
     $config->setErrorCorrectionLevel('l');
     expect($config->getErrorCorrectionLevel())->toBe(ErrorCorrectionLevel::L);
 
-    expect(fn () => $config->setErrorCorrectionLevel('invalid'))->toThrow(InvalidArgumentException::class, '$level must be one of the following values: '.implode(', ', ErrorCorrectionLevel::toArray()));
+    expect(fn () => $config->setErrorCorrectionLevel('invalid'))->toThrow(InvalidConfigurationException::class, 'Error correction level must be one of the following values: '.implode(', ', ErrorCorrectionLevel::toArray()));
 });
 
 test('it sets style from string or enum', function (): void {
@@ -146,11 +147,11 @@ test('it sets style from string or enum', function (): void {
     expect($config->getStyle())->toBe(Style::DOT);
     expect($config->getStyleSize())->toBe(0.5);
 
-    $config->setupStyle('round', 0.1);
+    $config->setupStyle('Round', 0.1);
     expect($config->getStyle())->toBe(Style::ROUND);
     expect($config->getStyleSize())->toBe(0.1);
 
-    expect(fn () => $config->setupStyle('invalid', 0.1))->toThrow(InvalidArgumentException::class, '$style must be one of the following values: '.implode(', ', Style::toArray()));
+    expect(fn () => $config->setupStyle('invalid', 0.1))->toThrow(InvalidConfigurationException::class, 'Style must be one of the following values: '.implode(', ', Style::toArray()).'. Got: invalid');
 });
 
 test('it sets style size and validates percentages', function (): void {
@@ -161,8 +162,8 @@ test('it sets style size and validates percentages', function (): void {
 
     expect($config->getStyle())->toBe(Style::DOT);
     expect($config->getStyleSize())->toBe(1.0);
-    expect(fn () => $config->setupStyle(Style::DOT, 0.0))->toThrow(InvalidArgumentException::class, 'Style size must be between 0 and 1');
-    expect(fn () => $config->setupStyle(Style::DOT, 1.1))->toThrow(InvalidArgumentException::class, 'Style size must be between 0 and 1');
+    expect(fn () => $config->setupStyle(Style::DOT, 0.0))->toThrow(InvalidConfigurationException::class, 'Style size must be between 0 and 1');
+    expect(fn () => $config->setupStyle(Style::DOT, 1.1))->toThrow(InvalidConfigurationException::class, 'Style size must be between 0 and 1');
 });
 
 test('it sets eye style from string or enum', function (): void {
@@ -175,7 +176,7 @@ test('it sets eye style from string or enum', function (): void {
     $config->setEyeStyle('circle');
     expect($config->getEyeStyle())->toBe(EyeStyle::CIRCLE);
 
-    expect(fn () => $config->setEyeStyle('invalid'))->toThrow(InvalidArgumentException::class, '$style must be one of the following values: '.implode(', ', EyeStyle::toArray()));
+    expect(fn () => $config->setEyeStyle('invalid'))->toThrow(InvalidConfigurationException::class, 'Eye style must be one of the following values: '.implode(', ', EyeStyle::toArray()).'. Got: invalid');
 });
 
 test('it sets internal eye style from string or enum', function (): void {
@@ -188,7 +189,7 @@ test('it sets internal eye style from string or enum', function (): void {
     $config->setInternalEyeStyle('circle');
     expect($config->getInternalEyeStyle())->toBe(EyeStyle::CIRCLE);
 
-    expect(fn () => $config->setInternalEyeStyle('invalid'))->toThrow(InvalidArgumentException::class, '$style must be one of the following values: '.implode(', ', EyeStyle::toArray()));
+    expect(fn () => $config->setInternalEyeStyle('invalid'))->toThrow(InvalidConfigurationException::class, 'Eye style must be one of the following values: '.implode(', ', EyeStyle::toArray()).'. Got: invalid');
 });
 
 test('it sets encoding', function (): void {
@@ -217,8 +218,8 @@ test('it validates RGB boundaries across all color methods', function (): void {
         ->and($config->getBackgroundColorValue()->blue)->toBe(0)
         ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
 
-    expect(fn () => $config->setupColor(-1, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupColor(256, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupColor(-1, 0, 0))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupColor(256, 0, 0))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.');
 });
 
 test('it handles grayscale configuration', function (): void {
@@ -241,10 +242,10 @@ test('it handles grayscale configuration', function (): void {
         ->and($config->getColorValue()->gray)->toBe(50)
         ->and($config->getBackgroundColorValue()->gray)->toBe(100);
 
-    expect(fn () => $config->setGrayscale(-1))->toThrow(InvalidArgumentException::class, 'Gray value must be between 0 and 100');
-    expect(fn () => $config->setGrayscale(101))->toThrow(InvalidArgumentException::class, 'Gray value must be between 0 and 100');
-    expect(fn () => $config->setGrayscale(50, 101))->toThrow(InvalidArgumentException::class, 'Background gray value must be between 0 and 100');
-    expect(fn () => $config->setGrayscale(50, -1))->toThrow(InvalidArgumentException::class, 'Background gray value must be between 0 and 100');
+    expect(fn () => $config->setGrayscale(-1))->toThrow(InvalidConfigurationException::class, 'Gray value must be between 0 and 100. Got: -1');
+    expect(fn () => $config->setGrayscale(101))->toThrow(InvalidConfigurationException::class, 'Gray value must be between 0 and 100. Got: 101');
+    expect(fn () => $config->setGrayscale(50, 101))->toThrow(InvalidConfigurationException::class, 'Gray value must be between 0 and 100. Got: 101');
+    expect(fn () => $config->setGrayscale(50, -1))->toThrow(InvalidConfigurationException::class, 'Gray value must be between 0 and 100. Got: -1');
 });
 
 test('it handles eye color configuration and validates eye numbers and colors', function (): void {
@@ -272,14 +273,14 @@ test('it handles eye color configuration and validates eye numbers and colors', 
         ->and($config->getEyeColors()[2]->getInternalColor()->getGreen())->toBe(0)
         ->and($config->getEyeColors()[2]->getInternalColor()->getBlue())->toBe(0);
 
-    expect(fn () => $config->setupEyeColor(-1, Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Eye number must be 0, 1, or 2');
-    expect(fn () => $config->setupEyeColor(3, Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Eye number must be 0, 1, or 2');
-    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([-1, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([256, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, -1, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, 256, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, 0, -1]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
-    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, 0, 256]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(-1, Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Eye number must be 0, 1, or 2');
+    expect(fn () => $config->setupEyeColor(3, Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Eye number must be 0, 1, or 2');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([-1, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([256, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, -1, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, 256, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, 0, -1]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([0, 0, 256]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Blue must be between 0 and 255.');
 });
 
 test('it configures gradients from strings and enums', function (): void {
@@ -292,24 +293,24 @@ test('it configures gradients from strings and enums', function (): void {
     $config->setupGradient(Rgb::fromArray([255, 0, 0]), Rgb::fromArray([0, 0, 255]), GradientType::RADIAL);
     expect($config->getGradient())->toBeInstanceOf(Gradient::class);
 
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0]), 'invalid'))->toThrow(InvalidArgumentException::class, '$type must be one of the following values: '.implode(', ', GradientType::toArray()));
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0]), 'invalid'))->toThrow(InvalidConfigurationException::class, 'Gradient type must be one of the following values: '.implode(', ', GradientType::toArray()).'. Got: invalid');
 });
 
 test('it throws exception when gradient colors are invalid', function (): void {
     $config = new Config;
 
-    expect(fn () => $config->setupGradient(Rgb::fromArray([-1, 0, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([256, 0, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, -1, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 256, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, -1]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 256]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([-1, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([256, 0, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, -1, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 256, 0]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, -1]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
-    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 256]), 'diagonal'))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([-1, 0, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([256, 0, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, -1, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 256, 0]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, -1]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 256]), Rgb::fromArray([0, 0, 0]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([-1, 0, 0]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([256, 0, 0]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, -1, 0]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 256, 0]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Green must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, -1]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Blue must be between 0 and 255.');
+    expect(fn () => $config->setupGradient(Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 256]), 'diagonal'))->toThrow(InvalidConfigurationException::class, 'Blue must be between 0 and 255.');
 });
 
 test('it sets up image merge from absolute file path', function (): void {
@@ -321,8 +322,8 @@ test('it sets up image merge from absolute file path', function (): void {
     expect($config->getImageMerge())->toBe(file_get_contents(__DIR__.'/../../Support/Fixtures/images/linkxtr.png'))
         ->and($config->getImagePercentage())->toBe(0.1);
 
-    expect(fn () => $config->setImagePercentage(0.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
-    expect(fn () => $config->setImagePercentage(1.0))->toThrow(InvalidArgumentException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
+    expect(fn () => $config->setImagePercentage(0.0))->toThrow(InvalidConfigurationException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
+    expect(fn () => $config->setImagePercentage(1.0))->toThrow(InvalidConfigurationException::class, 'Image merge percentage must be between 0 and 1 (exclusive)');
 });
 
 test('it sets up image merge from relative file path', function (): void {
@@ -338,8 +339,8 @@ test('it sets up image merge from relative file path', function (): void {
 test('it throws exception when path does not exist', function (): void {
     $config = new Config;
 
-    expect(fn () => $config->setupMergePath('non_existent_path'))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: non_existent_path');
-    expect(fn () => $config->setupMergePath('/non_existent_path'))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: /non_existent_path');
+    expect(fn () => $config->setupMergePath('non_existent_path'))->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: non_existent_path');
+    expect(fn () => $config->setupMergePath('/non_existent_path'))->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: /non_existent_path');
 });
 
 test('it throws exception when path is a directory', function (): void {
@@ -347,7 +348,7 @@ test('it throws exception when path is a directory', function (): void {
 
     expect(fn () => $config->setupMergePath(__DIR__))
         ->toThrow(
-            InvalidArgumentException::class,
+            InvalidConfigurationException::class,
             'Image file does not exist or is not readable: '.__DIR__
         );
 });
@@ -361,7 +362,7 @@ test('it throws exception when path is not readable', function (): void {
 
         $resolvedPath = realpath($filePath);
 
-        expect(fn () => $config->setupMergePath($filePath))->toThrow(InvalidArgumentException::class, 'Image file does not exist or is not readable: '.$resolvedPath);
+        expect(fn () => $config->setupMergePath($filePath))->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: '.$resolvedPath);
     } finally {
         chmod($filePath, 0777);
         unlink($filePath);
@@ -378,7 +379,7 @@ test('it throws exception when file_get_contents returns false', function (): vo
 
     $resolvedPath = realpath($path);
 
-    expect(fn () => $config->setupMergePath($path))->toThrow(InvalidArgumentException::class, 'Failed to read image file: '.$resolvedPath);
+    expect(fn () => $config->setupMergePath($path))->toThrow(InvalidConfigurationException::class, 'Failed to read image file: '.$resolvedPath);
 })->after(function (): void {
     global $mockFileGetContents;
     $mockFileGetContents = null;
@@ -507,7 +508,7 @@ test('it mathematically blocks directory traversal attacks on relative merge pat
         $relativePath = '../../'.basename($parentDir).'/'.basename($tempFile);
 
         expect(fn () => $config->setupMergePath($relativePath))
-            ->toThrow(InvalidArgumentException::class, 'Image file path must be inside the application base path.');
+            ->toThrow(InvalidConfigurationException::class, 'Image file path must be inside the application base path.');
     } finally {
         app()->setBasePath($originalBasePath);
         if (file_exists($tempFile)) {
@@ -551,7 +552,7 @@ test('it prevents directory traversal into sibling directories that share the sa
 
         expect(fn () => $config->setupMergePath($maliciousRelativePath))
             ->toThrow(
-                InvalidArgumentException::class,
+                InvalidConfigurationException::class,
                 'Image file path must be inside the application base path.'
             );
     } finally {

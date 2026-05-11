@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Gray as BaconGray;
+use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
 use Linkxtr\QrCode\ValueObjects\Colors\Gray;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
@@ -20,13 +21,13 @@ test('it creates valid gray color and respects default alpha', function (): void
 });
 
 test('it throws exception on boundary violations for gray channel', function (): void {
-    expect(fn (): Gray => new Gray(-1))->toThrow(InvalidArgumentException::class, 'Gray must be between 0 and 100.')
-        ->and(fn (): Gray => new Gray(101))->toThrow(InvalidArgumentException::class, 'Gray must be between 0 and 100.');
+    expect(fn (): Gray => new Gray(-1))->toThrow(InvalidConfigurationException::class, 'Gray must be between 0 and 100.')
+        ->and(fn (): Gray => new Gray(101))->toThrow(InvalidConfigurationException::class, 'Gray must be between 0 and 100.');
 });
 
 test('it throws exception on boundary violations for alpha', function (): void {
-    expect(fn (): Gray => new Gray(0, -1))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.')
-        ->and(fn (): Gray => new Gray(0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
+    expect(fn (): Gray => new Gray(0, -1))->toThrow(InvalidConfigurationException::class, 'Alpha must be between 0 and 100.')
+        ->and(fn (): Gray => new Gray(0, 101))->toThrow(InvalidConfigurationException::class, 'Alpha must be between 0 and 100.');
 });
 
 test('it converts to bacon gray color', function (): void {

@@ -7,8 +7,8 @@ namespace Linkxtr\QrCode\ValueObjects\Colors;
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\ColorInterface as BaconColorInterface;
 use BaconQrCode\Renderer\Color\Gray as BaconGray;
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\ColorInterface;
+use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 
 final readonly class Gray implements ColorInterface
 {
@@ -17,11 +17,11 @@ final readonly class Gray implements ColorInterface
         public int $alpha = 100
     ) {
         if ($gray < 0 || $gray > 100) {
-            throw new InvalidArgumentException('Gray must be between 0 and 100.');
+            throw InvalidConfigurationException::invalidColorChannel('Gray', 0, 100);
         }
 
         if ($alpha < 0 || $alpha > 100) {
-            throw new InvalidArgumentException('Alpha must be between 0 and 100.');
+            throw InvalidConfigurationException::invalidColorChannel('Alpha', 0, 100);
         }
     }
 

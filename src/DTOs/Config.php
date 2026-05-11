@@ -6,7 +6,6 @@ namespace Linkxtr\QrCode\DTOs;
 
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\ColorInterface;
 use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
@@ -14,6 +13,7 @@ use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
+use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
 use Linkxtr\QrCode\ValueObjects\Colors\Gray;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
@@ -155,15 +155,13 @@ final class Config
 
     public function setFormat(string|Format $format): void
     {
-        if (is_string($format)) {
-            $format = Format::tryFrom(strtolower($format));
+        $formatEnum = $format instanceof Format ? $format : Format::tryFrom(strtolower($format));
+
+        if ($formatEnum === null) {
+            throw InvalidConfigurationException::unsupportedFormat($format, Format::toArray());
         }
 
-        if (! $format) {
-            throw new InvalidArgumentException('$format must be one of the following values: '.implode(', ', Format::toArray()));
-        }
-
-        $this->format = $format;
+        $this->format = $formatEnum;
     }
 
     public function getFormat(): Format
@@ -173,15 +171,13 @@ final class Config
 
     public function setErrorCorrectionLevel(string|ErrorCorrectionLevel $level): void
     {
-        if (is_string($level)) {
-            $level = ErrorCorrectionLevel::tryFrom(strtoupper($level));
+        $levelEnum = $level instanceof ErrorCorrectionLevel ? $level : ErrorCorrectionLevel::tryFrom(strtoupper($level));
+
+        if ($levelEnum === null) {
+            throw InvalidConfigurationException::invalidErrorCorrectionLevel($level, ErrorCorrectionLevel::toArray());
         }
 
-        if (! $level) {
-            throw new InvalidArgumentException('$level must be one of the following values: '.implode(', ', ErrorCorrectionLevel::toArray()));
-        }
-
-        $this->errorCorrectionLevel = $level;
+        $this->errorCorrectionLevel = $levelEnum;
     }
 
     public function getErrorCorrectionLevel(): ErrorCorrectionLevel
@@ -210,15 +206,13 @@ final class Config
 
     public function setEyeStyle(string|EyeStyle $style): void
     {
-        if (is_string($style)) {
-            $style = EyeStyle::tryFrom($style);
+        $styleEnum = $style instanceof EyeStyle ? $style : EyeStyle::tryFrom($style);
+
+        if ($styleEnum === null) {
+            throw InvalidConfigurationException::invalidEyeStyle($style, EyeStyle::toArray());
         }
 
-        if (! $style) {
-            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', EyeStyle::toArray()));
-        }
-
-        $this->eyeStyle = $style;
+        $this->eyeStyle = $styleEnum;
     }
 
     public function getEyeStyle(): ?EyeStyle
@@ -228,15 +222,13 @@ final class Config
 
     public function setInternalEyeStyle(string|EyeStyle $style): void
     {
-        if (is_string($style)) {
-            $style = EyeStyle::tryFrom($style);
+        $styleEnum = $style instanceof EyeStyle ? $style : EyeStyle::tryFrom($style);
+
+        if ($styleEnum === null) {
+            throw InvalidConfigurationException::invalidEyeStyle($style, EyeStyle::toArray());
         }
 
-        if (! $style) {
-            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', EyeStyle::toArray()));
-        }
-
-        $this->internalEyeStyle = $style;
+        $this->internalEyeStyle = $styleEnum;
     }
 
     public function getInternalEyeStyle(): ?EyeStyle
@@ -247,7 +239,7 @@ final class Config
     public function setSize(int $size): void
     {
         if ($size <= 0) {
-            throw new InvalidArgumentException(sprintf('Size must be greater than 0. %s given.', $size));
+            throw InvalidConfigurationException::invalidSize($size);
         }
 
         $this->size = $size;
@@ -261,7 +253,7 @@ final class Config
     public function setMargin(int $margin): void
     {
         if ($margin < 0) {
-            throw new InvalidArgumentException(sprintf('Margin cannot be negative. %s given.', $margin));
+            throw InvalidConfigurationException::invalidMargin($margin);
         }
 
         $this->margin = $margin;
@@ -311,11 +303,11 @@ final class Config
     public function setGrayscale(int $gray, ?int $backgroundGray = null): void
     {
         if ($gray < 0 || $gray > 100) {
-            throw new InvalidArgumentException('Gray value must be between 0 and 100.');
+            throw InvalidConfigurationException::invalidGrayscale($gray);
         }
 
         if ($backgroundGray !== null && ($backgroundGray < 0 || $backgroundGray > 100)) {
-            throw new InvalidArgumentException('Background gray value must be between 0 and 100.');
+            throw InvalidConfigurationException::invalidGrayscale($backgroundGray);
         }
 
         $this->setColorModel(ColorModel::GRAY);
@@ -354,7 +346,7 @@ final class Config
     public function setupEyeColor(int $eyeNumber, Rgb $inner, ?Rgb $outer = null): void
     {
         if ($eyeNumber < 0 || $eyeNumber > 2) {
-            throw new InvalidArgumentException('Eye number must be 0, 1, or 2.');
+            throw InvalidConfigurationException::invalidEyeNumber($eyeNumber);
         }
 
         $this->setEyeColor($eyeNumber, new EyeFill(
@@ -373,20 +365,16 @@ final class Config
 
     public function setupGradient(Rgb $start, Rgb $end, string|GradientType $type = GradientType::VERTICAL): void
     {
-        if (is_string($type)) {
-            $type = GradientType::tryFrom(strtolower($type));
-        }
+        $typeEnum = $type instanceof GradientType ? $type : GradientType::tryFrom(strtolower($type));
 
-        if (! $type instanceof GradientType) {
-            throw new InvalidArgumentException(
-                '$type must be one of the following values: '.implode(', ', GradientType::toArray())
-            );
+        if ($typeEnum === null) {
+            throw InvalidConfigurationException::invalidGradientType($type, GradientType::toArray());
         }
 
         $this->setGradient(new Gradient(
             $start->toBaconColor(),
             $end->toBaconColor(),
-            $type->toBaconGradientType()
+            $typeEnum->toBaconGradientType()
         ));
     }
 
@@ -407,21 +395,21 @@ final class Config
         $displayPath = $resolvedPath !== false ? $resolvedPath : $filepath;
 
         if ($resolvedPath === false || ! is_file($resolvedPath) || ! is_readable($resolvedPath)) {
-            throw new InvalidArgumentException('Image file does not exist or is not readable: '.$displayPath);
+            throw InvalidConfigurationException::imageDoesNotExist($displayPath);
         }
 
         if (! $isAbsolute) {
             $realBaseDir = realpath($baseDir) ?: $baseDir;
 
             if (! str_starts_with($resolvedPath, $realBaseDir.DIRECTORY_SEPARATOR)) {
-                throw new InvalidArgumentException('Image file path must be inside the application base path.');
+                throw InvalidConfigurationException::imagePathOutsideApplication();
             }
         }
 
         $content = file_get_contents($resolvedPath);
 
         if ($content === false) {
-            throw new InvalidArgumentException('Failed to read image file: '.$resolvedPath);
+            throw InvalidConfigurationException::imageFileNotReadable($resolvedPath);
         }
 
         $this->imageMerge = $content;
@@ -435,7 +423,7 @@ final class Config
     public function setImagePercentage(float $percentage): void
     {
         if ($percentage <= 0 || $percentage >= 1) {
-            throw new InvalidArgumentException('Image merge percentage must be between 0 and 1 (exclusive).');
+            throw InvalidConfigurationException::invalidImageMergePercentage($percentage);
         }
 
         $this->imagePercentage = $percentage;
@@ -454,7 +442,7 @@ final class Config
     private function setStyleSize(float $size): void
     {
         if ($size <= 0 || $size > 1) {
-            throw new InvalidArgumentException(sprintf('Style size must be between 0 and 1. %s given.', $size));
+            throw InvalidConfigurationException::invalidStyleSize($size);
         }
 
         $this->styleSize = $size;
@@ -467,15 +455,13 @@ final class Config
 
     private function setStyle(string|Style $style): void
     {
-        if (is_string($style)) {
-            $style = Style::tryFrom($style);
+        $styleEnum = $style instanceof Style ? $style : Style::tryFrom(strtolower($style));
+
+        if ($styleEnum === null) {
+            throw InvalidConfigurationException::invalidStyle($style, Style::toArray());
         }
 
-        if (! $style) {
-            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', Style::toArray()));
-        }
-
-        $this->style = $style;
+        $this->style = $styleEnum;
     }
 
     private function setColorValue(ColorInterface $color): void

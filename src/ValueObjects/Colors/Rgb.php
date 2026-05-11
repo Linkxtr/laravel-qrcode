@@ -7,8 +7,8 @@ namespace Linkxtr\QrCode\ValueObjects\Colors;
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\ColorInterface as BaconColorInterface;
 use BaconQrCode\Renderer\Color\Rgb as BaconRgb;
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\ColorInterface;
+use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 
 final readonly class Rgb implements ColorInterface
 {
@@ -23,7 +23,7 @@ final readonly class Rgb implements ColorInterface
         $this->validate($blue, 'Blue');
 
         if ($alpha < 0 || $alpha > 100) {
-            throw new InvalidArgumentException('Alpha must be between 0 and 100.');
+            throw InvalidConfigurationException::invalidColorChannel('Alpha', 0, 100);
         }
     }
 
@@ -34,11 +34,11 @@ final readonly class Rgb implements ColorInterface
         if (strlen($cleanHex) === 3) {
             $cleanHex = sprintf('%1$s%1$s%2$s%2$s%3$s%3$s', $cleanHex[0], $cleanHex[1], $cleanHex[2]);
         } elseif (strlen($cleanHex) !== 6) {
-            throw new InvalidArgumentException('Invalid hex color format. Must be 3 or 6 characters.');
+            throw InvalidConfigurationException::invalidHexColorString();
         }
 
         if (! ctype_xdigit($cleanHex)) {
-            throw new InvalidArgumentException('Invalid hex color string provided.');
+            throw InvalidConfigurationException::invalidHexColor();
         }
 
         return new self(
@@ -54,7 +54,7 @@ final readonly class Rgb implements ColorInterface
      *
      * @param  string|array<mixed>  $color
      *
-     * @throws InvalidArgumentException
+     * @throws InvalidConfigurationException
      */
     public static function parse(string|array $color): self
     {
@@ -72,7 +72,7 @@ final readonly class Rgb implements ColorInterface
             return self::fromCsv($color);
         }
 
-        throw new InvalidArgumentException('Unrecognized color format. Please use an array, a hex string, or a comma-separated RGB string.');
+        throw InvalidConfigurationException::invalidColorFormat();
     }
 
     /**
@@ -84,7 +84,7 @@ final readonly class Rgb implements ColorInterface
 
         foreach ($color as $channel) {
             if (! is_numeric($channel)) {
-                throw new InvalidArgumentException('RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
+                throw InvalidConfigurationException::invalidColorArray();
             }
 
             $channels[] = (int) $channel;
@@ -104,7 +104,7 @@ final readonly class Rgb implements ColorInterface
 
         $count = count($parts);
         if ($count !== 3 && $count !== 4) {
-            throw new InvalidArgumentException('CSV color string must contain exactly 3 or 4 numeric values.');
+            throw InvalidConfigurationException::invalidCsvColorString();
         }
 
         return self::fromArray($parts);
@@ -169,7 +169,7 @@ final readonly class Rgb implements ColorInterface
     private function validate(int $value, string $name): void
     {
         if ($value < 0 || $value > 255) {
-            throw new InvalidArgumentException($name.' must be between 0 and 255.');
+            throw InvalidConfigurationException::invalidColorChannel($name, 0, 255);
         }
     }
 }

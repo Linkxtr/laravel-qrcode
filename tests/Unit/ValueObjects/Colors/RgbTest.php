@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Rgb as BaconRgb;
+use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
 use Linkxtr\QrCode\ValueObjects\Colors\Gray;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
@@ -22,17 +23,17 @@ it('creates valid rgb color and respects default alpha', function (): void {
 });
 
 it('throws exception on boundary violations for rgb channels', function (): void {
-    expect(fn (): Rgb => new Rgb(-1, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.')
-        ->and(fn (): Rgb => new Rgb(256, 0, 0))->toThrow(InvalidArgumentException::class, 'Red must be between 0 and 255.')
-        ->and(fn (): Rgb => new Rgb(0, -1, 0))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.')
-        ->and(fn (): Rgb => new Rgb(0, 256, 0))->toThrow(InvalidArgumentException::class, 'Green must be between 0 and 255.')
-        ->and(fn (): Rgb => new Rgb(0, 0, -1))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.')
-        ->and(fn (): Rgb => new Rgb(0, 0, 256))->toThrow(InvalidArgumentException::class, 'Blue must be between 0 and 255.');
+    expect(fn (): Rgb => new Rgb(-1, 0, 0))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.')
+        ->and(fn (): Rgb => new Rgb(256, 0, 0))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.')
+        ->and(fn (): Rgb => new Rgb(0, -1, 0))->toThrow(InvalidConfigurationException::class, 'Green must be between 0 and 255.')
+        ->and(fn (): Rgb => new Rgb(0, 256, 0))->toThrow(InvalidConfigurationException::class, 'Green must be between 0 and 255.')
+        ->and(fn (): Rgb => new Rgb(0, 0, -1))->toThrow(InvalidConfigurationException::class, 'Blue must be between 0 and 255.')
+        ->and(fn (): Rgb => new Rgb(0, 0, 256))->toThrow(InvalidConfigurationException::class, 'Blue must be between 0 and 255.');
 });
 
 it('throws exception on boundary violations for alpha', function (): void {
-    expect(fn (): Rgb => new Rgb(0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.')
-        ->and(fn (): Rgb => new Rgb(0, 0, 0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
+    expect(fn (): Rgb => new Rgb(0, 0, 0, -1))->toThrow(InvalidConfigurationException::class, 'Alpha must be between 0 and 100.')
+        ->and(fn (): Rgb => new Rgb(0, 0, 0, 101))->toThrow(InvalidConfigurationException::class, 'Alpha must be between 0 and 100.');
 });
 
 it('converts from hex string properly', function (): void {
@@ -52,8 +53,8 @@ it('converts from hex string properly', function (): void {
         ->and($color6->green)->toBe(43)
         ->and($color6->blue)->toBe(60);
 
-    expect(fn (): Rgb => Rgb::fromHex('#FFFF'))->toThrow(InvalidArgumentException::class, 'Invalid hex color format. Must be 3 or 6 characters.')
-        ->and(fn (): Rgb => Rgb::fromHex('ZZZZZZ'))->toThrow(InvalidArgumentException::class, 'Invalid hex color string provided.');
+    expect(fn (): Rgb => Rgb::fromHex('#FFFF'))->toThrow(InvalidConfigurationException::class, 'Invalid hex color format. Must be 3 or 6 characters.')
+        ->and(fn (): Rgb => Rgb::fromHex('ZZZZZZ'))->toThrow(InvalidConfigurationException::class, 'Invalid hex color string provided.');
 });
 
 it('converts to bacon rgb color', function (): void {
@@ -293,17 +294,17 @@ test('parse csv string', function (): void {
 });
 
 it('throws excetion on invalid color format', function (): void {
-    expect(fn (): Rgb => Rgb::parse('invalid'))->toThrow(InvalidArgumentException::class, 'Unrecognized color format. Please use an array, a hex string, or a comma-separated RGB string.');
+    expect(fn (): Rgb => Rgb::parse('invalid'))->toThrow(InvalidConfigurationException::class, 'Unrecognized color format. Please use an array, a hex string, or a comma-separated RGB string.');
 
-    expect(fn (): Rgb => Rgb::parse([1, 2, ['invalid']]))->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
+    expect(fn (): Rgb => Rgb::parse([1, 2, ['invalid']]))->toThrow(InvalidConfigurationException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
 
-    expect(fn (): Rgb => Rgb::parse('1, 2, 3, 4, 5'))->toThrow(InvalidArgumentException::class, 'CSV color string must contain exactly 3 or 4 numeric values.');
+    expect(fn (): Rgb => Rgb::parse('1, 2, 3, 4, 5'))->toThrow(InvalidConfigurationException::class, 'CSV color string must contain exactly 3 or 4 numeric values.');
 
-    expect(fn (): Rgb => Rgb::parse('1, 2, 3, '))->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
+    expect(fn (): Rgb => Rgb::parse('1, 2, 3, '))->toThrow(InvalidConfigurationException::class, 'RGB array values must be numeric. Nested arrays, objects, or invalid strings are not allowed.');
 });
 
 it('routes strings starting with hash to hex parser and throws specific exception', function (): void {
-    expect(fn (): Rgb => Rgb::parse('#XYZ123'))->toThrow(InvalidArgumentException::class, 'Invalid hex color string provided.');
+    expect(fn (): Rgb => Rgb::parse('#XYZ123'))->toThrow(InvalidConfigurationException::class, 'Invalid hex color string provided.');
 
-    expect(fn (): Rgb => Rgb::parse('#12'))->toThrow(InvalidArgumentException::class, 'Invalid hex color format. Must be 3 or 6 characters.');
+    expect(fn (): Rgb => Rgb::parse('#12'))->toThrow(InvalidConfigurationException::class, 'Invalid hex color format. Must be 3 or 6 characters.');
 });

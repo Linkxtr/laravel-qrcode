@@ -7,8 +7,8 @@ namespace Linkxtr\QrCode\ValueObjects\Colors;
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Cmyk as BaconCmyk;
 use BaconQrCode\Renderer\Color\ColorInterface as BaconColorInterface;
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\ColorInterface;
+use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 
 final readonly class Cmyk implements ColorInterface
 {
@@ -25,7 +25,7 @@ final readonly class Cmyk implements ColorInterface
         $this->validate($black, 'Black');
 
         if ($alpha < 0 || $alpha > 100) {
-            throw new InvalidArgumentException('Alpha must be between 0 and 100.');
+            throw InvalidConfigurationException::invalidColorChannel('Alpha', 0, 100);
         }
     }
 
@@ -89,7 +89,7 @@ final readonly class Cmyk implements ColorInterface
     private function validate(int $value, string $name): void
     {
         if ($value < 0 || $value > 100) {
-            throw new InvalidArgumentException($name.' must be between 0 and 100.');
+            throw InvalidConfigurationException::invalidColorChannel($name, 0, 100);
         }
     }
 }

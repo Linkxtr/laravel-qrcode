@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use BaconQrCode\Renderer\Color\Alpha;
 use BaconQrCode\Renderer\Color\Cmyk as BaconCmyk;
+use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
 use Linkxtr\QrCode\ValueObjects\Colors\Gray;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
@@ -23,19 +24,19 @@ test('it creates valid cmyk color and respects default alpha', function (): void
 });
 
 test('it throws exception on boundary violations for cmyk channels', function (): void {
-    expect(fn (): Cmyk => new Cmyk(-1, 0, 0, 0))->toThrow(InvalidArgumentException::class, 'Cyan must be between 0 and 100.')
-        ->and(fn (): Cmyk => new Cmyk(101, 0, 0, 0))->toThrow(InvalidArgumentException::class, 'Cyan must be between 0 and 100.')
-        ->and(fn (): Cmyk => new Cmyk(0, -1, 0, 0))->toThrow(InvalidArgumentException::class, 'Magenta must be between 0 and 100.')
-        ->and(fn (): Cmyk => new Cmyk(0, 101, 0, 0))->toThrow(InvalidArgumentException::class, 'Magenta must be between 0 and 100.')
-        ->and(fn (): Cmyk => new Cmyk(0, 0, -1, 0))->toThrow(InvalidArgumentException::class, 'Yellow must be between 0 and 100.')
-        ->and(fn (): Cmyk => new Cmyk(0, 0, 101, 0))->toThrow(InvalidArgumentException::class, 'Yellow must be between 0 and 100.')
-        ->and(fn (): Cmyk => new Cmyk(0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Black must be between 0 and 100.')
-        ->and(fn (): Cmyk => new Cmyk(0, 0, 0, 101))->toThrow(InvalidArgumentException::class, 'Black must be between 0 and 100.');
+    expect(fn (): Cmyk => new Cmyk(-1, 0, 0, 0))->toThrow(InvalidConfigurationException::class, 'Cyan must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(101, 0, 0, 0))->toThrow(InvalidConfigurationException::class, 'Cyan must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, -1, 0, 0))->toThrow(InvalidConfigurationException::class, 'Magenta must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 101, 0, 0))->toThrow(InvalidConfigurationException::class, 'Magenta must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 0, -1, 0))->toThrow(InvalidConfigurationException::class, 'Yellow must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 0, 101, 0))->toThrow(InvalidConfigurationException::class, 'Yellow must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 0, 0, -1))->toThrow(InvalidConfigurationException::class, 'Black must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 0, 0, 101))->toThrow(InvalidConfigurationException::class, 'Black must be between 0 and 100.');
 });
 
 test('it throws exception on boundary violations for alpha', function (): void {
-    expect(fn (): Cmyk => new Cmyk(0, 0, 0, 0, -1))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.')
-        ->and(fn (): Cmyk => new Cmyk(0, 0, 0, 0, 101))->toThrow(InvalidArgumentException::class, 'Alpha must be between 0 and 100.');
+    expect(fn (): Cmyk => new Cmyk(0, 0, 0, 0, -1))->toThrow(InvalidConfigurationException::class, 'Alpha must be between 0 and 100.')
+        ->and(fn (): Cmyk => new Cmyk(0, 0, 0, 0, 101))->toThrow(InvalidConfigurationException::class, 'Alpha must be between 0 and 100.');
 });
 
 test('it converts to bacon cmyk color', function (): void {
