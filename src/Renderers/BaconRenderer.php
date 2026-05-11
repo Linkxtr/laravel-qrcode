@@ -34,11 +34,11 @@ use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\Style;
+use Linkxtr\QrCode\Exceptions\MissingExtensionException;
 use Linkxtr\QrCode\Mergers\EpsMerger;
 use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
-use RuntimeException;
 
 final readonly class BaconRenderer
 {
@@ -83,7 +83,7 @@ final readonly class BaconRenderer
         }
 
         if (! extension_loaded('imagick') && ! extension_loaded('gd')) {
-            throw new RuntimeException('The imagick or gd extension is required to generate raster QR codes.');
+            throw MissingExtensionException::neitherImagickNorGdAvailable();
         }
 
         if (extension_loaded('imagick')) {
@@ -94,15 +94,15 @@ final readonly class BaconRenderer
         }
 
         if ($format !== Format::PNG) {
-            throw new RuntimeException(sprintf('Format "%s" requires the Imagick extension.', $format->value));
+            throw MissingExtensionException::imagickRequired(sprintf('to generate the %s format', $format->value));
         }
 
         if ($this->config->getStyle() !== Style::SQUARE) {
-            throw new RuntimeException('The GD library does not support non-square module styles (e.g., DOT, ROUND). Please enable the Imagick extension or use the SQUARE style.');
+            throw MissingExtensionException::imagickRequired('to use non-square module styles (e.g., DOT, ROUND). Please enable the Imagick extension or use the SQUARE style');
         }
 
         if ($this->config->getGradient() instanceof Gradient) {
-            throw new RuntimeException('The GD library does not support gradients. Please enable the Imagick extension or use solid colors.');
+            throw MissingExtensionException::imagickRequired('to use gradients. Please enable the Imagick extension or use solid colors');
         }
 
         return new GDLibRenderer(
@@ -144,7 +144,7 @@ final readonly class BaconRenderer
         $percentage = $this->config->getImagePercentage();
 
         if ($format === Format::EPS && ! extension_loaded('gd')) {
-            throw new RuntimeException('The "gd" extension is required to merge images into EPS format.');
+            throw MissingExtensionException::gdRequired('to merge images into EPS format');
         }
 
         return match ($format) {

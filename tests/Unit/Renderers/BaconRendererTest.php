@@ -22,6 +22,7 @@ use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\Style;
+use Linkxtr\QrCode\Exceptions\MissingExtensionException;
 use Linkxtr\QrCode\Mergers\EpsMerger;
 use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
@@ -49,17 +50,17 @@ it('throws exception if required extensions are not loaded', function (): void {
 
     $config->setFormat(Format::SVG);
 
-    expect(fn (): HtmlString => $renderer->render('test'))->not->toThrow(RuntimeException::class);
+    expect(fn (): HtmlString => $renderer->render('test'))->not->toThrow(MissingExtensionException::class);
 
     $config->setFormat(Format::EPS);
 
-    expect(fn (): HtmlString => $renderer->render('test'))->not->toThrow(RuntimeException::class);
+    expect(fn (): HtmlString => $renderer->render('test'))->not->toThrow(MissingExtensionException::class);
 
     $config->setFormat(Format::PNG);
-    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(RuntimeException::class, 'The imagick or gd extension is required to generate raster QR codes');
+    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(MissingExtensionException::class, 'The imagick or gd extension is required to generate raster QR codes');
 
     $config->setFormat(Format::WEBP);
-    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(RuntimeException::class, 'The imagick or gd extension is required to generate raster QR codes');
+    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(MissingExtensionException::class, 'The imagick or gd extension is required to generate raster QR codes');
 });
 
 it('throws an exception if trying to generate a non-PNG raster using only GD', function (): void {
@@ -72,7 +73,7 @@ it('throws an exception if trying to generate a non-PNG raster using only GD', f
     $config->setFormat(Format::WEBP);
 
     expect(fn (): HtmlString => $renderer->render('test'))
-        ->toThrow(RuntimeException::class, 'Format "webp" requires the Imagick extension.');
+        ->toThrow(MissingExtensionException::class, 'The Imagick extension is required to generate the webp format.');
 });
 
 it('falls back to GDLibRenderer for PNG if imagick is missing', function (): void {
@@ -244,7 +245,7 @@ it('throws an exception when trying to merge images into EPS format without gd e
 
     $renderer = new BaconRenderer($config);
 
-    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(RuntimeException::class, 'The "gd" extension is required to merge images into EPS format.');
+    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(MissingExtensionException::class, 'The GD extension is required to merge images into EPS format.');
 });
 
 it('renders an html string with merged image', function () use ($tinyPng): void {
@@ -261,7 +262,7 @@ it('renders an html string with merged image', function () use ($tinyPng): void 
         ->and($htmlString->toHtml())->toContain('href="data:image/png;base64');
 });
 
-it('throws a RuntimeException when using GD library with a non-square style', function (): void {
+it('throws a MissingExtensionException when using GD library with a non-square style', function (): void {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = false;
     $mockGdLoaded = true;
@@ -275,12 +276,12 @@ it('throws a RuntimeException when using GD library with a non-square style', fu
 
     expect(fn (): HtmlString => $renderer->render('https://linkxtr.com'))
         ->toThrow(
-            RuntimeException::class,
-            'The GD library does not support non-square module styles (e.g., DOT, ROUND). Please enable the Imagick extension or use the SQUARE style.'
+            MissingExtensionException::class,
+            'The Imagick extension is required to use non-square module styles (e.g., DOT, ROUND). Please enable the Imagick extension or use the SQUARE style.'
         );
 });
 
-it('throws a RuntimeException when using GD library with a gradient', function (): void {
+it('throws a MissingExtensionException when using GD library with a gradient', function (): void {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = false;
     $mockGdLoaded = true;
@@ -293,7 +294,7 @@ it('throws a RuntimeException when using GD library with a gradient', function (
     $renderer = new BaconRenderer($config);
 
     expect(fn (): HtmlString => $renderer->render('https://linkxtr.com'))->toThrow(
-        RuntimeException::class,
-        'The GD library does not support gradients. Please enable the Imagick extension or use solid colors.'
+        MissingExtensionException::class,
+        'The Imagick extension is required to use gradients. Please enable the Imagick extension or use solid colors.'
     );
 });
