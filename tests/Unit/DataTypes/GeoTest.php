@@ -123,3 +123,26 @@ test('it throws a required exception when null is passed as latitude or longitud
     expect(fn () => $geo->create([37.7749, null]))
         ->toThrow(InvalidGeoArgumentException::class, 'Latitude and longitude are required.');
 });
+
+it('formats small coordinates correctly', function (): void {
+    $geo = new Geo;
+    $geo->create([0.0000001, -0.0000002]);
+
+    expect((string) $geo)->toBe('geo:0.0000001,-0.0000002');
+});
+
+it('preserves high precision coordinates beyond 10 decimal places', function (): void {
+    $geo = new Geo;
+
+    $geo->create([40.123456789123, -74.123456789123]);
+
+    expect((string) $geo)->toBe('geo:40.123456789123,-74.123456789123');
+});
+
+it('handles extremely small scientific notation coordinates by converting them to zero', function (): void {
+    $geo = new Geo;
+
+    $geo->create([1.0E-11, -1.0E-11]);
+
+    expect((string) $geo)->toBe('geo:0,0');
+});

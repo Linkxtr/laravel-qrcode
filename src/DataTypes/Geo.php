@@ -24,7 +24,10 @@ final class Geo implements DataTypeInterface
             throw UninitializedDataTypeException::forType('Geo');
         }
 
-        $baseUri = self::PREFIX.$this->latitude.','.$this->longitude;
+        $lat = $this->formatCoordinate($this->latitude);
+        $lng = $this->formatCoordinate($this->longitude);
+
+        $baseUri = self::PREFIX.$lat.','.$lng;
 
         if ($this->name !== null) {
             return $baseUri.'?'.http_build_query(['name' => $this->name], encoding_type: PHP_QUERY_RFC3986);
@@ -72,5 +75,18 @@ final class Geo implements DataTypeInterface
         $this->latitude = $latitude;
         $this->longitude = $longitude;
         $this->name = $name;
+    }
+
+    private function formatCoordinate(float $coordinate): string
+    {
+        $string = (string) $coordinate;
+
+        if (! str_contains($string, 'E')) {
+            return $string;
+        }
+
+        $formatted = rtrim(rtrim(sprintf('%.10F', $coordinate), '0'), '.');
+
+        return $formatted === '-0' ? '0' : $formatted;
     }
 }
