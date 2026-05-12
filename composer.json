@@ -74,7 +74,10 @@
       "@test:type-coverage",
       "@test:unit"
     ],
-    "mutate": "pest --parallel --mutate --covered-only"
+    "mutate": [
+      "Composer\\Config::disableProcessTimeout",
+      "pest --parallel --mutate --covered-only"
+    ]
   },
   "config": {
     "sort-packages": true,
