@@ -21,10 +21,10 @@ use Stringable;
 use UnexpectedValueException;
 
 /**
- * @method HtmlString BTC(string $address, string $amount, array<mixed> $options = [])
+ * @method HtmlString BTC(string $address, int|float|string $amount, array<mixed> $options = [])
  * @method HtmlString CalendarEvent(array<mixed> $attributes)
  * @method HtmlString Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
- * @method HtmlString Ethereum(string $address, ?string $amount = null)
+ * @method HtmlString Ethereum(string $address, int|float|string|null $amount = null)
  * @method HtmlString Geo(float $latitude, float $longitude, string $name = '')
  * @method HtmlString MeCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
  * @method HtmlString PhoneNumber(string $phoneNumber)
