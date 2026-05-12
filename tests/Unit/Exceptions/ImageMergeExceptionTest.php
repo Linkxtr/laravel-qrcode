@@ -22,10 +22,23 @@ test('invalidImage sets correct error code and message', function (): void {
 
     expect($imageMergeException)
         ->toBeInstanceOf(ImageMergeException::class)
+        ->and($imageMergeException->getMessage())
+        ->toBe('Invalid image provided for merge. ')
         ->and($imageMergeException->getErrorCode())
         ->toBe('INVALID_MERGE_IMAGE')
         ->and($imageMergeException->getHelperMessage())
-        ->toBe('The image provided for merge is invalid.');
+        ->toBe('The image provided for merge is invalid. ');
+
+    $imageMergeException = ImageMergeException::invalidImage('details');
+
+    expect($imageMergeException)
+        ->toBeInstanceOf(ImageMergeException::class)
+        ->and($imageMergeException->getMessage())
+        ->toBe('Invalid image provided for merge. details')
+        ->and($imageMergeException->getErrorCode())
+        ->toBe('INVALID_MERGE_IMAGE')
+        ->and($imageMergeException->getHelperMessage())
+        ->toBe('The image provided for merge is invalid. details');
 });
 
 test('mergeFileNotFound sets correct error code and message', function (): void {

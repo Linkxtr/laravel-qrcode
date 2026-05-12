@@ -21,11 +21,11 @@ final class ImageMergeException extends RuntimeException implements QrCodeExcept
         return $exception;
     }
 
-    public static function invalidImage(): self
+    public static function invalidImage(?string $details = null): self
     {
-        $exception = new self('Invalid image provided for merge.');
+        $exception = new self('Invalid image provided for merge. '.($details ?? ''));
         $exception->errorCode = 'INVALID_MERGE_IMAGE';
-        $exception->helperMessage = 'The image provided for merge is invalid.';
+        $exception->helperMessage = 'The image provided for merge is invalid. '.($details ?? '');
 
         return $exception;
     }

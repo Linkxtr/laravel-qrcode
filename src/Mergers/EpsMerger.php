@@ -36,7 +36,10 @@ final readonly class EpsMerger implements MergerInterface
         $logo = @imagecreatefromstring($this->mergeImageContent);
 
         if (! $logo) {
-            throw ImageMergeException::invalidImage();
+            $error = error_get_last();
+            $message = $error !== null ? $error['message'] : 'Unknown GD error';
+
+            throw ImageMergeException::invalidImage($message);
         }
 
         $logoW = imagesx($logo);
