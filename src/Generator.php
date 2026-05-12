@@ -13,12 +13,12 @@ use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
+use Linkxtr\QrCode\Exceptions\CannotWriteFileException;
+use Linkxtr\QrCode\Exceptions\InvalidMacroReturnTypeException;
 use Linkxtr\QrCode\Renderers\BaconRenderer;
 use Linkxtr\QrCode\Support\DataTypeResolver;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
-use RuntimeException;
 use Stringable;
-use UnexpectedValueException;
 
 /**
  * @method HtmlString BTC(string $address, int|float|string $amount, array<mixed> $options = [])
@@ -73,11 +73,7 @@ final class Generator
             return $this->generate((string) $result);
         }
 
-        throw new UnexpectedValueException(sprintf(
-            'Macro "%s" must return a string, Stringable, or HtmlString. %s returned.',
-            $method,
-            get_debug_type($result)
-        ));
+        throw InvalidMacroReturnTypeException::invalidType($method, get_debug_type($result));
     }
 
     public function __clone()
@@ -92,7 +88,7 @@ final class Generator
         $htmlString = $baconRenderer->render($text);
 
         if ($filename !== null && file_put_contents($filename, $htmlString->toHtml()) === false) {
-            throw new RuntimeException('Failed to write QR code to file: '.$filename);
+            throw CannotWriteFileException::toPath($filename);
         }
 
         return $htmlString;
