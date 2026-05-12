@@ -95,11 +95,12 @@ final class Email implements DataTypeInterface
 
     private function validateAddress(mixed $address): string
     {
-        if (! filter_var($address, FILTER_VALIDATE_EMAIL)) {
+        $validated = filter_var($address, FILTER_VALIDATE_EMAIL);
+
+        if ($validated === false) {
             throw InvalidEmailArgumentException::invalidAddress();
         }
 
-        /** @var string $address */
-        return $address;
+        return $validated;
     }
 }
