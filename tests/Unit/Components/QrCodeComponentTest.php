@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\ComponentAttributeBag;
 use Linkxtr\QrCode\Components\QrCodeComponent;
 use Linkxtr\QrCode\Enums\GradientType;
@@ -26,7 +27,7 @@ test('it throws exceptions for invalid formats', function (): void {
 
 test('it throws exception for path traversal attempts in merge', function (): void {
     $component = new QrCodeComponent(data: 'test', merge: '../malicious.png');
-    expect(fn (): Closure => $component->render())->toThrow(InvalidConfigurationException::class, 'Image file path must be inside the application base path.');
+    expect(fn (): Closure => $component->render())->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: ../malicious.png');
 });
 
 test('it generates default svg with injected title and accessibility attributes', function (): void {
@@ -656,4 +657,30 @@ test('it correctly maps inner red color for eyeColor2 to prevent index mutations
     expect($fakeGenerator->calls['eyeColor'][0])->toBe(2);
     expect($fakeGenerator->calls['eyeColor'][1])->toBe([1, 2, 3, 100]);
     expect($fakeGenerator->calls['eyeColor'][2])->toBe([4, 5, 6, 100]);
+});
+
+it('logs a warning when an invalid color is provided', function (): void {
+    Log::shouldReceive('warning')
+        ->once()
+        ->withArgs(fn ($message): bool => str_contains((string) $message, 'QrCodeComponent: Unrecognized color format'));
+
+    $component = new QrCodeComponent(
+        data: 'Hello',
+        color: 'notacolor'
+    );
+
+    $component->render();
+});
+
+it('logs a warning when an invalid background color is provided', function (): void {
+    Log::shouldReceive('warning')
+        ->once()
+        ->withArgs(fn ($message): bool => str_contains((string) $message, 'QrCodeComponent: Unrecognized color format'));
+
+    $component = new QrCodeComponent(
+        data: 'Hello',
+        backgroundColor: 'invalid-bg'
+    );
+
+    $component->render();
 });

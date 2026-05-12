@@ -138,7 +138,9 @@ final class QrCodeComponent extends Component
     {
         try {
             return Rgb::parse($color);
-        } catch (InvalidConfigurationException) {
+        } catch (InvalidConfigurationException $invalidConfigurationException) {
+            logger()->warning('QrCodeComponent: '.$invalidConfigurationException->getMessage());
+
             return null;
         }
     }
