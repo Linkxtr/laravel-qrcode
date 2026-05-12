@@ -91,9 +91,9 @@ final class QrCodeComponent extends Component
             $generator = $generator->mergeString($this->mergeString, $this->mergePercentage);
         }
 
-        $htmlString = (string) $generator->generate($this->data);
+        return function (array $data) use ($generator): string {
+            $htmlString = (string) $generator->generate($this->data);
 
-        return function (array $data) use ($htmlString): string {
             /** @var ComponentAttributeBag $attributes */
             $attributes = $data['attributes'];
 
