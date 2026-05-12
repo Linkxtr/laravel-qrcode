@@ -30,13 +30,32 @@ test('it throws an exception if the normalized username is empty to prevent brok
     $telegram = new Telegram;
 
     expect(fn () => $telegram->create(['']))
-        ->toThrow(InvalidTelegramArgumentException::class, 'Telegram username cannot be empty.');
+        ->toThrow(InvalidTelegramArgumentException::class, 'Invalid Telegram username format.');
     expect(fn () => $telegram->create(['   ']))
-        ->toThrow(InvalidTelegramArgumentException::class, 'Telegram username cannot be empty.');
+        ->toThrow(InvalidTelegramArgumentException::class, 'Invalid Telegram username format.');
     expect(fn () => $telegram->create(['@']))
-        ->toThrow(InvalidTelegramArgumentException::class, 'Telegram username cannot be empty');
+        ->toThrow(InvalidTelegramArgumentException::class, 'Invalid Telegram username format');
     expect(fn () => $telegram->create(['   @   ']))
-        ->toThrow(InvalidTelegramArgumentException::class, 'Telegram username cannot be empty');
+        ->toThrow(InvalidTelegramArgumentException::class, 'Invalid Telegram username format');
+});
+
+it('throws an exception if the username is invalid', function (): void {
+    $telegram = new Telegram;
+
+    expect(fn () => $telegram->create(['abc']))
+        ->toThrow(InvalidTelegramArgumentException::class, 'Invalid Telegram username format.');
+
+    expect(fn () => $telegram->create(['!@#$%^']))
+        ->toThrow(InvalidTelegramArgumentException::class, 'Invalid Telegram username format.');
+
+    expect(fn () => $telegram->create(['12345678901234567890123456789012']))
+        ->toThrow(InvalidTelegramArgumentException::class, 'Invalid Telegram username format.');
+
+    expect(fn () => $telegram->create(['Hello world']))
+        ->toThrow(InvalidTelegramArgumentException::class, 'Invalid Telegram username format.');
+
+    expect(fn () => $telegram->create(['TooLongUserName1234567890123456789012345678901234']))
+        ->toThrow(InvalidTelegramArgumentException::class, 'Invalid Telegram username format.');
 });
 
 test('it generates standard Telegram uri from a clean username', function (): void {

@@ -19,7 +19,7 @@ test('invalidUsername sets correct error code and message', function (): void {
 
     expect($invalidTelegramArgumentException)->toBeInstanceOf(InvalidTelegramArgumentException::class)
         ->and($invalidTelegramArgumentException->getErrorCode())->toBe('INVALID_USERNAME')
-        ->and($invalidTelegramArgumentException->getHelperMessage())->toBe('Ensure the Telegram username is not empty after removing leading `@` symbol and trimming whitespace.');
+        ->and($invalidTelegramArgumentException->getHelperMessage())->toBe('Ensure the Telegram username is 5–32 characters long, contains only alphanumeric characters and underscores, and starts with a letter.');
 });
 
 test('missingArguments sets correct error code and message', function (): void {

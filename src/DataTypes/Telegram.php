@@ -38,7 +38,7 @@ final class Telegram implements DataTypeInterface
 
         $username = ltrim(trim($arguments[0]), '@');
 
-        if ($username === '') {
+        if (! preg_match('/^[a-zA-Z]\w{4,31}$/', $username)) {
             throw InvalidTelegramArgumentException::invalidUsername();
         }
 

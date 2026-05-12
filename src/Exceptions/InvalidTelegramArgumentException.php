@@ -17,9 +17,9 @@ final class InvalidTelegramArgumentException extends InvalidDataTypeArgumentExce
 
     public static function invalidUsername(): self
     {
-        $exception = new self('Telegram username cannot be empty.');
+        $exception = new self('Invalid Telegram username format.');
         $exception->errorCode = 'INVALID_USERNAME';
-        $exception->helperMessage = 'Ensure the Telegram username is not empty after removing leading `@` symbol and trimming whitespace.';
+        $exception->helperMessage = 'Ensure the Telegram username is 5–32 characters long, contains only alphanumeric characters and underscores, and starts with a letter.';
 
         return $exception;
     }
