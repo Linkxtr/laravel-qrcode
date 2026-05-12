@@ -86,10 +86,6 @@ final class QrCodeComponent extends Component
         }
 
         if ($this->merge !== null) {
-            if (str_contains($this->merge, '..')) {
-                throw InvalidConfigurationException::imagePathOutsideApplication();
-            }
-
             $generator = $generator->merge($this->merge, $this->mergePercentage);
         } elseif ($this->mergeString !== null) {
             $generator = $generator->mergeString($this->mergeString, $this->mergePercentage);
