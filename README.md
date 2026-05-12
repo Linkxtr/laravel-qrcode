@@ -197,6 +197,9 @@ QrCode::CalendarEvent([
     'start' => Carbon::create(2024, 8, 27, 9, 0, 0),
     'end' => Carbon::create(2024, 8, 28, 17, 0, 0),
 ]);
+// Note: Per RFC 5545, Calendar Events inject the current timestamp (DTSTAMP)
+// upon creation. Generating a QR code for the exact same event multiple
+// times will produce different binary outputs and cannot be strictly cached.
 
 // WhatsApp
 QrCode::WhatsApp(['number' => '+1234567890', 'message' => 'Hello from Laravel!']);
