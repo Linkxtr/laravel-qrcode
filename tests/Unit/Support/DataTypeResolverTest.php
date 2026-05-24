@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Linkxtr\QrCode\Exceptions\UnknownMethodException;
 use Linkxtr\QrCode\Support\DataTypeResolver;
 
+covers(DataTypeResolver::class);
+
 it('throws an exception for an unregistered method', function (): void {
     DataTypeResolver::resolve('unknownMethod', []);
 })->throws(
@@ -44,4 +46,26 @@ it('can resolve all mapped data types without instantiating unknown classes', fu
 
     $ethereum = DataTypeResolver::resolve('ethereum', ['0x1234567890abcdef']);
     expect($ethereum)->toBe('ethereum:0x1234567890abcdef');
+});
+
+it('throws an exception if a resolved class does not implement DataTypeInterface', function (): void {
+    final class BadDataType {}
+
+    $reflection = new ReflectionClass(DataTypeResolver::class);
+    $reflectionProperty = $reflection->getProperty('map');
+
+    $reflectionProperty->setValue(null, ['badtype' => BadDataType::class]);
+
+    expect(fn (): string => DataTypeResolver::resolve('badtype', []))->toThrow(UnknownMethodException::class, 'Data type class "BadDataType" must implement Linkxtr\QrCode\Contracts\DataTypeInterface.');
+
+    $reflectionProperty->setValue(null, null);
+});
+
+it('dynamically scans the directory and builds the data type map correctly', function () {
+    $reflection = new ReflectionClass(DataTypeResolver::class);
+    $property = $reflection->getProperty('map');
+    $property->setValue(null, null);
+
+    $result = DataTypeResolver::resolve('email', ['test@example.com']);
+    expect($result)->toContain('mailto:test@example.com');
 });

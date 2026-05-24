@@ -4,39 +4,17 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Support;
 
-use Linkxtr\QrCode\DataTypes\BTC;
-use Linkxtr\QrCode\DataTypes\CalendarEvent;
-use Linkxtr\QrCode\DataTypes\Email;
-use Linkxtr\QrCode\DataTypes\Ethereum;
-use Linkxtr\QrCode\DataTypes\Geo;
-use Linkxtr\QrCode\DataTypes\MeCard;
-use Linkxtr\QrCode\DataTypes\PhoneNumber;
-use Linkxtr\QrCode\DataTypes\SMS;
-use Linkxtr\QrCode\DataTypes\Telegram;
-use Linkxtr\QrCode\DataTypes\VCard;
-use Linkxtr\QrCode\DataTypes\WhatsApp;
-use Linkxtr\QrCode\DataTypes\WiFi;
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\Exceptions\UnknownMethodException;
 
 final class DataTypeResolver
 {
     /**
-     * Map of normalized method names to their concrete DataType classes.
+     * In-memory cache of dynamically resolved data types.
+     *
+     * @var array<string, string>|null
      */
-    private const MAP = [
-        'btc' => BTC::class,
-        'calendarevent' => CalendarEvent::class,
-        'email' => Email::class,
-        'ethereum' => Ethereum::class,
-        'geo' => Geo::class,
-        'mecard' => MeCard::class,
-        'phonenumber' => PhoneNumber::class,
-        'sms' => SMS::class,
-        'telegram' => Telegram::class,
-        'vcard' => VCard::class,
-        'whatsapp' => WhatsApp::class,
-        'wifi' => WiFi::class,
-    ];
+    private static ?array $map = null;
 
     /**
      * Resolve a data type method call into its string payload.
@@ -47,18 +25,52 @@ final class DataTypeResolver
      */
     public static function resolve(string $method, array $arguments): string
     {
+        $dataTypes = self::getMap();
+
         $normalizedMethod = strtolower($method);
 
-        if (! array_key_exists($normalizedMethod, self::MAP)) {
+        if (! array_key_exists($normalizedMethod, $dataTypes)) {
             throw UnknownMethodException::methodNotFound($method);
         }
 
-        $className = self::MAP[$normalizedMethod];
+        $className = $dataTypes[$normalizedMethod];
 
         $dataType = new $className;
+
+        if (! $dataType instanceof DataTypeInterface) {
+            throw UnknownMethodException::dataTypeNotImplemented($className);
+        }
 
         $dataType->create($arguments);
 
         return (string) $dataType;
+    }
+
+    /**
+     * Get the map of data types.
+     *
+     * @return array<string, string>
+     */
+    private static function getMap(): array
+    {
+        if (self::$map !== null) {
+            return self::$map;
+        }
+
+        $directory = __DIR__.'/../DataTypes';
+
+        $dataTypes = [];
+
+        foreach (scandir($directory) as $file) {
+            if (str_ends_with($file, '.php')) {
+                $className = basename($file, '.php');
+                $fullClassName = 'Linkxtr\\QrCode\\DataTypes\\'.$className;
+                $dataTypes[strtolower($className)] = $fullClassName;
+            }
+        }
+
+        self::$map = $dataTypes;
+
+        return $dataTypes;
     }
 }
