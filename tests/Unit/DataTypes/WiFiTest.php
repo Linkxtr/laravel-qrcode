@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\WiFi;
-use Linkxtr\QrCode\Exceptions\InvalidWiFiArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidWiFiArgumentException;
 
 covers(WiFi::class);
 

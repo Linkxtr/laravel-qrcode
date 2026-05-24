@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Linkxtr\QrCode\Exceptions\InvalidCalenderEventArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidCalenderEventArgumentException;
 
 covers(InvalidCalenderEventArgumentException::class);
 

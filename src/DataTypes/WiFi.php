@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode\DataTypes;
 
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
-use Linkxtr\QrCode\Exceptions\InvalidWiFiArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidWiFiArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class WiFi implements DataTypeInterface

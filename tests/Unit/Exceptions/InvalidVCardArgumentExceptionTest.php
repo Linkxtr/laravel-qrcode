@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Linkxtr\QrCode\Exceptions\InvalidVCardArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidVCardArgumentException;
 
 covers(InvalidVCardArgumentException::class);
 

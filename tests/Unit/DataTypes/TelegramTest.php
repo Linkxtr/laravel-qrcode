@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\Telegram;
-use Linkxtr\QrCode\Exceptions\InvalidTelegramArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidTelegramArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(Telegram::class);

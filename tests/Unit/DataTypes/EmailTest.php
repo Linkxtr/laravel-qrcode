@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\Email;
-use Linkxtr\QrCode\Exceptions\InvalidEmailArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidEmailArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(Email::class);

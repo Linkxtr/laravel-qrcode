@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\PhoneNumber;
-use Linkxtr\QrCode\Exceptions\InvalidPhoneNumberArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidPhoneNumberArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(PhoneNumber::class);

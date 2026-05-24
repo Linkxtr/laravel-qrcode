@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode\DataTypes;
 
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
-use Linkxtr\QrCode\Exceptions\InvalidVCardArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidVCardArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class VCard implements DataTypeInterface

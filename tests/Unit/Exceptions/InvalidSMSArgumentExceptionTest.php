@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Linkxtr\QrCode\Exceptions\InvalidSMSArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidSMSArgumentException;
 
 covers(InvalidSMSArgumentException::class);
 

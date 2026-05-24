@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode\DataTypes;
 
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
-use Linkxtr\QrCode\Exceptions\InvalidBTCArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidBTCArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class BTC implements DataTypeInterface

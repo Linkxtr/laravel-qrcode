@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes\Concerns;
 
-use Linkxtr\QrCode\Exceptions\InvalidPhoneNumberArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidPhoneNumberArgumentException;
 
 trait ValidatesPhoneNumbers
 {

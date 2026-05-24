@@ -6,7 +6,7 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
-use Linkxtr\QrCode\Exceptions\InvalidWhatsAppArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidWhatsAppArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class WhatsApp implements DataTypeInterface

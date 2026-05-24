@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Linkxtr\QrCode\Exceptions\InvalidEthereumArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidEthereumArgumentException;
 
 covers(InvalidEthereumArgumentException::class);
 

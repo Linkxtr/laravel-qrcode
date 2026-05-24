@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Linkxtr\QrCode\Exceptions\InvalidBTCArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidBTCArgumentException;
 
 covers(InvalidBTCArgumentException::class);
 

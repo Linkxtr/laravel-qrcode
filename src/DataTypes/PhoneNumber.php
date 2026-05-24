@@ -6,7 +6,7 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
-use Linkxtr\QrCode\Exceptions\InvalidPhoneNumberArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidPhoneNumberArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class PhoneNumber implements DataTypeInterface

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Carbon\Carbon;
 use Linkxtr\QrCode\DataTypes\CalendarEvent;
-use Linkxtr\QrCode\Exceptions\InvalidCalenderEventArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidCalenderEventArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(CalendarEvent::class);

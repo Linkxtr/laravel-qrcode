@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\SMS;
-use Linkxtr\QrCode\Exceptions\InvalidSMSArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidSMSArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(SMS::class);

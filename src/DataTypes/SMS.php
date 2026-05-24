@@ -6,7 +6,7 @@ namespace Linkxtr\QrCode\DataTypes;
 
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
-use Linkxtr\QrCode\Exceptions\InvalidSMSArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidSMSArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class SMS implements DataTypeInterface

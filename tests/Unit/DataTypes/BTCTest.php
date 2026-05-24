@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\BTC;
-use Linkxtr\QrCode\Exceptions\InvalidBTCArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidBTCArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(BTC::class);

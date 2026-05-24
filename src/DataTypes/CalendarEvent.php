@@ -7,7 +7,7 @@ namespace Linkxtr\QrCode\DataTypes;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
-use Linkxtr\QrCode\Exceptions\InvalidCalenderEventArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidCalenderEventArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 final class CalendarEvent implements DataTypeInterface

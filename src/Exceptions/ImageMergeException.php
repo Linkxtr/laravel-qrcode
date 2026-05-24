@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode\Exceptions;
 
 use ImagickException;
+use Linkxtr\QrCode\Contracts\QrCodeExceptionInterface;
 use Linkxtr\QrCode\Exceptions\Concerns\HasHelperMessage;
 use RuntimeException;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Linkxtr\QrCode\Exceptions;
+namespace Linkxtr\QrCode\Contracts;
 
 use Throwable;
 

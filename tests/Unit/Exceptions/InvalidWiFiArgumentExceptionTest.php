@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Linkxtr\QrCode\Exceptions\InvalidWiFiArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidWiFiArgumentException;
 
 covers(InvalidWiFiArgumentException::class);
 

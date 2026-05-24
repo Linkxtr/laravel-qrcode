@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Linkxtr\QrCode\Exceptions\InvalidMeCardArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidMeCardArgumentException;
 
 covers(InvalidMeCardArgumentException::class);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode\Exceptions;
 
 use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\QrCodeExceptionInterface;
 use Linkxtr\QrCode\Exceptions\Concerns\HasHelperMessage;
 
 abstract class InvalidDataTypeArgumentException extends InvalidArgumentException implements QrCodeExceptionInterface

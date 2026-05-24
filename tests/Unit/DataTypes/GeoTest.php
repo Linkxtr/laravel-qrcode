@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\Geo;
-use Linkxtr\QrCode\Exceptions\InvalidGeoArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidGeoArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(Geo::class);

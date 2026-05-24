@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Linkxtr\QrCode\Exceptions;
+namespace Linkxtr\QrCode\Exceptions\DataTypes;
+
+use Linkxtr\QrCode\Exceptions\InvalidDataTypeArgumentException;
 
 final class InvalidTelegramArgumentException extends InvalidDataTypeArgumentException
 {

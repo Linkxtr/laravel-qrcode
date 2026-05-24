@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Linkxtr\QrCode\Exceptions\InvalidTelegramArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidTelegramArgumentException;
 
 covers(InvalidTelegramArgumentException::class);
 

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\WhatsApp;
-use Linkxtr\QrCode\Exceptions\InvalidWhatsAppArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidWhatsAppArgumentException;
 use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(WhatsApp::class);
