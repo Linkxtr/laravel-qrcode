@@ -474,6 +474,13 @@ final class Generator
 
     private function getRenderer(): RendererInterface
     {
+        if (in_array($this->format, [Format::SVG, Format::EPS], true)) {
+            return new ImageRenderer(
+                $this->getRendererStyle(),
+                $this->getFormatter()
+            );
+        }
+
         if (! extension_loaded('imagick') && ! extension_loaded('gd')) {
             throw new RuntimeException('The imagick or gd extension is required to generate QR codes.');
         }

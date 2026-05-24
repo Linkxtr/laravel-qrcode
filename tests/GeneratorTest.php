@@ -10,6 +10,7 @@ use BaconQrCode\Renderer\Eye\CompositeEye;
 use BaconQrCode\Renderer\Eye\PointyEye;
 use BaconQrCode\Renderer\Eye\SimpleCircleEye;
 use BaconQrCode\Renderer\Eye\SquareEye;
+use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Module\DotsModule;
 use BaconQrCode\Renderer\Module\RoundnessModule;
 use BaconQrCode\Renderer\Module\SquareModule;
@@ -301,6 +302,15 @@ test('get renderer return a renderer instance', function () {
     $qrCode = new Generator;
     expect(invade($qrCode)->getRendererStyle())->not->toBeNull()->toBeInstanceOf(RendererStyle::class);
 });
+
+test('svg and eps renderers do not require imagick or gd extensions', function (string $format) {
+    $GLOBALS['mockImagickLoaded'] = false;
+    $GLOBALS['mockGdLoaded'] = false;
+
+    $qrCode = (new Generator)->format($format);
+
+    expect(invade($qrCode)->getRenderer())->toBeInstanceOf(ImageRenderer::class);
+})->with(['svg', 'eps']);
 
 it('throws exception if data type is not supported', function () {
     (new Generator)->notReal('fooBar');
