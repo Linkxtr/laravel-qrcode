@@ -16,7 +16,6 @@ use BaconQrCode\Renderer\Module\DotsModule;
 use BaconQrCode\Renderer\Module\RoundnessModule;
 use BaconQrCode\Renderer\Module\SquareModule;
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
-use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\EyeStyle;
@@ -28,6 +27,7 @@ use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Renderers\BaconRenderer;
+use Linkxtr\QrCode\Support\QrCodeResult;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 covers(BaconRenderer::class);
@@ -50,17 +50,17 @@ it('throws exception if required extensions are not loaded', function (): void {
 
     $config->setFormat(Format::SVG);
 
-    expect(fn (): HtmlString => $renderer->render('test'))->not->toThrow(MissingExtensionException::class);
+    expect(fn (): QrCodeResult => $renderer->render('test'))->not->toThrow(MissingExtensionException::class);
 
     $config->setFormat(Format::EPS);
 
-    expect(fn (): HtmlString => $renderer->render('test'))->not->toThrow(MissingExtensionException::class);
+    expect(fn (): QrCodeResult => $renderer->render('test'))->not->toThrow(MissingExtensionException::class);
 
     $config->setFormat(Format::PNG);
-    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(MissingExtensionException::class, 'The imagick or gd extension is required to generate raster QR codes');
+    expect(fn (): QrCodeResult => $renderer->render('test'))->toThrow(MissingExtensionException::class, 'The imagick or gd extension is required to generate raster QR codes');
 
     $config->setFormat(Format::WEBP);
-    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(MissingExtensionException::class, 'The imagick or gd extension is required to generate raster QR codes');
+    expect(fn (): QrCodeResult => $renderer->render('test'))->toThrow(MissingExtensionException::class, 'The imagick or gd extension is required to generate raster QR codes');
 });
 
 it('throws an exception if trying to generate a non-PNG raster using only GD', function (): void {
@@ -72,7 +72,7 @@ it('throws an exception if trying to generate a non-PNG raster using only GD', f
     $renderer = new BaconRenderer($config);
     $config->setFormat(Format::WEBP);
 
-    expect(fn (): HtmlString => $renderer->render('test'))
+    expect(fn (): QrCodeResult => $renderer->render('test'))
         ->toThrow(MissingExtensionException::class, 'The Imagick extension is required to generate the webp format.');
 });
 
@@ -98,8 +98,8 @@ it('successfully generates SVG and EPS without requiring any image extensions', 
 
     // SVG should succeed
     $config->setFormat(Format::SVG);
-    $htmlString = $renderer->render('test');
-    expect((string) $htmlString)->toContain('<svg');
+    $QrCodeResult = $renderer->render('test');
+    expect((string) $QrCodeResult)->toContain('<svg');
 
     // EPS should succeed
     $config->setFormat(Format::EPS);
@@ -204,11 +204,11 @@ it('renders an html string without merged image', function (): void {
     $config = new Config;
     $renderer = new BaconRenderer($config);
 
-    $htmlString = $renderer->render('test payload');
+    $QrCodeResult = $renderer->render('test payload');
 
-    expect($htmlString)->toBeInstanceOf(HtmlString::class)
-        ->and($htmlString->toHtml())->toContain('<svg')
-        ->and($htmlString->toHtml())->not->toContain('href="data:image/png;base64');
+    expect($QrCodeResult)->toBeInstanceOf(QrCodeResult::class)
+        ->and($QrCodeResult->toHtml())->toContain('<svg')
+        ->and($QrCodeResult->toHtml())->not->toContain('href="data:image/png;base64');
 });
 
 it('calls the correct merger based on format', function () use ($tinyPng): void {
@@ -245,7 +245,7 @@ it('throws an exception when trying to merge images into EPS format without gd e
 
     $renderer = new BaconRenderer($config);
 
-    expect(fn (): HtmlString => $renderer->render('test'))->toThrow(MissingExtensionException::class, 'The GD extension is required to merge images into EPS format.');
+    expect(fn (): QrCodeResult => $renderer->render('test'))->toThrow(MissingExtensionException::class, 'The GD extension is required to merge images into EPS format.');
 });
 
 it('renders an html string with merged image', function () use ($tinyPng): void {
@@ -255,11 +255,11 @@ it('renders an html string with merged image', function () use ($tinyPng): void 
 
     $renderer = new BaconRenderer($config);
 
-    $htmlString = $renderer->render('test payload');
+    $QrCodeResult = $renderer->render('test payload');
 
-    expect($htmlString)->toBeInstanceOf(HtmlString::class)
-        ->and($htmlString->toHtml())->toContain('<svg')
-        ->and($htmlString->toHtml())->toContain('href="data:image/png;base64');
+    expect($QrCodeResult)->toBeInstanceOf(QrCodeResult::class)
+        ->and($QrCodeResult->toHtml())->toContain('<svg')
+        ->and($QrCodeResult->toHtml())->toContain('href="data:image/png;base64');
 });
 
 it('throws a MissingExtensionException when using GD library with a non-square style', function (): void {
@@ -274,7 +274,7 @@ it('throws a MissingExtensionException when using GD library with a non-square s
 
     $renderer = new BaconRenderer($config);
 
-    expect(fn (): HtmlString => $renderer->render('https://linkxtr.com'))
+    expect(fn (): QrCodeResult => $renderer->render('https://linkxtr.com'))
         ->toThrow(
             MissingExtensionException::class,
             'The Imagick extension is required to use non-square module styles (e.g., DOT, ROUND). Please enable the Imagick extension or use the SQUARE style.'
@@ -293,7 +293,7 @@ it('throws a MissingExtensionException when using GD library with a gradient', f
 
     $renderer = new BaconRenderer($config);
 
-    expect(fn (): HtmlString => $renderer->render('https://linkxtr.com'))->toThrow(
+    expect(fn (): QrCodeResult => $renderer->render('https://linkxtr.com'))->toThrow(
         MissingExtensionException::class,
         'The Imagick extension is required to use gradients. Please enable the Imagick extension or use solid colors.'
     );

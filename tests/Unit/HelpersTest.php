@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\HtmlString;
+use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
+use Linkxtr\QrCode\Support\QrCodeResult;
 
 test('qrcode helper resolves the generator from the container when no argument is provided', function (): void {
     $generator = qrcode();
@@ -17,19 +18,19 @@ test('qrcode helper delegates directly to the facade when text is provided to ki
     {
         public ?string $receivedData = null;
 
-        public function generate(string $data): HtmlString
+        public function generate(string $data): QrCodeResult
         {
             $this->receivedData = $data;
 
-            return new HtmlString('<svg>helper-test</svg>');
+            return new QrCodeResult('<svg>helper-test</svg>', Format::SVG);
         }
     };
 
     QrCode::swap($fakeGenerator);
 
-    $htmlString = qrcode('https://linkxtr.com');
+    $QrCodeResult = qrcode('https://linkxtr.com');
 
-    expect($htmlString)->toBeInstanceOf(HtmlString::class)
-        ->and((string) $htmlString)->toBe('<svg>helper-test</svg>');
+    expect($QrCodeResult)->toBeInstanceOf(QrCodeResult::class)
+        ->and((string) $QrCodeResult)->toBe('<svg>helper-test</svg>');
     expect($fakeGenerator->receivedData)->toBe('https://linkxtr.com');
 });

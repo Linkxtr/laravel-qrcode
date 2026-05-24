@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
+use Linkxtr\QrCode\Support\QrCodeResult;
 
 afterEach(function (): void {
     Generator::flushMacros();
@@ -19,7 +19,7 @@ test('developers can register and execute custom macros on the QrCode facade', f
 
     $result = QrCode::myCustomTicket('EVT-999', 12345);
 
-    expect($result)->toBeInstanceOf(HtmlString::class);
+    expect($result)->toBeInstanceOf(QrCodeResult::class);
     expect((string) $result)->toContain('<svg')
         ->toContain('width="300"');
 });

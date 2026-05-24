@@ -48,7 +48,7 @@ test('it initializes with default values', function (): void {
 });
 
 test('it seeds configuration from array payload', function (): void {
-    $config = new Config([
+    $config = Config::fromArray([
         'size' => 1,
         'margin' => 0,
         'format' => 'PNG',
@@ -74,7 +74,7 @@ test('it seeds configuration from array payload', function (): void {
 });
 
 test('it falls back to default size when provide invalid size and margin', function (): void {
-    $config = new Config([
+    $config = Config::fromArray([
         'size' => -1,
         'margin' => -1,
     ]);
@@ -82,7 +82,7 @@ test('it falls back to default size when provide invalid size and margin', funct
     expect($config->getSize())->toBe(400)
         ->and($config->getMargin())->toBe(4);
 
-    $config = new Config([
+    $config = Config::fromArray([
         'size' => 0,
     ]);
 
@@ -561,4 +561,14 @@ test('it prevents directory traversal into sibling directories that share the sa
         unlink($filePath);
         rmdir($siblingDir);
     }
+});
+
+it('ignores the size configuration if it is not an integer', function (): void {
+    $config = Config::fromArray([
+        'size' => '300',
+    ]);
+
+    $defaultConfig = new Config;
+
+    expect($config->getSize())->toBe($defaultConfig->getSize());
 });

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode;
 
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Traits\Macroable;
 use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\ColorModel;
@@ -17,22 +16,23 @@ use Linkxtr\QrCode\Exceptions\CannotWriteFileException;
 use Linkxtr\QrCode\Exceptions\InvalidMacroReturnTypeException;
 use Linkxtr\QrCode\Renderers\BaconRenderer;
 use Linkxtr\QrCode\Support\DataTypeResolver;
+use Linkxtr\QrCode\Support\QrCodeResult;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 use Stringable;
 
 /**
- * @method HtmlString BTC(string $address, int|float|string $amount, array<mixed> $options = [])
- * @method HtmlString CalendarEvent(array<mixed> $attributes)
- * @method HtmlString Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
- * @method HtmlString Ethereum(string $address, int|float|string|null $amount = null)
- * @method HtmlString Geo(float $latitude, float $longitude, string $name = '')
- * @method HtmlString MeCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
- * @method HtmlString PhoneNumber(string $phoneNumber)
- * @method HtmlString SMS(string $smsAddress = '', string $message = '')
- * @method HtmlString Telegram(string|array<mixed> $username)
- * @method HtmlString VCard(array<mixed> $properties)
- * @method HtmlString WhatsApp(string|array<mixed> $number, ?string $message = null)
- * @method HtmlString WiFi(array<mixed> $credentials)
+ * @method QrCodeResult BTC(string $address, int|float|string $amount, array<mixed> $options = [])
+ * @method QrCodeResult CalendarEvent(array<mixed> $attributes)
+ * @method QrCodeResult Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
+ * @method QrCodeResult Ethereum(string $address, int|float|string|null $amount = null)
+ * @method QrCodeResult Geo(float $latitude, float $longitude, string $name = '')
+ * @method QrCodeResult MeCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
+ * @method QrCodeResult PhoneNumber(string $phoneNumber)
+ * @method QrCodeResult SMS(string $smsAddress = '', string $message = '')
+ * @method QrCodeResult Telegram(string|array<mixed> $username)
+ * @method QrCodeResult VCard(array<mixed> $properties)
+ * @method QrCodeResult WhatsApp(string|array<mixed> $number, ?string $message = null)
+ * @method QrCodeResult WiFi(array<mixed> $credentials)
  */
 final class Generator
 {
@@ -49,13 +49,13 @@ final class Generator
      */
     public function __construct(array $config = [])
     {
-        $this->config = new Config($config);
+        $this->config = Config::fromArray($config);
     }
 
     /**
      * @param  array<mixed>  $arguments
      */
-    public function __call(string $method, array $arguments): HtmlString
+    public function __call(string $method, array $arguments): QrCodeResult
     {
         if (! self::hasMacro($method)) {
             $payload = DataTypeResolver::resolve($method, $arguments);
@@ -65,7 +65,7 @@ final class Generator
 
         $result = $this->macroCall($method, $arguments);
 
-        if ($result instanceof HtmlString) {
+        if ($result instanceof QrCodeResult) {
             return $result;
         }
 
@@ -81,17 +81,27 @@ final class Generator
         $this->config = clone $this->config;
     }
 
-    public function generate(string $text, ?string $filename = null): HtmlString
+    public function generate(string $text, ?string $filename = null): QrCodeResult
     {
         $baconRenderer = new BaconRenderer($this->config);
 
-        $htmlString = $baconRenderer->render($text);
+        $qrCodeResult = $baconRenderer->render($text);
 
-        if ($filename !== null && file_put_contents($filename, $htmlString->toHtml()) === false) {
-            throw CannotWriteFileException::toPath($filename);
+        if ($filename !== null) {
+            $directory = dirname($filename);
+
+            if (! is_dir($directory)) {
+                throw CannotWriteFileException::toPath($filename);
+            }
+
+            $bytesWritten = @file_put_contents($filename, $qrCodeResult);
+
+            if ($bytesWritten === false) {
+                throw CannotWriteFileException::toPath($filename);
+            }
         }
 
-        return $htmlString;
+        return $qrCodeResult;
     }
 
     public function merge(string $filepath, float $percentage = .2): self

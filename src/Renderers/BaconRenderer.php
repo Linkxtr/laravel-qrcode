@@ -27,7 +27,6 @@ use BaconQrCode\Renderer\RendererStyle\Fill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
-use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Contracts\ColorInterface;
 use Linkxtr\QrCode\Contracts\MergerInterface;
 use Linkxtr\QrCode\DTOs\Config;
@@ -39,6 +38,7 @@ use Linkxtr\QrCode\Mergers\EpsMerger;
 use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
+use Linkxtr\QrCode\Support\QrCodeResult;
 
 final readonly class BaconRenderer
 {
@@ -53,7 +53,7 @@ final readonly class BaconRenderer
     /**
      * Render the QR code based on the provided payload and config.
      */
-    public function render(string $payload): HtmlString
+    public function render(string $payload): QrCodeResult
     {
         $renderer = $this->getRenderer();
         $writer = new Writer($renderer);
@@ -68,7 +68,7 @@ final readonly class BaconRenderer
             $content = $this->mergeImage($content);
         }
 
-        return new HtmlString($content);
+        return new QrCodeResult($content, $this->config->getFormat());
     }
 
     private function getRenderer(): RendererInterface

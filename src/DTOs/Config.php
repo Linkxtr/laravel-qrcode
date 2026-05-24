@@ -116,41 +116,45 @@ final class Config
     /**
      * @param  array<mixed>  $config
      */
-    public function __construct(array $config = [])
+    public static function fromArray(array $config): self
     {
+        $instance = new self;
+
         if (isset($config['size']) && is_int($config['size'])) {
-            $this->size = $config['size'] > 0 ? $config['size'] : $this->size;
+            $instance->size = $config['size'] > 0 ? $config['size'] : $instance->getSize();
         }
 
         if (isset($config['margin']) && is_int($config['margin'])) {
-            $this->margin = $config['margin'] >= 0 ? $config['margin'] : $this->margin;
+            $instance->margin = $config['margin'] >= 0 ? $config['margin'] : $instance->getMargin();
         }
 
         if (isset($config['format']) && is_string($config['format'])) {
             $format = Format::tryFrom(strtolower($config['format']));
             if ($format !== null) {
-                $this->format = $format;
+                $instance->format = $format;
             }
         }
 
         if (isset($config['error_correction']) && is_string($config['error_correction'])) {
             $level = ErrorCorrectionLevel::tryFrom(strtoupper($config['error_correction']));
             if ($level !== null) {
-                $this->errorCorrectionLevel = $level;
+                $instance->errorCorrectionLevel = $level;
             }
         }
 
         if (isset($config['encoding']) && is_string($config['encoding'])) {
-            $this->encoding = strtoupper($config['encoding']);
+            $instance->encoding = strtoupper($config['encoding']);
         }
 
         if (isset($config['color']) && (is_string($config['color']) || is_array($config['color']))) {
-            $this->colorValue = Rgb::parse($config['color']);
+            $instance->colorValue = Rgb::parse($config['color']);
         }
 
         if (isset($config['background_color']) && (is_string($config['background_color']) || is_array($config['background_color']))) {
-            $this->backgroundColorValue = Rgb::parse($config['background_color']);
+            $instance->backgroundColorValue = Rgb::parse($config['background_color']);
         }
+
+        return $instance;
     }
 
     public function setFormat(string|Format $format): void

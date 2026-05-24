@@ -12,9 +12,9 @@ test('invalidType creates exception with correct error code and helper message',
     expect($invalidMacroReturnTypeException)
         ->toBeInstanceOf(InvalidMacroReturnTypeException::class)
         ->and($invalidMacroReturnTypeException->getMessage())
-        ->toBe('Macro "test" must return a string, Stringable, or HtmlString. invalidType returned.')
+        ->toBe('Macro "test" must return a string, Stringable, or QrCodeResult. invalidType returned.')
         ->and($invalidMacroReturnTypeException->getErrorCode())
         ->toBe('INVALID_MACRO_RETURN_TYPE')
         ->and($invalidMacroReturnTypeException->getHelperMessage())
-        ->toBe('Ensure your registered macro in the AppServiceProvider returns a plain string payload or a fully generated HtmlString instance from $this->generate().');
+        ->toBe('Ensure your registered macro in the AppServiceProvider returns a plain string payload or a fully generated QrCodeResult instance from $this->generate().');
 });

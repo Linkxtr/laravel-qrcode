@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
-use Illuminate\Support\HtmlString;
 use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
 use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
+use Linkxtr\QrCode\Exceptions\CannotWriteFileException;
 use Linkxtr\QrCode\Generator;
+use Linkxtr\QrCode\Support\QrCodeResult;
 
 require_once __DIR__.'/../Support/Overrides.php';
 
@@ -30,7 +31,7 @@ it('can register and call custom macros that return a string payload', function 
 
     $generator = new Generator([]);
 
-    expect($generator->myMacro('hello-world'))->toBeInstanceOf(HtmlString::class);
+    expect($generator->myMacro('hello-world'))->toBeInstanceOf(QrCodeResult::class);
 })->after(function (): void {
     Generator::flushMacros();
 });
@@ -40,15 +41,15 @@ it('can register and call custom macros that return pre-styled generation', func
 
     $generator = new Generator([]);
 
-    expect($generator->myStyledMacro('hello-world'))->toBeInstanceOf(HtmlString::class);
+    expect($generator->myStyledMacro('hello-world'))->toBeInstanceOf(QrCodeResult::class);
 })->after(function (): void {
     Generator::flushMacros();
 });
 
-test('macro returning HtmlString is returned directly without regeneration', function (): void {
-    $expectedHtml = new HtmlString('<svg id="exact-macro-match"></svg>');
+test('macro returning QrCodeResult is returned directly without regeneration', function (): void {
+    $expectedHtml = new QrCodeResult('<svg id="exact-macro-match"></svg>', Format::SVG);
 
-    Generator::macro('returnsHtml', fn (): HtmlString => $expectedHtml);
+    Generator::macro('returnsHtml', fn (): QrCodeResult => $expectedHtml);
 
     $generator = new Generator;
     $result = $generator->returnsHtml();
@@ -71,7 +72,7 @@ test('macro returning a Stringable object is successfully generated', function (
     $generator = new Generator;
     $result = $generator->returnsStringable();
 
-    expect($result)->toBeInstanceOf(HtmlString::class)
+    expect($result)->toBeInstanceOf(QrCodeResult::class)
         ->and($result->toHtml())->toContain('<svg');
 })->after(function (): void {
     Generator::flushMacros();
@@ -83,7 +84,7 @@ it('throws an exception for unsupported type returns from macro', function (): v
     $generator = new Generator([]);
 
     $generator->returnArray();
-})->throws(UnexpectedValueException::class, 'Macro "returnArray" must return a string, Stringable, or HtmlString. array returned.')
+})->throws(UnexpectedValueException::class, 'Macro "returnArray" must return a string, Stringable, or QrCodeResult. array returned.')
     ->after(function (): void {
         Generator::flushMacros();
     });
@@ -91,10 +92,10 @@ it('throws an exception for unsupported type returns from macro', function (): v
 it('still delegates to data types if macro is not registered', function (): void {
     $generator = new Generator([]);
 
-    $htmlString = $generator->Email('test@example.com');
+    $qrCodeResult = $generator->Email('test@example.com');
 
-    expect($htmlString)->toBeInstanceOf(HtmlString::class);
-    expect((string) $htmlString)->toContain('<svg');
+    expect($qrCodeResult)->toBeInstanceOf(QrCodeResult::class);
+    expect((string) $qrCodeResult)->toContain('<svg');
 });
 
 test('fluent configuration methods return a cloned instance with updated config', function (): void {
@@ -189,7 +190,7 @@ test('generate throws exception if file_put_contents fails', function (): void {
     global $mockFilePutContents;
     $mockFilePutContents = true;
 
-    expect(fn (): HtmlString => $generator->generate('fail-test', 'fail-test.svg'))
+    expect(fn (): QrCodeResult => $generator->generate('fail-test', 'fail-test.svg'))
         ->toThrow(RuntimeException::class, 'Failed to write QR code to file: fail-test.svg');
 })->after(function (): void {
     global $mockFilePutContents;
@@ -204,4 +205,30 @@ test('it mathematically rejects arrays and objects inside color configurations',
 
     expect(fn (): Generator => $generator->gradient([255, 0, 0], [0, new stdClass, 0]))
         ->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric.');
+});
+
+it('throws an exception when attempting to save to a non-existent directory', function (): void {
+    $generator = new Generator;
+
+    $invalidPath = __DIR__.'/this_directory_does_not_exist/qrcode.png';
+
+    expect(fn (): QrCodeResult => $generator->generate('Hello World', $invalidPath))
+        ->toThrow(CannotWriteFileException::class);
+});
+
+it('can successfully generate and save a qr code to a file', function (): void {
+    $generator = new Generator;
+
+    $tempFile = sys_get_temp_dir().'/test_qrcode_'.uniqid().'.svg';
+
+    if (file_exists($tempFile)) {
+        unlink($tempFile);
+    }
+
+    $generator->format('svg')->generate('Hello World', $tempFile);
+
+    expect(file_exists($tempFile))->toBeTrue()
+        ->and(filesize($tempFile))->toBeGreaterThan(0);
+
+    unlink($tempFile);
 });
