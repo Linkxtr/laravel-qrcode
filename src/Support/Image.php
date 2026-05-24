@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Support;
 
-use ErrorException;
 use GdImage;
 use Linkxtr\QrCode\Exceptions\ImageMergeException;
 
@@ -17,26 +16,20 @@ final readonly class Image
      */
     public function __construct(string $image)
     {
-        try {
-            $img = imagecreatefromstring($image);
-        } catch (ErrorException) {
-            throw ImageMergeException::invalidImageData();
-        }
+        $img = @imagecreatefromstring($image);
 
-        if ($img === false) {
+        if (! $img) {
             throw ImageMergeException::invalidImageData();
         }
 
         $this->gdImage = $img;
     }
 
-    /** @return int<0, max> */
     public function getWidth(): int
     {
         return imagesx($this->gdImage);
     }
 
-    /** @return int<0, max> */
     public function getHeight(): int
     {
         return imagesy($this->gdImage);

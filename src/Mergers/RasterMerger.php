@@ -50,13 +50,6 @@ final class RasterMerger implements MergerInterface
         $mergeWidth = $this->mergeImage->getWidth();
         $mergeHeight = $this->mergeImage->getHeight();
 
-        // @codeCoverageIgnoreStart
-        if ($mergeWidth === 0 || $mergeHeight === 0) {
-            throw ImageMergeException::mergeImageDimensionsCannotBeZero();
-        }
-
-        // @codeCoverageIgnoreEnd
-
         $mergeRatio = $mergeWidth / $mergeHeight;
 
         $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage)); // @pest-mutate-ignore
@@ -71,7 +64,7 @@ final class RasterMerger implements MergerInterface
         $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2); // @pest-mutate-ignore
         $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2); // @pest-mutate-ignore
 
-        $canvas = imagecreatetruecolor($sourceWidth, $sourceHeight);
+        $canvas = imagecreatetruecolor(max(1, $sourceWidth), max(1, $sourceHeight));
 
         if (! $canvas) {
             throw ImageMergeException::mergeCanvasCreationFailed();

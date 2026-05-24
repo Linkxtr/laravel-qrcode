@@ -54,10 +54,7 @@
   "autoload-dev": {
     "psr-4": {
       "Tests\\": "tests/"
-    },
-    "files": [
-      "tests/Support/Overrides.php"
-    ]
+    }
   },
   "scripts": {
     "refactor": "rector",

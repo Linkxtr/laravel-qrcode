@@ -30,6 +30,8 @@ use Linkxtr\QrCode\Renderers\BaconRenderer;
 use Linkxtr\QrCode\Support\QrCodeResult;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
+require_once __DIR__.'/../../Support/Overrides.php';
+
 covers(BaconRenderer::class);
 
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');

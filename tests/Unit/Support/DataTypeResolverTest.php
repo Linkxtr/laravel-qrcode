@@ -61,10 +61,10 @@ it('throws an exception if a resolved class does not implement DataTypeInterface
     $reflectionProperty->setValue(null, null);
 });
 
-it('dynamically scans the directory and builds the data type map correctly', function () {
+it('dynamically scans the directory and builds the data type map correctly', function (): void {
     $reflection = new ReflectionClass(DataTypeResolver::class);
-    $property = $reflection->getProperty('map');
-    $property->setValue(null, null);
+    $reflectionProperty = $reflection->getProperty('map');
+    $reflectionProperty->setValue(null, null);
 
     $result = DataTypeResolver::resolve('email', ['test@example.com']);
     expect($result)->toContain('mailto:test@example.com');

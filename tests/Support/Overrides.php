@@ -203,22 +203,3 @@ namespace Linkxtr\QrCode\Mergers {
         }
     }
 }
-
-namespace Linkxtr\QrCode\Support {
-    use GdImage;
-
-    if (! isset($GLOBALS['mockImageCreateFromString'])) {
-        $GLOBALS['mockImageCreateFromString'] = null;
-    }
-
-    if (! function_exists(__NAMESPACE__.'\imagecreatefromstring')) {
-        function imagecreatefromstring($data): GdImage|false
-        {
-            if (isset($GLOBALS['mockImageCreateFromString']) && $GLOBALS['mockImageCreateFromString'] === false) {
-                return false;
-            }
-
-            return \imagecreatefromstring($data);
-        }
-    }
-}

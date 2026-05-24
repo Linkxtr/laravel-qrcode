@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use Linkxtr\QrCode\Console\Commands\GenerateQrCodeCommand;
+use Linkxtr\QrCode\Contracts\QrCodeExceptionInterface;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
+use Linkxtr\QrCode\Exceptions\Concerns\HasHelperMessage;
 use Linkxtr\QrCode\Facades\QrCode;
 
 covers(GenerateQrCodeCommand::class);
@@ -158,6 +160,12 @@ test('it enforces strict Alpha boundary checks to kill integer boundary mutants'
 });
 
 test('it gracefully catches Generator exceptions and returns failure', function (): void {
+
+    final class FakeGeneratorException extends Exception implements QrCodeExceptionInterface
+    {
+        use HasHelperMessage;
+    }
+
     $crashingGenerator = new class
     {
         public function __call(string $name, array $arguments): self
@@ -167,7 +175,7 @@ test('it gracefully catches Generator exceptions and returns failure', function 
 
         public function generate(): string
         {
-            throw new Exception('Simulated crash');
+            throw new FakeGeneratorException('Simulated crash');
         }
     };
     QrCode::swap($crashingGenerator);

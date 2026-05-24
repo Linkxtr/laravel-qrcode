@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Console\Commands;
 
-use Exception;
 use Illuminate\Console\Command;
+use Linkxtr\QrCode\Contracts\QrCodeExceptionInterface;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
 use Linkxtr\QrCode\Facades\QrCode;
 
@@ -148,8 +148,8 @@ final class GenerateQrCodeCommand extends Command
 
             return self::SUCCESS;
 
-        } catch (Exception $exception) {
-            error('Failed to generate QR Code: '.$exception->getMessage());
+        } catch (QrCodeExceptionInterface $qrCodeException) {
+            error('Failed to generate QR Code: '.$qrCodeException->getMessage());
 
             return self::FAILURE;
         }
