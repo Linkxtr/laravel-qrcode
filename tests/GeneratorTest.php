@@ -304,12 +304,29 @@ test('get renderer return a renderer instance', function () {
 });
 
 test('svg and eps renderers do not require imagick or gd extensions', function (string $format) {
+    $previousImagickLoaded = $GLOBALS['mockImagickLoaded'] ?? null;
+    $previousGdLoaded = $GLOBALS['mockGdLoaded'] ?? null;
+
     $GLOBALS['mockImagickLoaded'] = false;
     $GLOBALS['mockGdLoaded'] = false;
 
-    $qrCode = (new Generator)->format($format);
+    try {
+        $qrCode = (new Generator)->format($format);
 
-    expect(invade($qrCode)->getRenderer())->toBeInstanceOf(ImageRenderer::class);
+        expect(invade($qrCode)->getRenderer())->toBeInstanceOf(ImageRenderer::class);
+    } finally {
+        if ($previousImagickLoaded === null) {
+            unset($GLOBALS['mockImagickLoaded']);
+        } else {
+            $GLOBALS['mockImagickLoaded'] = $previousImagickLoaded;
+        }
+
+        if ($previousGdLoaded === null) {
+            unset($GLOBALS['mockGdLoaded']);
+        } else {
+            $GLOBALS['mockGdLoaded'] = $previousGdLoaded;
+        }
+    }
 })->with(['svg', 'eps']);
 
 it('throws exception if data type is not supported', function () {
