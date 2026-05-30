@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Support;
 
+use ArgumentCountError;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Exceptions\DataTypes\GenericInvalidDataTypeArgumentException;
 use Linkxtr\QrCode\Exceptions\UnknownMethodException;
+use TypeError;
 
 final class DataTypeResolver
 {
@@ -35,13 +38,23 @@ final class DataTypeResolver
 
         $className = $dataTypes[$normalizedMethod];
 
-        $dataType = new $className;
+        try {
+            if (count($arguments) === 1 && is_array($arguments[0])) {
+                $arguments = $arguments[0];
+            }
+
+            $dataType = new $className(...$arguments);
+        } catch (ArgumentCountError|TypeError $e) {
+            if ($e instanceof ArgumentCountError) {
+                throw GenericInvalidDataTypeArgumentException::missingArguments($e->getMessage());
+            }
+
+            throw GenericInvalidDataTypeArgumentException::invalidArgument($e->getMessage());
+        }
 
         if (! $dataType instanceof DataTypeInterface) {
             throw UnknownMethodException::dataTypeNotImplemented($className);
         }
-
-        $dataType->create($arguments);
 
         return (string) $dataType;
     }

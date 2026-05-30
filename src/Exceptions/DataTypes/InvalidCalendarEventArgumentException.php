@@ -6,7 +6,7 @@ namespace Linkxtr\QrCode\Exceptions\DataTypes;
 
 use Linkxtr\QrCode\Exceptions\InvalidDataTypeArgumentException;
 
-final class InvalidCalenderEventArgumentException extends InvalidDataTypeArgumentException
+final class InvalidCalendarEventArgumentException extends InvalidDataTypeArgumentException
 {
     public static function invalidSummary(string $type): self
     {

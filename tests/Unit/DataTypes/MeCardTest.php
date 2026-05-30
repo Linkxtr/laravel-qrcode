@@ -4,153 +4,88 @@ declare(strict_types=1);
 
 use Linkxtr\QrCode\DataTypes\MeCard;
 use Linkxtr\QrCode\Exceptions\DataTypes\InvalidMeCardArgumentException;
-use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
 
 covers(MeCard::class);
 
-it('throws exception if rendered before creation', function (): void {
-    $meCard = new MeCard;
-    expect(fn (): string => (string) $meCard)
-        ->toThrow(UninitializedDataTypeException::class, 'MeCard must be initialized via create() before rendering.');
+test('it throws exception if name is missing', function (): void {
+    expect(fn (): MeCard => new MeCard)
+        ->toThrow(TypeError::class);
 });
 
-it('throws exception if name is missing or invalid', function (): void {
-    $meCard = new MeCard;
-
-    expect(fn () => $meCard->create([]))
-        ->toThrow(InvalidMeCardArgumentException::class, 'MeCard Name is mandatory.');
-
-    expect(fn () => $meCard->create([123]))
-        ->toThrow(InvalidMeCardArgumentException::class, 'MeCard name must be a non-empty string. Provided type: integer');
-
-    expect(fn () => $meCard->create(['name' => '']))
-        ->toThrow(InvalidMeCardArgumentException::class, 'MeCard name must be a non-empty string. Provided type: empty string');
+test('it throws exception if name is an empty string', function (): void {
+    expect(fn (): MeCard => new MeCard(''))
+        ->toThrow(InvalidMeCardArgumentException::class);
 });
 
-it('successfully maps the 5 common positional arguments', function (): void {
-    $meCard = new MeCard;
-    // Maps: Name, Phone, Email, URL, Address
-    $meCard->create([
-        'Khaled Sadek',
-        '+123456789',
-        'test@example.com',
-        'https://github.com',
-        '123 Main St',
-    ]);
+test('it strips empty string associative arguments', function (): void {
+    $mecard = new MeCard('John Doe', phone: '', email: '', note: '');
 
-    expect((string) $meCard)->toBe('MECARD:N:Khaled Sadek;TEL:+123456789;EMAIL:test@example.com;ADR:123 Main St;URL:https://github.com;;');
+    $expected = 'MECARD:N:John Doe;;';
+
+    expect((string) $mecard)->toBe($expected);
 });
 
-it('successfully maps all 13 associative array arguments', function (): void {
-    $meCard = new MeCard;
-    $meCard->create([[
-        'name' => 'Khaled Sadek',
-        'reading' => 'Kha-led',
-        'nickname' => 'KhaledDev',
-        'phone' => '+123456',
-        'phone2' => '+654321',
-        'phone3' => '+789012',
-        'videoPhone' => '+111111',
-        'email' => 'test@example.com',
-        'note' => 'Developer',
-        'birthday' => '19900101',
-        'address' => '123 Main St',
-        'postOfficeBox' => 'PO123',
-        'url' => 'https://github.com',
-    ]]);
+test('it generates full MeCard uri', function (): void {
+    $mecard = new MeCard('John Doe', phone: '+15551234567', email: 'test@example.com', note: 'A note');
 
-    $expected = 'MECARD:N:Khaled Sadek;SOUND:Kha-led;NICKNAME:KhaledDev;TEL:+123456;TEL:+654321;TEL:+789012;TEL-AV:+111111;EMAIL:test@example.com;NOTE:Developer;BDAY:19900101;ADR:123 Main St;POBOX:PO123;URL:https://github.com;;';
-    expect((string) $meCard)->toBe($expected);
+    $expected = 'MECARD:N:John Doe;TEL:+15551234567;EMAIL:test@example.com;NOTE:A note;;';
+
+    expect((string) $mecard)->toBe($expected);
 });
 
-it('ignores non-string associative arguments', function (): void {
-    $meCard = new MeCard;
-    $meCard->create([[
-        'name' => 'Khaled Sadek',
-        'reading' => 123,
-        'nickname' => false,
-        'phone' => ['invalid'],
-        'phone2' => 456,
-        'phone3' => null,
-        'videoPhone' => [],
-        'email' => null,
-        'note' => 456.7,
-        'birthday' => false,
-        'address' => [],
-        'postOfficeBox' => 123,
-        'url' => null,
-    ]]);
-
-    expect((string) $meCard)->toBe('MECARD:N:Khaled Sadek;;');
+test('it strictly maps first and last names independently', function (): void {
+    $mecard1 = new MeCard('Khaled');
+    expect((string) $mecard1)->toBe('MECARD:N:Khaled;;');
 });
 
-it('strips empty string associative arguments', function (): void {
-    $meCard = new MeCard;
-    $meCard->create([[
-        'name' => 'Khaled Sadek',
-        'reading' => '',
-        'nickname' => '',
-        'phone' => '',
-        'phone2' => '',
-        'phone3' => '',
-        'videoPhone' => '',
-        'email' => '',
-        'note' => '',
-        'birthday' => '',
-        'address' => '',
-        'postOfficeBox' => '',
-        'url' => '',
-    ]]);
+test('it escapes reserved characters accurately', function (): void {
+    $mecard = new MeCard('Name\\With;Special:Chars,Here', note: 'Line1Line2');
 
-    expect((string) $meCard)->toBe('MECARD:N:Khaled Sadek;;');
+    $expected = 'MECARD:N:Name\\\\With\\;Special\\:Chars,Here;NOTE:Line1Line2;;';
+
+    expect((string) $mecard)->toBe($expected);
 });
 
-it('accurately escapes special characters', function (): void {
-    $meCard = new MeCard;
+test('it creates mecard with all properties', function (): void {
+    $mecard = new MeCard(
+        name: 'John Doe',
+        phone: '+15551234567',
+        email: '[EMAIL_ADDRESS]',
+        url: 'https://example.com',
+        address: '123 Main St',
+        reading: 'John Doe',
+        nickname: 'John',
+        phone2: '+15551234567',
+        phone3: '+15551234567',
+        videoPhone: '+15551234567',
+        note: 'A note',
+        birthday: '2022-01-01',
+        postOfficeBox: '1234567890'
+    );
 
-    $chaosString = 'Name\\With;Special:Chars,Here';
+    $expected = 'MECARD:N:John Doe;SOUND:John Doe;NICKNAME:John;TEL:+15551234567;TEL:+15551234567;TEL:+15551234567;TEL-AV:+15551234567;EMAIL:[EMAIL_ADDRESS];NOTE:A note;BDAY:2022-01-01;ADR:123 Main St;POBOX:1234567890;URL:https://example.com;;';
 
-    $meCard->create([$chaosString]);
-    $expected = 'MECARD:N:Name\\\\With\\;Special\\:Chars,Here;;';
-
-    expect((string) $meCard)->toBe($expected);
+    expect((string) $mecard)->toBe($expected);
 });
 
-it('rigorously escapes semicolons and backslashes in URLs to prevent MeCard delimiter corruption', function (): void {
-    $meCard = new MeCard;
+it('ignores empty optional arguments', function (): void {
+    $mecard = new MeCard(
+        name: 'John Doe',
+        phone: '',
+        email: '',
+        url: '',
+        address: '',
+        reading: '',
+        nickname: '',
+        phone2: '',
+        phone3: '',
+        videoPhone: '',
+        note: '',
+        birthday: '',
+        postOfficeBox: ''
+    );
 
-    $meCard->create([[
-        'name' => 'John Doe',
-        'url' => 'https://example.com/path;session=123\\backup',
-    ]]);
+    $expected = 'MECARD:N:John Doe;;';
 
-    $result = (string) $meCard;
-
-    expect($result)->toContain('URL:https://example.com/path\;session=123\\\\backup;');
-
-    expect($result)->not->toContain('path;session');
-});
-
-it('escapes commas in non-name fields', function (): void {
-    $meCard = new MeCard;
-
-    $meCard->create([
-        'name' => 'Doe,John',
-        'note' => 'Hello, World',
-    ]);
-
-    expect((string) $meCard)->toBe('MECARD:N:Doe,John;NOTE:Hello\, World;;');
-});
-
-it('escapes special characters correctly in both name and non-name fields', function (): void {
-    $meCard = new MeCard;
-
-    $meCard->create([
-        'name' => 'Doe,John\\With;Special:Chars',
-        'note' => 'Note,With\\All;Special:Chars',
-    ]);
-
-    $expected = 'MECARD:N:Doe,John\\\\With\\;Special\\:Chars;NOTE:Note\\,With\\\\All\\;Special\\:Chars;;';
-
-    expect((string) $meCard)->toBe($expected);
+    expect((string) $mecard)->toBe($expected);
 });

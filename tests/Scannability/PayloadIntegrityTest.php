@@ -66,7 +66,7 @@ it('can scan a generated QR code with complex WiFi payload', function (bool $ima
         'encryption' => 'WPA',
         'ssid' => 'MyNetwork',
         'password' => 'SuperSecret',
-        'hidden' => 'true',
+        'hidden' => true,
     ]);
 
     expect(read_qr_code((string) $qrCodeResult))->toBe('WIFI:S:MyNetwork;T:WPA;P:SuperSecret;H:true;;');

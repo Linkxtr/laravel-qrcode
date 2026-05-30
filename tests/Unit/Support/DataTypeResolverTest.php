@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Exceptions\DataTypes\GenericInvalidDataTypeArgumentException;
 use Linkxtr\QrCode\Exceptions\UnknownMethodException;
 use Linkxtr\QrCode\Support\DataTypeResolver;
 
@@ -68,4 +70,32 @@ it('dynamically scans the directory and builds the data type map correctly', fun
 
     $result = DataTypeResolver::resolve('email', ['test@example.com']);
     expect($result)->toContain('mailto:test@example.com');
+});
+
+it('throws an exception if the data type class has an invalid constructor', function (): void {
+    final readonly class DummyDataType implements DataTypeInterface
+    {
+        public function __construct(private string $arg) {}
+
+        public function __toString(): string
+        {
+            return 'dummy, '.$this->arg;
+        }
+    }
+
+    $reflection = new ReflectionClass(DataTypeResolver::class);
+    $reflectionProperty = $reflection->getProperty('map');
+    $originalMap = $reflectionProperty->getValue();
+
+    $reflectionProperty->setValue(null, ['dummy' => DummyDataType::class]);
+
+    expect(fn (): string => DataTypeResolver::resolve('dummy', []))->toThrow(
+        GenericInvalidDataTypeArgumentException::class
+    );
+
+    expect(fn (): string => DataTypeResolver::resolve('dummy', [null]))->toThrow(
+        GenericInvalidDataTypeArgumentException::class
+    );
+
+    $reflectionProperty->setValue(null, $originalMap);
 });

@@ -4,94 +4,72 @@ declare(strict_types=1);
 
 use Carbon\Carbon;
 use Linkxtr\QrCode\DataTypes\CalendarEvent;
-use Linkxtr\QrCode\Exceptions\DataTypes\InvalidCalenderEventArgumentException;
-use Linkxtr\QrCode\Exceptions\UninitializedDataTypeException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidCalendarEventArgumentException;
 
 covers(CalendarEvent::class);
 
 afterEach(fn () => Carbon::setTestNow());
 
-test('it throws exception if rendered before creation', function (): void {
-    $event = new CalendarEvent;
-    expect(fn (): string => (string) $event)
-        ->toThrow(UninitializedDataTypeException::class, 'Calendar event must be initialized via create() before rendering.');
-});
-
-test('it throws exception if arguments are not an array', function (): void {
-    $event = new CalendarEvent;
-    expect(fn () => $event->create(['not-an-array']))
-        ->toThrow(InvalidCalenderEventArgumentException::class, 'Invalid CalendarEvent arguments.');
-});
-
 test('it throws exception if summary is missing, invalid type, or empty', function (): void {
-    $event = new CalendarEvent;
+    expect(fn (): CalendarEvent => new CalendarEvent(summary: '', start: '2023-01-01', end: '2023-01-02'))
+        ->toThrow(InvalidCalendarEventArgumentException::class, 'The summary must be a non-empty string.');
 
-    expect(fn () => $event->create([[]]))
-        ->toThrow(InvalidCalenderEventArgumentException::class, 'Summary is required.');
-
-    expect(fn () => $event->create([['summary' => 123]]))
-        ->toThrow(InvalidCalenderEventArgumentException::class, 'The summary must be a non-empty string.');
-
-    expect(fn () => $event->create([['summary' => '']]))
-        ->toThrow(InvalidCalenderEventArgumentException::class, 'The summary must be a non-empty string.');
+    expect(fn (): CalendarEvent => new CalendarEvent(start: '2023-01-01', end: '2023-01-02'))
+        ->toThrow(TypeError::class);
 });
 
 test('it throws exception if start date is missing', function (): void {
-    $event = new CalendarEvent;
-    expect(fn () => $event->create([['summary' => 'Meeting']]))
-        ->toThrow(InvalidCalenderEventArgumentException::class, 'Start date is required.');
+    expect(fn (): CalendarEvent => new CalendarEvent(summary: 'Meeting', end: '2023-01-02'))
+        ->toThrow(TypeError::class);
 });
 
 test('it throws exception if end date is missing', function (): void {
-    $event = new CalendarEvent;
-    expect(fn () => $event->create([['summary' => 'Meeting', 'start' => '2023-01-01']]))
-        ->toThrow(InvalidCalenderEventArgumentException::class, 'End date is required.');
+    expect(fn (): CalendarEvent => new CalendarEvent(summary: 'Meeting', start: '2023-01-01'))
+        ->toThrow(TypeError::class);
 });
 
 test('it strictly enforces end date must be after start date', function (): void {
-    $event = new CalendarEvent;
+    expect(fn (): CalendarEvent => new CalendarEvent(
+        summary: 'Meeting', start: '2023-01-01 12:00:00', end: '2023-01-01 12:00:00'
+    ))->toThrow(InvalidCalendarEventArgumentException::class, 'The end date must be after the start date.');
 
-    expect(fn () => $event->create([
-        ['summary' => 'Meeting', 'start' => '2023-01-01 12:00:00', 'end' => '2023-01-01 12:00:00'],
-    ]))->toThrow(InvalidCalenderEventArgumentException::class, 'The end date must be after the start date.');
-
-    expect(fn () => $event->create([
-        ['summary' => 'Meeting', 'start' => '2023-01-01 12:00:00', 'end' => '2023-01-01 11:59:59'],
-    ]))->toThrow(InvalidCalenderEventArgumentException::class, 'The end date must be after the start date.');
+    expect(fn (): CalendarEvent => new CalendarEvent(
+        summary: 'Meeting', start: '2023-01-01 12:00:00', end: '2023-01-01 11:59:59'
+    ))->toThrow(InvalidCalendarEventArgumentException::class, 'The end date must be after the start date.');
 });
 
 test('it successfully parses numeric timestamps and DateTimeInterfaces', function (): void {
-    $event = new CalendarEvent;
     $dateTime = Carbon::parse('2023-01-01 14:00:00');
 
-    $event->create([
-        ['summary' => 'Meeting', 'start' => 1672574400, 'end' => $dateTime],
-    ]);
+    $event = new CalendarEvent(
+        summary: 'Meeting', start: 1672574400, end: $dateTime
+    );
 
-    expect(invade($event)->start->timestamp)->toBe(1672574400)
-        ->and(invade($event)->end->format('Y-m-d H:i:s'))->toBe('2023-01-01 14:00:00');
+    expect(invade($event)->startParsed->timestamp)->toBe(1672574400)
+        ->and(invade($event)->endParsed->format('Y-m-d H:i:s'))->toBe('2023-01-01 14:00:00');
 });
 
 test('it throws exception for invalid date types', function (): void {
-    $event = new CalendarEvent;
-    expect(fn () => $event->create([
-        ['summary' => 'Meeting', 'start' => ['invalid-type'], 'end' => '2023-01-01'],
-    ]))->toThrow(InvalidCalenderEventArgumentException::class, 'The date must be a string, numeric, or DateTimeInterface.');
+    expect(fn (): CalendarEvent => new CalendarEvent(
+        summary: 'Meeting', start: ['invalid-type'], end: '2023-01-01'
+    ))->toThrow(TypeError::class);
+    expect(fn (): CalendarEvent => new CalendarEvent(
+        summary: 'Meeting', start: 'invalid-type', end: '2023-01-01'
+    ))->toThrow(InvalidCalendarEventArgumentException::class);
 });
 
 test('it generates full formatted calendar string and strictly preserves timezones', function (): void {
     Carbon::setTestNow(Carbon::parse('2023-10-15 08:30:00', 'UTC'));
 
-    $event = new CalendarEvent;
-    $event->create([[
-        'summary' => 'Main Meeting',
-        'start' => '2023-12-01 12:00:00+02:00',
-        'end' => '2023-12-01 14:00:00+02:00',
-        'description' => 'Optional Desc',
-        'location' => 'Optional Loc',
-    ]]);
+    $event = new CalendarEvent(
+        summary: 'Main Meeting',
+        start: '2023-12-01 12:00:00+02:00',
+        end: '2023-12-01 14:00:00+02:00',
+        description: 'Optional Desc',
+        location: 'Optional Loc'
+    );
 
-    $uid = invade($event)->uid;
+    $uid = invade($event)->uidValue;
 
     $expectedString = implode("\r\n", [
         'BEGIN:VCALENDAR',
@@ -112,34 +90,17 @@ test('it generates full formatted calendar string and strictly preserves timezon
 
     expect((string) $event)->toBe($expectedString);
 
-    expect(invade($event)->start->getTimezone()->getName())->toBe('+02:00');
-});
-
-test('it ignores optional parameters if they are not strings', function (): void {
-    $event = new CalendarEvent;
-    $event->create([[
-        'summary' => 'Meeting',
-        'start' => '2023-12-01 12:00:00',
-        'end' => '2023-12-01 14:00:00',
-        'description' => 12345,
-        'location' => null,
-    ]]);
-
-    $result = (string) $event;
-    expect($result)->not->toContain('DESCRIPTION:')
-        ->and($result)->not->toContain('LOCATION:');
+    expect(invade($event)->startParsed->getTimezone()->getName())->toBe('+02:00');
 });
 
 test('it rigorously escapes special characters in strings', function (): void {
-    $event = new CalendarEvent;
-
     $chaosString = "Line1\\Line2,Line3;Line4\r\nLine5\nLine6\rLine7";
 
-    $event->create([[
-        'summary' => $chaosString,
-        'start' => '2023-12-01 12:00:00',
-        'end' => '2023-12-01 14:00:00',
-    ]]);
+    $event = new CalendarEvent(
+        summary: $chaosString,
+        start: '2023-12-01 12:00:00',
+        end: '2023-12-01 14:00:00'
+    );
 
     $result = (string) $event;
 
@@ -149,14 +110,13 @@ test('it rigorously escapes special characters in strings', function (): void {
 });
 
 test('it generates a valid structured UID', function (): void {
-    $event = new CalendarEvent;
-    $event->create([[
-        'summary' => 'Meeting',
-        'start' => '2023-12-01 12:00:00',
-        'end' => '2023-12-01 14:00:00',
-    ]]);
+    $event = new CalendarEvent(
+        summary: 'Meeting',
+        start: '2023-12-01 12:00:00',
+        end: '2023-12-01 14:00:00'
+    );
 
-    $uid = invade($event)->uid;
+    $uid = invade($event)->uidValue;
 
     expect($uid)->toEndWith('@linkxtr-qrcode')
         ->and($uid)->not->toStartWith('@linkxtr-qrcode');
@@ -165,131 +125,104 @@ test('it generates a valid structured UID', function (): void {
     expect(strlen($uniquePart))->toBe(40);
 });
 
-test('it clears stale optional data and applies state atomically on object reuse', function (): void {
-    $event = new CalendarEvent;
-
-    $event->create([[
-        'summary' => 'Meeting 1',
-        'start' => '2023-12-01 12:00:00',
-        'end' => '2023-12-01 14:00:00',
-        'description' => 'Old Description',
-        'location' => 'Old Location',
-    ]]);
-
-    expect((string) $event)->toContain('DESCRIPTION:Old Description')
-        ->and((string) $event)->toContain('LOCATION:Old Location');
-
-    $event->create([[
-        'summary' => 'Meeting 2',
-        'start' => '2023-12-02 12:00:00',
-        'end' => '2023-12-02 14:00:00',
-    ]]);
-
-    expect((string) $event)->not->toContain('DESCRIPTION:')
-        ->and((string) $event)->not->toContain('LOCATION:');
-});
-
-test('it does not mutate instance state if validation fails', function (): void {
-    $event = new CalendarEvent;
-
-    $event->create([[
-        'summary' => 'Meeting 1',
-        'start' => '2023-12-01 12:00:00',
-        'end' => '2023-12-01 14:00:00',
-    ]]);
-
-    $originalUid = invade($event)->uid;
-
-    try {
-        $event->create([[
-            'summary' => 'Meeting 2',
-            'start' => '2023-12-02 12:00:00',
-        ]]);
-    } catch (InvalidCalenderEventArgumentException) {
-    }
-
-    expect(invade($event)->summary)->toBe('Meeting 1')
-        ->and(invade($event)->uid)->toBe($originalUid);
-});
-
 test('it generates deterministic UIDs for identical events', function (): void {
-    $data = [[
-        'summary' => 'Team Sync',
-        'start' => '2024-01-01 10:00:00',
-        'end' => '2024-01-01 11:00:00',
-    ]];
+    $event1 = new CalendarEvent(
+        summary: 'Team Sync',
+        start: '2024-01-01 10:00:00',
+        end: '2024-01-01 11:00:00'
+    );
 
-    $event1 = new CalendarEvent;
-    $event1->create($data);
+    $event2 = new CalendarEvent(
+        summary: 'Team Sync',
+        start: '2024-01-01 10:00:00',
+        end: '2024-01-01 11:00:00'
+    );
 
-    $event2 = new CalendarEvent;
-    $event2->create($data);
-
-    expect(invade($event1)->uid)->toBe(invade($event2)->uid);
+    expect(invade($event1)->uidValue)->toBe(invade($event2)->uidValue);
 });
 
 test('it allows custom UIDs to be passed', function (): void {
-    $event = new CalendarEvent;
-    $event->create([[
-        'summary' => 'Meeting',
-        'start' => '2023-12-01 12:00:00',
-        'end' => '2023-12-01 14:00:00',
-        'uid' => 'custom-uuid-12345',
-    ]]);
+    $event = new CalendarEvent(
+        summary: 'Meeting',
+        start: '2023-12-01 12:00:00',
+        end: '2023-12-01 14:00:00',
+        uid: 'custom-uuid-12345'
+    );
 
-    expect(invade($event)->uid)->toBe('custom-uuid-12345');
+    expect(invade($event)->uidValue)->toBe('custom-uuid-12345');
 });
 
 test('the generated UID changes if any core event detail changes', function (): void {
-    $baseData = [
-        'summary' => 'Core Meeting',
-        'start' => '2024-01-01 10:00:00',
-        'end' => '2024-01-01 11:00:00',
-        'description' => 'Core Description',
-        'location' => 'Core Location',
-    ];
+    $baseEvent = new CalendarEvent(
+        summary: 'Core Meeting',
+        start: '2024-01-01 10:00:00',
+        end: '2024-01-01 11:00:00',
+        description: 'Core Description',
+        location: 'Core Location'
+    );
 
-    $baseEvent = new CalendarEvent;
-    $baseEvent->create([$baseData]);
+    $baseUid = invade($baseEvent)->uidValue;
 
-    $baseUid = invade($baseEvent)->uid;
+    $diffSummary = new CalendarEvent(
+        summary: 'Different Meeting',
+        start: '2024-01-01 10:00:00',
+        end: '2024-01-01 11:00:00',
+        description: 'Core Description',
+        location: 'Core Location'
+    );
 
-    $diffSummary = new CalendarEvent;
-    $diffSummary->create([array_merge($baseData, ['summary' => 'Different Meeting'])]);
+    expect(invade($diffSummary)->uidValue)->not->toBe($baseUid);
 
-    expect(invade($diffSummary)->uid)->not->toBe($baseUid);
+    $diffStart = new CalendarEvent(
+        summary: 'Core Meeting',
+        start: '2024-01-01 09:00:00',
+        end: '2024-01-01 11:00:00',
+        description: 'Core Description',
+        location: 'Core Location'
+    );
 
-    $diffStart = new CalendarEvent;
-    $diffStart->create([array_merge($baseData, ['start' => '2024-01-01 09:00:00'])]);
+    expect(invade($diffStart)->uidValue)->not->toBe($baseUid);
 
-    expect(invade($diffStart)->uid)->not->toBe($baseUid);
+    $diffEnd = new CalendarEvent(
+        summary: 'Core Meeting',
+        start: '2024-01-01 10:00:00',
+        end: '2024-01-01 12:00:00',
+        description: 'Core Description',
+        location: 'Core Location'
+    );
 
-    $diffEnd = new CalendarEvent;
-    $diffEnd->create([array_merge($baseData, ['end' => '2024-01-01 12:00:00'])]);
+    expect(invade($diffEnd)->uidValue)->not->toBe($baseUid);
 
-    expect(invade($diffEnd)->uid)->not->toBe($baseUid);
+    $diffDesc = new CalendarEvent(
+        summary: 'Core Meeting',
+        start: '2024-01-01 10:00:00',
+        end: '2024-01-01 11:00:00',
+        description: 'Different Description',
+        location: 'Core Location'
+    );
 
-    $diffDesc = new CalendarEvent;
-    $diffDesc->create([array_merge($baseData, ['description' => 'Different Description'])]);
+    expect(invade($diffDesc)->uidValue)->not->toBe($baseUid);
 
-    expect(invade($diffDesc)->uid)->not->toBe($baseUid);
+    $diffLoc = new CalendarEvent(
+        summary: 'Core Meeting',
+        start: '2024-01-01 10:00:00',
+        end: '2024-01-01 11:00:00',
+        description: 'Core Description',
+        location: 'Different Location'
+    );
 
-    $diffLoc = new CalendarEvent;
-    $diffLoc->create([array_merge($baseData, ['location' => 'Different Location'])]);
-
-    expect(invade($diffLoc)->uid)->not->toBe($baseUid);
+    expect(invade($diffLoc)->uidValue)->not->toBe($baseUid);
 });
 
 test('it ignores an empty string custom UID and falls back to generated hash', function (): void {
-    $event = new CalendarEvent;
-    $event->create([[
-        'summary' => 'Meeting',
-        'start' => '2023-12-01 12:00:00',
-        'end' => '2023-12-01 14:00:00',
-        'uid' => '',
-    ]]);
+    $event = new CalendarEvent(
+        summary: 'Meeting',
+        start: '2023-12-01 12:00:00',
+        end: '2023-12-01 14:00:00',
+        uid: ''
+    );
 
-    $uid = invade($event)->uid;
+    $uid = invade($event)->uidValue;
 
     expect($uid)->not->toBe('')
         ->and($uid)->toEndWith('@linkxtr-qrcode')
@@ -297,20 +230,31 @@ test('it ignores an empty string custom UID and falls back to generated hash', f
 });
 
 test('the generated UID uses the exact concatenation order of summary, start, and end', function (): void {
-    $event = new CalendarEvent;
-
-    $event->create([[
-        'summary' => 'ExactOrderTest',
-        'start' => '2024-01-01 10:00:00',
-        'end' => '2024-01-01 11:00:00',
-        'description' => 'Core Description',
-        'location' => 'Core Location',
-    ]]);
+    $event = new CalendarEvent(
+        summary: 'ExactOrderTest',
+        start: '2024-01-01 10:00:00',
+        end: '2024-01-01 11:00:00',
+        description: 'Core Description',
+        location: 'Core Location'
+    );
 
     $invaded = invade($event);
 
-    $expectedStringToHash = 'ExactOrderTest'.$invaded->start->timestamp.$invaded->end->timestamp.$invaded->description.$invaded->location;
+    $expectedStringToHash = 'ExactOrderTest'.$invaded->startParsed->timestamp.$invaded->endParsed->timestamp.$invaded->description.$invaded->location;
 
     $expectedUid = sha1($expectedStringToHash).'@linkxtr-qrcode';
-    expect($invaded->uid)->toBe($expectedUid);
+    expect($invaded->uidValue)->toBe($expectedUid);
+});
+
+it('ignores empty description and location', function (): void {
+    $event = new CalendarEvent(
+        summary: 'Meeting',
+        start: '2023-12-01 12:00:00',
+        end: '2023-12-01 14:00:00',
+        description: '',
+        location: '',
+    );
+
+    expect((string) $event)->not->toContain('DESCRIPTION:')
+        ->and((string) $event)->not->toContain('LOCATION:');
 });
