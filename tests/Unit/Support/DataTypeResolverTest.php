@@ -1,8 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
-use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\Exceptions\DataTypes\GenericInvalidDataTypeArgumentException;
 use Linkxtr\QrCode\Exceptions\UnknownMethodException;
 use Linkxtr\QrCode\Support\DataTypeResolver;
@@ -72,30 +70,22 @@ it('dynamically scans the directory and builds the data type map correctly', fun
     expect($result)->toContain('mailto:test@example.com');
 });
 
-it('throws an exception if the data type class has an invalid constructor', function (): void {
-    final readonly class DummyDataType implements DataTypeInterface
-    {
-        public function __construct(private string $arg) {}
+it('throws a missing arguments exception when not enough arguments are passed', function (): void {
+    try {
+        DataTypeResolver::resolve('email', []);
 
-        public function __toString(): string
-        {
-            return 'dummy, '.$this->arg;
-        }
+        test()->fail('Expected exception was not thrown.');
+    } catch (GenericInvalidDataTypeArgumentException $genericInvalidDataTypeArgumentException) {
+        expect($genericInvalidDataTypeArgumentException->getErrorCode())->toBe('MISSING_ARGUMENTS');
     }
+});
 
-    $reflection = new ReflectionClass(DataTypeResolver::class);
-    $reflectionProperty = $reflection->getProperty('map');
-    $originalMap = $reflectionProperty->getValue();
+it('throws an invalid argument exception when the wrong type is passed', function (): void {
+    try {
+        DataTypeResolver::resolve('email', [new stdClass]);
 
-    $reflectionProperty->setValue(null, ['dummy' => DummyDataType::class]);
-
-    expect(fn (): string => DataTypeResolver::resolve('dummy', []))->toThrow(
-        GenericInvalidDataTypeArgumentException::class
-    );
-
-    expect(fn (): string => DataTypeResolver::resolve('dummy', [null]))->toThrow(
-        GenericInvalidDataTypeArgumentException::class
-    );
-
-    $reflectionProperty->setValue(null, $originalMap);
+        test()->fail('Expected exception was not thrown.');
+    } catch (GenericInvalidDataTypeArgumentException $genericInvalidDataTypeArgumentException) {
+        expect($genericInvalidDataTypeArgumentException->getErrorCode())->toBe('INVALID_ARGUMENT');
+    }
 });

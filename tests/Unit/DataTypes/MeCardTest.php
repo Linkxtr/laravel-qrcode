@@ -89,3 +89,23 @@ it('ignores empty optional arguments', function (): void {
 
     expect((string) $mecard)->toBe($expected);
 });
+
+it('properly escapes special characters in mecard fields', function (): void {
+    $poisonUrl = 'https://example.com/path;name,param\\';
+
+    $meCard = new MeCard(
+        name: 'Doe, John; Jr.\\',
+        phone: '123456789',
+        email: 'test@example.com',
+        url: $poisonUrl,
+        address: '123: Main St; Apt, 4\\',
+    );
+
+    $result = (string) $meCard;
+
+    expect($result)->toContain('N:Doe, John\; Jr.\\\\;');
+
+    expect($result)->toContain('ADR:123\: Main St\; Apt\, 4\\\\;');
+
+    expect($result)->toContain('URL:https://example.com/path\;name,param\\\\;');
+});
