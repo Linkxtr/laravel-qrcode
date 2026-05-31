@@ -4,97 +4,68 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidWiFiArgumentException;
 
-final class WiFi implements DataTypeInterface
+final readonly class WiFi implements DataTypeInterface
 {
-    private string $prefix = 'WIFI:';
-
-    private string $ssid = '';
-
-    private string $password;
-
-    private bool $hidden;
-
     private string $encryption;
 
-    private string $separator = ';';
+    public function __construct(
+        private string $ssid,
+        ?string $encryption = null,
+        private ?string $password = null,
+        private bool $hidden = false
+    ) {
+        if ($this->ssid === '') {
+            throw InvalidWiFiArgumentException::invalidSsidValue('string');
+        }
+
+        $hasPassword = $this->password !== null && $this->password !== '';
+        $enc = $encryption !== null && $encryption !== '' ? strtoupper($encryption) : null;
+
+        if ($enc !== null) {
+            if (in_array($enc, ['WPA2', 'WPA3'], true)) {
+                $enc = 'WPA';
+            }
+
+            if (! in_array($enc, ['WEP', 'WPA', 'NOPASS'], true)) {
+                throw InvalidWiFiArgumentException::invalidEncryptionValue($enc);
+            }
+
+            $this->encryption = $enc;
+        } else {
+            $this->encryption = $hasPassword ? 'WPA' : 'NOPASS';
+        }
+
+        if ($this->encryption === 'NOPASS' && $hasPassword) {
+            throw InvalidWiFiArgumentException::passwordWithNopassEncryption();
+        }
+    }
 
     public function __toString(): string
     {
-        if ($this->ssid === '') {
-            throw new InvalidArgumentException('WiFi SSID is required.');
+        $wifi = 'WIFI:S:'.$this->escapeValue($this->ssid).';';
+        $wifi .= 'T:'.$this->encryption.';';
+
+        if ($this->password !== null && $this->password !== '') {
+            $wifi .= 'P:'.$this->escapeValue($this->password).';';
         }
 
-        return $this->buildWiFiString();
+        if ($this->hidden) {
+            $wifi .= 'H:true;';
+        }
+
+        return $wifi.';';
     }
 
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    public function create(array $arguments): void
+    private function escapeValue(string $value): string
     {
-        $this->setProperties($arguments);
-    }
-
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    private function setProperties(array $arguments): void
-    {
-        if (! isset($arguments[0]) || ! is_array($arguments[0])) {
-            throw new InvalidArgumentException('Invalid WiFi arguments.');
-        }
-
-        $arguments = $arguments[0];
-
-        if (! isset($arguments['ssid']) || ! is_string($arguments['ssid']) || $arguments['ssid'] === '') {
-            throw new InvalidArgumentException('SSID is required and must be a string.');
-        }
-
-        $this->ssid = $arguments['ssid'];
-
-        if (isset($arguments['password']) && is_string($arguments['password'])) {
-            $this->password = $arguments['password'];
-        }
-
-        if (isset($arguments['encryption']) && is_string($arguments['encryption'])) {
-            $encryption = strtoupper($arguments['encryption']);
-            $supported = ['WEP', 'WPA', 'WPA2', 'NOPASS'];
-
-            if (! in_array($encryption, $supported, true)) {
-                throw new InvalidArgumentException('Invalid encryption type. Supported types are WEP, WPA, WPA2, nopass.');
-            }
-
-            $this->encryption = $encryption === 'NOPASS' ? 'nopass' : $encryption;
-        }
-
-        if (isset($arguments['hidden']) && is_bool($arguments['hidden'])) {
-            $this->hidden = $arguments['hidden'];
-        }
-    }
-
-    private function buildWiFiString(): string
-    {
-        $wifi = $this->prefix;
-
-        if (isset($this->encryption)) {
-            $wifi .= 'T:'.$this->encryption.$this->separator;
-        } elseif (isset($this->password)) {
-            $wifi .= 'T:WPA'.$this->separator;
-        }
-
-        $wifi .= 'S:'.$this->ssid.$this->separator;
-
-        if (isset($this->password) && (! isset($this->encryption) || $this->encryption !== 'nopass')) {
-            $wifi .= 'P:'.$this->password.$this->separator;
-        }
-
-        if (isset($this->hidden) && $this->hidden) {
-            $wifi .= 'H:true'.$this->separator;
-        }
-
-        return $wifi;
+        return strtr($value, [
+            '\\' => '\\\\',
+            ';' => '\\;',
+            ':' => '\\:',
+            ',' => '\\,',
+        ]);
     }
 }

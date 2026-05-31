@@ -10,8 +10,8 @@ enum Format: string
 {
     use EnumHelper;
 
-    case PNG = 'png';
-    case SVG = 'svg';
-    case EPS = 'eps';
-    case WEBP = 'webp';
+    case PNG = 'png'; // requires imagick or gd
+    case SVG = 'svg'; // no requires
+    case EPS = 'eps'; // no requires
+    case WEBP = 'webp'; // requires imagick
 }

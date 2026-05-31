@@ -4,39 +4,28 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidTelegramArgumentException;
 
-final class Telegram implements DataTypeInterface
+final readonly class Telegram implements DataTypeInterface
 {
-    private ?string $username = null;
+    private const PREFIX = 'https://t.me/';
+
+    private string $username;
+
+    public function __construct(string $username)
+    {
+        $cleanedUsername = ltrim(trim($username), '@');
+
+        if (! preg_match('/^[a-zA-Z]\w{4,31}$/', $cleanedUsername)) {
+            throw InvalidTelegramArgumentException::invalidUsername();
+        }
+
+        $this->username = $cleanedUsername;
+    }
 
     public function __toString(): string
     {
-        if (! $this->username) {
-            throw new InvalidArgumentException('Telegram username is mandatory.');
-        }
-
-        return 'https://t.me/'.$this->username;
-    }
-
-    /**
-     * @param  list<mixed>|array<string, mixed>  $arguments
-     */
-    public function create(array $arguments): void
-    {
-        $properties = $arguments;
-
-        // Support positional arguments
-        if (array_is_list($arguments)) {
-            $properties = [];
-            if (isset($arguments[0])) {
-                $properties['username'] = $arguments[0];
-            }
-        }
-
-        if (isset($properties['username']) && is_string($properties['username'])) {
-            $this->username = $properties['username'];
-        }
+        return self::PREFIX.$this->username;
     }
 }

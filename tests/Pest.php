@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use chillerlan\QRCode\QRCode as QRCodeDecoder;
-use Tests\TestCase;
+use Tests\Support\TestCase;
+
+require_once __DIR__.'/Support/Overrides.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -14,7 +16,21 @@ use Tests\TestCase;
 |
 */
 
-uses(TestCase::class)->in(__DIR__);
+uses(TestCase::class)->afterEach(function (): void {
+    $GLOBALS['mockImagickLoaded'] = null;
+    $GLOBALS['mockGdLoaded'] = null;
+    $GLOBALS['mockFileGetContents'] = null;
+    $GLOBALS['mockFilePutContents'] = null;
+    $GLOBALS['mockImageColorAllocateAlpha'] = null;
+    $GLOBALS['mockImageColorAllocate'] = null;
+    $GLOBALS['mockImageCreateTrueColor'] = null;
+    $GLOBALS['mockObGetClean'] = null;
+    $GLOBALS['mockImageFill'] = null;
+    $GLOBALS['mockImageCopy'] = null;
+    $GLOBALS['mockImageCopyResampled'] = null;
+    $GLOBALS['mockImageSaveAlpha'] = null;
+    $GLOBALS['mock_imagepng_empty'] = null;
+})->in('Unit', 'Scannability', 'Feature', 'Scalability');
 
 /*
 |--------------------------------------------------------------------------
@@ -27,9 +43,7 @@ uses(TestCase::class)->in(__DIR__);
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
+expect()->extend('toBeOne', fn () => $this->toBe(1));
 
 /*
 |--------------------------------------------------------------------------
@@ -61,10 +75,10 @@ function read_qr_code(string $imageContent): string
         $imagick->readImageBlob($imageContent);
         $imagick->setImageFormat('png');
         $imageContent = $imagick->getImageBlob();
-    } catch (Throwable $e) {
+    } catch (Throwable $throwable) {
         $format = $isSvg ? 'SVG' : 'EPS';
 
-        return "ERROR: Could not rasterize {$format}. ".$e->getMessage();
+        return sprintf('ERROR: Could not rasterize %s. ', $format).$throwable->getMessage();
     }
 
     return (string) (new QRCodeDecoder)->readFromBlob($imageContent);

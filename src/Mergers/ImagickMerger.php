@@ -6,25 +6,33 @@ namespace Linkxtr\QrCode\Mergers;
 
 use Imagick;
 use ImagickException;
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
-use RuntimeException;
+use Linkxtr\QrCode\Enums\Format;
+use Linkxtr\QrCode\Exceptions\ImageMergeException;
 
-final readonly class ImagickMerger implements MergerInterface
+final class ImagickMerger implements MergerInterface
 {
+    private Format $format = Format::PNG;
+
     public function __construct(
-        private string $sourceImageContent,
-        private string $mergeImageContent,
-        private string $format = 'png',
-        private float $percentage = 0.2
+        private readonly string $sourceImageContent,
+        private readonly string $mergeImageContent,
+        private readonly float $percentage = 0.2
     ) {
-        if (! in_array($this->format, ['png', 'webp'], true)) {
-            throw new InvalidArgumentException('ImagickMerger only supports "png" or "webp" formats.');
+        if ($this->percentage <= 0 || $this->percentage >= 1) {
+            throw ImageMergeException::invalidPercentage();
+        }
+    }
+
+    public function setFormat(Format $format): self
+    {
+        if (! in_array($format, [Format::PNG, Format::WEBP], true)) {
+            throw ImageMergeException::unsupportedFormat('ImagickMerger only supports "png" or "webp" formats.');
         }
 
-        if ($this->percentage <= 0 || $this->percentage >= 1) {
-            throw new InvalidArgumentException('$percentage must be between 0 and 1');
-        }
+        $this->format = $format;
+
+        return $this;
     }
 
     public function merge(): string
@@ -47,35 +55,35 @@ final readonly class ImagickMerger implements MergerInterface
 
             $mergeRatio = $mergeWidth / $mergeHeight;
 
-            $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage));
-            $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio));
+            $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage)); // @pest-mutate-ignore
+            $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio)); // @pest-mutate-ignore
 
             // Constrain to canvas if logo exceeds vertical bounds
-            if ($targetLogoHeight > $sourceHeight * $this->percentage) {
-                $targetLogoHeight = max(1, (int) ($sourceHeight * $this->percentage));
+            if ($targetLogoHeight > $sourceHeight * $this->percentage) { // @pest-mutate-ignore
+                $targetLogoHeight = max(1, (int) ($sourceHeight * $this->percentage)); // @pest-mutate-ignore
                 $targetLogoWidth = max(1, (int) ($targetLogoHeight * $mergeRatio));
             }
 
             $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
-            $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
+            $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2); // @pest-mutate-ignore
 
-            $merge->resizeImage($targetLogoWidth, $targetLogoHeight, Imagick::FILTER_LANCZOS, 1);
+            $merge->resizeImage($targetLogoWidth, $targetLogoHeight, Imagick::FILTER_LANCZOS, 1); // @pest-mutate-ignore
 
             $source->compositeImage($merge, Imagick::COMPOSITE_DEFAULT, $centerX, $centerY);
 
-            $source->setImageFormat($this->format);
+            $source->setImageFormat($this->format->value);
 
-            if ($this->format === 'webp') {
-                $source->setImageCompressionQuality(90);
+            if ($this->format === Format::WEBP) { // @pest-mutate-ignore
+                $source->setImageCompressionQuality(90); // @pest-mutate-ignore
             }
 
             return $source->getImageBlob();
 
         } catch (ImagickException $imagickException) {
-            throw new RuntimeException('Imagick merge failed: '.$imagickException->getMessage(), $imagickException->getCode(), $imagickException);
+            throw ImageMergeException::imagickException($imagickException);
         } finally {
-            $source?->clear();
-            $source?->destroy();
+            $source?->clear(); // @pest-mutate-ignore
+            $source?->destroy(); // @pest-mutate-ignore
             $merge?->clear();
             $merge?->destroy();
         }

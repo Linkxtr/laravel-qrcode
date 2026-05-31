@@ -87,9 +87,9 @@ public function generate()
 }
 ```
 
-### Via Artisan CLI
+### 🛠 CLI Generator
 
-You can generate QR codes directly from the command line using the `qr:generate` Artisan command. This is useful for quickly creating QR codes or integrating generation into shell scripts.
+You can generate QR codes directly from the command line using the `qr:generate` Artisan command. This is perfect for build scripts or quick exports.
 
 **Interactive Mode**
 
@@ -163,7 +163,7 @@ QrCode::SMS('+1234567890', 'Message body');
 // WiFi
 QrCode::WiFi([
     'ssid' => 'Network',
-    'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, nopass
+    'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, NOPASS
     'password' => 'Password'
 ]);
 
@@ -197,6 +197,9 @@ QrCode::CalendarEvent([
     'start' => Carbon::create(2024, 8, 27, 9, 0, 0),
     'end' => Carbon::create(2024, 8, 28, 17, 0, 0),
 ]);
+// Note: Per RFC 5545, Calendar Events inject the current timestamp (DTSTAMP)
+// upon creation. Generating a QR code for the exact same event multiple
+// times will produce different binary outputs and cannot be strictly cached.
 
 // WhatsApp
 QrCode::WhatsApp(['number' => '+1234567890', 'message' => 'Hello from Laravel!']);
@@ -324,7 +327,7 @@ QrCode::size(300)
 ```php
 QrCode::WiFi([
     'ssid' => 'MyWiFi',
-    'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, nopass
+    'encryption' => 'WPA', // Supported: WEP, WPA, WPA2, NOPASS
     'password' => 'my-password'
 ]);
 ```

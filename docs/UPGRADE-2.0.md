@@ -11,6 +11,9 @@ This guide provides detailed instructions for upgrading from `linkxtr/laravel-qr
     - [1. PHP Version Requirement](#1-php-version-requirement)
     - [2. Namespace Changes](#2-namespace-changes)
     - [3. Color System](#3-color-system)
+    - [4. Dropped Compatibility](#4-dropped-compatibility)
+    - [5. Configuration Defaults](#5-configuration-defaults-v24x)
+    - [6. Strict Data Validation](#6-strict-data-validation)
   - [Upgrade Steps](#upgrade-steps)
     - [1. Update Dependencies](#1-update-dependencies)
     - [2. Update Your Code](#2-update-your-code)
@@ -61,6 +64,11 @@ If your application relied on the previous package defaults, ensure you define y
 ```bash
 php artisan vendor:publish --tag=qrcode-config
 ```
+
+### 6. Strict Data Validation
+
+In previous versions, passing incorrectly formatted data (like a bad phone number or invalid Wi-Fi config) might have silently generated a corrupted QR code.
+In v2.0, all Data Types strictly validate their inputs. If you pass invalid data, the package will now throw an `InvalidArgumentException`. You should wrap dynamic user inputs in `try/catch` blocks if you do not validate them beforehand.
 
 ## Upgrade Steps
 

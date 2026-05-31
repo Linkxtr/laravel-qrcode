@@ -4,54 +4,39 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidWhatsAppArgumentException;
 
-final class WhatsApp implements DataTypeInterface
+final readonly class WhatsApp implements DataTypeInterface
 {
-    private ?string $number = null;
+    use ValidatesPhoneNumbers;
 
-    private ?string $message = null;
+    private const PREFIX = 'https://wa.me/';
+
+    private string $phoneNumber;
+
+    public function __construct(
+        string|int|float $phoneNumber,
+        private ?string $message = null
+    ) {
+        $rawNumber = trim((string) $phoneNumber);
+
+        if ($rawNumber === '') {
+            throw InvalidWhatsAppArgumentException::emptyPhoneNumber();
+        }
+
+        $this->phoneNumber = ltrim($this->validatePhoneNumber($rawNumber), '+');
+    }
 
     public function __toString(): string
     {
-        if ($this->number === null) {
-            throw new InvalidArgumentException('WhatsApp must be initialized via create() before rendering.');
+        $uri = self::PREFIX.$this->phoneNumber;
+
+        if ($this->message !== null && $this->message !== '') {
+            return $uri.'?'.http_build_query(['text' => $this->message], encoding_type: PHP_QUERY_RFC3986);
         }
 
-        $url = 'https://wa.me/'.$this->number;
-
-        if ($this->message !== null) {
-            $url .= '?text='.urlencode($this->message);
-        }
-
-        return $url;
-    }
-
-    /**
-     * @param  list<mixed>|array<string, mixed>  $arguments
-     */
-    public function create(array $arguments): void
-    {
-        if (array_is_list($arguments)) {
-            $arguments = [
-                'number' => $arguments[0] ?? null,
-                'message' => $arguments[1] ?? null,
-            ];
-        }
-
-        if (! isset($arguments['number']) || $arguments['number'] === '') {
-            throw new InvalidArgumentException('WhatsApp number is mandatory.');
-        }
-
-        foreach (['number', 'message'] as $key) {
-            if (isset($arguments[$key])) {
-                if (! is_string($arguments[$key])) {
-                    throw new InvalidArgumentException(sprintf('WhatsApp %s must be a string.', $key));
-                }
-
-                $this->{$key} = $arguments[$key];
-            }
-        }
+        return $uri;
     }
 }

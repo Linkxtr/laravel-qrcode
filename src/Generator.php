@@ -4,71 +4,35 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode;
 
-use BaconQrCode\Renderer\Color\Alpha;
-use BaconQrCode\Renderer\Color\Cmyk;
-use BaconQrCode\Renderer\Color\ColorInterface;
-use BaconQrCode\Renderer\Color\Gray;
-use BaconQrCode\Renderer\Color\Rgb;
-use BaconQrCode\Renderer\Eye\CompositeEye;
-use BaconQrCode\Renderer\Eye\EyeInterface;
-use BaconQrCode\Renderer\Eye\ModuleEye;
-use BaconQrCode\Renderer\Eye\PointyEye;
-use BaconQrCode\Renderer\Eye\SimpleCircleEye;
-use BaconQrCode\Renderer\Eye\SquareEye;
-use BaconQrCode\Renderer\GDLibRenderer;
-use BaconQrCode\Renderer\Image\EpsImageBackEnd;
-use BaconQrCode\Renderer\Image\ImageBackEndInterface;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Module\DotsModule;
-use BaconQrCode\Renderer\Module\ModuleInterface;
-use BaconQrCode\Renderer\Module\RoundnessModule;
-use BaconQrCode\Renderer\Module\SquareModule;
-use BaconQrCode\Renderer\RendererInterface;
-use BaconQrCode\Renderer\RendererStyle\EyeFill;
-use BaconQrCode\Renderer\RendererStyle\Fill;
-use BaconQrCode\Renderer\RendererStyle\Gradient;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
-use BadMethodCallException;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Traits\Macroable;
-use InvalidArgumentException;
-use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
 use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
-use Linkxtr\QrCode\Mergers\EpsMerger;
-use Linkxtr\QrCode\Mergers\ImagickMerger;
-use Linkxtr\QrCode\Mergers\RasterMerger;
-use Linkxtr\QrCode\Mergers\SvgMerger;
-use Linkxtr\QrCode\Support\Image;
-use Linkxtr\QrCode\ValueObjects\ColorValue;
-use RuntimeException;
+use Linkxtr\QrCode\Exceptions\CannotWriteFileException;
+use Linkxtr\QrCode\Exceptions\InvalidMacroReturnTypeException;
+use Linkxtr\QrCode\Renderers\BaconRenderer;
+use Linkxtr\QrCode\Support\DataTypeResolver;
+use Linkxtr\QrCode\Support\QrCodeResult;
+use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 use Stringable;
-use UnexpectedValueException;
-
-use function is_array;
-use function is_int;
-use function strval;
 
 /**
- * @method HtmlString BTC(string $address, float $amount, array<mixed> $options = [])
- * @method HtmlString CalendarEvent(array<mixed> $attributes)
- * @method HtmlString Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
- * @method HtmlString Ethereum(string $address, ?float $amount = null)
- * @method HtmlString Geo(float $latitude, float $longitude, string $name = '')
- * @method HtmlString MeCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
- * @method HtmlString PhoneNumber(string $phoneNumber)
- * @method HtmlString SMS(string $smsAddress = '', string $message = '')
- * @method HtmlString Telegram(string|array<mixed> $username)
- * @method HtmlString VCard(array<mixed> $properties)
- * @method HtmlString WhatsApp(string|array<mixed> $number, ?string $message = null)
- * @method HtmlString WiFi(array<mixed> $credentials)
+ * @method QrCodeResult BTC(string $address, int|float|string $amount, array<mixed> $options = [])
+ * @method QrCodeResult CalendarEvent(array<mixed> $attributes)
+ * @method QrCodeResult Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
+ * @method QrCodeResult Ethereum(string $address, int|float|string|null $amount = null)
+ * @method QrCodeResult Geo(float $latitude, float $longitude, string $name = '')
+ * @method QrCodeResult MeCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
+ * @method QrCodeResult PhoneNumber(string $phoneNumber)
+ * @method QrCodeResult SMS(string $smsAddress = '', string $message = '')
+ * @method QrCodeResult Telegram(string|array<mixed> $username)
+ * @method QrCodeResult VCard(array<mixed> $properties)
+ * @method QrCodeResult WhatsApp(string|array<mixed> $number, ?string $message = null)
+ * @method QrCodeResult WiFi(array<mixed> $credentials)
  */
 final class Generator
 {
@@ -76,104 +40,7 @@ final class Generator
         __call as macroCall;
     }
 
-    /**
-     * The PNG compression level.
-     * Only applicable to PNG format when using GDLibRenderer.
-     */
-    private const PNG_COMPRESSION_LEVEL = 9;
-
-    /**
-     * The output format.
-     * See `Format` enum for possible values.
-     */
-    private Format $format = Format::SVG;
-
-    /**
-     * The error correction level.
-     * See `ErrorCorrectionLevel` enum for possible values.
-     */
-    private ErrorCorrectionLevel $errorCorrectionLevel = ErrorCorrectionLevel::M;
-
-    /**
-     * The style of the blocks within the QR code.
-     * See `Style` enum for possible values.
-     */
-    private Style $style = Style::SQUARE;
-
-    /**
-     * The style to apply to the eyes of the QR code.
-     * See `EyeStyle` enum for possible values.
-     */
-    private ?EyeStyle $eyeStyle = null;
-
-    /**
-     * The internal style to apply to the eyes of the QR code.
-     * Only applies when a composite eye is desired.
-     */
-    private ?EyeStyle $internalEyeStyle = null;
-
-    /**
-     * The size of the selected style between 0 and 1.
-     * Only applicable to 'dot' and 'round' styles.
-     */
-    private float $styleSize = 0.5;
-
-    /**
-     * The size of the QR code in pixels.
-     */
-    private int $size = 400;
-
-    /**
-     * The margin around the QR code.
-     */
-    private int $margin = 4;
-
-    /**
-     * The encoding mode. Possible values are
-     * ISO-8859-2, ISO-8859-3, ISO-8859-4, ISO-8859-5, ISO-8859-6,
-     * ISO-8859-7, ISO-8859-8, ISO-8859-9, ISO-8859-10, ISO-8859-11,
-     * ISO-8859-12, ISO-8859-13, ISO-8859-14, ISO-8859-15, ISO-8859-16,
-     * SHIFT-JIS, WINDOWS-1250, WINDOWS-1251, WINDOWS-1252, WINDOWS-1256,
-     * UTF-16BE, UTF-8, ASCII, GBK, EUC-KR.
-     */
-    private string $encoding = 'UTF-8';
-
-    /**
-     * The foreground color value of the QR code.
-     */
-    private ?ColorValue $colorValue = null;
-
-    /**
-     * The background color value of the QR code.
-     */
-    private ?ColorValue $backgroundColorValue = null;
-
-    /**
-     * The color model used to build colors.
-     */
-    private ColorModel $colorModel = ColorModel::RGB;
-
-    /**
-     * An array that holds EyeFills of the color of the eyes.
-     *
-     * @var array<int, EyeFill>
-     */
-    private array $eyeColors = [];
-
-    /**
-     * The gradient to apply to the QR code.
-     */
-    private ?Gradient $gradient = null;
-
-    /**
-     * Holds an image string that will be merged with the QR code.
-     */
-    private string $imageMerge = '';
-
-    /**
-     * The percentage that a merged image should take over the source image.
-     */
-    private float $imagePercentage = .2;
+    private Config $config;
 
     /**
      * Initialise the generator, optionally seeding defaults from the package config.
@@ -182,496 +49,236 @@ final class Generator
      */
     public function __construct(array $config = [])
     {
-        if (isset($config['size']) && is_int($config['size'])) {
-            $this->size = $config['size'] > 0 ? $config['size'] : $this->size;
-        }
-
-        if (isset($config['margin']) && is_int($config['margin'])) {
-            $this->margin = $config['margin'] >= 0 ? $config['margin'] : $this->margin;
-        }
-
-        if (isset($config['format']) && \is_string($config['format'])) {
-            $format = Format::tryFrom(strtolower($config['format']));
-            if ($format !== null) {
-                $this->format = $format;
-            }
-        }
-
-        if (isset($config['error_correction']) && \is_string($config['error_correction'])) {
-            $level = ErrorCorrectionLevel::tryFrom(strtoupper($config['error_correction']));
-            if ($level !== null) {
-                $this->errorCorrectionLevel = $level;
-            }
-        }
-
-        if (isset($config['encoding']) && \is_string($config['encoding'])) {
-            $this->encoding = strtoupper($config['encoding']);
-        }
-
-        if (isset($config['color']) && is_array($config['color'])) {
-            $this->colorValue = new ColorValue(...$this->readRgb($config['color'], 0));
-        }
-
-        if (isset($config['background_color']) && is_array($config['background_color'])) {
-            $this->backgroundColorValue = new ColorValue(...$this->readRgb($config['background_color'], 255));
-        }
+        $this->config = Config::fromArray($config);
     }
 
     /**
-     * @param  array<int, mixed>  $arguments
+     * @param  array<mixed>  $arguments
      */
-    public function __call(string $method, array $arguments): HtmlString
+    public function __call(string $method, array $arguments): QrCodeResult
     {
-        if (self::hasMacro($method)) {
-            $result = $this->macroCall($method, $arguments);
+        if (! self::hasMacro($method)) {
+            $payload = DataTypeResolver::resolve($method, $arguments);
 
-            if ($result instanceof HtmlString) {
-                return $result;
+            return $this->generate($payload);
+        }
+
+        $result = $this->macroCall($method, $arguments);
+
+        if ($result instanceof QrCodeResult) {
+            return $result;
+        }
+
+        if (is_string($result) || $result instanceof Stringable) {
+            return $this->generate((string) $result);
+        }
+
+        throw InvalidMacroReturnTypeException::invalidType($method, get_debug_type($result));
+    }
+
+    public function __clone()
+    {
+        $this->config = clone $this->config;
+    }
+
+    public function generate(string $text, ?string $filename = null): QrCodeResult
+    {
+        $baconRenderer = new BaconRenderer($this->config);
+
+        $qrCodeResult = $baconRenderer->render($text);
+
+        if ($filename !== null) {
+            $directory = dirname($filename);
+
+            if (! is_dir($directory)) {
+                throw CannotWriteFileException::toPath($filename);
             }
 
-            if (is_string($result) || $result instanceof Stringable) {
-                return $this->generate((string) $result);
+            $bytesWritten = @file_put_contents($filename, $qrCodeResult);
+
+            if ($bytesWritten === false) {
+                throw CannotWriteFileException::toPath($filename);
             }
-
-            throw new UnexpectedValueException(sprintf(
-                'Macro "%s" must return a string, Stringable, or HtmlString. %s returned.',
-                $method,
-                get_debug_type($result)
-            ));
         }
 
-        $dataType = $this->createClass($method);
-        $dataType->create($arguments);
-
-        return $this->generate(strval($dataType));
+        return $qrCodeResult;
     }
 
-    public function generate(string $text, ?string $filename = null): HtmlString
+    public function merge(string $filepath, float $percentage = .2): self
     {
-        $qrCode = $this->getWriter($this->getRenderer())->writeString($text, $this->encoding, $this->errorCorrectionLevel->toBaconErrorCorrectionLevel());
+        $instance = clone $this;
 
-        if ($this->imageMerge !== '') {
-            $qrCode = $this->mergeImage($qrCode);
-        }
-
-        if ($filename && file_put_contents($filename, $qrCode) === false) {
-            throw new RuntimeException('Failed to write QR code to file: '.$filename);
-        }
-
-        return new HtmlString($qrCode);
-    }
-
-    public function merge(string $filepath, float $percentage = .2, bool $absolute = false): self
-    {
-        if (function_exists('base_path') && ! $absolute) {
-            $filepath = base_path().DIRECTORY_SEPARATOR.$filepath;
-        }
-
-        $content = file_get_contents($filepath);
-
-        if ($content === false) {
-            throw new InvalidArgumentException('Failed to read image file: '.$filepath);
-        }
-
-        $this->imageMerge = $content;
-        $this->imagePercentage = $percentage;
-
-        return $this;
-    }
-
-    public function mergeString(string $content, float $percentage = .2): self
-    {
-        $this->imageMerge = $content;
-        $this->imagePercentage = $percentage;
-
-        return $this;
-    }
-
-    public function size(int $size): self
-    {
-        $this->size = $size;
-
-        return $this;
-    }
-
-    public function format(string|Format $format): self
-    {
-        if (is_string($format)) {
-            $format = Format::tryFrom($format);
-        }
-
-        if (! $format) {
-            throw new InvalidArgumentException('$format must be one of the following values: '.implode(', ', Format::toArray()));
-        }
-
-        $this->format = $format;
-
-        return $this;
-    }
-
-    public function cmyk(): self
-    {
-        $this->colorModel = ColorModel::CMYK;
-
-        return $this;
-    }
-
-    public function rgb(): self
-    {
-        $this->colorModel = ColorModel::RGB;
-
-        return $this;
-    }
-
-    public function gray(int $gray, ?int $backgroundGray = null): self
-    {
-        if ($gray < 0 || $gray > 100) {
-            throw new InvalidArgumentException('Gray value must be between 0 and 100.');
-        }
-
-        if ($backgroundGray !== null && ($backgroundGray < 0 || $backgroundGray > 100)) {
-            throw new InvalidArgumentException('Background gray value must be between 0 and 100.');
-        }
-
-        $this->colorModel = ColorModel::GRAY;
-        $this->colorValue = new ColorValue($gray, 0, 0);
-
-        $this->backgroundColorValue = new ColorValue($backgroundGray ?? 100, 0, 0);
-
-        return $this;
-    }
-
-    public function color(int $c1, int $c2, int $c3, ?int $c4 = null): self
-    {
-        $this->colorValue = new ColorValue($c1, $c2, $c3, $c4);
-
-        return $this;
-    }
-
-    public function backgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null): self
-    {
-        $this->backgroundColorValue = new ColorValue($c1, $c2, $c3, $c4);
-
-        return $this;
-    }
-
-    public function eyeColor(int $eyeNumber, int $innerRed, int $innerGreen, int $innerBlue, int $outerRed = 0, int $outerGreen = 0, int $outerBlue = 0): self
-    {
-        if ($eyeNumber < 0 || $eyeNumber > 2) {
-            throw new InvalidArgumentException(sprintf('$eyeNumber must be 0, 1, or 2.  %s is not valid.', $eyeNumber));
-        }
-
-        $this->eyeColors[$eyeNumber] = new EyeFill(
-            $this->createColor($innerRed, $innerGreen, $innerBlue),
-            $this->createColor($outerRed, $outerGreen, $outerBlue)
-        );
-
-        return $this;
-    }
-
-    public function gradient(int $startRed, int $startGreen, int $startBlue, int $endRed, int $endGreen, int $endBlue, string|GradientType $type): self
-    {
-        if (is_string($type)) {
-            $type = GradientType::tryFrom($type);
-        }
-
-        if (! $type) {
-            throw new InvalidArgumentException('$type must be one of the following values: '.implode(', ', GradientType::toArray()));
-        }
-
-        $this->gradient = new Gradient(
-            $this->createColor($startRed, $startGreen, $startBlue),
-            $this->createColor($endRed, $endGreen, $endBlue),
-            $type->toBaconGradientType()
-        );
-
-        return $this;
-    }
-
-    public function eye(string|EyeStyle $style): self
-    {
-        if (is_string($style)) {
-            $style = EyeStyle::tryFrom($style);
-        }
-
-        if (! $style) {
-            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', EyeStyle::toArray()));
-        }
-
-        $this->eyeStyle = $style;
-
-        return $this;
-    }
-
-    public function internalEye(string|EyeStyle $style): self
-    {
-        if (is_string($style)) {
-            $style = EyeStyle::tryFrom($style);
-        }
-
-        if (! $style) {
-            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', EyeStyle::toArray()));
-        }
-
-        $this->internalEyeStyle = $style;
-
-        return $this;
-    }
-
-    public function style(string|Style $style, float $size = 0.5): self
-    {
-        if (is_string($style)) {
-            $style = Style::tryFrom($style);
-        }
-
-        if (! $style) {
-            throw new InvalidArgumentException('$style must be one of the following values: '.implode(', ', Style::toArray()));
-        }
-
-        if ($size <= 0 || $size > 1) {
-            throw new InvalidArgumentException(sprintf('$size must be greater than 0 and less than or equal to 1. %s is not valid.', $size));
-        }
-
-        $this->style = $style;
-        $this->styleSize = $size;
-
-        return $this;
-    }
-
-    public function encoding(string $encoding): self
-    {
-        $this->encoding = strtoupper($encoding);
-
-        return $this;
-    }
-
-    public function errorCorrection(string|ErrorCorrectionLevel $errorCorrection): self
-    {
-        if (is_string($errorCorrection)) {
-            $errorCorrection = ErrorCorrectionLevel::tryFrom(strtoupper($errorCorrection));
-        }
-
-        if (! $errorCorrection) {
-            throw new InvalidArgumentException('$errorCorrection must be one of the following values: '.implode(', ', ErrorCorrectionLevel::toArray()));
-        }
-
-        $this->errorCorrectionLevel = $errorCorrection;
-
-        return $this;
-    }
-
-    public function margin(int $margin): self
-    {
-        $this->margin = $margin;
-
-        return $this;
-    }
-
-    private function getWriter(RendererInterface $renderer): Writer
-    {
-        return new Writer($renderer);
-    }
-
-    private function getRenderer(): RendererInterface
-    {
-        if (! extension_loaded('imagick') && ! extension_loaded('gd')) {
-            throw new RuntimeException('The imagick or gd extension is required to generate QR codes.');
-        }
-
-        if (extension_loaded('imagick')) {
-            return new ImageRenderer(
-                $this->getRendererStyle(),
-                $this->getFormatter()
-            );
-        }
-
-        if ($this->format !== Format::PNG) {
-            throw new RuntimeException('The imagick extension is required to generate QR codes in '.$this->format->value.' format.');
-        }
-
-        return new GDLibRenderer(
-            $this->size,
-            $this->margin,
-            $this->format->value,
-            self::PNG_COMPRESSION_LEVEL,
-            $this->getFill()
-        );
-    }
-
-    private function getRendererStyle(): RendererStyle
-    {
-        return new RendererStyle($this->size, $this->margin, $this->getModule(), $this->getEye(), $this->getFill());
-    }
-
-    private function getModule(): ModuleInterface
-    {
-        if ($this->style === Style::DOT) {
-            return new DotsModule($this->styleSize);
-        }
-
-        if ($this->style === Style::ROUND) {
-            return new RoundnessModule($this->styleSize);
-        }
-
-        return SquareModule::instance();
-    }
-
-    private function getEye(): EyeInterface
-    {
-        $module = $this->getModule();
-        $externalEye = $this->getEyeInstance($this->eyeStyle, $module);
-
-        if ($this->internalEyeStyle instanceof EyeStyle) {
-            $internalEye = $this->getEyeInstance($this->internalEyeStyle, $module);
-
-            return new CompositeEye($externalEye, $internalEye);
-        }
-
-        return $externalEye;
-    }
-
-    private function getEyeInstance(?EyeStyle $eyeStyle, ModuleInterface $module): EyeInterface
-    {
-        return match ($eyeStyle) {
-            EyeStyle::SQUARE => SquareEye::instance(),
-            EyeStyle::CIRCLE => SimpleCircleEye::instance(),
-            EyeStyle::POINTY => PointyEye::instance(),
-            null => new ModuleEye($module),
-        };
-    }
-
-    private function getFill(): Fill
-    {
-        $foregroundColor = $this->buildColor($this->colorValue) ?? new Rgb(0, 0, 0);
-        $backgroundColor = $this->buildColor($this->backgroundColorValue) ?? new Rgb(255, 255, 255);
-        $eye0 = $this->eyeColors[0] ?? EyeFill::inherit();
-        $eye1 = $this->eyeColors[1] ?? EyeFill::inherit();
-        $eye2 = $this->eyeColors[2] ?? EyeFill::inherit();
-
-        if ($this->gradient instanceof Gradient) {
-            return Fill::withForegroundGradient($backgroundColor, $this->gradient, $eye0, $eye1, $eye2);
-        }
-
-        return Fill::withForegroundColor($backgroundColor, $foregroundColor, $eye0, $eye1, $eye2);
-    }
-
-    private function buildColor(?ColorValue $colorValue): ?ColorInterface
-    {
-        if (! $colorValue instanceof ColorValue) {
-            return null;
-        }
-
-        if ($this->colorModel === ColorModel::GRAY) {
-            return new Gray($colorValue->c1);
-        }
-
-        if ($this->colorModel === ColorModel::CMYK) {
-            return new Cmyk($colorValue->c1, $colorValue->c2, $colorValue->c3, $colorValue->c4 ?? 0);
-        }
-
-        return $this->createColor($colorValue->c1, $colorValue->c2, $colorValue->c3, $colorValue->c4);
-    }
-
-    private function createColor(int $red, int $green, int $blue, ?int $alpha = null): ColorInterface
-    {
-        if (is_null($alpha)) {
-            return new Rgb($red, $green, $blue);
-        }
-
-        return new Alpha($alpha, new Rgb($red, $green, $blue));
-    }
-
-    /**
-     * Read a RGB colour from a config array that may use either a positional index
-     * or a named key.  Returns $default when the value is absent or not an int.
-     *
-     * @param  array<mixed>  $raw
-     * @return array{int, int, int, int|null}
-     */
-    private function readRgb(array $raw, int $default): array
-    {
-        $red = $raw['r'] ?? $raw[0] ?? $default;
-        $green = $raw['g'] ?? $raw[1] ?? $default;
-        $blue = $raw['b'] ?? $raw[2] ?? $default;
-        $alpha = $raw['a'] ?? $raw[3] ?? null;
-
-        if (! is_int($red)) {
-            $red = $default;
-        }
-
-        if (! is_int($green)) {
-            $green = $default;
-        }
-
-        if (! is_int($blue)) {
-            $blue = $default;
-        }
-
-        if ($alpha !== null && ! is_int($alpha)) {
-            $alpha = null;
-        }
-
-        return [$red, $green, $blue, $alpha];
-    }
-
-    private function getFormatter(): ImageBackEndInterface
-    {
-        return match ($this->format) {
-            Format::PNG => new ImagickImageBackEnd('png'),
-            Format::WEBP => new ImagickImageBackEnd('webp'),
-            Format::EPS => new EpsImageBackEnd,
-            Format::SVG => new SvgImageBackEnd,
-        };
-    }
-
-    private function mergeImage(string $qrCode): string
-    {
-        if ($this->format === Format::EPS) {
-            $merger = new EpsMerger($qrCode, $this->imageMerge, $this->imagePercentage);
-
-            return $merger->merge();
-        }
-
-        if ($this->format === Format::SVG) {
-            $merger = new SvgMerger($qrCode, $this->imageMerge, $this->imagePercentage);
-
-            return $merger->merge();
-        }
-
-        if (extension_loaded('imagick') && in_array($this->format, [Format::PNG, Format::WEBP], true)) {
-            $merger = new ImagickMerger($qrCode, $this->imageMerge, $this->format->value, $this->imagePercentage);
-
-            return $merger->merge();
-        }
-
-        $merger = new RasterMerger(new Image($qrCode), new Image($this->imageMerge), $this->format->value, $this->imagePercentage);
-
-        return $merger->merge();
-    }
-
-    private function createClass(string $method): DataTypeInterface
-    {
-        $class = $this->formatClass($method);
-
-        if (! class_exists($class)) {
-            throw new BadMethodCallException;
-        }
-
-        $instance = new $class;
-
-        if ($instance::class !== $class) {
-            throw new BadMethodCallException;
-        }
-
-        if (! $instance instanceof DataTypeInterface) {
-            throw new BadMethodCallException;
-        }
+        $instance->config->setupMergePath($filepath);
+        $instance->config->setImagePercentage($percentage);
 
         return $instance;
     }
 
-    private function formatClass(string $method): string
+    public function mergeString(string $content, float $percentage = .2): self
     {
-        return 'Linkxtr\\QrCode\\DataTypes\\'.$method;
+        $instance = clone $this;
+
+        $instance->config->setupMergeString($content);
+        $instance->config->setImagePercentage($percentage);
+
+        return $instance;
+    }
+
+    public function size(int $size): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setSize($size);
+
+        return $instance;
+    }
+
+    public function format(string|Format $format): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setFormat($format);
+
+        return $instance;
+    }
+
+    public function cmyk(): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setColorModel(ColorModel::CMYK);
+
+        return $instance;
+    }
+
+    public function rgb(): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setColorModel(ColorModel::RGB);
+
+        return $instance;
+    }
+
+    public function gray(int $gray, ?int $backgroundGray = null): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setGrayscale($gray, $backgroundGray);
+
+        return $instance;
+    }
+
+    public function color(int $c1, int $c2, int $c3, ?int $c4 = null): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setupColor($c1, $c2, $c3, $c4);
+
+        return $instance;
+    }
+
+    public function backgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setupBackgroundColor($c1, $c2, $c3, $c4);
+
+        return $instance;
+    }
+
+    /**
+     * @param  string|array<mixed>  $inner
+     * @param  string|array<mixed>|null  $outer
+     */
+    public function eyeColor(int $eyeNumber, string|array $inner, string|array|null $outer = null): self
+    {
+        $instance = clone $this;
+        $innerRgb = Rgb::parse($inner);
+
+        if ($outer === null) {
+            $instance->config->setupEyeColor($eyeNumber, $innerRgb);
+
+            return $instance;
+        }
+
+        $outerRgb = Rgb::parse($outer);
+
+        $instance->config->setupEyeColor(
+            $eyeNumber,
+            $innerRgb,
+            $outerRgb
+        );
+
+        return $instance;
+    }
+
+    /**
+     * @param  string|array<mixed>  $start
+     * @param  string|array<mixed>  $end
+     */
+    public function gradient(string|array $start, string|array $end, string|GradientType $type = GradientType::VERTICAL): self
+    {
+        $startRgb = Rgb::parse($start);
+        $endRgb = Rgb::parse($end);
+        $instance = clone $this;
+
+        $instance->config->setupGradient($startRgb, $endRgb, $type);
+
+        return $instance;
+    }
+
+    public function eye(string|EyeStyle $style): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setEyeStyle($style);
+
+        return $instance;
+    }
+
+    public function internalEye(string|EyeStyle $style): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setInternalEyeStyle($style);
+
+        return $instance;
+    }
+
+    public function style(string|Style $style, ?float $size = null): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setupStyle($style, $size);
+
+        return $instance;
+    }
+
+    public function encoding(string $encoding): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setEncoding($encoding);
+
+        return $instance;
+    }
+
+    public function errorCorrection(string|ErrorCorrectionLevel $errorCorrection): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setErrorCorrectionLevel($errorCorrection);
+
+        return $instance;
+    }
+
+    public function margin(int $margin): self
+    {
+        $instance = clone $this;
+
+        $instance->config->setMargin($margin);
+
+        return $instance;
     }
 }

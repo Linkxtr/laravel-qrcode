@@ -4,88 +4,51 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidGeoArgumentException;
 
-final class Geo implements DataTypeInterface
+final readonly class Geo implements DataTypeInterface
 {
-    private string $prefix = 'geo:';
+    private const PREFIX = 'geo:';
 
-    private float $latitude;
+    public function __construct(
+        private float $latitude,
+        private float $longitude,
+        private ?string $name = null
+    ) {
+        if ($this->latitude < -90 || $this->latitude > 90) {
+            throw InvalidGeoArgumentException::invalidLatitude();
+        }
 
-    private float $longitude;
-
-    private string $name = '';
+        if ($this->longitude < -180 || $this->longitude > 180) {
+            throw InvalidGeoArgumentException::invalidLongitude();
+        }
+    }
 
     public function __toString(): string
     {
-        return $this->buildGeoString();
+        $lat = $this->formatCoordinate($this->latitude);
+        $lng = $this->formatCoordinate($this->longitude);
+
+        $baseUri = self::PREFIX.$lat.','.$lng;
+
+        if ($this->name !== null) {
+            return $baseUri.'?'.http_build_query(['name' => $this->name], encoding_type: PHP_QUERY_RFC3986);
+        }
+
+        return $baseUri;
     }
 
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    public function create(array $arguments): void
+    private function formatCoordinate(float $coordinate): string
     {
-        $this->setProperties($arguments);
-    }
+        $string = (string) $coordinate;
 
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    private function setProperties(array $arguments): void
-    {
-        if (! isset($arguments[0]) || ! isset($arguments[1])) {
-            throw new InvalidArgumentException('Both latitude and longitude are required.');
+        if (! str_contains($string, 'E')) {
+            return $string;
         }
 
-        $this->latitude = $this->validateCoordinate($arguments[0], 'latitude');
-        $this->longitude = $this->validateCoordinate($arguments[1], 'longitude');
+        $formatted = rtrim(rtrim(sprintf('%.10F', $coordinate), '0'), '.');
 
-        if (! isset($arguments[2])) {
-            return;
-        }
-
-        if (! is_string($arguments[2])) {
-            throw new InvalidArgumentException('Invalid name value: must be a string');
-        }
-
-        $this->name = $arguments[2];
-    }
-
-    private function validateCoordinate(mixed $value, string $type): float
-    {
-        if (! is_numeric($value)) {
-            throw new InvalidArgumentException(sprintf('Invalid %s value: must be a number', $type));
-        }
-
-        $value = (float) $value; // @pest-mutate-ignore
-
-        if ($type === 'latitude' && ($value < -90 || $value > 90)) {
-            throw new InvalidArgumentException('Latitude must be between -90 and 90 degrees');
-        }
-
-        if ($type === 'longitude' && ($value < -180 || $value > 180)) {
-            throw new InvalidArgumentException('Longitude must be between -180 and 180 degrees');
-        }
-
-        return $value;
-    }
-
-    private function buildGeoString(): string
-    {
-        if (! isset($this->latitude) || ! isset($this->longitude)) {
-            throw new InvalidArgumentException('Geo must be initialized via create() before rendering.');
-        }
-
-        if ($this->name === '') {
-            return $this->prefix.$this->latitude.','.$this->longitude;
-        }
-
-        $query = http_build_query([
-            'name' => $this->name,
-        ]);
-
-        return $this->prefix.$this->latitude.','.$this->longitude.'?'.$query;
+        return $formatted === '-0' ? '0' : $formatted;
     }
 }

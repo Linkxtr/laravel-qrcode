@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Console\Commands;
 
-use Exception;
 use Illuminate\Console\Command;
+use Linkxtr\QrCode\Contracts\QrCodeExceptionInterface;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
 use Linkxtr\QrCode\Facades\QrCode;
 
@@ -44,16 +44,11 @@ final class GenerateQrCodeCommand extends Command
         $dataArg = $this->getStringArgument('data');
         $isInteractive = $dataArg === null;
 
-        $data = $dataArg;
-        if ($isInteractive) {
-            $data = text(
-                label: 'What data/payload should be encoded in the QR code?',
-                placeholder: 'https://linkxtr.com',
-                required: true
-            );
-        }
-
-        $data = (string) $data;
+        $data = $dataArg ?? text(
+            label: 'What data/payload should be encoded in the QR code?',
+            placeholder: 'https://linkxtr.com',
+            required: 'Data payload is required.'
+        );
 
         $outputOpt = $this->getStringOption('output');
         $output = $outputOpt ?? ($isInteractive ? text(
@@ -64,67 +59,62 @@ final class GenerateQrCodeCommand extends Command
         $output = is_string($output) && $output !== '' ? $output : null;
 
         $formatOpt = $this->getStringOption('format');
+
+        /** @var string $format */
         $format = $formatOpt ?? ($isInteractive && $output !== null ? select(
             label: 'What output format do you want?',
             options: ['svg', 'png', 'webp', 'eps'],
             default: 'svg'
         ) : 'svg');
-        $format = (string) $format;
 
-        // Advanced Options Defaults
         $size = $this->getStringOption('size') ?? '400';
         $color = $this->getStringOption('color') ?? '0,0,0';
         $backgroundColor = $this->getStringOption('backgroundColor') ?? '255,255,255';
         $margin = $this->getStringOption('margin') ?? '4';
         $errorCorrection = $this->getStringOption('errorCorrection') ?? 'M';
 
-        $hasPassedAdvancedOptions = $this->option('size') || $this->option('color') || $this->option('backgroundColor') || $this->option('margin') || $this->option('errorCorrection');
+        $hasPassedAdvancedOptions = $this->option('size') !== null // @pest-mutate-ignore
+            || $this->option('color') !== null // @pest-mutate-ignore
+            || $this->option('backgroundColor') !== null // @pest-mutate-ignore
+            || $this->option('margin') !== null // @pest-mutate-ignore
+            || $this->option('errorCorrection') !== null; // @pest-mutate-ignore
 
-        if ($isInteractive && ! $hasPassedAdvancedOptions && confirm(label: 'Do you want to configure advanced options (size, colors, margin)?', default: false)) {
-            $size = text(
-                label: 'Size in pixels',
-                default: '400',
-                validate: fn (string $value): ?string => is_numeric($value) && (int) $value > 0 ? null : 'Size must be a positive integer.'
-            );
+        if ($isInteractive && confirm(label: 'Do you want to configure advanced options (size, colors, margin)?', default: $hasPassedAdvancedOptions)) {
+            if ($this->option('size') === null) {
+                $size = text(label: 'Size in pixels', default: $size, validate: $this->validateSize(...));
+            }
 
-            $color = text(
-                label: 'Foreground color (RGB or RGBA comma-separated)',
-                default: '0,0,0',
-                validate: fn (string $value): ?string => $this->validateColorString($value)
-            );
+            if ($this->option('color') === null) {
+                $color = text(label: 'Foreground color (RGB or RGBA comma-separated)', default: $color, validate: $this->validateColorString(...));
+            }
 
-            $backgroundColor = text(
-                label: 'Background color (RGB or RGBA comma-separated)',
-                default: '255,255,255',
-                validate: fn (string $value): ?string => $this->validateColorString($value)
-            );
+            if ($this->option('backgroundColor') === null) {
+                $backgroundColor = text(label: 'Background color (RGB or RGBA comma-separated)', default: $backgroundColor, validate: $this->validateColorString(...));
+            }
 
-            $margin = text(
-                label: 'Margin',
-                default: '4',
-                validate: fn (string $value): ?string => is_numeric($value) && (int) $value >= 0 ? null : 'Margin must be a positive integer or zero.'
-            );
+            if ($this->option('margin') === null) {
+                $margin = text(label: 'Margin', default: $margin, validate: $this->validateMargin(...));
+            }
 
-            $errorCorrection = select(
-                label: 'Error correction level',
-                options: ['L', 'M', 'Q', 'H'],
-                default: 'M'
-            );
+            if ($this->option('errorCorrection') === null) {
+                /** @var string $errorCorrection */
+                $errorCorrection = select(label: 'Error correction level', options: ['L', 'M', 'Q', 'H'], default: $errorCorrection);
+            }
         }
 
-        if (! is_numeric($size) || (int) $size <= 0) {
-            error('Size must be a positive integer.');
+        if ($sizeError = $this->validateSize($size)) {
+            error($sizeError);
 
             return self::FAILURE;
         }
 
-        if (! is_numeric($margin) || (int) $margin < 0) {
-            error('Margin must be a positive integer or zero.');
+        if ($marginError = $this->validateMargin($margin)) {
+            error($marginError);
 
             return self::FAILURE;
         }
 
-        $errorCorrectionLevel = ErrorCorrectionLevel::tryFrom(strtoupper((string) $errorCorrection));
+        $errorCorrectionLevel = ErrorCorrectionLevel::tryFrom(strtoupper($errorCorrection));
 
         if ($errorCorrectionLevel === null) {
             error('Invalid error correction level. Please use L, M, Q, or H.');
@@ -152,30 +142,31 @@ final class GenerateQrCodeCommand extends Command
                 info('✨ QR Code successfully generated and saved to: '.$output);
             } else {
                 $result = $generator->generate($data);
-                $this->line((string) $result);
+
+                $this->line(sprintf('%s', $result));
             }
 
             return self::SUCCESS;
 
-        } catch (Exception $exception) {
-            error('Failed to generate QR Code: '.$exception->getMessage());
+        } catch (QrCodeExceptionInterface $qrCodeException) {
+            error('Failed to generate QR Code: '.$qrCodeException->getMessage());
 
             return self::FAILURE;
         }
     }
 
-    private function getStringArgument(string $key): ?string
+    private function validateSize(string $value): ?string
     {
-        $value = $this->argument($key);
+        $intVal = filter_var($value, FILTER_VALIDATE_INT);
 
-        return is_string($value) ? $value : null;
+        return is_int($intVal) && $intVal > 0 ? null : 'Size must be a positive integer.';
     }
 
-    private function getStringOption(string $key): ?string
+    private function validateMargin(string $value): ?string
     {
-        $value = $this->option($key);
+        $intVal = filter_var($value, FILTER_VALIDATE_INT);
 
-        return is_string($value) ? $value : null;
+        return is_int($intVal) && $intVal >= 0 ? null : 'Margin must be a positive integer or zero.';
     }
 
     private function validateColorString(string $color): ?string
@@ -186,17 +177,17 @@ final class GenerateQrCodeCommand extends Command
         }
 
         foreach ($rgb as $index => $val) {
-            $trimmed = trim($val);
-            if (! is_numeric($trimmed)) {
+            $intVal = filter_var($val, FILTER_VALIDATE_INT);
+
+            if (! is_int($intVal)) {
                 return 'All color values must be numeric.';
             }
 
-            $val = (int) $trimmed;
-            if ($index < 3 && ($val < 0 || $val > 255)) {
+            if ($index < 3 && ($intVal < 0 || $intVal > 255)) {
                 return 'RGB values must be between 0 and 255.';
             }
 
-            if ($index === 3 && ($val < 0 || $val > 100)) {
+            if ($index === 3 && ($intVal < 0 || $intVal > 100)) {
                 return 'Alpha value must be between 0 and 100.';
             }
         }
@@ -220,10 +211,24 @@ final class GenerateQrCodeCommand extends Command
         $rgb = explode(',', $color);
 
         return [
-            0 => (int) trim($rgb[0]),
-            1 => (int) trim($rgb[1]),
-            2 => (int) trim($rgb[2]),
-            3 => isset($rgb[3]) ? (int) trim($rgb[3]) : null,
+            (int) $rgb[0],
+            (int) $rgb[1],
+            (int) $rgb[2],
+            isset($rgb[3]) ? (int) $rgb[3] : null,
         ];
+    }
+
+    private function getStringArgument(string $key): ?string
+    {
+        $value = $this->argument($key);
+
+        return is_string($value) ? $value : null;
+    }
+
+    private function getStringOption(string $key): ?string
+    {
+        $value = $this->option($key);
+
+        return is_string($value) ? $value : null;
     }
 }

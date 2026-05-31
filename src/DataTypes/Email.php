@@ -4,108 +4,57 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidEmailArgumentException;
 
-final class Email implements DataTypeInterface
+final readonly class Email implements DataTypeInterface
 {
-    private string $prefix = 'mailto:';
+    private const PREFIX = 'mailto:';
 
-    private ?string $address = null;
+    public function __construct(
+        private string $address,
+        private ?string $subject = null,
+        private ?string $body = null,
+        private ?string $cc = null,
+        private ?string $bcc = null
+    ) {
+        if (filter_var($this->address, FILTER_VALIDATE_EMAIL) === false) {
+            throw InvalidEmailArgumentException::invalidAddress();
+        }
 
-    private string $subject;
+        if ($this->cc !== null && filter_var($this->cc, FILTER_VALIDATE_EMAIL) === false) {
+            throw InvalidEmailArgumentException::invalidAddress();
+        }
 
-    private string $body;
-
-    private string $cc;
-
-    private string $bcc;
+        if ($this->bcc !== null && filter_var($this->bcc, FILTER_VALIDATE_EMAIL) === false) {
+            throw InvalidEmailArgumentException::invalidAddress();
+        }
+    }
 
     public function __toString(): string
     {
-        return $this->buildEmailString();
-    }
-
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    public function create(array $arguments): void
-    {
-        $this->setProperties($arguments);
-    }
-
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    private function setProperties(array $arguments): void
-    {
-        if (isset($arguments[0])) {
-            $this->address = $this->setAddress($arguments[0]);
-        }
-
-        if (isset($arguments[1])) {
-            if (! is_string($arguments[1])) {
-                throw new InvalidArgumentException('Invalid subject provided to Email.');
-            }
-
-            $this->subject = $arguments[1];
-        }
-
-        if (isset($arguments[2])) {
-            if (! is_string($arguments[2])) {
-                throw new InvalidArgumentException('Invalid body provided to Email.');
-            }
-
-            $this->body = $arguments[2];
-        }
-
-        if (isset($arguments[3])) {
-            $this->cc = $this->setAddress($arguments[3]);
-        }
-
-        if (isset($arguments[4])) {
-            $this->bcc = $this->setAddress($arguments[4]);
-        }
-    }
-
-    private function buildEmailString(): string
-    {
-        if ($this->address === null) {
-            throw new InvalidArgumentException('Email address is required.');
-        }
-
         $params = [];
 
-        if (isset($this->subject) && $this->subject !== '') {
+        if ($this->subject !== null && $this->subject !== '') {
             $params['subject'] = $this->subject;
         }
 
-        if (isset($this->body) && $this->body !== '') {
+        if ($this->body !== null && $this->body !== '') {
             $params['body'] = $this->body;
         }
 
-        if (isset($this->cc) && $this->cc !== '') {
+        if ($this->cc !== null) {
             $params['cc'] = $this->cc;
         }
 
-        if (isset($this->bcc) && $this->bcc !== '') {
+        if ($this->bcc !== null) {
             $params['bcc'] = $this->bcc;
         }
 
         if ($params === []) {
-            return $this->prefix.$this->address;
+            return self::PREFIX.$this->address;
         }
 
-        return $this->prefix.$this->address.'?'.http_build_query($params);
-    }
-
-    private function setAddress(mixed $address): string
-    {
-        if (! filter_var($address, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidArgumentException('Invalid email address provided to Email.');
-        }
-
-        /** @var string $address */
-        return $address;
+        return self::PREFIX.$this->address.'?'.http_build_query($params, encoding_type: PHP_QUERY_RFC3986);
     }
 }

@@ -4,125 +4,93 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidMeCardArgumentException;
 
-final class MeCard implements DataTypeInterface
+final readonly class MeCard implements DataTypeInterface
 {
-    private string $name = '';
-
-    private ?string $reading = null;
-
-    private ?string $phone = null;
-
-    private ?string $email = null;
-
-    private ?string $note = null;
-
-    private ?string $birthday = null;
-
-    private ?string $address = null;
-
-    private ?string $url = null;
+    public function __construct(
+        private string $name,
+        private ?string $phone = null,
+        private ?string $email = null,
+        private ?string $url = null,
+        private ?string $address = null,
+        private ?string $reading = null,
+        private ?string $nickname = null,
+        private ?string $phone2 = null,
+        private ?string $phone3 = null,
+        private ?string $videoPhone = null,
+        private ?string $note = null,
+        private ?string $birthday = null,
+        private ?string $postOfficeBox = null
+    ) {
+        if ($this->name === '') {
+            throw InvalidMeCardArgumentException::invalidNameType('string');
+        }
+    }
 
     public function __toString(): string
     {
-        if ($this->name === '') {
-            throw new InvalidArgumentException('MeCard must be initialized via create() before rendering.');
-        }
+        $meCard = 'MECARD:N:'.$this->escapeNameValue($this->name).';';
 
-        $meCard = 'MECARD:';
-
-        $meCard .= 'N:'.$this->escapeValue($this->name).';';
-
-        if ($this->reading) {
+        if ($this->reading !== null && $this->reading !== '') {
             $meCard .= 'SOUND:'.$this->escapeValue($this->reading).';';
         }
 
-        if ($this->phone) {
+        if ($this->nickname !== null && $this->nickname !== '') {
+            $meCard .= 'NICKNAME:'.$this->escapeValue($this->nickname).';';
+        }
+
+        if ($this->phone !== null && $this->phone !== '') {
             $meCard .= 'TEL:'.$this->escapeValue($this->phone).';';
         }
 
-        if ($this->email) {
+        if ($this->phone2 !== null && $this->phone2 !== '') {
+            $meCard .= 'TEL:'.$this->escapeValue($this->phone2).';';
+        }
+
+        if ($this->phone3 !== null && $this->phone3 !== '') {
+            $meCard .= 'TEL:'.$this->escapeValue($this->phone3).';';
+        }
+
+        if ($this->videoPhone !== null && $this->videoPhone !== '') {
+            $meCard .= 'TEL-AV:'.$this->escapeValue($this->videoPhone).';';
+        }
+
+        if ($this->email !== null && $this->email !== '') {
             $meCard .= 'EMAIL:'.$this->escapeValue($this->email).';';
         }
 
-        if ($this->note) {
+        if ($this->note !== null && $this->note !== '') {
             $meCard .= 'NOTE:'.$this->escapeValue($this->note).';';
         }
 
-        if ($this->birthday) {
+        if ($this->birthday !== null && $this->birthday !== '') {
             $meCard .= 'BDAY:'.$this->escapeValue($this->birthday).';';
         }
 
-        if ($this->address) {
+        if ($this->address !== null && $this->address !== '') {
             $meCard .= 'ADR:'.$this->escapeValue($this->address).';';
         }
 
-        if ($this->url) {
-            $meCard .= 'URL:'.$this->escapeValue($this->url).';';
+        if ($this->postOfficeBox !== null && $this->postOfficeBox !== '') {
+            $meCard .= 'POBOX:'.$this->escapeValue($this->postOfficeBox).';';
+        }
+
+        if ($this->url !== null && $this->url !== '') {
+            $meCard .= 'URL:'.$this->escapeUrlValue($this->url).';';
         }
 
         return $meCard.';';
     }
 
-    /**
-     * @param  list<mixed>|array<string, mixed>  $arguments
-     */
-    public function create(array $arguments): void
+    private function escapeNameValue(string $value): string
     {
-        $properties = $arguments;
-
-        // Support positional arguments
-        // Order: name, phone, email, ...? Usually name, phone, email are most common positional
-        if (array_is_list($arguments)) {
-            $properties = [];
-            if (isset($arguments[0])) {
-                $properties['name'] = $arguments[0];
-            }
-
-            if (isset($arguments[1])) {
-                $properties['phone'] = $arguments[1];
-            }
-
-            if (isset($arguments[2])) {
-                $properties['email'] = $arguments[2];
-            }
-        }
-
-        if (! isset($properties['name']) || ! is_string($properties['name'])) {
-            throw new InvalidArgumentException('MeCard Name is mandatory.');
-        }
-
-        $this->name = $properties['name'];
-
-        if (isset($properties['reading']) && is_string($properties['reading'])) {
-            $this->reading = $properties['reading'];
-        }
-
-        if (isset($properties['phone']) && is_string($properties['phone'])) {
-            $this->phone = $properties['phone'];
-        }
-
-        if (isset($properties['email']) && is_string($properties['email'])) {
-            $this->email = $properties['email'];
-        }
-
-        if (isset($properties['note']) && is_string($properties['note'])) {
-            $this->note = $properties['note'];
-        }
-
-        if (isset($properties['birthday']) && is_string($properties['birthday'])) {
-            $this->birthday = $properties['birthday'];
-        }
-
-        if (isset($properties['address']) && is_string($properties['address'])) {
-            $this->address = $properties['address'];
-        }
-
-        if (isset($properties['url']) && is_string($properties['url'])) {
-            $this->url = $properties['url'];
-        }
+        return strtr($value, [
+            '\\' => '\\\\',
+            ';' => '\\;',
+            ':' => '\\:',
+        ]);
     }
 
     private function escapeValue(string $value): string
@@ -131,7 +99,15 @@ final class MeCard implements DataTypeInterface
             '\\' => '\\\\',
             ';' => '\\;',
             ':' => '\\:',
-            ',' => '\\,', // Sometimes needed for list values, but safer to escape
+            ',' => '\\,',
+        ]);
+    }
+
+    private function escapeUrlValue(string $value): string
+    {
+        return strtr($value, [
+            '\\' => '\\\\',
+            ';' => '\\;',
         ]);
     }
 }

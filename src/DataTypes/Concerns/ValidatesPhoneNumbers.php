@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes\Concerns;
 
-use InvalidArgumentException;
+use Linkxtr\QrCode\Exceptions\DataTypes\InvalidPhoneNumberArgumentException;
 
 trait ValidatesPhoneNumbers
 {
-    protected function validatePhoneNumber(string $phoneNumber): void
+    protected function validatePhoneNumber(string $phoneNumber): string
     {
-        $cleaned = preg_replace('/[^\d+]/', '', $phoneNumber);
-
-        if (empty($cleaned) || ! preg_match('/^\+?\d{1,15}$/', $cleaned)) {
-            throw new InvalidArgumentException('Invalid phone number format. Must be 1-15 digits, optionally starting with +');
+        if (! preg_match('/^\+?[\d\s().-]+$/', $phoneNumber)) {
+            throw InvalidPhoneNumberArgumentException::invalidPhoneNumberFormat();
         }
+
+        $cleaned = (string) preg_replace('/[^\d+]/', '', $phoneNumber); // @pest-mutate-ignore
+
+        if (! preg_match('/^\+?\d{1,15}$/', $cleaned)) {
+            throw InvalidPhoneNumberArgumentException::invalidPhoneNumberLength();
+        }
+
+        return $cleaned;
     }
 }

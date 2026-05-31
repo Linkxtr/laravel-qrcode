@@ -4,55 +4,24 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DataTypes;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\DataTypeInterface;
 use Linkxtr\QrCode\DataTypes\Concerns\ValidatesPhoneNumbers;
-use LogicException;
 
-final class PhoneNumber implements DataTypeInterface
+final readonly class PhoneNumber implements DataTypeInterface
 {
     use ValidatesPhoneNumbers;
 
-    private string $prefix = 'tel:';
+    private const PREFIX = 'tel:';
 
-    private ?string $phoneNumber = null;
+    private string $phoneNumber;
+
+    public function __construct(string|int|float $phoneNumber)
+    {
+        $this->phoneNumber = $this->validatePhoneNumber((string) $phoneNumber);
+    }
 
     public function __toString(): string
     {
-        return $this->buildPhoneNumberString();
-    }
-
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    public function create(array $arguments): void
-    {
-        $this->setProperties($arguments);
-    }
-
-    /**
-     * @param  list<mixed>  $arguments
-     */
-    private function setProperties(array $arguments): void
-    {
-        if (! isset($arguments[0])) {
-            throw new InvalidArgumentException('Phone number is required.');
-        }
-
-        if (! is_string($arguments[0])) {
-            throw new InvalidArgumentException('Phone number must be a string.');
-        }
-
-        $this->validatePhoneNumber($arguments[0]);
-        $this->phoneNumber = $arguments[0];
-    }
-
-    private function buildPhoneNumberString(): string
-    {
-        if ($this->phoneNumber === null) {
-            throw new LogicException('Phone number is required. Call create() before using this object.');
-        }
-
-        return $this->prefix.$this->phoneNumber;
+        return self::PREFIX.$this->phoneNumber;
     }
 }

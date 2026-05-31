@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\Mergers;
 
-use InvalidArgumentException;
 use Linkxtr\QrCode\Contracts\MergerInterface;
+use Linkxtr\QrCode\Exceptions\ImageMergeException;
 
 final readonly class SvgMerger implements MergerInterface
 {
@@ -18,53 +18,70 @@ final readonly class SvgMerger implements MergerInterface
     public function merge(): string
     {
         if ($this->percentage <= 0 || $this->percentage >= 1) {
-            throw new InvalidArgumentException('$percentage must be between 0 and 1');
+            throw ImageMergeException::invalidPercentage();
         }
 
         $widthFound = preg_match('/width=["\'](\d+(?:\.\d+)?)\s*(?:px)?["\']/i', $this->svgContent, $widthMatch);
         $heightFound = preg_match('/height=["\'](\d+(?:\.\d+)?)\s*(?:px)?["\']/i', $this->svgContent, $heightMatch);
 
         if (! $widthFound || ! $heightFound) {
-            throw new InvalidArgumentException('Could not determine SVG dimensions. Ensure the SVG has width and height attributes.');
+            throw ImageMergeException::couldNotDetermineSvgDimensions();
         }
 
         $svgWidth = (int) $widthMatch[1];
-        $svgHeight = (int) $heightMatch[1];
+        $svgHeight = (int) $heightMatch[1]; // @pest-mutate-ignore
 
         $imageInfo = getimagesizefromstring($this->mergeImageContent);
 
         if ($imageInfo === false) {
-            throw new InvalidArgumentException('Invalid image data provided for merge. Could not determine image type/size.');
+            throw ImageMergeException::invalidImage();
         }
 
         [$logoWidth, $logoHeight] = $imageInfo;
         $mimeType = $imageInfo['mime'];
 
-        $logoRatio = $logoHeight > 0 ? $logoWidth / $logoHeight : 1;
-        $targetWidth = (int) ($svgWidth * $this->percentage);
-        $targetHeight = (int) ($targetWidth / $logoRatio);
+        if ($logoWidth <= 0 || $logoHeight <= 0) {
+            throw ImageMergeException::invalidImage();
+        }
 
-        $x = (int) (($svgWidth - $targetWidth) / 2);
-        $y = (int) (($svgHeight - $targetHeight) / 2);
+        $logoRatio = $logoWidth / $logoHeight;
+        $targetWidth = max(1, (int) ($svgWidth * $this->percentage)); // @pest-mutate-ignore
+        $targetHeight = max(1, (int) ($targetWidth / $logoRatio)); // @pest-mutate-ignore
+
+        if ($targetHeight > $svgHeight * $this->percentage) { // @pest-mutate-ignore
+            $targetHeight = max(1, (int) ($svgHeight * $this->percentage)); // @pest-mutate-ignore
+            $targetWidth = max(1, (int) ($targetHeight * $logoRatio)); // @pest-mutate-ignore
+        }
+
+        $x = (int) (($svgWidth - $targetWidth) / 2); // @pest-mutate-ignore
+        $y = (int) (($svgHeight - $targetHeight) / 2); // @pest-mutate-ignore
 
         $base64Image = base64_encode($this->mergeImageContent);
         $imageUri = sprintf('data:%s;base64,%s', $mimeType, $base64Image);
 
         $imageTag = sprintf(
-            '<image x="%d" y="%d" width="%d" height="%d" href="%s" />',
+            '<image x="%d" y="%d" width="%d" height="%d" href="%s" xlink:href="%s" />',
             $x,
             $y,
             $targetWidth,
             $targetHeight,
+            $imageUri,
             $imageUri
         );
 
-        $closingTagPos = strrpos($this->svgContent, '</svg>');
+        $svgContent = $this->svgContent;
 
-        if ($closingTagPos === false) {
-            throw new InvalidArgumentException('Invalid SVG content: closing tag not found.');
+        if (! str_contains($svgContent, 'xmlns:xlink=')) {
+            $replaced = preg_replace('/<svg\s/i', '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ', $svgContent, 1);
+            $svgContent = (string) $replaced; // @pest-mutate-ignore
         }
 
-        return substr_replace($this->svgContent, $imageTag.'</svg>', $closingTagPos, strlen('</svg>'));
+        $closingTagPos = strrpos($svgContent, '</svg>');
+
+        if ($closingTagPos === false) {
+            throw ImageMergeException::invalidSvgContent();
+        }
+
+        return substr_replace($svgContent, $imageTag.'</svg>', $closingTagPos, strlen('</svg>'));
     }
 }

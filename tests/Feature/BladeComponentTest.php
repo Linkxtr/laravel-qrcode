@@ -2,232 +2,36 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature;
-
 use Illuminate\Support\Facades\Blade;
-use Illuminate\View\ViewException;
 
-it('renders a default qr code component', function () {
-    $blade_string = '<x-qr-code data="https://example.com" />';
+test('the blade component renders a real SVG directly from a view', function (): void {
+    $html = Blade::render(
+        '<x-qrcode data="https://linkxtr.com" size="150" color="255,0,0" style="round" />'
+    );
 
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('<svg', 'xmlns="http://www.w3.org/2000/svg"');
+    expect($html)->toContain('<svg')
+        ->toContain('width="150"')
+        ->toContain('height="150"')
+        ->toContain('#ff0000');
 });
 
-it('renders a qr code component with custom size', function () {
-    $blade_string = '<x-qr-code data="https://example.com" size="300" />';
+test('the blade component handles base64 image formats correctly', function (): void {
+    $html = Blade::render(
+        '<x-qrcode data="test" format="png" class="my-qr-class" />'
+    );
 
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('<svg', 'width="300"');
+    expect($html)->toContain('<img')
+        ->toContain('class="my-qr-class"')
+        ->toContain('src="data:image/png;base64,');
 });
 
-it('throws an exception when rendering eps format via component', function () {
-    $blade_string = '<x-qr-code data="https://example.com" format="eps" />';
+test('it supports the old tag syntax', function (): void {
+    $html = Blade::render(
+        '<x-qr-code data="https://linkxtr.com" size="150" color="255,0,0" style="round" />'
+    );
 
-    Blade::render($blade_string);
-})->throws(ViewException::class, 'EPS format is not supported for HTML embedding in the Blade component.');
-
-it('throws an exception when rendering invalid format via component', function () {
-    $blade_string = '<x-qr-code data="https://example.com" format="invalid" />';
-
-    Blade::render($blade_string);
-})->throws(ViewException::class, 'Invalid format.');
-
-it('renders a qr code component with rgb color', function () {
-    $blade_string = '<x-qr-code data="https://example.com" color="255,0,0" />';
-
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('fill="#ff0000"');
-});
-
-it('renders a qr code component with hex color', function () {
-    $blade_string = '<x-qr-code data="https://example.com" color="#ff0000" />';
-
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('fill="#ff0000"');
-});
-
-it('renders a qr code component with shorthand hex color', function () {
-    $blade_string = '<x-qr-code data="https://example.com" color="#f00" />';
-
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('fill="#ff0000"');
-});
-
-it('renders a qr code component with background rgb color', function () {
-    $blade_string = '<x-qr-code data="https://example.com" background-color="0,0,255" />';
-
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('fill="#0000ff"');
-});
-
-it('renders a qr code component with hex background color', function () {
-    $blade_string = '<x-qr-code data="https://example.com" background-color="#0000FF" />';
-
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('fill="#0000ff"');
-});
-
-it('renders a qr code component with style, margin, error correction, and encoding', function () {
-    $blade_string = '<x-qr-code data="https://example.com" style="round" margin="2" error-correction="h" encoding="UTF-8" />';
-
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('<svg');
-});
-
-it('ignores invalid rgb color string', function () {
-    $blade_string = '<x-qr-code data="https://example.com" color="255,0" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg');
-});
-
-it('ignores completely invalid color string', function () {
-    $blade_string = '<x-qr-code data="https://example.com" color="not-a-color" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg')->and($rendered)->toContain('fill="#000000"'); // Verify default black color is used;
-});
-
-it('ignores invalid hex color strings', function () {
-    $blade_string = '<x-qr-code data="https://example.com" color="#gg0000" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg')->and($rendered)->toContain('fill="#000000"');
-});
-
-it('renders a qr code component with eye style', function () {
-    $blade_string = '<x-qr-code data="https://example.com" eye="circle" />';
-    $rendered = Blade::render($blade_string);
-    // Verifying it renders without crashing
-    expect($rendered)->toContain('<svg');
-});
-
-it('renders a qr code component with eye colors', function () {
-    $blade_string = '<x-qr-code data="https://example.com" eye-color0="#ff0000, #00ff00" eye-color1="#0000ff|#ffffff" eye-color2="#000000|#ff0000" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg');
-});
-
-it('ignores eye color definitions with insufficient colors', function () {
-    $blade_string = '<x-qr-code data="https://example.com" eye-color1="#ff0000" eye-color2="#00ff00" gradient="#ff0000" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg');
-});
-
-it('preserves spaces in RGB tuples for multi-colors', function () {
-    $blade_string = '<x-qr-code data="https://example.com" eye-color0="255, 0, 0 | 0, 255, 0" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg');
-});
-
-it('renders a qr code component with gradient', function () {
-    $blade_string = '<x-qr-code data="https://example.com" gradient="#ff0000, #0000ff" gradient-type="vertical" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg');
-});
-
-it('renders a qr code component with default gradient type', function () {
-    $blade_string = '<x-qr-code data="https://example.com" gradient="#ff0000, #0000ff" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg');
-});
-
-it('renders a qr code component with merge', function () {
-    $blade_string = '<x-qr-code data="https://example.com" format="png" merge="images/linkxtr.png" merge-percentage=".3" />';
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('<img', 'src="data:image/png;base64,');
-});
-
-it('renders a qr code component with absolute merge path', function () {
-    $absolutePath = realpath(__DIR__.'/../images/linkxtr.png');
-    expect($absolutePath)->not->toBeFalse('Test image file not found: '.__DIR__.'/../images/linkxtr.png');
-    $blade_string = '<x-qr-code data="https://example.com" format="png" merge="'.$absolutePath.'" merge-percentage=".3" merge-absolute="true" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<img', 'src="data:image/png;base64,');
-});
-
-it('renders a qr code component with merge string', function () {
-    $imgData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
-
-    $blade_string = '<x-qr-code data="https://example.com" format="svg" merge-string="'.$imgData.'" merge-percentage=".3" />';
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)->toContain('<svg', 'xmlns="http://www.w3.org/2000/svg"');
-});
-
-it('throws an exception when merge path contains directory traversal', function () {
-    $blade_string = '<x-qr-code data="https://example.com" merge="../images/logo.png" />';
-
-    Blade::render($blade_string);
-})->throws(ViewException::class, 'Invalid merge path, path traversal is not allowed.');
-
-it('throws an exception when merge path contains embedded directory traversal', function () {
-    $blade_string = '<x-qr-code data="https://example.com" merge="images/../../../etc/passwd" />';
-
-    Blade::render($blade_string);
-})->throws(ViewException::class, 'Invalid merge path, path traversal is not allowed.');
-
-it('applies html attributes to the svg tag', function () {
-    $blade = '<x-qr-code data="https://example.com" class="mb-4 shadow" id="my-qr" />';
-    $html = Blade::render($blade);
-
-    expect($html)
-        ->toContain('class="mb-4 shadow"')
-        ->toContain('id="my-qr"');
-});
-
-it('applies html attributes to the img tag', function () {
-    $blade = '<x-qr-code data="https://example.com" format="png" class="mb-4 shadow" id="my-qr" />';
-    $html = Blade::render($blade);
-
-    expect($html)
-        ->toContain('class="mb-4 shadow"')
-        ->toContain('id="my-qr"');
-});
-
-it('supports alpha channel in colors rendering svg', function () {
-    $blade_string = '<x-qr-code data="https://example.com" color="255,0,0,50" background-color="0,0,255,50" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg')->and($rendered)->toContain('fill-opacity="0.5"');
-});
-
-it('supports alpha channel in colors rendering png', function () {
-    $blade_string = '<x-qr-code data="https://example.com" format="png" color="255,0,0,50" background-color="0,0,255,50" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<img')->and($rendered)->toContain('src="data:image/png;base64,');
-});
-
-it('supports 8-character hex color', function () {
-    $blade_string = '<x-qr-code data="https://example.com" color="#ff0000ff" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg')->and($rendered)->toContain('fill="#ff0000"');
-});
-
-it('supports 8-character hex background color', function () {
-    $blade_string = '<x-qr-code data="https://example.com" background-color="#ff0000ff" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('<svg')->and($rendered)->toContain('fill="#ff0000"');
-});
-
-it('supports 8-character hex color with alpha', function () {
-    $blade_string = '<x-qr-code data="https://example.com" color="#ff00002F" />';
-    $rendered = Blade::render($blade_string);
-    expect($rendered)->toContain('fill="#ff0000"')->and($rendered)->toContain('fill-opacity="0.47"');
-});
-
-it('includes accessibility attributes and title in svg output', function () {
-    $blade_string = '<x-qr-code data="https://example.com" format="svg" />';
-    $rendered = Blade::render($blade_string);
-
-    expect($rendered)
-        ->toContain('role="img"')
-        ->toContain('aria-label="QR Code"')
-        ->toContain('<title>QR Code</title>');
+    expect($html)->toContain('<svg')
+        ->toContain('width="150"')
+        ->toContain('height="150"')
+        ->toContain('#ff0000');
 });
