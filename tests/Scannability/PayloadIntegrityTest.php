@@ -9,11 +9,6 @@ beforeEach(function (): void {
     global $mockImagickLoaded, $mockGdLoaded;
     $mockImagickLoaded = extension_loaded('imagick');
     $mockGdLoaded = extension_loaded('gd');
-
-    // Reset Override mocks to ensure clean state
-    $GLOBALS['mockImageColorAllocate'] = null;
-    $GLOBALS['mockImageCreateTrueColor'] = null;
-    $GLOBALS['mockImageColorAllocateAlpha'] = null;
 });
 
 $drivers = [];

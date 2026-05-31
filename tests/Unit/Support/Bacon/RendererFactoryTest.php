@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use BaconQrCode\Renderer\GDLibRenderer;
+use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererInterface;
 use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\Format;
@@ -12,6 +13,18 @@ use Linkxtr\QrCode\Support\Bacon\RendererFactory;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 covers(RendererFactory::class);
+
+it('uses ImageRenderer when imagick is loaded', function (Format $format): void {
+    global $mockImagickLoaded;
+    $mockImagickLoaded = true;
+
+    $config = new Config;
+    $config->setFormat($format);
+
+    $renderer = RendererFactory::make($config);
+
+    expect($renderer)->toBeInstanceOf(ImageRenderer::class);
+})->with(Format::cases());
 
 it('falls back to GDLibRenderer for PNG if imagick is missing', function (): void {
     global $mockImagickLoaded;
