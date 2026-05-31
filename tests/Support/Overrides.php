@@ -28,7 +28,7 @@ namespace Linkxtr\QrCode\DTOs {
     }
 }
 
-namespace Linkxtr\QrCode\Renderers {
+namespace Linkxtr\QrCode\Support\Bacon {
     if (! isset($GLOBALS['mockImagickLoaded'])) {
         $GLOBALS['mockImagickLoaded'] = null;
     }
