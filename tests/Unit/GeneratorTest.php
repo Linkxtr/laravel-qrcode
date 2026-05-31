@@ -14,8 +14,6 @@ use Linkxtr\QrCode\Exceptions\CannotWriteFileException;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\Support\QrCodeResult;
 
-require_once __DIR__.'/../Support/Overrides.php';
-
 covers(Generator::class);
 
 it('passes array config from constructor to the underlying DTO', function (): void {
@@ -192,9 +190,6 @@ test('generate throws exception if file_put_contents fails', function (): void {
 
     expect(fn (): QrCodeResult => $generator->generate('fail-test', 'fail-test.svg'))
         ->toThrow(RuntimeException::class, 'Failed to write QR code to file: fail-test.svg');
-})->after(function (): void {
-    global $mockFilePutContents;
-    $mockFilePutContents = null;
 });
 
 test('it mathematically rejects arrays and objects inside color configurations', function (): void {

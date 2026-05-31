@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Linkxtr\QrCode\Exceptions\ImageMergeException;
 use Linkxtr\QrCode\Mergers\EpsMerger;
 
-require_once __DIR__.'/../../Support/Overrides.php';
-
 covers(EpsMerger::class);
 
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
@@ -103,9 +101,6 @@ it('throws exception if image canvas cannot be created', function () use ($tinyP
 
     expect(fn (): string => (new EpsMerger($epsBase, $tinyPng, 0.2))->merge())
         ->toThrow(RuntimeException::class, 'Failed to create resized logo canvas.');
-})->after(function (): void {
-    global $mockImageCreateTrueColor;
-    $mockImageCreateTrueColor = null;
 });
 
 it('throws exception if white color cannot be allocated', function () use ($tinyPng, $epsBase): void {
@@ -114,9 +109,6 @@ it('throws exception if white color cannot be allocated', function () use ($tiny
 
     expect(fn (): string => (new EpsMerger($epsBase, $tinyPng, 0.2))->merge())
         ->toThrow(RuntimeException::class, 'Could not allocate white color for the logo.');
-})->after(function (): void {
-    global $mockImageColorAllocate;
-    $mockImageColorAllocate = null;
 });
 
 it('throws exception if output buffer capture fails', function () use ($tinyPng, $epsBase): void {
@@ -126,8 +118,6 @@ it('throws exception if output buffer capture fails', function () use ($tinyPng,
     expect(fn (): string => (new EpsMerger($epsBase, $tinyPng, 0.2))->merge())
         ->toThrow(RuntimeException::class, 'Failed to capture hex data from output buffer.');
 })->after(function (): void {
-    global $mockObGetClean;
-    $mockObGetClean = null;
     if (ob_get_level() > 0) {
         ob_end_clean();
     }

@@ -7,8 +7,6 @@ use Linkxtr\QrCode\Exceptions\ImageMergeException;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Support\Image;
 
-require_once __DIR__.'/../../Support/Overrides.php';
-
 covers(RasterMerger::class, Image::class);
 
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
@@ -50,9 +48,6 @@ it('throws exception if transparent color cannot be created', function () use ($
 
     expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
         ->toThrow(ImageMergeException::class, 'Failed to create transparent color.');
-})->after(function (): void {
-    global $mockImageColorAllocateAlpha;
-    $mockImageColorAllocateAlpha = null;
 });
 
 it('throws exception if image canvas cannot be created', function () use ($tinyPng): void {
@@ -61,9 +56,6 @@ it('throws exception if image canvas cannot be created', function () use ($tinyP
 
     expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
         ->toThrow(ImageMergeException::class, 'Failed to create image canvas.');
-})->after(function (): void {
-    global $mockImageCreateTrueColor;
-    $mockImageCreateTrueColor = null;
 });
 
 it('throws exception if imagefill fails', function () use ($tinyPng): void {
@@ -72,9 +64,6 @@ it('throws exception if imagefill fails', function () use ($tinyPng): void {
 
     expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
         ->toThrow(ImageMergeException::class, 'Failed to fill image with transparent color.');
-})->after(function (): void {
-    global $mockImageFill;
-    $mockImageFill = null;
 });
 
 it('throws exception if imagecopy fails', function () use ($tinyPng): void {
@@ -83,9 +72,6 @@ it('throws exception if imagecopy fails', function () use ($tinyPng): void {
 
     expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
         ->toThrow(ImageMergeException::class, 'Failed to copy source image to canvas');
-})->after(function (): void {
-    global $mockImageCopy;
-    $mockImageCopy = null;
 });
 
 it('throws exception if imagecopyresampled fails', function () use ($tinyPng): void {
@@ -94,9 +80,6 @@ it('throws exception if imagecopyresampled fails', function () use ($tinyPng): v
 
     expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
         ->toThrow(ImageMergeException::class, 'Failed to copy/resample merge image');
-})->after(function (): void {
-    global $mockImageCopyResampled;
-    $mockImageCopyResampled = null;
 });
 
 it('throws exception if imagesavealpha fails', function () use ($tinyPng): void {
@@ -105,9 +88,6 @@ it('throws exception if imagesavealpha fails', function () use ($tinyPng): void 
 
     expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
         ->toThrow(ImageMergeException::class, 'Failed to save alpha channel information.');
-})->after(function (): void {
-    global $mockImageSaveAlpha;
-    $mockImageSaveAlpha = null;
 });
 
 it('throws exception if output buffer capture fails', function () use ($tinyPng): void {
@@ -117,8 +97,6 @@ it('throws exception if output buffer capture fails', function () use ($tinyPng)
     expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
         ->toThrow(ImageMergeException::class, 'Failed to render image binary.');
 })->after(function (): void {
-    global $mockObGetClean;
-    $mockObGetClean = null;
     if (ob_get_level() > 0) {
         ob_end_clean();
     }
@@ -130,9 +108,6 @@ it('throws exception if image creation fails returning false', function (): void
 
     expect(fn (): Image => new Image('valid string but mock fails'))
         ->toThrow(ImageMergeException::class, 'Invalid image data provided to Image.');
-})->after(function (): void {
-    global $mockImageCreateFromString;
-    $mockImageCreateFromString = null;
 });
 
 it('constrains merge image if it exceeds vertical bounds', function (): void {
@@ -207,9 +182,6 @@ it('throws exception when output content is an empty string', function () use ($
     $merger = new RasterMerger($tinyPng, $tinyPng, 0.2);
     expect(fn (): string => $merger->merge())
         ->toThrow(ImageMergeException::class, 'Failed to render image binary.');
-})->after(function (): void {
-    global $mock_imagepng_empty;
-    $mock_imagepng_empty = null;
 });
 
 test('it throws a logic exception if an unsupported format bypasses validation', function () use ($tinyPng): void {

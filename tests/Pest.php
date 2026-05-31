@@ -5,6 +5,8 @@ declare(strict_types=1);
 use chillerlan\QRCode\QRCode as QRCodeDecoder;
 use Tests\Support\TestCase;
 
+require_once __DIR__.'/Support/Overrides.php';
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -14,7 +16,21 @@ use Tests\Support\TestCase;
 |
 */
 
-uses(TestCase::class)->in('Unit', 'Scannability', 'Feature', 'Scalability');
+uses(TestCase::class)->afterEach(function (): void {
+    $GLOBALS['mockImagickLoaded'] = null;
+    $GLOBALS['mockGdLoaded'] = null;
+    $GLOBALS['mockFileGetContents'] = null;
+    $GLOBALS['mockFilePutContents'] = null;
+    $GLOBALS['mockImageColorAllocateAlpha'] = null;
+    $GLOBALS['mockImageColorAllocate'] = null;
+    $GLOBALS['mockImageCreateTrueColor'] = null;
+    $GLOBALS['mockObGetClean'] = null;
+    $GLOBALS['mockImageFill'] = null;
+    $GLOBALS['mockImageCopy'] = null;
+    $GLOBALS['mockImageCopyResampled'] = null;
+    $GLOBALS['mockImageSaveAlpha'] = null;
+    $GLOBALS['mock_imagepng_empty'] = null;
+})->in('Unit', 'Scannability', 'Feature', 'Scalability');
 
 /*
 |--------------------------------------------------------------------------

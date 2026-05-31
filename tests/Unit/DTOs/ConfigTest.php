@@ -17,8 +17,6 @@ use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
 use Linkxtr\QrCode\ValueObjects\Colors\Gray;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
-require_once __DIR__.'/../../Support/Overrides.php';
-
 covers(Config::class);
 
 test('it initializes with default values', function (): void {
@@ -380,9 +378,6 @@ test('it throws exception when file_get_contents returns false', function (): vo
     $resolvedPath = realpath($path);
 
     expect(fn () => $config->setupMergePath($path))->toThrow(InvalidConfigurationException::class, 'Failed to read image file: '.$resolvedPath);
-})->after(function (): void {
-    global $mockFileGetContents;
-    $mockFileGetContents = null;
 });
 
 test('it sets up string image merges and validates percentages', function (): void {
