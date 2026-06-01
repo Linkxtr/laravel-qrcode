@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use chillerlan\QRCode\QRCode as QRCodeDecoder;
+use Linkxtr\QrCode\Support\Environment;
 use Tests\Support\TestCase;
 
 require_once __DIR__.'/Support/Overrides.php';
@@ -17,8 +18,8 @@ require_once __DIR__.'/Support/Overrides.php';
 */
 
 uses(TestCase::class)->afterEach(function (): void {
-    $GLOBALS['mockImagickLoaded'] = null;
-    $GLOBALS['mockGdLoaded'] = null;
+    Environment::clearMocks();
+
     $GLOBALS['mockFileGetContents'] = null;
     $GLOBALS['mockFilePutContents'] = null;
     $GLOBALS['mockImageColorAllocateAlpha'] = null;

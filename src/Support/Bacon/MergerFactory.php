@@ -12,6 +12,7 @@ use Linkxtr\QrCode\Mergers\EpsMerger;
 use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
+use Linkxtr\QrCode\Support\Environment;
 
 final readonly class MergerFactory
 {
@@ -36,14 +37,14 @@ final readonly class MergerFactory
         $imageMerge = $this->config->getImageMerge();
         $percentage = $this->config->getImagePercentage();
 
-        if ($format === Format::EPS && ! extension_loaded('gd')) {
+        if ($format === Format::EPS && ! Environment::hasExtension('gd')) {
             throw MissingExtensionException::gdRequired('to merge images into EPS format');
         }
 
         return match ($format) {
             Format::EPS => new EpsMerger($content, $imageMerge, $percentage),
             Format::SVG => new SvgMerger($content, $imageMerge, $percentage),
-            default => extension_loaded('imagick')
+            default => Environment::hasExtension('imagick')
                 ? (new ImagickMerger($content, $imageMerge, $percentage))->setFormat($format)
                 : (new RasterMerger($content, $imageMerge, $percentage))->setFormat($format),
         };

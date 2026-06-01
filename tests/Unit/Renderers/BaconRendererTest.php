@@ -7,6 +7,7 @@ use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\Style;
 use Linkxtr\QrCode\Exceptions\MissingExtensionException;
 use Linkxtr\QrCode\Renderers\BaconRenderer;
+use Linkxtr\QrCode\Support\Environment;
 use Linkxtr\QrCode\Support\QrCodeResult;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
@@ -15,9 +16,8 @@ covers(BaconRenderer::class);
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 
 it('throws exception if required extensions are not loaded', function (): void {
-    global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = false;
-    $mockGdLoaded = false;
+    Environment::disableExtension('imagick');
+    Environment::disableExtension('gd');
 
     $config = new Config;
     $renderer = new BaconRenderer($config);
@@ -38,9 +38,8 @@ it('throws exception if required extensions are not loaded', function (): void {
 });
 
 it('throws an exception if trying to generate a non-PNG raster using only GD', function (): void {
-    global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = false;
-    $mockGdLoaded = true;
+    Environment::enableExtension('gd');
+    Environment::disableExtension('imagick');
 
     $config = new Config;
     $renderer = new BaconRenderer($config);
@@ -51,9 +50,8 @@ it('throws an exception if trying to generate a non-PNG raster using only GD', f
 });
 
 it('successfully generates SVG and EPS without requiring any image extensions', function (): void {
-    global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = false;
-    $mockGdLoaded = false;
+    Environment::disableExtension('imagick');
+    Environment::disableExtension('gd');
 
     $config = new Config;
     $renderer = new BaconRenderer($config);
@@ -81,8 +79,7 @@ it('renders an html string without merged image', function (): void {
 });
 
 it('throws an exception when trying to merge images into EPS format without gd extension', function () use ($tinyPng): void {
-    global $mockGdLoaded;
-    $mockGdLoaded = false;
+    Environment::disableExtension('gd');
 
     $config = new Config;
     $config->setFormat(Format::EPS);
@@ -108,9 +105,8 @@ it('renders an html string with merged image', function () use ($tinyPng): void 
 });
 
 it('throws a MissingExtensionException when using GD library with a non-square style', function (): void {
-    global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = false;
-    $mockGdLoaded = true;
+    Environment::enableExtension('gd');
+    Environment::disableExtension('imagick');
 
     $config = new Config;
     $config->setFormat(Format::PNG);
@@ -127,9 +123,8 @@ it('throws a MissingExtensionException when using GD library with a non-square s
 });
 
 it('throws a MissingExtensionException when using GD library with a gradient', function (): void {
-    global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = false;
-    $mockGdLoaded = true;
+    Environment::enableExtension('gd');
+    Environment::disableExtension('imagick');
 
     $config = new Config;
     $config->setFormat(Format::PNG);

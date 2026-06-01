@@ -10,13 +10,13 @@ use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\Style;
 use Linkxtr\QrCode\Exceptions\MissingExtensionException;
 use Linkxtr\QrCode\Support\Bacon\RendererFactory;
+use Linkxtr\QrCode\Support\Environment;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
 covers(RendererFactory::class);
 
 it('uses ImageRenderer when imagick is loaded', function (Format $format): void {
-    global $mockImagickLoaded;
-    $mockImagickLoaded = true;
+    Environment::enableExtension('imagick');
 
     $config = new Config;
     $config->setFormat($format);
@@ -27,8 +27,8 @@ it('uses ImageRenderer when imagick is loaded', function (Format $format): void 
 })->with(Format::cases());
 
 it('falls back to GDLibRenderer for PNG if imagick is missing', function (): void {
-    global $mockImagickLoaded;
-    $mockImagickLoaded = false;
+    Environment::enableExtension('gd');
+    Environment::disableExtension('imagick');
 
     $config = new Config;
     $config->setFormat(Format::PNG);
@@ -39,9 +39,8 @@ it('falls back to GDLibRenderer for PNG if imagick is missing', function (): voi
 });
 
 it('throws exception if required extensions are not loaded', function (): void {
-    global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = false;
-    $mockGdLoaded = false;
+    Environment::disableExtension('imagick');
+    Environment::disableExtension('gd');
 
     $config = new Config;
     $config->setFormat(Format::SVG);
@@ -60,9 +59,8 @@ it('throws exception if required extensions are not loaded', function (): void {
 });
 
 it('throws an exception if trying to generate a non-PNG raster using only GD', function (): void {
-    global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = false;
-    $mockGdLoaded = true;
+    Environment::enableExtension('gd');
+    Environment::disableExtension('imagick');
 
     $config = new Config;
     $config->setFormat(Format::WEBP);
@@ -72,9 +70,8 @@ it('throws an exception if trying to generate a non-PNG raster using only GD', f
 });
 
 it('throws a MissingExtensionException when using GD library with a non-square style', function (): void {
-    global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = false;
-    $mockGdLoaded = true;
+    Environment::enableExtension('gd');
+    Environment::disableExtension('imagick');
 
     $config = new Config;
     $config->setFormat(Format::PNG);
@@ -89,9 +86,8 @@ it('throws a MissingExtensionException when using GD library with a non-square s
 });
 
 it('throws a MissingExtensionException when using GD library with a gradient', function (): void {
-    global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = false;
-    $mockGdLoaded = true;
+    Environment::enableExtension('gd');
+    Environment::disableExtension('imagick');
 
     $config = new Config;
     $config->setFormat(Format::PNG);

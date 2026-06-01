@@ -12,6 +12,7 @@ use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\Style;
 use Linkxtr\QrCode\Exceptions\MissingExtensionException;
+use Linkxtr\QrCode\Support\Environment;
 
 final readonly class RendererFactory
 {
@@ -55,11 +56,11 @@ final readonly class RendererFactory
             return true;
         }
 
-        if (! extension_loaded('imagick') && ! extension_loaded('gd')) {
+        if (! Environment::hasExtension('imagick') && ! Environment::hasExtension('gd')) {
             throw MissingExtensionException::neitherImagickNorGdAvailable();
         }
 
-        if (extension_loaded('imagick')) {
+        if (Environment::hasExtension('imagick')) {
             return true;
         }
 

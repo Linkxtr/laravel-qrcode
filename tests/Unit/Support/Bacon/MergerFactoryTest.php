@@ -10,15 +10,15 @@ use Linkxtr\QrCode\Mergers\ImagickMerger;
 use Linkxtr\QrCode\Mergers\RasterMerger;
 use Linkxtr\QrCode\Mergers\SvgMerger;
 use Linkxtr\QrCode\Support\Bacon\MergerFactory;
+use Linkxtr\QrCode\Support\Environment;
 
 covers(MergerFactory::class);
 
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 
 it('calls the correct merger based on format', function () use ($tinyPng): void {
-    global $mockImagickLoaded, $mockGdLoaded;
-    $mockImagickLoaded = true;
-    $mockGdLoaded = true;
+    Environment::enableExtension('gd');
+    Environment::enableExtension('imagick');
 
     $config = new Config;
 
@@ -40,13 +40,12 @@ it('calls the correct merger based on format', function () use ($tinyPng): void 
     $mergerFactory = new MergerFactory($config);
     expect(invade($mergerFactory)->getMerger($tinyPng))->toBeInstanceOf(ImagickMerger::class);
 
-    $mockImagickLoaded = false;
+    Environment::disableExtension('imagick');
     expect(invade($mergerFactory)->getMerger($tinyPng))->toBeInstanceOf(RasterMerger::class);
 });
 
 it('throws missing extension exception when gd is not loaded and format is eps', function (): void {
-    global $mockGdLoaded;
-    $mockGdLoaded = false;
+    Environment::disableExtension('gd');
 
     $config = new Config;
     $config->setFormat(Format::EPS);
