@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\App;
+use Linkxtr\QrCode\Exceptions\InvalidEnvironmentMutationException;
 use Linkxtr\QrCode\Support\Environment;
 
 covers(Environment::class);
@@ -42,4 +44,23 @@ it('can completely clear all mocked states', function (): void {
 
     expect(Environment::hasExtension('fake_missing_ext'))->toBeFalse()
         ->and(Environment::hasExtension('core'))->toBeTrue();
+});
+
+it('throws an exception if mutation methods are called outside a testing environment', function (): void {
+    App::shouldReceive('runningUnitTests')
+        ->once()
+        ->andReturn(false);
+
+    expect(fn () => Environment::disableExtension('imagick'))
+        ->toThrow(InvalidEnvironmentMutationException::class, 'strictly reserved for testing environments');
+});
+
+it('forces GD fallback and ignores imagick when configured to do so', function (): void {
+    Environment::enableExtension('imagick');
+
+    expect(Environment::hasExtension('imagick'))->toBeTrue();
+
+    config(['qrcode.force_gd' => true]);
+
+    expect(Environment::hasExtension('imagick'))->toBeFalse();
 });

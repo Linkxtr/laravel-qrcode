@@ -94,4 +94,16 @@ return [
     |
     */
     'encoding' => env('QR_CODE_ENCODING', 'UTF-8'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Force GD Backend
+    |--------------------------------------------------------------------------
+    |
+    | If your server has Imagick installed but restricts its usage (e.g., via
+    | strict security policies), you can force the package to bypass Imagick
+    | and fall back to the GD extension for rendering raster images.
+    |
+    */
+    'force_gd' => env('QRCODE_FORCE_GD', false),
 ];
