@@ -16,6 +16,10 @@ covers(MergerFactory::class);
 $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 
 it('calls the correct merger based on format', function () use ($tinyPng): void {
+    global $mockImagickLoaded, $mockGdLoaded;
+    $mockImagickLoaded = true;
+    $mockGdLoaded = true;
+
     $config = new Config;
 
     $config->setFormat(Format::SVG);
@@ -36,7 +40,6 @@ it('calls the correct merger based on format', function () use ($tinyPng): void 
     $mergerFactory = new MergerFactory($config);
     expect(invade($mergerFactory)->getMerger($tinyPng))->toBeInstanceOf(ImagickMerger::class);
 
-    global $mockImagickLoaded;
     $mockImagickLoaded = false;
     expect(invade($mergerFactory)->getMerger($tinyPng))->toBeInstanceOf(RasterMerger::class);
 });
