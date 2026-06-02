@@ -11,6 +11,8 @@ use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 
+use function Linkxtr\QrCode\DTOs\base_path;
+
 covers(QrCodeComponent::class);
 
 beforeEach(function (): void {
@@ -27,7 +29,7 @@ test('it throws exceptions for invalid formats', function (): void {
 
 test('it throws exception for path traversal attempts in merge', function (): void {
     $component = new QrCodeComponent(data: 'test', merge: '../malicious.png');
-    expect(fn (): Closure => $component->render())->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: '.realpath('../malicious.png'));
+    expect(fn (): Closure => $component->render())->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: '.base_path('../malicious.png'));
 });
 
 test('it generates default svg with injected title and accessibility attributes', function (): void {

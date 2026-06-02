@@ -391,7 +391,7 @@ final class Config
 
     public function setupMergePath(string $filepath): void
     {
-        $isAbsolute = preg_match('~^(/|[a-zA-Z]:[\\\\/])~', $filepath) === 1;
+        $isAbsolute = preg_match('~^(/|//|\\\\\\\\|[a-zA-Z]:[\\\\/])~', $filepath) === 1;
 
         $filepath = $isAbsolute ? $filepath : base_path($filepath);
         $realPath = realpath($filepath);
@@ -405,7 +405,7 @@ final class Config
         }
 
         if (! File::isReadable($realPath)) {
-            throw InvalidConfigurationException::imageDoesNotExist($realPath);
+            throw InvalidConfigurationException::imageFileNotReadable($realPath);
         }
 
         $content = file_get_contents($realPath);

@@ -105,5 +105,5 @@ return [
     | and fall back to the GD extension for rendering raster images.
     |
     */
-    'force_gd' => env('QRCODE_FORCE_GD', false),
+    'force_gd' => env('QR_CODE_FORCE_GD', false),
 ];
