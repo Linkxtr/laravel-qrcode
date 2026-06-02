@@ -173,11 +173,21 @@ test('fluent configuration methods return a cloned instance with updated config'
         ->and(invade($mergeString)->config->getImageMerge())->toBe('test')
         ->and(invade($mergeString)->config->getImagePercentage())->toBe(0.1);
 
+    $mergeString2 = $generator->mergeString('test');
+    expect($mergeString2)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($mergeString2)->config->getImageMerge())->toBe('test')
+        ->and(invade($mergeString2)->config->getImagePercentage())->toBe(0.2);
+
     $expectedContent = file_get_contents(realpath(__DIR__.'/../Support/Fixtures/images/linkxtr.png'));
     $merged = $generator->merge(realpath(__DIR__.'/../Support/Fixtures/images/linkxtr.png'), 0.3);
     expect($merged)->toBeInstanceOf(Generator::class)->not->toBe($generator)
         ->and(invade($merged)->config->getImageMerge())->toBe($expectedContent)
         ->and(invade($merged)->config->getImagePercentage())->toBe(0.3);
+
+    $merged2 = $generator->merge(realpath(__DIR__.'/../Support/Fixtures/images/linkxtr.png'));
+    expect($merged2)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($merged2)->config->getImageMerge())->toBe($expectedContent)
+        ->and(invade($merged2)->config->getImagePercentage())->toBe(0.2);
 
     expect(invade($generator)->config->getSize())->toBe(400);
 });

@@ -6,6 +6,7 @@ namespace Linkxtr\QrCode\DTOs;
 
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
+use Illuminate\Support\Facades\File;
 use Linkxtr\QrCode\Contracts\ColorInterface;
 use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
@@ -14,6 +15,7 @@ use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
 use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
+use Linkxtr\QrCode\Support\Environment;
 use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
 use Linkxtr\QrCode\ValueObjects\Colors\Gray;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
@@ -389,31 +391,27 @@ final class Config
 
     public function setupMergePath(string $filepath): void
     {
-        $baseDir = function_exists('base_path') ? base_path() : (getcwd() ?: ''); // @pest-mutate-ignore
         $isAbsolute = preg_match('~^(/|[a-zA-Z]:[\\\\/])~', $filepath) === 1;
-        $targetPath = $isAbsolute
-            ? $filepath
-            : $baseDir.DIRECTORY_SEPARATOR.$filepath;
-        $resolvedPath = realpath($targetPath);
 
-        $displayPath = $resolvedPath !== false ? $resolvedPath : $filepath;
+        $filepath = $isAbsolute ? $filepath : base_path($filepath);
+        $realPath = realpath($filepath);
 
-        if ($resolvedPath === false || ! is_file($resolvedPath) || ! is_readable($resolvedPath)) {
-            throw InvalidConfigurationException::imageDoesNotExist($displayPath);
+        if ($realPath === false || ! File::isFile($realPath)) {
+            throw InvalidConfigurationException::imageDoesNotExist($filepath);
         }
 
-        if (! $isAbsolute) {
-            $realBaseDir = realpath($baseDir) ?: $baseDir;
-
-            if (! str_starts_with($resolvedPath, $realBaseDir.DIRECTORY_SEPARATOR)) {
-                throw InvalidConfigurationException::imagePathOutsideApplication();
-            }
+        if (! $isAbsolute && ! $this->isPathInsideApplication($realPath)) {
+            throw InvalidConfigurationException::imagePathOutsideApplication();
         }
 
-        $content = file_get_contents($resolvedPath);
+        if (! File::isReadable($realPath)) {
+            throw InvalidConfigurationException::imageDoesNotExist($realPath);
+        }
+
+        $content = file_get_contents($realPath);
 
         if ($content === false) {
-            throw InvalidConfigurationException::imageFileNotReadable($resolvedPath);
+            throw InvalidConfigurationException::imageFileNotReadable($realPath);
         }
 
         $this->imageMerge = $content;
@@ -441,6 +439,21 @@ final class Config
     public function getImagePercentage(): float
     {
         return $this->imagePercentage;
+    }
+
+    private function isPathInsideApplication(string $resolvedPath): bool
+    {
+        $realBase = realpath(base_path()) ?: base_path();
+
+        $normalizedPath = str_replace('\\', '/', $resolvedPath); // @pest-mutate-ignore
+        $normalizedBase = rtrim(str_replace('\\', '/', $realBase), '/').'/'; // @pest-mutate-ignore
+
+        if (Environment::isWindows()) { // @pest-mutate-ignore
+            $normalizedPath = strtolower($normalizedPath);
+            $normalizedBase = strtolower($normalizedBase);
+        }
+
+        return str_starts_with($normalizedPath, $normalizedBase);
     }
 
     private function setStyleSize(float $size): void

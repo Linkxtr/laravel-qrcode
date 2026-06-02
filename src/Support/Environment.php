@@ -13,6 +13,8 @@ final class Environment
     /** @var array<string, bool> */
     private static array $mockedExtensions = [];
 
+    private static ?bool $mockedIsWindows = null;
+
     public static function hasExtension(string $extension): bool
     {
         if ($extension === 'imagick' && self::shouldForceGdFallback()) {
@@ -47,11 +49,27 @@ final class Environment
     public static function clearMocks(): void
     {
         self::$mockedExtensions = [];
+        self::$mockedIsWindows = null;
+    }
+
+    public static function isWindows(): bool
+    {
+        if (self::$mockedIsWindows !== null) {
+            return self::$mockedIsWindows;
+        }
+
+        return DIRECTORY_SEPARATOR === '\\';
+    }
+
+    public static function mockIsWindows(bool $isWindows): void
+    {
+        self::ensureTestingEnvironment();
+        self::$mockedIsWindows = $isWindows;
     }
 
     private static function shouldForceGdFallback(): bool
     {
-        return Config::boolean('qrcode.force_gd', false);
+        return Config::get('qrcode.force_gd', false) === true;
     }
 
     private static function ensureTestingEnvironment(): void

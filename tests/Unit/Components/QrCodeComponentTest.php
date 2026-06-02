@@ -27,11 +27,13 @@ test('it throws exceptions for invalid formats', function (): void {
 
 test('it throws exception for path traversal attempts in merge', function (): void {
     $component = new QrCodeComponent(data: 'test', merge: '../malicious.png');
-    expect(fn (): Closure => $component->render())->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: ../malicious.png');
+    expect(fn (): Closure => $component->render())->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: '.realpath('../malicious.png'));
 });
 
 test('it generates default svg with injected title and accessibility attributes', function (): void {
     $component = new QrCodeComponent(data: 'https://linkxtr.com');
+
+    expect($component->margin)->toBe(0);
 
     $closure = $component->render();
     $html = $closure(['attributes' => new ComponentAttributeBag(['class' => 'qr-class'])]);
@@ -39,6 +41,8 @@ test('it generates default svg with injected title and accessibility attributes'
     expect($html)
         ->toStartWith('<?xml')
         ->toContain('<svg')
+        ->toContain('width="100"')
+        ->toContain('height="100"')
         ->toContain('class="qr-class"')
         ->toContain('role="img"')
         ->toContain('aria-label="QR Code"')

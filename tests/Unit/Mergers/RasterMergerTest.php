@@ -30,14 +30,19 @@ test('it properly propagates ImageMergeException for invalid image data', functi
 });
 
 test('it successfully merges two images as PNG', function () use ($tinyPng): void {
-    $merger = new RasterMerger($tinyPng, $tinyPng, 0.2);
+    $merger = new RasterMerger($tinyPng, $tinyPng, 0.1);
     $result = $merger->merge();
 
     expect(substr($result, 1, 3))->toBe('PNG');
 });
 
+it('use default percentage if not set', function () use ($tinyPng): void {
+    $merger = new RasterMerger($tinyPng, $tinyPng);
+    expect(invade($merger)->percentage)->toBe(0.2);
+});
+
 test('it successfully merges and sets formatting for WEBP', function () use ($tinyPng): void {
-    $result = (new RasterMerger($tinyPng, $tinyPng, 0.2))->setFormat(Format::WEBP)->merge();
+    $result = (new RasterMerger($tinyPng, $tinyPng, 0.9))->setFormat(Format::WEBP)->merge();
 
     expect($result)->toBeString()->toContain('WEBP');
 });

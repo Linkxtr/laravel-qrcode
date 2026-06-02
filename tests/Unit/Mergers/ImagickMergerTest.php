@@ -40,7 +40,7 @@ test('it throws exception for unsupported formats', function () use ($tinyPng): 
 });
 
 test('it successfully merges two images as PNG', function () use ($tinyPng): void {
-    $merger = new ImagickMerger($tinyPng, $tinyPng, 0.2);
+    $merger = new ImagickMerger($tinyPng, $tinyPng, 0.9);
     $merger->setFormat(Format::PNG);
 
     $result = $merger->merge();
@@ -48,12 +48,17 @@ test('it successfully merges two images as PNG', function () use ($tinyPng): voi
     expect(substr($result, 1, 3))->toBe('PNG');
 });
 
+it('use default percentage if not set', function () use ($tinyPng): void {
+    $merger = new ImagickMerger($tinyPng, $tinyPng);
+    expect(invade($merger)->percentage)->toBe(0.2);
+});
+
 test('it successfully merges and sets compression for WEBP format', function () use ($tinyPng): void {
     if (! in_array('WEBP', Imagick::queryFormats('WEBP'), true)) {
         $this->markTestSkipped('ImageMagick WEBP support is required for this assertion.');
     }
 
-    $merger = new ImagickMerger($tinyPng, $tinyPng, 0.2);
+    $merger = new ImagickMerger($tinyPng, $tinyPng, 0.1);
     $merger->setFormat(Format::WEBP);
 
     $result = $merger->merge();
@@ -88,7 +93,7 @@ test('it properly concatenates the Imagick exception message', function (): void
         ->and($message)->not->toBe('Imagick merge failed: ');
 });
 
-test('it strictly maintains aspect ratio during calculations (kills ratio mutants)', function () use ($getTallPng): void {
+test('it strictly maintains aspect ratio during calculations', function () use ($getTallPng): void {
     $image = new Imagick;
     $image->newImage(100, 100, new ImagickPixel('white'));
     $image->setImageFormat('png');
