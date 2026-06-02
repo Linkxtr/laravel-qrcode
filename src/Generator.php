@@ -104,7 +104,7 @@ final class Generator
         return $qrCodeResult;
     }
 
-    public function merge(string $filepath, float $percentage = .2): self
+    public function merge(string $filepath, float $percentage = .2): static
     {
         $instance = clone $this;
 
@@ -114,7 +114,7 @@ final class Generator
         return $instance;
     }
 
-    public function mergeString(string $content, float $percentage = .2): self
+    public function mergeString(string $content, float $percentage = .2): static
     {
         $instance = clone $this;
 
@@ -124,7 +124,7 @@ final class Generator
         return $instance;
     }
 
-    public function size(int $size): self
+    public function size(int $size): static
     {
         $instance = clone $this;
 
@@ -133,7 +133,7 @@ final class Generator
         return $instance;
     }
 
-    public function format(string|Format $format): self
+    public function format(string|Format $format): static
     {
         $instance = clone $this;
 
@@ -142,7 +142,7 @@ final class Generator
         return $instance;
     }
 
-    public function cmyk(): self
+    public function cmyk(): static
     {
         $instance = clone $this;
 
@@ -151,7 +151,7 @@ final class Generator
         return $instance;
     }
 
-    public function rgb(): self
+    public function rgb(): static
     {
         $instance = clone $this;
 
@@ -160,7 +160,7 @@ final class Generator
         return $instance;
     }
 
-    public function gray(int $gray, ?int $backgroundGray = null): self
+    public function gray(int $gray, ?int $backgroundGray = null): static
     {
         $instance = clone $this;
 
@@ -169,7 +169,7 @@ final class Generator
         return $instance;
     }
 
-    public function color(int $c1, int $c2, int $c3, ?int $c4 = null): self
+    public function color(int $c1, int $c2, int $c3, ?int $c4 = null): static
     {
         $instance = clone $this;
 
@@ -178,7 +178,7 @@ final class Generator
         return $instance;
     }
 
-    public function backgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null): self
+    public function backgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null): static
     {
         $instance = clone $this;
 
@@ -191,7 +191,7 @@ final class Generator
      * @param  string|array<mixed>  $inner
      * @param  string|array<mixed>|null  $outer
      */
-    public function eyeColor(int $eyeNumber, string|array $inner, string|array|null $outer = null): self
+    public function eyeColor(int $eyeNumber, string|array $inner, string|array|null $outer = null): static
     {
         $instance = clone $this;
         $innerRgb = Rgb::parse($inner);
@@ -217,7 +217,7 @@ final class Generator
      * @param  string|array<mixed>  $start
      * @param  string|array<mixed>  $end
      */
-    public function gradient(string|array $start, string|array $end, string|GradientType $type = GradientType::VERTICAL): self
+    public function gradient(string|array $start, string|array $end, string|GradientType $type = GradientType::VERTICAL): static
     {
         $startRgb = Rgb::parse($start);
         $endRgb = Rgb::parse($end);
@@ -228,7 +228,7 @@ final class Generator
         return $instance;
     }
 
-    public function eye(string|EyeStyle $style): self
+    public function eye(string|EyeStyle $style): static
     {
         $instance = clone $this;
 
@@ -237,7 +237,7 @@ final class Generator
         return $instance;
     }
 
-    public function internalEye(string|EyeStyle $style): self
+    public function internalEye(string|EyeStyle $style): static
     {
         $instance = clone $this;
 
@@ -246,7 +246,7 @@ final class Generator
         return $instance;
     }
 
-    public function style(string|Style $style, ?float $size = null): self
+    public function style(string|Style $style, ?float $size = null): static
     {
         $instance = clone $this;
 
@@ -255,7 +255,7 @@ final class Generator
         return $instance;
     }
 
-    public function encoding(string $encoding): self
+    public function encoding(string $encoding): static
     {
         $instance = clone $this;
 
@@ -264,7 +264,7 @@ final class Generator
         return $instance;
     }
 
-    public function errorCorrection(string|ErrorCorrectionLevel $errorCorrection): self
+    public function errorCorrection(string|ErrorCorrectionLevel $errorCorrection): static
     {
         $instance = clone $this;
 
@@ -273,7 +273,7 @@ final class Generator
         return $instance;
     }
 
-    public function margin(int $margin): self
+    public function margin(int $margin): static
     {
         $instance = clone $this;
 

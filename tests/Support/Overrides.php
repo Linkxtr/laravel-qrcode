@@ -28,31 +28,6 @@ namespace Linkxtr\QrCode\DTOs {
     }
 }
 
-namespace Linkxtr\QrCode\Renderers {
-    if (! isset($GLOBALS['mockImagickLoaded'])) {
-        $GLOBALS['mockImagickLoaded'] = null;
-    }
-
-    if (! isset($GLOBALS['mockGdLoaded'])) {
-        $GLOBALS['mockGdLoaded'] = null;
-    }
-
-    if (! function_exists(__NAMESPACE__.'\extension_loaded')) {
-        function extension_loaded($extension): bool
-        {
-            if ($extension === 'imagick') {
-                return $GLOBALS['mockImagickLoaded'] ?? \extension_loaded($extension);
-            }
-
-            if ($extension === 'gd') {
-                return $GLOBALS['mockGdLoaded'] ?? \extension_loaded($extension);
-            }
-
-            return \extension_loaded($extension);
-        }
-    }
-}
-
 namespace Linkxtr\QrCode {
     if (! isset($GLOBALS['mockFilePutContents'])) {
         $GLOBALS['mockFilePutContents'] = null;

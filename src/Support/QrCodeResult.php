@@ -34,11 +34,9 @@ final readonly class QrCodeResult implements Htmlable, Responsable, Stringable
 
     public function toDataUri(): string
     {
-        if ($this->format === Format::SVG) {
-            return 'data:image/svg+xml;base64,'.base64_encode($this->content);
-        }
+        $mimeType = $this->getMimeType();
 
-        return 'data:image/'.$this->format->value.';base64,'.base64_encode($this->content);
+        return sprintf('data:%s;base64,%s', $mimeType, base64_encode($this->content));
     }
 
     /**
@@ -46,17 +44,22 @@ final readonly class QrCodeResult implements Htmlable, Responsable, Stringable
      */
     public function toResponse(mixed $request): Response
     {
-        $contentType = $this->format === Format::SVG
-            ? 'image/svg+xml'
-            : 'image/'.$this->format->value;
-
         return response($this->content, 200, [
-            'Content-Type' => $contentType,
+            'Content-Type' => $this->getMimeType(),
         ]);
     }
 
     public function isSvg(): bool
     {
         return $this->format === Format::SVG;
+    }
+
+    public function getMimeType(): string
+    {
+        return match ($this->format) {
+            Format::SVG => 'image/svg+xml',
+            Format::EPS => 'application/postscript',
+            default => 'image/'.$this->format->value,
+        };
     }
 }

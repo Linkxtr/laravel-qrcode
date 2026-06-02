@@ -13,9 +13,12 @@ use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
 use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
+use Linkxtr\QrCode\Support\Environment;
 use Linkxtr\QrCode\ValueObjects\Colors\Cmyk;
 use Linkxtr\QrCode\ValueObjects\Colors\Gray;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
+
+use function Linkxtr\QrCode\DTOs\base_path;
 
 covers(Config::class);
 
@@ -337,7 +340,7 @@ test('it sets up image merge from relative file path', function (): void {
 test('it throws exception when path does not exist', function (): void {
     $config = new Config;
 
-    expect(fn () => $config->setupMergePath('non_existent_path'))->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: non_existent_path');
+    expect(fn () => $config->setupMergePath('non_existent_path'))->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: '.base_path('non_existent_path'));
     expect(fn () => $config->setupMergePath('/non_existent_path'))->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: /non_existent_path');
 });
 
@@ -360,7 +363,7 @@ test('it throws exception when path is not readable', function (): void {
 
         $resolvedPath = realpath($filePath);
 
-        expect(fn () => $config->setupMergePath($filePath))->toThrow(InvalidConfigurationException::class, 'Image file does not exist or is not readable: '.$resolvedPath);
+        expect(fn () => $config->setupMergePath($filePath))->toThrow(InvalidConfigurationException::class, 'Failed to read image file: '.$resolvedPath);
     } finally {
         chmod($filePath, 0777);
         unlink($filePath);
@@ -566,4 +569,14 @@ it('ignores the size configuration if it is not an integer', function (): void {
     $defaultConfig = new Config;
 
     expect($config->getSize())->toBe($defaultConfig->getSize());
+});
+
+it('normalizes casing on Windows environments to prevent traversal', function (): void {
+    Environment::mockIsWindows(true);
+
+    $config = new Config;
+
+    expect(fn () => $config->setupMergePath('Support/Fixtures/images/linkxtr.png'))->not->toThrow(InvalidConfigurationException::class);
+
+    Environment::clearMocks();
 });
