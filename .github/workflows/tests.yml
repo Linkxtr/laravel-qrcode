@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [ main, 2.x, 1.x ]
+    branches: [ main, 3.x, 2.x, 1.x ]
   pull_request:
-    branches: [ main, 2.x, 1.x ]
+    branches: [ main, 3.x, 2.x, 1.x ]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -17,12 +17,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php: 8.2
-            laravel: ^11.0
-            testbench: ^9.0
-          - php: 8.3
-            laravel: ^11.0
-            testbench: ^9.0
           - php: 8.2
             laravel: ^12.0
             testbench: ^10.0

@@ -22,7 +22,7 @@ A clear and concise description of what you expected to happen.
 **Environment:**
 
 - PHP Version: [e.g. 8.2]
-- Laravel Version: [e.g. 11.0]
+- Laravel Version: [e.g. 12.0]
 - Package Version: [e.g. 3.0.0]
 - Image Driver: [Imagick / GD / None]
 - **QR Rendering Config** (Optional - Please fill this out if your issue relates to visual output, rendering, or colors):

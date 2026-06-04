@@ -3,7 +3,7 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
 [![Total Downloads](https://img.shields.io/packagist/dt/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
 [![PHP Version](https://img.shields.io/packagist/php-v/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
-[![Laravel Version](https://img.shields.io/badge/Laravel-11+-FF2D20?style=flat-square&logo=laravel)](https://packagist.org/packages/linkxtr/laravel-qrcode)
+[![Laravel Version](https://img.shields.io/badge/Laravel-12+-FF2D20?style=flat-square&logo=laravel)](https://packagist.org/packages/linkxtr/laravel-qrcode)
 [![License](https://img.shields.io/packagist/l/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
 
 A clean, fluent, and modern QR code generator for Laravel. Generate SVG, PNG, WebP, and EPS codes via a fluent Facade, a native Blade component, or an interactive Artisan CLI.
@@ -30,7 +30,7 @@ $qr = QrCode::size(400)
     ->color(30, 64, 175)
     ->errorCorrection('H')
     ->merge(public_path('logo.png'), 0.25)
-    ->generate('[https://example.com](https://example.com)');
+    ->generate('https://example.com');
 ```
 
 ## The Blade Component
@@ -39,7 +39,7 @@ Drop QR codes directly into your views with zero PHP logic. It automatically han
 
 ```blade
 <x-qr-code
-    data="[https://example.com](https://example.com)"
+    data="https://example.com"
     size="300"
     color="#1E40AF"
     margin="2"
