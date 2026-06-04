@@ -25,17 +25,17 @@
   "require": {
     "php": "^8.2",
     "bacon/bacon-qr-code": "^3.0",
-    "illuminate/contracts": "^11.0|^12.0|^13.0",
-    "illuminate/support": "^11.0|^12.0|^13.0"
+    "illuminate/contracts": "^12.0|^13.0",
+    "illuminate/support": "^12.0|^13.0"
   },
   "suggest": {
     "ext-gd": "Required to generate PNG and WebP images via GD",
     "ext-imagick": "Required to generate PNG and WebP images via Imagick"
   },
   "require-dev": {
-    "chillerlan/php-qrcode": "^5.0",
+    "chillerlan/php-qrcode": "^6.0",
     "laravel/pint": "^1.0",
-    "orchestra/testbench": "^9.0|^10.0|^11.0",
+    "orchestra/testbench": "^10.0|^11.0",
     "pestphp/pest": "^3.0|^4.0",
     "pestphp/pest-plugin-laravel": "^3.0|^4.0",
     "pestphp/pest-plugin-type-coverage": "^3.0|^4.0",

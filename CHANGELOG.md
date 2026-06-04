@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Minimum Laravel version is now 12.0.
 - **Breaking:** `MergerInterface` no longer enforces a `__construct` signature.
 - **Breaking:** Fluent methods on the Generator now return a cloned instance (Immutable Builder) to prevent state leakage.
 - Unified configuration colors to use single comma-separated strings instead of split RGBA env vars.
