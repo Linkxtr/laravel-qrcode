@@ -253,7 +253,6 @@ test('it handles eye color configuration and validates eye numbers and colors', 
     $config = new Config;
 
     $config->setupEyeColor(0, Rgb::fromArray([255, 0, 0]), Rgb::fromArray([0, 255, 0]));
-    $config->setupEyeColor(2, Rgb::fromArray([0, 0, 255]));
 
     expect($config->getEyeColors()[0])->toBeInstanceOf(EyeFill::class)
         ->and($config->getEyeColors()[0]->getExternalColor())->toBeInstanceOf(BaconRgb::class)
@@ -263,17 +262,17 @@ test('it handles eye color configuration and validates eye numbers and colors', 
         ->and($config->getEyeColors()[0]->getInternalColor())->toBeInstanceOf(BaconRgb::class)
         ->and($config->getEyeColors()[0]->getInternalColor()->getRed())->toBe(0)
         ->and($config->getEyeColors()[0]->getInternalColor()->getGreen())->toBe(255)
-        ->and($config->getEyeColors()[0]->getInternalColor()->getBlue())->toBe(0)
-        ->and($config->getEyeColors()[2])->toBeInstanceOf(EyeFill::class)
+        ->and($config->getEyeColors()[0]->getInternalColor()->getBlue())->toBe(0);
+
+    $config->setupEyeColor(2, Rgb::fromArray([0, 0, 255]));
+
+    expect($config->getEyeColors()[2])->toBeInstanceOf(EyeFill::class)
         ->and($config->getEyeColors()[2]->getExternalColor())->toBeInstanceOf(BaconRgb::class)
         ->and($config->getEyeColors()[2]->getExternalColor()->getRed())->toBe(0)
         ->and($config->getEyeColors()[2]->getExternalColor()->getGreen())->toBe(0)
-        ->and($config->getEyeColors()[2]->getExternalColor()->getBlue())->toBe(255)
-        ->and($config->getEyeColors()[2]->getInternalColor())->toBeInstanceOf(BaconRgb::class)
-        ->and($config->getEyeColors()[2]->getInternalColor()->getRed())->toBe(0)
-        ->and($config->getEyeColors()[2]->getInternalColor()->getGreen())->toBe(0)
-        ->and($config->getEyeColors()[2]->getInternalColor()->getBlue())->toBe(0);
+        ->and($config->getEyeColors()[2]->getExternalColor()->getBlue())->toBe(255);
 
+    expect(fn () => $config->getEyeColors()[2]->getInternalColor())->toThrow(RuntimeException::class, 'Internal eye color inherits foreground color');
     expect(fn () => $config->setupEyeColor(-1, Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Eye number must be 0, 1, or 2');
     expect(fn () => $config->setupEyeColor(3, Rgb::fromArray([0, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Eye number must be 0, 1, or 2');
     expect(fn () => $config->setupEyeColor(0, Rgb::fromArray([-1, 0, 0]), Rgb::fromArray([0, 0, 0])))->toThrow(InvalidConfigurationException::class, 'Red must be between 0 and 255.');

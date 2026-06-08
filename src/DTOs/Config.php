@@ -357,7 +357,7 @@ final class Config
 
         $this->setEyeColor($eyeNumber, new EyeFill(
             $inner->toBaconColor(),
-            $outer?->toBaconColor() ?? Rgb::fromArray([])->toBaconColor()
+            $outer?->toBaconColor() ?? null
         ));
     }
 

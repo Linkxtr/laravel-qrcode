@@ -100,3 +100,19 @@ it('throws a MissingExtensionException when using GD library with a gradient', f
             'The Imagick extension is required to use gradients. Please enable the Imagick extension or use solid colors.'
         );
 });
+
+it('throws a MissingExtensionException when using GD library with custom eye colors', function (): void {
+    Environment::enableExtension('gd');
+    Environment::disableExtension('imagick');
+
+    $config = new Config;
+    $config->setFormat(Format::PNG);
+
+    $config->setupEyeColor(0, new Rgb(255, 0, 0), new Rgb(0, 0, 255));
+
+    expect(fn (): RendererInterface => RendererFactory::make($config))
+        ->toThrow(
+            MissingExtensionException::class,
+            'The Imagick extension is required to use custom eye colors. Please enable the Imagick extension or use default eye colors.'
+        );
+});
