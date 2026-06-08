@@ -111,18 +111,6 @@ it('throws exception if white color cannot be allocated', function () use ($tiny
         ->toThrow(RuntimeException::class, 'Could not allocate white color for the logo.');
 });
 
-it('throws exception if output buffer capture fails', function () use ($tinyPng, $epsBase): void {
-    global $mockObGetClean;
-    $mockObGetClean = false;
-
-    expect(fn (): string => (new EpsMerger($epsBase, $tinyPng, 0.2))->merge())
-        ->toThrow(RuntimeException::class, 'Failed to capture hex data from output buffer.');
-})->after(function (): void {
-    if (ob_get_level() > 0) {
-        ob_end_clean();
-    }
-});
-
 test('it strictly loops and calculates accurate bitwise hex data for every pixel', function (): void {
     $tinyEps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 10 10\nshowpage";
 
@@ -142,14 +130,14 @@ test('it strictly loops and calculates accurate bitwise hex data for every pixel
 test('it strictly fills the background with white to preserve transparent logos', function (): void {
     $tinyEps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 10 10\nshowpage";
 
-    $logo = \imagecreatetruecolor(2, 2);
-    \imagealphablending($logo, false);
-    \imagesavealpha($logo, true);
-    $transparent = \imagecolorallocatealpha($logo, 0, 0, 0, 127);
-    \imagefill($logo, 0, 0, $transparent);
-    \ob_start();
-    \imagepng($logo);
-    $transparentPng = \ob_get_clean();
+    $logo = imagecreatetruecolor(2, 2);
+    imagealphablending($logo, false);
+    imagesavealpha($logo, true);
+    $transparent = imagecolorallocatealpha($logo, 0, 0, 0, 127);
+    imagefill($logo, 0, 0, $transparent);
+    ob_start();
+    imagepng($logo);
+    $transparentPng = ob_get_clean();
     unset($logo);
 
     $result = (new EpsMerger($tinyEps, $transparentPng, 0.2))->merge();
@@ -171,4 +159,22 @@ it('strictly calculates qr dimensions from shifted bounding boxes to kill math m
     $result = (new EpsMerger($epsShifted, $squarePng, 0.2))->merge();
 
     expect($result)->toContain('50 60 translate');
+});
+
+test('it strictly wraps hex data at exactly 72 characters to satisfy Adobe DSC compliance', function (): void {
+    $tinyEps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 20 20\nshowpage";
+
+    $logo = imagecreatetruecolor(4, 4);
+    $color = imagecolorallocate($logo, 171, 187, 205);
+    imagefill($logo, 0, 0, $color);
+    ob_start();
+    imagepng($logo);
+    $customPng = ob_get_clean();
+    unset($logo);
+
+    $result = (new EpsMerger($tinyEps, $customPng, 0.2))->merge();
+
+    $expectedHexData = str_repeat('abbbcd', 12)."\n".str_repeat('abbbcd', 4);
+
+    expect($result)->toContain("colorimage\n".$expectedHexData."\ngrestore");
 });
