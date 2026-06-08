@@ -76,6 +76,10 @@ final readonly class RendererFactory
             throw MissingExtensionException::imagickRequired('to use gradients. Please enable the Imagick extension or use solid colors');
         }
 
+        if ($this->config->getEyeColors() !== []) {
+            throw MissingExtensionException::imagickRequired('to use custom eye colors. Please enable the Imagick extension or use default eye colors');
+        }
+
         return false;
     }
 }

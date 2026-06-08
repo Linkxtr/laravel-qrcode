@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode;
 
+use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Support\Traits\Macroable;
 use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\ColorModel;
@@ -21,18 +23,18 @@ use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 use Stringable;
 
 /**
- * @method QrCodeResult BTC(string $address, int|float|string $amount, array<mixed> $options = [])
- * @method QrCodeResult CalendarEvent(array<mixed> $attributes)
- * @method QrCodeResult Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = '')
- * @method QrCodeResult Ethereum(string $address, int|float|string|null $amount = null)
- * @method QrCodeResult Geo(float $latitude, float $longitude, string $name = '')
- * @method QrCodeResult MeCard(string|array<mixed> $name, ?string $phone = null, ?string $email = null, ?string $note = null, ?string $birthday = null, ?string $address = null, ?string $url = null)
- * @method QrCodeResult PhoneNumber(string $phoneNumber)
- * @method QrCodeResult SMS(string $smsAddress = '', string $message = '')
- * @method QrCodeResult Telegram(string|array<mixed> $username)
- * @method QrCodeResult VCard(array<mixed> $properties)
- * @method QrCodeResult WhatsApp(string|array<mixed> $number, ?string $message = null)
- * @method QrCodeResult WiFi(array<mixed> $credentials)
+ * @method QrCodeResult BTC(string $address, float|string $amount, ?string $label = null, ?string $message = null, ?string $returnAddress = null)
+ * @method QrCodeResult CalendarEvent(string $summary, Carbon|DateTimeInterface|string|int $start, Carbon|DateTimeInterface|string|int $end, ?string $description = null, ?string $location = null, ?string $uid = null)
+ * @method QrCodeResult Email(string $address, ?string $subject = null, ?string $body = null, ?string $cc = null, ?string $bcc = null)
+ * @method QrCodeResult Ethereum(string $address, float|string|null $amount = null)
+ * @method QrCodeResult Geo(float $latitude, float $longitude, ?string $name = null)
+ * @method QrCodeResult MeCard(string $name, ?string $phone = null, ?string $email = null, ?string $url = null, ?string $address = null, ?string $reading = null, ?string $nickname = null, ?string $phone2 = null, ?string $phone3 = null, ?string $videoPhone = null, ?string $note = null, ?string $birthday = null, ?string $postOfficeBox = null)
+ * @method QrCodeResult PhoneNumber(string|int $phoneNumber)
+ * @method QrCodeResult SMS(string|int $phoneNumber, ?string $message = null)
+ * @method QrCodeResult Telegram(string $username)
+ * @method QrCodeResult VCard(string $name, ?string $phone = null, ?string $email = null, ?string $company = null, ?string $job = null, ?string $firstName = null, ?string $lastName = null, ?string $emailWork = null, ?string $emailHome = null, ?string $phoneWork = null, ?string $phoneHome = null, ?string $phoneCell = null, ?string $role = null, ?string $address = null, ?string $url = null, ?string $note = null, ?string $birthday = null)
+ * @method QrCodeResult WhatsApp(string|int $phoneNumber, ?string $message = null)
+ * @method QrCodeResult WiFi(string $ssid, ?string $encryption = null, ?string $password = null, bool $hidden = false)
  */
 final class Generator
 {
