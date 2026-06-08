@@ -178,3 +178,39 @@ test('it strictly wraps hex data at exactly 72 characters to satisfy Adobe DSC c
 
     expect($result)->toContain("colorimage\n".$expectedHexData."\ngrestore");
 });
+
+test('it correctly chunks hex data when the buffer exceeds 72 characters', function (): void {
+    $tinyEps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 25 25\nshowpage";
+
+    $logo = \imagecreatetruecolor(5, 5);
+    $color = \imagecolorallocate($logo, 171, 187, 205);
+    \imagefill($logo, 0, 0, $color);
+    \ob_start();
+    \imagepng($logo);
+    $customPng = \ob_get_clean();
+    unset($logo);
+
+    $result = (new EpsMerger($tinyEps, $customPng, 0.2))->merge();
+
+    $expectedHexData = str_repeat('abbbcd', 12)."\n".str_repeat('abbbcd', 12)."\n".'abbbcd';
+
+    expect($result)->toContain("colorimage\n".$expectedHexData."\ngrestore");
+});
+
+test('it correctly handles hex data that perfectly divides by 72 characters without trailing newlines', function (): void {
+    $tinyEps = "%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 30 20\nshowpage";
+
+    $logo = \imagecreatetruecolor(6, 4);
+    $color = \imagecolorallocate($logo, 171, 187, 205);
+    \imagefill($logo, 0, 0, $color);
+    \ob_start();
+    \imagepng($logo);
+    $customPng = \ob_get_clean();
+    unset($logo);
+
+    $result = (new EpsMerger($tinyEps, $customPng, 0.2))->merge();
+
+    $expectedHexData = str_repeat('abbbcd', 12)."\n".str_repeat('abbbcd', 12);
+
+    expect($result)->toContain("colorimage\n".$expectedHexData."\ngrestore");
+});

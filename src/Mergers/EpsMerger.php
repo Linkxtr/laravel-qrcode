@@ -79,15 +79,29 @@ final readonly class EpsMerger implements MergerInterface
             $logoW, $logoH
         );
 
-        $rawData = '';
+        $hexLines = [];
+        $hexBuffer = '';
+
         for ($y = 0; $y < $targetH; ++$y) {
+            $rowRaw = '';
+
             for ($x = 0; $x < $targetW; ++$x) {
                 $rgb = imagecolorat($resizedLogo, $x, $y);
-                $rawData .= chr(($rgb >> 16) & 0xFF).chr(($rgb >> 8) & 0xFF).chr($rgb & 0xFF);
+                $rowRaw .= chr(($rgb >> 16) & 0xFF).chr(($rgb >> 8) & 0xFF).chr($rgb & 0xFF);
+            }
+
+            $hexBuffer .= bin2hex($rowRaw);
+            while (strlen($hexBuffer) >= 72) { // @pest-mutate-ignore
+                $hexLines[] = substr($hexBuffer, 0, 72);
+                $hexBuffer = substr($hexBuffer, 72);
             }
         }
 
-        $hexData = rtrim(chunk_split(bin2hex($rawData), 72, "\n"));
+        if ($hexBuffer !== '') {
+            $hexLines[] = $hexBuffer;
+        }
+
+        $hexData = implode("\n", $hexLines);
 
         unset($logo);
         unset($resizedLogo);
