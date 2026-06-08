@@ -15,7 +15,7 @@ final readonly class PhoneNumber implements DataTypeInterface
 
     private string $phoneNumber;
 
-    public function __construct(string|int|float $phoneNumber)
+    public function __construct(string|int $phoneNumber)
     {
         $this->phoneNumber = $this->validatePhoneNumber((string) $phoneNumber);
     }

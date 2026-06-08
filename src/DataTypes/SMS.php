@@ -16,7 +16,7 @@ final readonly class SMS implements DataTypeInterface
     private string $phoneNumber;
 
     public function __construct(
-        string|int|float $phoneNumber,
+        string|int $phoneNumber,
         private ?string $message = null
     ) {
         $this->phoneNumber = $this->validatePhoneNumber((string) $phoneNumber);

@@ -17,7 +17,7 @@ final readonly class WhatsApp implements DataTypeInterface
     private string $phoneNumber;
 
     public function __construct(
-        string|int|float $phoneNumber,
+        string|int $phoneNumber,
         private ?string $message = null
     ) {
         $rawNumber = trim((string) $phoneNumber);

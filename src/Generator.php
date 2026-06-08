@@ -29,11 +29,11 @@ use Stringable;
  * @method QrCodeResult Ethereum(string $address, float|string|null $amount = null)
  * @method QrCodeResult Geo(float $latitude, float $longitude, ?string $name = null)
  * @method QrCodeResult MeCard(string $name, ?string $phone = null, ?string $email = null, ?string $url = null, ?string $address = null, ?string $reading = null, ?string $nickname = null, ?string $phone2 = null, ?string $phone3 = null, ?string $videoPhone = null, ?string $note = null, ?string $birthday = null, ?string $postOfficeBox = null)
- * @method QrCodeResult PhoneNumber(string|int|float $phoneNumber)
- * @method QrCodeResult SMS(string|int|float $phoneNumber, ?string $message = null)
+ * @method QrCodeResult PhoneNumber(string|int $phoneNumber)
+ * @method QrCodeResult SMS(string|int $phoneNumber, ?string $message = null)
  * @method QrCodeResult Telegram(string $username)
  * @method QrCodeResult VCard(string $name, ?string $phone = null, ?string $email = null, ?string $company = null, ?string $job = null, ?string $firstName = null, ?string $lastName = null, ?string $emailWork = null, ?string $emailHome = null, ?string $phoneWork = null, ?string $phoneHome = null, ?string $phoneCell = null, ?string $role = null, ?string $address = null, ?string $url = null, ?string $note = null, ?string $birthday = null)
- * @method QrCodeResult WhatsApp(string|int|float $phoneNumber, ?string $message = null)
+ * @method QrCodeResult WhatsApp(string|int $phoneNumber, ?string $message = null)
  * @method QrCodeResult WiFi(string $ssid, ?string $encryption = null, ?string $password = null, bool $hidden = false)
  */
 final class Generator
