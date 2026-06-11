@@ -86,6 +86,7 @@ jobs:
         with:
           name: coverage-report-${{ matrix.php }}-${{ matrix.laravel }}
           path: build/logs/clover.xml
+          if-no-files-found: error
 
   lint:
     name: Lint
