@@ -63,7 +63,7 @@
     "test:lint": "pint --parallel --test",
     "test:types": "phpstan analyse --ansi",
     "test:type-coverage": "pest --type-coverage --compact --coverage --min=100",
-    "test:unit": "pest --parallel --colors=always --coverage --min=100",
+    "test:unit": "pest --parallel --colors=always --coverage --min=100 --coverage-clover build/logs/clover.xml",
     "test": [
       "@test:refactor",
       "@test:lint",
