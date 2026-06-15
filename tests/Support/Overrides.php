@@ -108,65 +108,6 @@ namespace Linkxtr\QrCode\Mergers {
         }
     }
 
-    if (! isset($GLOBALS['mockImageFill'])) {
-        $GLOBALS['mockImageFill'] = null;
-    }
-
-    if (! function_exists(__NAMESPACE__.'\imagefill')) {
-        function imagefill(...$args): bool
-        {
-            if (isset($GLOBALS['mockImageFill']) && $GLOBALS['mockImageFill'] === false) {
-                return false;
-            }
-
-            return \imagefill(...$args);
-        }
-    }
-
-    if (! isset($GLOBALS['mockImageCopy'])) {
-        $GLOBALS['mockImageCopy'] = null;
-    }
-
-    if (! function_exists(__NAMESPACE__.'\imagecopy')) {
-        function imagecopy(...$args): bool
-        {
-            if (isset($GLOBALS['mockImageCopy']) && $GLOBALS['mockImageCopy'] === false) {
-                return false;
-            }
-
-            return \imagecopy(...$args);
-        }
-    }
-
-    if (! isset($GLOBALS['mockImageCopyResampled'])) {
-        $GLOBALS['mockImageCopyResampled'] = null;
-    }
-
-    if (! function_exists(__NAMESPACE__.'\imagecopyresampled')) {
-        function imagecopyresampled(...$args): bool
-        {
-            if (isset($GLOBALS['mockImageCopyResampled']) && $GLOBALS['mockImageCopyResampled'] === false) {
-                return false;
-            }
-
-            return \imagecopyresampled(...$args);
-        }
-    }
-
-    if (! isset($GLOBALS['mockImageSaveAlpha'])) {
-        $GLOBALS['mockImageSaveAlpha'] = null;
-    }
-
-    if (! function_exists(__NAMESPACE__.'\imagesavealpha')) {
-        function imagesavealpha(...$args): bool
-        {
-            if (isset($GLOBALS['mockImageSaveAlpha']) && $GLOBALS['mockImageSaveAlpha'] === false) {
-                return false;
-            }
-
-            return \imagesavealpha(...$args);
-        }
-    }
 
     if (! isset($GLOBALS['mock_imagepng_empty'])) {
         $GLOBALS['mock_imagepng_empty'] = null;

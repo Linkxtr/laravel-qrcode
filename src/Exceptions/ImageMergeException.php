@@ -121,23 +121,6 @@ final class ImageMergeException extends RuntimeException implements QrCodeExcept
         return $exception;
     }
 
-    public static function mergeImageFillFailed(): self
-    {
-        $exception = new self('Failed to fill image with transparent color.');
-        $exception->errorCode = 'MERGE_IMAGE_FILL_FAILED';
-        $exception->helperMessage = 'Failed to fill image with transparent color.';
-
-        return $exception;
-    }
-
-    public static function failedToSaveAlphaChannelInformation(): self
-    {
-        $exception = new self('Failed to save alpha channel information.');
-        $exception->errorCode = 'FAILED_TO_SAVE_ALPHA_CHANNEL_INFORMATION';
-        $exception->helperMessage = 'Failed to save alpha channel information.';
-
-        return $exception;
-    }
 
     public static function failedToRenderImageBinary(): self
     {
@@ -148,25 +131,6 @@ final class ImageMergeException extends RuntimeException implements QrCodeExcept
         return $exception;
     }
 
-    public static function failedToCopySourceImageToCanvas(int $sourceWidth, int $sourceHeight): self
-    {
-        $message = sprintf('Failed to copy source image to canvas (Source: %dx%d).', $sourceWidth, $sourceHeight);
-        $exception = new self($message);
-        $exception->errorCode = 'FAILED_TO_COPY_SOURCE_IMAGE_TO_CANVAS';
-        $exception->helperMessage = $message;
-
-        return $exception;
-    }
-
-    public static function failedToCopyResampleMergeImage(int $targetLogoWidth, int $targetLogoHeight, int $mergeWidth, int $mergeHeight): self
-    {
-        $message = sprintf('Failed to copy/resample merge image (Target: %dx%d, Source: %dx%d).', $targetLogoWidth, $targetLogoHeight, $mergeWidth, $mergeHeight);
-        $exception = new self($message);
-        $exception->errorCode = 'FAILED_TO_COPY_RESAMPLE_MERGE_IMAGE';
-        $exception->helperMessage = $message;
-
-        return $exception;
-    }
 
     public static function invalidImageData(): self
     {

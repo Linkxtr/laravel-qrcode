@@ -26,10 +26,6 @@ uses(TestCase::class)->afterEach(function (): void {
     $GLOBALS['mockImageColorAllocate'] = null;
     $GLOBALS['mockImageCreateTrueColor'] = null;
     $GLOBALS['mockObGetClean'] = null;
-    $GLOBALS['mockImageFill'] = null;
-    $GLOBALS['mockImageCopy'] = null;
-    $GLOBALS['mockImageCopyResampled'] = null;
-    $GLOBALS['mockImageSaveAlpha'] = null;
     $GLOBALS['mock_imagepng_empty'] = null;
 })->in('Unit', 'Scannability', 'Feature', 'Scalability');
 
