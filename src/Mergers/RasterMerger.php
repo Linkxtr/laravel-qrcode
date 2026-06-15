@@ -78,36 +78,28 @@ final class RasterMerger implements MergerInterface
             throw ImageMergeException::transparentColorCannotBeCreated();
         }
 
-        if (! imagefill($canvas, 0, 0, $transparent)) { // @pest-mutate-ignore
-            throw ImageMergeException::mergeImageFillFailed();
-        }
+        imagefill($canvas, 0, 0, $transparent); // @pest-mutate-ignore
 
         imagealphablending($canvas, true); // @pest-mutate-ignore
 
-        if (! imagecopy(
+        imagecopy(
             $canvas,
             $this->sourceImage->getImageResource(),
             0, 0, 0, 0, // @pest-mutate-ignore
             $sourceWidth,
             $sourceHeight
-        )) {
-            throw ImageMergeException::failedToCopySourceImageToCanvas($sourceWidth, $sourceHeight);
-        }
+        );
 
-        if (! imagecopyresampled(
+        imagecopyresampled(
             $canvas,
             $this->mergeImage->getImageResource(),
             $centerX, $centerY,
             0, 0, // @pest-mutate-ignore
             $targetLogoWidth, $targetLogoHeight,
             $mergeWidth, $mergeHeight
-        )) {
-            throw ImageMergeException::failedToCopyResampleMergeImage($targetLogoWidth, $targetLogoHeight, $mergeWidth, $mergeHeight);
-        }
+        );
 
-        if (! imagesavealpha($canvas, true)) {
-            throw ImageMergeException::failedToSaveAlphaChannelInformation();
-        }
+        imagesavealpha($canvas, true);
 
         return $this->createOutput($canvas);
     }

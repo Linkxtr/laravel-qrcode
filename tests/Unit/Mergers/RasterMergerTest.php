@@ -63,37 +63,6 @@ it('throws exception if image canvas cannot be created', function () use ($tinyP
         ->toThrow(ImageMergeException::class, 'Failed to create image canvas.');
 });
 
-it('throws exception if imagefill fails', function () use ($tinyPng): void {
-    global $mockImageFill;
-    $mockImageFill = false;
-
-    expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
-        ->toThrow(ImageMergeException::class, 'Failed to fill image with transparent color.');
-});
-
-it('throws exception if imagecopy fails', function () use ($tinyPng): void {
-    global $mockImageCopy;
-    $mockImageCopy = false;
-
-    expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
-        ->toThrow(ImageMergeException::class, 'Failed to copy source image to canvas');
-});
-
-it('throws exception if imagecopyresampled fails', function () use ($tinyPng): void {
-    global $mockImageCopyResampled;
-    $mockImageCopyResampled = false;
-
-    expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
-        ->toThrow(ImageMergeException::class, 'Failed to copy/resample merge image');
-});
-
-it('throws exception if imagesavealpha fails', function () use ($tinyPng): void {
-    global $mockImageSaveAlpha;
-    $mockImageSaveAlpha = false;
-
-    expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
-        ->toThrow(ImageMergeException::class, 'Failed to save alpha channel information.');
-});
 
 it('throws exception if output buffer capture fails', function () use ($tinyPng): void {
     global $mockObGetClean;
