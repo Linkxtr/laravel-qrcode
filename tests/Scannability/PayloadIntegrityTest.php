@@ -56,12 +56,12 @@ it('can scan a generated QR code with complex WiFi payload', function (bool $ima
     Environment::mockExtension('imagick', $imagick);
     Environment::mockExtension('gd', $gd);
 
-    $qrCodeResult = QrCode::format('png')->WiFi([
-        'encryption' => 'WPA',
-        'ssid' => 'MyNetwork',
-        'password' => 'SuperSecret',
-        'hidden' => true,
-    ]);
+    $qrCodeResult = QrCode::format('png')->WiFi(
+        encryption: 'WPA',
+        ssid: 'MyNetwork',
+        password: 'SuperSecret',
+        hidden: true,
+    );
 
     expect(read_qr_code((string) $qrCodeResult))->toBe('WIFI:S:MyNetwork;T:WPA;P:SuperSecret;H:true;;');
 })->with('drivers');
