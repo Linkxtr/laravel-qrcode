@@ -150,3 +150,9 @@ test('it only injects xmlns:xlink into the first svg tag', function () use ($tin
 
     expect(substr_count($result, 'xmlns:xlink='))->toBe(1);
 });
+
+test('it throws exception if the root XML node is not an svg', function () use ($tinyPng): void {
+    $svgContent = '<?xml version="1.0" encoding="UTF-8"?><not-svg></not-svg>';
+    $merger = new SvgMerger($svgContent, $tinyPng, 0.2);
+    $merger->merge();
+})->throws(ImageMergeException::class);

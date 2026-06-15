@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\ComponentAttributeBag;
 use Linkxtr\QrCode\Components\QrCodeComponent;
 use Linkxtr\QrCode\Enums\GradientType;
+use Linkxtr\QrCode\Exceptions\GenerationException;
 use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\Generator;
@@ -437,9 +438,10 @@ test('it handles translation escaping and strictly limits svg injection', functi
 
     expect($html)->toStartWith('<svg ')
         ->toContain('class="test-class"');
-    expect($html)->toContain('<title>Mocked Title</title>');
-    expect($html)->toContain('id="1"><title>Mocked Title</title></svg><svg id="2"></svg>');
-    expect($html)->not->toContain('<svg id="2"><title>');
+    expect($html)->toMatch('/<title[^>]*>Mocked Title<\/title>/');
+    expect($html)->toMatch('/<svg[^>]*id="1"[^>]*><title[^>]*>Mocked Title<\/title><\/svg>/');
+    expect($html)->toContain('<svg id="2"></svg>');
+    expect($html)->not->toMatch('/<svg[^>]*id="2"[^>]*><title/');
 });
 
 test('it precisely formats the img tag for non-svg formats', function (): void {
@@ -689,4 +691,73 @@ it('logs a warning when an invalid background color is provided', function (): v
     );
 
     $component->render();
+});
+
+test('it throws exception for malformed svg from generator', function (): void {
+    $fakeGenerator = new class
+    {
+        public function __call(string $name, array $args)
+        {
+            return $this;
+        }
+
+        public function generate(): string
+        {
+            return 'Not an SVG at all';
+        }
+    };
+
+    QrCode::swap($fakeGenerator);
+
+    $component = new QrCodeComponent(data: 'test');
+    $closure = $component->render();
+
+    $closure(['attributes' => new ComponentAttributeBag([])]);
+})->throws(GenerationException::class);
+
+test('it throws exception when loadXML fails due to malformed XML', function (): void {
+    $fakeGenerator = new class
+    {
+        public function __call(string $name, array $args)
+        {
+            return $this;
+        }
+
+        public function generate(): string
+        {
+            return '<svg><unclosed-tag></svg>';
+        }
+    };
+
+    QrCode::swap($fakeGenerator);
+
+    $component = new QrCodeComponent(data: 'test');
+    $closure = $component->render();
+
+    $closure(['attributes' => new ComponentAttributeBag([])]);
+})->throws(GenerationException::class);
+
+test('it does not inject a title if the svg already contains one', function (): void {
+    $fakeGenerator = new class
+    {
+        public function __call(string $name, array $args)
+        {
+            return $this;
+        }
+
+        public function generate(): string
+        {
+            return '<svg><title>Existing Title</title><g></g></svg>';
+        }
+    };
+
+    QrCode::swap($fakeGenerator);
+
+    $component = new QrCodeComponent(data: 'test');
+    $closure = $component->render();
+
+    $html = $closure(['attributes' => new ComponentAttributeBag([])]);
+
+    expect($html)->toContain('<title>Existing Title</title>');
+    expect($html)->not->toContain('<title>QR Code</title>');
 });
