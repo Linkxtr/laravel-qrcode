@@ -151,7 +151,6 @@ test('transparentColorCannotBeCreated sets correct error code and message', func
         ->toBe('Failed to create transparent color.');
 });
 
-
 test('failedToRenderImageBinary sets correct error code and message', function (): void {
     $imageMergeException = ImageMergeException::failedToRenderImageBinary();
 
@@ -162,7 +161,6 @@ test('failedToRenderImageBinary sets correct error code and message', function (
         ->and($imageMergeException->getHelperMessage())
         ->toBe('Failed to render image binary.');
 });
-
 
 test('invalidImageData sets correct error code and message', function (): void {
     $imageMergeException = ImageMergeException::invalidImageData();

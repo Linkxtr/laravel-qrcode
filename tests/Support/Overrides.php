@@ -108,7 +108,6 @@ namespace Linkxtr\QrCode\Mergers {
         }
     }
 
-
     if (! isset($GLOBALS['mock_imagepng_empty'])) {
         $GLOBALS['mock_imagepng_empty'] = null;
     }

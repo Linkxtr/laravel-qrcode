@@ -121,7 +121,6 @@ final class ImageMergeException extends RuntimeException implements QrCodeExcept
         return $exception;
     }
 
-
     public static function failedToRenderImageBinary(): self
     {
         $exception = new self('Failed to render image binary.');
@@ -130,7 +129,6 @@ final class ImageMergeException extends RuntimeException implements QrCodeExcept
 
         return $exception;
     }
-
 
     public static function invalidImageData(): self
     {

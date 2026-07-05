@@ -63,7 +63,6 @@ it('throws exception if image canvas cannot be created', function () use ($tinyP
         ->toThrow(ImageMergeException::class, 'Failed to create image canvas.');
 });
 
-
 it('throws exception if output buffer capture fails', function () use ($tinyPng): void {
     global $mockObGetClean;
     $mockObGetClean = false;
