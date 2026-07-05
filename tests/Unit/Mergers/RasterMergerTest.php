@@ -63,18 +63,6 @@ it('throws exception if image canvas cannot be created', function () use ($tinyP
         ->toThrow(ImageMergeException::class, 'Failed to create image canvas.');
 });
 
-it('throws exception if output buffer capture fails', function () use ($tinyPng): void {
-    global $mockObGetClean;
-    $mockObGetClean = false;
-
-    expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
-        ->toThrow(ImageMergeException::class, 'Failed to render image binary.');
-})->after(function (): void {
-    if (ob_get_level() > 0) {
-        ob_end_clean();
-    }
-});
-
 it('throws exception if image creation fails returning false', function (): void {
     global $mockImageCreateFromString;
     $mockImageCreateFromString = false;

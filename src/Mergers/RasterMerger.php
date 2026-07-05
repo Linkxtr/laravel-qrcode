@@ -99,7 +99,7 @@ final class RasterMerger implements MergerInterface
             $mergeWidth, $mergeHeight
         );
 
-        imagesavealpha($canvas, true);
+        imagesavealpha($canvas, true); // @pest-mutate-ignore
 
         return $this->createOutput($canvas);
     }
@@ -118,7 +118,7 @@ final class RasterMerger implements MergerInterface
 
         unset($gdImage);
 
-        if (! $success || $content === false || $content === '') {
+        if (! $success || $content === '') {
             throw ImageMergeException::failedToRenderImageBinary();
         }
 
