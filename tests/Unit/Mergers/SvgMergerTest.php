@@ -218,10 +218,10 @@ test('it adds the w3 xlink namespace to the root svg node if missing', function 
 test('it accurately rounds coordinate attributes to exactly four decimal places', function () use ($tinyPng): void {
     $svg = '<svg width="10" height="10"></svg>';
 
-    $merger = new SvgMerger($svg, $tinyPng, 0.77531);
+    $merger = new SvgMerger($svg, $tinyPng, 0.775308);
     $result = $merger->merge();
 
-    expect($result)->toContain('x="1.1234"');
+    expect($result)->toContain('x="1.1235"');
 });
 
 test('it accurately rounds the y coordinate to exactly four decimal places', function () use ($tinyPng): void {
