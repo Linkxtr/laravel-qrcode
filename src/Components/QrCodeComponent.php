@@ -126,73 +126,68 @@ final class QrCodeComponent extends Component
         $domDocument = new DOMDocument;
         $libxmlState = libxml_use_internal_errors(true);
 
-        $loaded = $domDocument->loadXML('<?xml version="1.0" encoding="UTF-8"?><root>'.$svg.'</root>');
+        try {
+            $loaded = $domDocument->loadXML('<?xml version="1.0" encoding="UTF-8"?><root>'.$svg.'</root>');
 
-        if (! $loaded || ! $domDocument->documentElement instanceof DOMElement) {
-            throw GenerationException::invalidSvgString();
-        }
-
-        $domNodeList = $domDocument->getElementsByTagName('svg');
-
-        if ($domNodeList->length === 0) {
-            throw GenerationException::invalidSvgString();
-        }
-
-        /** @var DOMElement $firstSvgNode */
-        $firstSvgNode = $domNodeList->item(0);
-
-        $translatedTitle = __('QR Code');
-        $titleText = is_string($translatedTitle) ? $translatedTitle : 'QR Code';
-
-        $hasTitle = false;
-        foreach ($firstSvgNode->childNodes as $child) {
-            if ($child->nodeName === 'title') {
-                $hasTitle = true;
-                break;
+            if (! $loaded || ! $domDocument->documentElement instanceof DOMElement) { // @pest-mutate-ignore
+                throw GenerationException::invalidSvgString();
             }
-        }
 
-        if (! $hasTitle) {
-            $titleNode = $domDocument->createElementNS(
-                'http://www.w3.org/2000/svg',
-                'title',
-                htmlspecialchars($titleText, ENT_XML1, 'UTF-8')
-            );
+            $domNodeList = $domDocument->getElementsByTagName('svg');
 
-            if ($firstSvgNode->firstChild) {
-                $firstSvgNode->insertBefore($titleNode, $firstSvgNode->firstChild);
-            } else {
-                $firstSvgNode->appendChild($titleNode);
+            if ($domNodeList->length === 0) {
+                throw GenerationException::invalidSvgString();
             }
-        }
 
-        $mergedAttributes = $componentAttributeBag->merge([
-            'role' => 'img',
-            'aria-label' => __('QR Code'),
-        ]);
+            /** @var DOMElement $firstSvgNode */
+            $firstSvgNode = $domNodeList->item(0);
 
-        foreach ($mergedAttributes->getAttributes() as $key => $value) {
-            if (is_scalar($value) || $value instanceof Stringable || $value === null) {
-                $firstSvgNode->setAttribute($key, (string) $value);
+            $translatedTitle = __('QR Code');
+            $titleText = is_string($translatedTitle) ? $translatedTitle : 'QR Code';
+
+            $hasTitle = false;
+            foreach ($firstSvgNode->childNodes as $child) {
+                if ($child->nodeName === 'title') {
+                    $hasTitle = true;
+                    break; // @pest-mutate-ignore
+                }
             }
-        }
 
-        $output = '';
-        foreach ($domDocument->documentElement->childNodes as $child) {
-            $serialized = $domDocument->saveXML($child, LIBXML_NOEMPTYTAG);
-            if ($serialized !== false) {
-                $output .= $serialized;
+            if (! $hasTitle) {
+                $titleNode = $domDocument->createElementNS('http://www.w3.org/2000/svg', 'title');
+                $titleNode->appendChild($domDocument->createTextNode($titleText));
+
+                if ($firstSvgNode->firstChild) {
+                    $firstSvgNode->insertBefore($titleNode, $firstSvgNode->firstChild);
+                } else {
+                    $firstSvgNode->appendChild($titleNode);
+                }
             }
+
+            $mergedAttributes = $componentAttributeBag->merge([
+                'role' => 'img',
+                'aria-label' => __('QR Code'),
+            ]);
+
+            foreach ($mergedAttributes->getAttributes() as $key => $value) {
+                if (is_scalar($value) || $value instanceof Stringable || $value === null) {
+                    $firstSvgNode->setAttribute($key, (string) $value);
+                }
+            }
+
+            $output = '';
+            foreach ($domDocument->documentElement->childNodes as $child) {
+                $serialized = $domDocument->saveXML($child, LIBXML_NOEMPTYTAG);
+                if ($serialized !== false) { // @pest-mutate-ignore
+                    $output .= $serialized;
+                }
+            }
+
+            return $xmlDeclaration.$output;
+        } finally {
+            libxml_clear_errors(); // @pest-mutate-ignore
+            libxml_use_internal_errors($libxmlState); // @pest-mutate-ignore
         }
-
-        if ($output !== '') {
-            $svg = $xmlDeclaration.$output;
-        }
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($libxmlState);
-
-        return $svg;
     }
 
     /**

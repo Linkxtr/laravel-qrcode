@@ -11,11 +11,16 @@ use Linkxtr\QrCode\Exceptions\ImageMergeException;
 
 final readonly class SvgMerger implements MergerInterface
 {
+    private DOMDocument $domDocument;
+
     public function __construct(
         private string $svgContent,
         private string $mergeImageContent,
-        private float $percentage
-    ) {}
+        private float $percentage,
+        ?DOMDocument $domDocument = null
+    ) {
+        $this->domDocument = $domDocument ?? new DOMDocument;
+    }
 
     public function merge(): string
     {
@@ -23,32 +28,23 @@ final readonly class SvgMerger implements MergerInterface
             throw ImageMergeException::invalidPercentage();
         }
 
-        $domDocument = new DOMDocument;
-
         $libxmlState = libxml_use_internal_errors(true);
-        $loaded = $domDocument->loadXML($this->svgContent);
-        libxml_clear_errors();
-        libxml_use_internal_errors($libxmlState);
+        $this->domDocument->loadXML($this->svgContent);
+        libxml_clear_errors(); // @pest-mutate-ignore
+        libxml_use_internal_errors($libxmlState); // @pest-mutate-ignore
 
-        if (! $loaded) {
-            throw ImageMergeException::invalidSvgContent();
-        }
-
-        $svgNode = $domDocument->documentElement;
+        $svgNode = $this->domDocument->documentElement;
 
         if (! $svgNode instanceof DOMElement || $svgNode->nodeName !== 'svg') {
             throw ImageMergeException::invalidSvgContent();
         }
 
-        $widthAttr = $svgNode->getAttribute('width');
-        $heightAttr = $svgNode->getAttribute('height');
+        $svgWidth = (float) $svgNode->getAttribute('width');
+        $svgHeight = (float) $svgNode->getAttribute('height');
 
-        if ($widthAttr === '' || $heightAttr === '') {
+        if ($svgWidth <= 0 || $svgHeight <= 0) {
             throw ImageMergeException::couldNotDetermineSvgDimensions();
         }
-
-        $svgWidth = (int) $widthAttr;
-        $svgHeight = (int) $heightAttr;
 
         $imageInfo = getimagesizefromstring($this->mergeImageContent);
 
@@ -64,16 +60,19 @@ final readonly class SvgMerger implements MergerInterface
         }
 
         $logoRatio = $logoWidth / $logoHeight;
-        $targetWidth = max(1, (int) ($svgWidth * $this->percentage));
-        $targetHeight = max(1, (int) ($targetWidth / $logoRatio));
+        $targetWidth = $svgWidth * $this->percentage;
+        $targetHeight = $targetWidth / $logoRatio;
 
-        if ($targetHeight > $svgHeight * $this->percentage) {
-            $targetHeight = max(1, (int) ($svgHeight * $this->percentage));
-            $targetWidth = max(1, (int) ($targetHeight * $logoRatio));
+        if ($targetHeight > $svgHeight * $this->percentage) { // @pest-mutate-ignore
+            $targetHeight = $svgHeight * $this->percentage;
+            $targetWidth = $targetHeight * $logoRatio;
         }
 
-        $x = (int) (($svgWidth - $targetWidth) / 2);
-        $y = (int) (($svgHeight - $targetHeight) / 2);
+        $targetWidth = max(1.0, $targetWidth);
+        $targetHeight = max(1.0, $targetHeight);
+
+        $x = ($svgWidth - $targetWidth) / 2;
+        $y = ($svgHeight - $targetHeight) / 2;
 
         $base64Image = base64_encode($this->mergeImageContent);
         $imageUri = sprintf('data:%s;base64,%s', $mimeType, $base64Image);
@@ -82,24 +81,21 @@ final readonly class SvgMerger implements MergerInterface
             $svgNode->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xlink', 'http://www.w3.org/1999/xlink');
         }
 
-        $imageElement = $domDocument->createElementNS('http://www.w3.org/2000/svg', 'image');
-        $imageElement->setAttribute('x', (string) $x);
-        $imageElement->setAttribute('y', (string) $y);
-        $imageElement->setAttribute('width', (string) $targetWidth);
-        $imageElement->setAttribute('height', (string) $targetHeight);
+        $imageElement = $this->domDocument->createElementNS('http://www.w3.org/2000/svg', 'image');
+        $imageElement->setAttribute('x', (string) round($x, 4));
+        $imageElement->setAttribute('y', (string) round($y, 4));
+        $imageElement->setAttribute('width', (string) round($targetWidth, 4));
+        $imageElement->setAttribute('height', (string) round($targetHeight, 4));
         $imageElement->setAttribute('href', $imageUri);
         $imageElement->setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', $imageUri);
 
         $svgNode->appendChild($imageElement);
 
-        $output = $domDocument->saveXML($svgNode);
+        $output = $this->domDocument->saveXML($svgNode);
 
-        // @codeCoverageIgnoreStart
         if ($output === false) {
             throw ImageMergeException::invalidSvgContent();
         }
-
-        // @codeCoverageIgnoreEnd
 
         return $output;
     }

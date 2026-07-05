@@ -761,3 +761,89 @@ test('it does not inject a title if the svg already contains one', function (): 
     expect($html)->toContain('<title>Existing Title</title>');
     expect($html)->not->toContain('<title>QR Code</title>');
 });
+
+test('it does not inject a duplicate title tag if the svg already contains one', function (): void {
+    $originalSvg = '<svg xmlns="http://www.w3.org/2000/svg"><title>Existing</title><path d="M0 0"/></svg>';
+
+    $component = new QrCodeComponent(data: 'test');
+    $result = invade($component)->prepareSvg($originalSvg, new ComponentAttributeBag(['title' => 'New Title']));
+
+    expect(substr_count($result, '<title>'))->toBe(1)
+        ->and($result)->toContain('<title>Existing</title>');
+});
+
+test('it securely escapes html characters in the svg title', function (): void {
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+    $maliciousTitle = 'My <QR> Code & Link';
+
+    $component = new QrCodeComponent(data: 'test');
+    $result = invade($component)->prepareSvg($svg, new ComponentAttributeBag(['title' => $maliciousTitle]));
+
+    expect($result)->toContain('My &lt;QR&gt; Code &amp; Link')
+        ->and($result)->not->toContain('<QR>');
+});
+
+test('it inserts the title tag as the very first child of the svg element', function (): void {
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg"><g id="qr-data"></g></svg>';
+
+    $component = new QrCodeComponent(data: 'test');
+    $result = invade($component)->prepareSvg($svg, new ComponentAttributeBag(['title' => 'Access']));
+
+    $titlePos = strpos($result, '<title>Access</title>');
+    $gPos = strpos($result, '<g id="qr-data">');
+
+    expect($titlePos)->toBeLessThan($gPos);
+});
+
+test('it accepts scalar and stringable attributes and casts them strictly', function (): void {
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+
+    $stringableObject = new class implements Stringable
+    {
+        public function __toString(): string
+        {
+            return 'custom-value';
+        }
+    };
+
+    $attributes = [
+        'data-int' => 123,
+        'data-obj' => $stringableObject,
+        'data-null' => null,
+    ];
+
+    $component = new QrCodeComponent(data: 'test');
+    $result = invade($component)->prepareSvg($svg, new ComponentAttributeBag($attributes));
+
+    expect($result)->toContain('data-int="123"')
+        ->and($result)->toContain('data-obj="custom-value"');
+});
+
+test('it securely escapes html characters and prepends title as the first child', function (): void {
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg"><g id="qr-data"></g></svg>';
+    $component = new QrCodeComponent(data: 'test');
+    $result = invade($component)->prepareSvg($svg, new ComponentAttributeBag(['title' => 'Malicious < & > Tag']));
+
+    expect($result)->toContain('Malicious &lt; &amp; &gt; Tag')
+        ->and($result)->not->toContain('< & >');
+
+    $titlePos = strpos($result, '<title>');
+    $gPos = strpos($result, '<g id="qr-data">');
+    expect($titlePos)->toBeLessThan($gPos);
+});
+
+test('it strictly filters attribute types and prevents casting exceptions', function (): void {
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+    $component = new QrCodeComponent(data: 'test');
+
+    $attributes = [
+        'data-valid' => 'standard',
+        'data-invalid' => ['nested' => 'array'],
+        'data-empty' => null,
+    ];
+
+    $result = invade($component)->prepareSvg($svg, new ComponentAttributeBag($attributes));
+
+    expect($result)->toContain('data-valid="standard"')
+        ->and($result)->not->toContain('data-invalid');
+});

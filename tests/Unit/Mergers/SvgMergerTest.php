@@ -72,18 +72,6 @@ test('it throws exception if svg is missing closing tag', function () use ($tiny
         ->toThrow(ImageMergeException::class, 'Invalid SVG content: closing tag not found.');
 });
 
-test('it strictly truncates float dimensions before calculating percentages', function () use ($tinyPng): void {
-    $svg = '<svg width="11.9" height="22.9"></svg>';
-
-    $merger = new SvgMerger($svg, $tinyPng, 0.9);
-    $result = $merger->merge();
-
-    expect($result)->toContain('x="1"')
-        ->and($result)->toContain('y="6"')
-        ->and($result)->toContain('width="9"')
-        ->and($result)->toContain('height="9"');
-});
-
 test('it accurately calculates ratio for non-square images', function (): void {
     $rectPng = file_get_contents(__DIR__.'/../../Support/Fixtures/images/300X200.png');
 
@@ -93,7 +81,7 @@ test('it accurately calculates ratio for non-square images', function (): void {
     $result = $merger->merge();
 
     expect($result)->toContain('width="20"')
-        ->and($result)->toContain('height="13"');
+        ->and($result)->toContain('height="13.3333"');
 });
 
 test('it strictly restrains tall images to the percentage limit on the Y-axis to protect error correction', function (): void {
@@ -156,3 +144,109 @@ test('it throws exception if the root XML node is not an svg', function () use (
     $merger = new SvgMerger($svgContent, $tinyPng, 0.2);
     $merger->merge();
 })->throws(ImageMergeException::class);
+
+it('throws exception if saveXML returns false', function () use ($tinyPng): void {
+    $svg = '<svg width="100" height="100"></svg>';
+    $mockDocument = new class extends DOMDocument
+    {
+        public function saveXML(?DOMNode $node = null, int $options = 0): string|false
+        {
+            return false;
+        }
+    };
+    $merger = new SvgMerger($svg, $tinyPng, 0.2, $mockDocument);
+    $merger->merge();
+})->throws(ImageMergeException::class);
+
+it('throws exception if the root node is invalid', function () use ($tinyPng): void {
+    $notSvg = 'just a string';
+
+    $merger = new SvgMerger($notSvg, $tinyPng, 0.2);
+    $merger->merge();
+})->throws(ImageMergeException::class);
+
+test('it preserves float precision for sub-pixel accuracy when calculating dimensions', function () use ($tinyPng): void {
+    $svg = '<svg width="11.9" height="22.9"></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.9);
+    $result = $merger->merge();
+
+    expect($result)->toContain('x="0.595"')
+        ->and($result)->toContain('y="6.095"')
+        ->and($result)->toContain('width="10.71"')
+        ->and($result)->toContain('height="10.71"');
+});
+
+test('it processes float dimensions below 1 and enforces a minimum target size of 1.0', function () use ($tinyPng): void {
+    $svg = '<svg width="0.5" height="0.5"></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.5);
+    $result = $merger->merge();
+
+    expect($result)->toContain('width="1"')
+        ->and($result)->toContain('height="1"');
+});
+
+test('it allows target dimensions between 1 and 2 without rounding up', function () use ($tinyPng): void {
+    $svg = '<svg width="10" height="10"></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.15);
+    $result = $merger->merge();
+
+    expect($result)->toContain('width="1.5"')
+        ->and($result)->toContain('height="1.5"');
+});
+
+test('it preserves existing xmlns:xlink attributes on the root svg node', function () use ($tinyPng): void {
+    $svg = '<svg width="100" height="100" xmlns:xlink="http://custom.namespace.test/"></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.5);
+    $result = $merger->merge();
+
+    expect($result)->toContain('<svg xmlns:xlink="http://custom.namespace.test/"');
+});
+
+test('it adds the w3 xlink namespace to the root svg node if missing', function () use ($tinyPng): void {
+    $svg = '<svg width="100" height="100"></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.5);
+    $result = $merger->merge();
+
+    expect($result)->toStartWith('<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+});
+
+test('it accurately rounds coordinate attributes to exactly four decimal places', function () use ($tinyPng): void {
+    $svg = '<svg width="10" height="10"></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.77531);
+    $result = $merger->merge();
+
+    expect($result)->toContain('x="1.1234"');
+});
+
+test('it accurately rounds the y coordinate to exactly four decimal places', function () use ($tinyPng): void {
+    $svg = '<svg width="10" height="10.2469"></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.8);
+    $result = $merger->merge();
+    expect($result)->toContain('y="1.1235"');
+});
+
+test('it accurately rounds target dimensions to exactly four decimal places', function () use ($tinyPng): void {
+    $svg = '<svg width="2.2469" height="10"></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.5);
+    $result = $merger->merge();
+    expect($result)->toContain('width="1.1235"')
+        ->and($result)->toContain('height="1.1235"');
+});
+
+test('it sets both standard and namespace href attributes on the image element', function () use ($tinyPng): void {
+    $svg = '<svg width="100" height="100"></svg>';
+
+    $merger = new SvgMerger($svg, $tinyPng, 0.5);
+    $result = $merger->merge();
+
+    expect($result)->toContain(' href="data:image/png;base64,')
+        ->and($result)->toContain(' xlink:href="data:image/png;base64,');
+});
