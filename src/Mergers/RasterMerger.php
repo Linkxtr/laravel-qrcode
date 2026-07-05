@@ -78,28 +78,26 @@ final class RasterMerger implements MergerInterface
             throw ImageMergeException::transparentColorCannotBeCreated();
         }
 
-        imagefill($canvas, 0, 0, $transparent); // @pest-mutate-ignore
+        $operationsSuccessful = imagefill($canvas, 0, 0, $transparent) // @pest-mutate-ignore
+            && imagealphablending($canvas, true) // @pest-mutate-ignore
+            && imagecopy(
+                $canvas,
+                $this->sourceImage->getImageResource(),
+                0, 0, 0, 0, // @pest-mutate-ignore
+                $sourceWidth,
+                $sourceHeight
+            ) && imagecopyresampled(
+                $canvas,
+                $this->mergeImage->getImageResource(),
+                $centerX, $centerY, // @pest-mutate-ignore
+                0, 0, // @pest-mutate-ignore
+                $targetLogoWidth, $targetLogoHeight, // @pest-mutate-ignore
+                $mergeWidth, $mergeHeight // @pest-mutate-ignore
+            ) && imagesavealpha($canvas, true); // @pest-mutate-ignore
 
-        imagealphablending($canvas, true); // @pest-mutate-ignore
-
-        imagecopy(
-            $canvas,
-            $this->sourceImage->getImageResource(),
-            0, 0, 0, 0, // @pest-mutate-ignore
-            $sourceWidth,
-            $sourceHeight
-        );
-
-        imagecopyresampled(
-            $canvas,
-            $this->mergeImage->getImageResource(),
-            $centerX, $centerY,
-            0, 0, // @pest-mutate-ignore
-            $targetLogoWidth, $targetLogoHeight,
-            $mergeWidth, $mergeHeight
-        );
-
-        imagesavealpha($canvas, true); // @pest-mutate-ignore
+        if (! $operationsSuccessful) {
+            throw ImageMergeException::mergeProcessFailed();
+        }
 
         return $this->createOutput($canvas);
     }
@@ -118,7 +116,7 @@ final class RasterMerger implements MergerInterface
 
         unset($gdImage);
 
-        if (! $success || $content === '') {
+        if (! $success || $content === false || $content === '') { // @phpstan-ignore identical.alwaysFalse
             throw ImageMergeException::failedToRenderImageBinary();
         }
 

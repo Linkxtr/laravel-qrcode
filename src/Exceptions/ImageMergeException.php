@@ -156,4 +156,13 @@ final class ImageMergeException extends RuntimeException implements QrCodeExcept
 
         return $exception;
     }
+
+    public static function mergeProcessFailed(): self
+    {
+        $exception = new self('Failed to perform image merge operation.');
+        $exception->errorCode = 'MERGE_PROCESS_FAILED';
+        $exception->helperMessage = 'Failed to perform image merge operation.';
+
+        return $exception;
+    }
 }

@@ -194,3 +194,14 @@ test('invalidSvgContent sets correct error code and message', function (): void 
         ->and($imageMergeException->getHelperMessage())
         ->toBe('Invalid SVG content: closing tag not found.');
 });
+
+test('mergeProcessFailed sets correct error code and message', function (): void {
+    $imageMergeException = ImageMergeException::mergeProcessFailed();
+
+    expect($imageMergeException)
+        ->toBeInstanceOf(ImageMergeException::class)
+        ->and($imageMergeException->getErrorCode())
+        ->toBe('MERGE_PROCESS_FAILED')
+        ->and($imageMergeException->getHelperMessage())
+        ->toBe('Failed to perform image merge operation.');
+});

@@ -93,6 +93,36 @@ namespace Linkxtr\QrCode\Mergers {
         }
     }
 
+    if (! isset($GLOBALS['mockObGetClean'])) {
+        $GLOBALS['mockObGetClean'] = null;
+    }
+
+    if (! function_exists(__NAMESPACE__.'\ob_get_clean')) {
+        function ob_get_clean(): string|false
+        {
+            if (isset($GLOBALS['mockObGetClean']) && $GLOBALS['mockObGetClean'] === false) {
+                return false;
+            }
+
+            return \ob_get_clean();
+        }
+    }
+
+    if (! isset($GLOBALS['mockImageFill'])) {
+        $GLOBALS['mockImageFill'] = null;
+    }
+
+    if (! function_exists(__NAMESPACE__.'\imagefill')) {
+        function imagefill(...$args): bool
+        {
+            if (isset($GLOBALS['mockImageFill']) && $GLOBALS['mockImageFill'] === false) {
+                return false;
+            }
+
+            return \imagefill(...$args);
+        }
+    }
+
     if (! isset($GLOBALS['mock_imagepng_empty'])) {
         $GLOBALS['mock_imagepng_empty'] = null;
     }
