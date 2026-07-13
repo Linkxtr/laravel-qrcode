@@ -25,11 +25,17 @@ final readonly class Image
         $this->gdImage = $img;
     }
 
+    /**
+     * @return int<1, max>
+     */
     public function getWidth(): int
     {
         return imagesx($this->gdImage);
     }
 
+    /**
+     * @return int<1, max>
+     */
     public function getHeight(): int
     {
         return imagesy($this->gdImage);

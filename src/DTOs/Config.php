@@ -445,10 +445,10 @@ final class Config
     {
         $realBase = realpath(base_path()) ?: base_path();
 
-        $normalizedPath = str_replace('\\', '/', $resolvedPath); // @pest-mutate-ignore
-        $normalizedBase = rtrim(str_replace('\\', '/', $realBase), '/').'/'; // @pest-mutate-ignore
+        $normalizedPath = str_replace('\\', '/', $resolvedPath);
+        $normalizedBase = rtrim(str_replace('\\', '/', $realBase), '/').'/';
 
-        if (Environment::isWindows()) { // @pest-mutate-ignore
+        if (Environment::isWindows()) {
             $normalizedPath = strtolower($normalizedPath);
             $normalizedBase = strtolower($normalizedBase);
         }

@@ -14,7 +14,7 @@ trait ValidatesPhoneNumbers
             throw InvalidPhoneNumberArgumentException::invalidPhoneNumberFormat();
         }
 
-        $cleaned = (string) preg_replace('/[^\d+]/', '', $phoneNumber); // @pest-mutate-ignore
+        $cleaned = (string) preg_replace('/[^\d+]/', '', $phoneNumber);
 
         if (! preg_match('/^\+?\d{1,15}$/', $cleaned)) {
             throw InvalidPhoneNumberArgumentException::invalidPhoneNumberLength();

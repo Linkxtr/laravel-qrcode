@@ -63,3 +63,8 @@ test('it throws exception if string contains letters or symbols', function () us
     expect(fn (): string => $traitTester->test('+1-555-123-4567@'))
         ->toThrow(InvalidPhoneNumberArgumentException::class, 'Phone number contains invalid characters');
 });
+
+test('it safely handles PCRE errors by casting null returns to empty strings', function () use ($traitTester): void {
+    $GLOBALS['mockPregReplaceNull'] = true;
+    expect(fn (): string => $traitTester->test('+1234567890'))->toThrow(InvalidPhoneNumberArgumentException::class);
+});

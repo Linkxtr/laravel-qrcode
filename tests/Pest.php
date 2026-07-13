@@ -22,15 +22,12 @@ uses(TestCase::class)->afterEach(function (): void {
 
     $GLOBALS['mockFileGetContents'] = null;
     $GLOBALS['mockFilePutContents'] = null;
-    $GLOBALS['mockImageColorAllocateAlpha'] = null;
     $GLOBALS['mockImageColorAllocate'] = null;
     $GLOBALS['mockImageCreateTrueColor'] = null;
     $GLOBALS['mockObGetClean'] = null;
-    $GLOBALS['mockImageFill'] = null;
-    $GLOBALS['mockImageCopy'] = null;
-    $GLOBALS['mockImageCopyResampled'] = null;
-    $GLOBALS['mockImageSaveAlpha'] = null;
     $GLOBALS['mock_imagepng_empty'] = null;
+    $GLOBALS['mockRealPath'] = null;
+    $GLOBALS['mockPregReplaceNull'] = null;
 })->in('Unit', 'Scannability', 'Feature', 'Scalability');
 
 /*

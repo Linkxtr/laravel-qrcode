@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode\Components;
 
 use Closure;
-use Illuminate\Support\Str;
+use DOMDocument;
+use DOMElement;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use Linkxtr\QrCode\Enums\GradientType;
+use Linkxtr\QrCode\Exceptions\GenerationException;
 use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
 use Linkxtr\QrCode\Facades\QrCode;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
+use Stringable;
 
 final class QrCodeComponent extends Component
 {
@@ -98,37 +101,96 @@ final class QrCodeComponent extends Component
             $attributes = $data['attributes'];
 
             if ($this->format === 'svg') {
-                $svg = $htmlString;
-
-                if (! str_contains($svg, '<title')) {
-                    $translatedTitle = __('QR Code');
-                    $title = e(is_string($translatedTitle) ? $translatedTitle : 'QR Code');
-
-                    $replacedSvg = preg_replace_callback(
-                        '/<svg[^>]*>/i',
-                        static fn (array $m): string => $m[0].'<title>'.$title.'</title>',
-                        $svg,
-                        1
-                    );
-                    $svg = is_string($replacedSvg) ? $replacedSvg : $svg;
-                }
-
-                $mergedAttributes = $attributes->merge([
-                    'role' => 'img',
-                    'aria-label' => __('QR Code'),
-                ]);
-
-                return Str::replaceFirst('<svg', '<svg '.$mergedAttributes->toHtml(), $svg);
+                return $this->prepareSvg($htmlString, $attributes);
             }
 
-            $mergedAttributes = $attributes->except('src')->merge([
+            $componentAttributeBag = $attributes->except('src')->merge([
                 'alt' => __('QR Code'),
             ]);
 
             $base64 = base64_encode($htmlString);
 
-            return '<img '.$mergedAttributes->toHtml().' src="data:image/'.$this->format.';base64,'.$base64.'" />';
+            return '<img '.$componentAttributeBag->toHtml().' src="data:image/'.$this->format.';base64,'.$base64.'" />';
         };
+    }
+
+    private function prepareSvg(string $svg, ComponentAttributeBag $componentAttributeBag): string
+    {
+        $xmlDeclaration = '';
+
+        if (preg_match('/^\s*<\?xml[^>]*\?>\s*/i', $svg, $matches)) {
+            $xmlDeclaration = $matches[0];
+            $svg = substr($svg, strlen($xmlDeclaration));
+        }
+
+        $domDocument = new DOMDocument;
+        $libxmlState = libxml_use_internal_errors(true);
+
+        try {
+            $loaded = $domDocument->loadXML('<?xml version="1.0" encoding="UTF-8"?><root>'.$svg.'</root>');
+
+            if (! $loaded) {
+                throw GenerationException::invalidSvgString();
+            }
+
+            $domNodeList = $domDocument->getElementsByTagName('svg');
+
+            if ($domNodeList->length === 0) {
+                throw GenerationException::invalidSvgString();
+            }
+
+            /** @var DOMElement $firstSvgNode */
+            $firstSvgNode = $domNodeList->item(0);
+
+            $translatedTitle = __('QR Code');
+            $titleText = is_string($translatedTitle) ? $translatedTitle : 'QR Code';
+
+            $hasTitle = false;
+            foreach ($firstSvgNode->childNodes as $child) {
+                if ($child->nodeName === 'title') {
+                    $hasTitle = true;
+                }
+            }
+
+            if (! $hasTitle) {
+                $titleNode = $domDocument->createElementNS('http://www.w3.org/2000/svg', 'title');
+                $titleNode->appendChild($domDocument->createTextNode($titleText));
+
+                if ($firstSvgNode->firstChild) {
+                    $firstSvgNode->insertBefore($titleNode, $firstSvgNode->firstChild);
+                } else {
+                    $firstSvgNode->appendChild($titleNode);
+                }
+            }
+
+            $mergedAttributes = $componentAttributeBag->merge([
+                'role' => 'img',
+                'aria-label' => __('QR Code'),
+            ]);
+
+            foreach ($mergedAttributes->getAttributes() as $key => $value) {
+                if (is_scalar($value) || $value instanceof Stringable || $value === null) {
+                    $firstSvgNode->setAttribute($key, (string) $value);
+                }
+            }
+
+            $output = '';
+
+            /** @var DOMElement $documentElement */
+            $documentElement = $domDocument->documentElement;
+
+            foreach ($documentElement->childNodes as $child) {
+                /** @var string $serialized */
+                $serialized = $domDocument->saveXML($child, LIBXML_NOEMPTYTAG);
+
+                $output .= $serialized;
+            }
+
+            return $xmlDeclaration.$output;
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($libxmlState);
+        }
     }
 
     /**
