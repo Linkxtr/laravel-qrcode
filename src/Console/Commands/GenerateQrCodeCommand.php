@@ -73,13 +73,17 @@ final class GenerateQrCodeCommand extends Command
         $margin = $this->getStringOption('margin') ?? '4';
         $errorCorrection = $this->getStringOption('errorCorrection') ?? 'M';
 
-        $hasPassedAdvancedOptions = $this->option('size') !== null // @pest-mutate-ignore
-            || $this->option('color') !== null // @pest-mutate-ignore
-            || $this->option('backgroundColor') !== null // @pest-mutate-ignore
-            || $this->option('margin') !== null // @pest-mutate-ignore
-            || $this->option('errorCorrection') !== null; // @pest-mutate-ignore
+        $hasPassedAdvancedOptions = $this->option('size') !== null
+            || $this->option('color') !== null
+            || $this->option('backgroundColor') !== null
+            || $this->option('margin') !== null
+            || $this->option('errorCorrection') !== null;
 
-        if ($isInteractive && confirm(label: 'Do you want to configure advanced options (size, colors, margin)?', default: $hasPassedAdvancedOptions)) {
+        $shouldConfigureAdvanced = $isInteractive && (
+            $hasPassedAdvancedOptions || confirm(label: 'Do you want to configure advanced options (size, colors, margin)?')
+        );
+
+        if ($shouldConfigureAdvanced) {
             if ($this->option('size') === null) {
                 $size = text(label: 'Size in pixels', default: $size, validate: $this->validateSize(...));
             }

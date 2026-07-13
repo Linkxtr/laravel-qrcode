@@ -37,14 +37,11 @@ final class ImagickMerger implements MergerInterface
 
     public function merge(): string
     {
-        $source = null;
-        $merge = null;
+        $source = new Imagick;
+        $merge = new Imagick;
 
         try {
-            $source = new Imagick;
             $source->readImageBlob($this->sourceImageContent);
-
-            $merge = new Imagick;
             $merge->readImageBlob($this->mergeImageContent);
 
             $sourceWidth = $source->getImageWidth();
@@ -53,39 +50,26 @@ final class ImagickMerger implements MergerInterface
             $mergeWidth = $merge->getImageWidth();
             $mergeHeight = $merge->getImageHeight();
 
-            $mergeRatio = $mergeWidth / $mergeHeight;
+            $boxW = $sourceWidth * $this->percentage;
+            $boxH = $sourceHeight * $this->percentage;
 
-            $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage)); // @pest-mutate-ignore
-            $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio)); // @pest-mutate-ignore
+            $scale = min($boxW / $mergeWidth, $boxH / $mergeHeight);
 
-            // Constrain to canvas if logo exceeds vertical bounds
-            if ($targetLogoHeight > $sourceHeight * $this->percentage) { // @pest-mutate-ignore
-                $targetLogoHeight = max(1, (int) ($sourceHeight * $this->percentage)); // @pest-mutate-ignore
-                $targetLogoWidth = max(1, (int) ($targetLogoHeight * $mergeRatio));
-            }
+            $targetLogoWidth = max(1, (int) ($mergeWidth * $scale));
+            $targetLogoHeight = max(1, (int) ($mergeHeight * $scale));
 
             $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
-            $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2); // @pest-mutate-ignore
+            $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
 
-            $merge->resizeImage($targetLogoWidth, $targetLogoHeight, Imagick::FILTER_LANCZOS, 1); // @pest-mutate-ignore
+            $merge->resizeImage($targetLogoWidth, $targetLogoHeight, Imagick::FILTER_LANCZOS, 1);
 
             $source->compositeImage($merge, Imagick::COMPOSITE_DEFAULT, $centerX, $centerY);
 
             $source->setImageFormat($this->format->value);
 
-            if ($this->format === Format::WEBP) { // @pest-mutate-ignore
-                $source->setImageCompressionQuality(90); // @pest-mutate-ignore
-            }
-
             return $source->getImageBlob();
-
         } catch (ImagickException $imagickException) {
             throw ImageMergeException::imagickException($imagickException);
-        } finally {
-            $source?->clear(); // @pest-mutate-ignore
-            $source?->destroy(); // @pest-mutate-ignore
-            $merge?->clear();
-            $merge?->destroy();
         }
     }
 }

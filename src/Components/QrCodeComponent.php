@@ -129,7 +129,7 @@ final class QrCodeComponent extends Component
         try {
             $loaded = $domDocument->loadXML('<?xml version="1.0" encoding="UTF-8"?><root>'.$svg.'</root>');
 
-            if (! $loaded || ! $domDocument->documentElement instanceof DOMElement) { // @pest-mutate-ignore
+            if (! $loaded) {
                 throw GenerationException::invalidSvgString();
             }
 
@@ -149,7 +149,6 @@ final class QrCodeComponent extends Component
             foreach ($firstSvgNode->childNodes as $child) {
                 if ($child->nodeName === 'title') {
                     $hasTitle = true;
-                    break; // @pest-mutate-ignore
                 }
             }
 
@@ -176,17 +175,21 @@ final class QrCodeComponent extends Component
             }
 
             $output = '';
-            foreach ($domDocument->documentElement->childNodes as $child) {
+
+            /** @var DOMElement $documentElement */
+            $documentElement = $domDocument->documentElement;
+
+            foreach ($documentElement->childNodes as $child) {
+                /** @var string $serialized */
                 $serialized = $domDocument->saveXML($child, LIBXML_NOEMPTYTAG);
-                if ($serialized !== false) { // @pest-mutate-ignore
-                    $output .= $serialized;
-                }
+
+                $output .= $serialized;
             }
 
             return $xmlDeclaration.$output;
         } finally {
-            libxml_clear_errors(); // @pest-mutate-ignore
-            libxml_use_internal_errors($libxmlState); // @pest-mutate-ignore
+            libxml_clear_errors();
+            libxml_use_internal_errors($libxmlState);
         }
     }
 

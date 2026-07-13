@@ -12,6 +12,10 @@ use Linkxtr\QrCode\Support\Image;
 
 final class RasterMerger implements MergerInterface
 {
+    private const ORIGIN = 0;
+
+    private const WEBP_COMPRESSION = 90;
+
     private Format $format = Format::PNG;
 
     private readonly Image $sourceImage;
@@ -50,56 +54,31 @@ final class RasterMerger implements MergerInterface
         $mergeWidth = $this->mergeImage->getWidth();
         $mergeHeight = $this->mergeImage->getHeight();
 
-        $mergeRatio = $mergeWidth / $mergeHeight;
+        $boxW = $sourceWidth * $this->percentage;
+        $boxH = $sourceHeight * $this->percentage;
 
-        $targetLogoWidth = max(1, (int) ($sourceWidth * $this->percentage)); // @pest-mutate-ignore
-        $targetLogoHeight = max(1, (int) ($targetLogoWidth / $mergeRatio)); // @pest-mutate-ignore
+        $scale = min($boxW / $mergeWidth, $boxH / $mergeHeight);
 
-        // Constrain to canvas if logo exceeds vertical bounds
-        if ($targetLogoHeight > $sourceHeight * $this->percentage) {
-            $targetLogoHeight = max(1, (int) ($sourceHeight * $this->percentage));
-            $targetLogoWidth = max(1, (int) ($targetLogoHeight * $mergeRatio));
-        }
+        $targetLogoWidth = max(1, (int) ($mergeWidth * $scale));
+        $targetLogoHeight = max(1, (int) ($mergeHeight * $scale));
 
-        $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2); // @pest-mutate-ignore
-        $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2); // @pest-mutate-ignore
+        $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
+        $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
 
-        $canvas = imagecreatetruecolor(max(1, $sourceWidth), max(1, $sourceHeight));
+        $gdImage = $this->sourceImage->getImageResource();
 
-        if (! $canvas) {
-            throw ImageMergeException::mergeCanvasCreationFailed();
-        }
+        imagecopyresampled(
+            $gdImage,
+            $this->mergeImage->getImageResource(),
+            $centerX, $centerY,
+            self::ORIGIN, self::ORIGIN,
+            $targetLogoWidth, $targetLogoHeight,
+            $mergeWidth, $mergeHeight
+        );
 
-        imagealphablending($canvas, false); // @pest-mutate-ignore
-        imagesavealpha($canvas, true); // @pest-mutate-ignore
-        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127); // @pest-mutate-ignore
+        imagesavealpha($gdImage, true);
 
-        if (! $transparent) {
-            throw ImageMergeException::transparentColorCannotBeCreated();
-        }
-
-        $operationsSuccessful = imagefill($canvas, 0, 0, $transparent) // @pest-mutate-ignore
-            && imagealphablending($canvas, true) // @pest-mutate-ignore
-            && imagecopy(
-                $canvas,
-                $this->sourceImage->getImageResource(),
-                0, 0, 0, 0, // @pest-mutate-ignore
-                $sourceWidth,
-                $sourceHeight
-            ) && imagecopyresampled(
-                $canvas,
-                $this->mergeImage->getImageResource(),
-                $centerX, $centerY, // @pest-mutate-ignore
-                0, 0, // @pest-mutate-ignore
-                $targetLogoWidth, $targetLogoHeight, // @pest-mutate-ignore
-                $mergeWidth, $mergeHeight // @pest-mutate-ignore
-            ) && imagesavealpha($canvas, true); // @pest-mutate-ignore
-
-        if (! $operationsSuccessful) {
-            throw ImageMergeException::mergeProcessFailed();
-        }
-
-        return $this->createOutput($canvas);
+        return $this->createOutput($gdImage);
     }
 
     private function createOutput(GdImage $gdImage): string
@@ -107,7 +86,7 @@ final class RasterMerger implements MergerInterface
         ob_start();
 
         $success = match ($this->format) {
-            Format::WEBP => imagewebp($gdImage, null, 90), // @pest-mutate-ignore
+            Format::WEBP => imagewebp($gdImage, null, self::WEBP_COMPRESSION),
             Format::PNG => imagepng($gdImage),
             default => throw ImageMergeException::unsupportedFormat('RasterMerger only supports "png" or "webp" formats.'),
         };

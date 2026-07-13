@@ -214,3 +214,45 @@ test('it correctly handles hex data that perfectly divides by 72 characters with
 
     expect($result)->toContain("colorimage\n".$expectedHexData."\ngrestore");
 });
+
+test('it enforces a minimum dimension of 1 pixel for extremely small percentages to kill max() mutants', function () use ($epsBase): void {
+    $logo = imagecreatetruecolor(10, 10);
+    imagefill($logo, 0, 0, imagecolorallocate($logo, 0, 0, 0));
+    ob_start();
+    imagepng($logo);
+    $tinyPng = ob_get_clean();
+    unset($logo);
+
+    $result = (new EpsMerger($epsBase, $tinyPng, 0.001))->merge();
+
+    expect($result)->toContain('1 1 scale');
+});
+
+test('it strictly truncates decimal coordinates to integers to prevent float translation', function () use ($epsBase): void {
+    $logo = imagecreatetruecolor(25, 25);
+    imagefill($logo, 0, 0, imagecolorallocate($logo, 0, 0, 0));
+    ob_start();
+    imagepng($logo);
+    $png = ob_get_clean();
+    unset($logo);
+
+    $result = (new EpsMerger($epsBase, $png, 0.25))->merge();
+
+    expect($result)
+        ->toContain('25 25 scale')
+        ->toContain('37 37 translate');
+});
+
+test('it strictly scales wide images using the width boundary to kill math mutants', function () use ($epsBase): void {
+    $logo = imagecreatetruecolor(100, 10);
+    $black = imagecolorallocate($logo, 0, 0, 0);
+    imagefill($logo, 0, 0, $black);
+    ob_start();
+    imagepng($logo);
+    $widePng = ob_get_clean();
+    unset($logo);
+
+    $result = (new EpsMerger($epsBase, $widePng, 0.2))->merge();
+
+    expect($result)->toContain('20 2 scale');
+});

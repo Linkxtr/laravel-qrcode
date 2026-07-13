@@ -26,6 +26,21 @@ namespace Linkxtr\QrCode\DTOs {
             return \file_get_contents(...$args);
         }
     }
+
+    if (! isset($GLOBALS['mockRealPath'])) {
+        $GLOBALS['mockRealPath'] = null;
+    }
+
+    if (! function_exists(__NAMESPACE__.'\realpath')) {
+        function realpath(...$args): string|false
+        {
+            if (isset($GLOBALS['mockRealPath']) && $GLOBALS['mockRealPath'] !== null) {
+                return $GLOBALS['mockRealPath'];
+            }
+
+            return \realpath(...$args);
+        }
+    }
 }
 
 namespace Linkxtr\QrCode {
@@ -47,21 +62,6 @@ namespace Linkxtr\QrCode {
 
 namespace Linkxtr\QrCode\Mergers {
     use GdImage;
-
-    if (! isset($GLOBALS['mockImageColorAllocateAlpha'])) {
-        $GLOBALS['mockImageColorAllocateAlpha'] = null;
-    }
-
-    if (! function_exists(__NAMESPACE__.'\imagecolorallocatealpha')) {
-        function imagecolorallocatealpha(...$args): int|false
-        {
-            if (isset($GLOBALS['mockImageColorAllocateAlpha']) && $GLOBALS['mockImageColorAllocateAlpha'] === false) {
-                return false;
-            }
-
-            return \imagecolorallocatealpha(...$args);
-        }
-    }
 
     if (! isset($GLOBALS['mockImageColorAllocate'])) {
         $GLOBALS['mockImageColorAllocate'] = null;
@@ -108,21 +108,6 @@ namespace Linkxtr\QrCode\Mergers {
         }
     }
 
-    if (! isset($GLOBALS['mockImageFill'])) {
-        $GLOBALS['mockImageFill'] = null;
-    }
-
-    if (! function_exists(__NAMESPACE__.'\imagefill')) {
-        function imagefill(...$args): bool
-        {
-            if (isset($GLOBALS['mockImageFill']) && $GLOBALS['mockImageFill'] === false) {
-                return false;
-            }
-
-            return \imagefill(...$args);
-        }
-    }
-
     if (! isset($GLOBALS['mock_imagepng_empty'])) {
         $GLOBALS['mock_imagepng_empty'] = null;
     }
@@ -135,6 +120,23 @@ namespace Linkxtr\QrCode\Mergers {
             }
 
             return \imagepng(...$args);
+        }
+    }
+}
+
+namespace Linkxtr\QrCode\DataTypes\Concerns {
+    if (! isset($GLOBALS['mockPregReplaceNull'])) {
+        $GLOBALS['mockPregReplaceNull'] = false;
+    }
+
+    if (! function_exists(__NAMESPACE__.'\preg_replace')) {
+        function preg_replace(...$args): string|array|null
+        {
+            if (! empty($GLOBALS['mockPregReplaceNull'])) {
+                return null;
+            }
+
+            return \preg_replace(...$args);
         }
     }
 }

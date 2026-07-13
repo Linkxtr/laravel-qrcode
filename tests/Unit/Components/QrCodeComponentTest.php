@@ -847,3 +847,51 @@ test('it strictly filters attribute types and prevents casting exceptions', func
     expect($result)->toContain('data-valid="standard"')
         ->and($result)->not->toContain('data-invalid');
 });
+
+test('it strictly cleans up global libxml state and clears errors in the finally block', function (): void {
+    $initialState = libxml_use_internal_errors(false);
+    libxml_clear_errors();
+
+    $fakeGenerator = new class
+    {
+        public function __call(string $name, array $arguments)
+        {
+            return $this;
+        }
+
+        public function generate(): string
+        {
+            return '<svg><unclosed-tag></svg>';
+        }
+    };
+    QrCode::swap($fakeGenerator);
+
+    $component = new QrCodeComponent(data: 'test');
+
+    try {
+        $component->render()(['attributes' => new ComponentAttributeBag([])]);
+    } catch (GenerationException) {
+    }
+
+    expect(libxml_get_errors())->toBeEmpty();
+
+    $currentState = libxml_use_internal_errors(false);
+    expect($currentState)->toBeFalse();
+
+    libxml_use_internal_errors($initialState);
+});
+
+test('it strictly clears pre-existing global libxml errors in the finally block', function (): void {
+    $initialState = libxml_use_internal_errors(true);
+
+    simplexml_load_string('<invalid-tag>');
+
+    expect(libxml_get_errors())->not->toBeEmpty();
+
+    $component = new QrCodeComponent(data: 'test');
+    $component->render()(['attributes' => new ComponentAttributeBag([])]);
+
+    expect(libxml_get_errors())->toBeEmpty();
+
+    libxml_use_internal_errors($initialState);
+});

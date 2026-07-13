@@ -185,17 +185,6 @@ test('it gracefully catches Generator exceptions and returns failure', function 
         ->expectsOutputToContain('Failed to generate QR Code: Simulated crash');
 });
 
-// test('it skips advanced interactive prompts if ANY advanced option is passed in CLI to kill Boolean logic mutants', function () {
-//     $this->artisan('qr:generate', [
-//         '--size' => '500',
-//     ])
-//         ->expectsQuestion('What data/payload should be encoded in the QR code?', 'test')
-//         ->expectsQuestion('Where should the QR code be saved?', '')
-//         ->assertSuccessful();
-
-//     expect($this->fakeGenerator->calls['size'][0])->toBe(500);
-// });
-
 test('it successfully normalizes lowercase error correction levels to kill strtoupper mutants', function (): void {
     $this->artisan('qr:generate', [
         'data' => 'test',
@@ -206,8 +195,6 @@ test('it successfully normalizes lowercase error correction levels to kill strto
 });
 
 test('it validates exact integer boundaries for size and margin to kill increment mutants', function (): void {
-    // 1 is the absolute minimum for size (> 0)
-    // 0 is the absolute minimum for margin (>= 0)
     $this->artisan('qr:generate', [
         'data' => 'test',
         '--size' => '1',
@@ -221,7 +208,7 @@ test('it validates exact integer boundaries for size and margin to kill incremen
 test('it strictly rejects floating point sizes and margins to kill integer casting mutants', function (): void {
     $this->artisan('qr:generate', [
         'data' => 'test',
-        '--size' => '1.5', // Without filter_var, (int) '1.5' > 0 evaluates to true and bypasses validation!
+        '--size' => '1.5',
     ])->assertFailed()
         ->expectsOutputToContain('Size must be a positive integer.');
 
@@ -232,37 +219,53 @@ test('it strictly rejects floating point sizes and margins to kill integer casti
         ->expectsOutputToContain('Margin must be a positive integer or zero.');
 });
 
-// test('it skips advanced interactive prompts if ANY single advanced option is passed in CLI', function (string $option, string $value) {
-//     // This dynamically tests every single item in the array_filter!
-//     // Kills all RemoveArrayItem mutants on Line 79.
-//     $this->artisan('qr:generate', [
-//         $option => $value,
-//     ])
-//         ->expectsQuestion('What data/payload should be encoded in the QR code?', 'test')
-//         ->expectsQuestion('Where should the QR code be saved?', '')
-//         ->assertSuccessful();
-// })->with([
-//     ['--size', '500'],
-//     ['--color', '255,0,0'],
-//     ['--backgroundColor', '0,0,0'],
-//     ['--margin', '2'],
-//     ['--errorCorrection', 'H'],
-// ]);
-
 test('it strictly validates the blue channel boundary to kill index mutants', function (): void {
-    // Kills the `$index < 3` to `< 2` mutant!
-    // If the loop stops checking at index 2, the blue channel (256) will slip through and crash the test.
     $this->artisan('qr:generate', ['data' => 'test', '--color' => '0,0,256'])
         ->assertFailed()
         ->expectsOutputToContain('RGB values must be between 0 and 255.');
 });
 
 test('it enforces exact alpha channel boundaries to kill boolean boundary mutants', function (): void {
-    // Test exactly 0 (Kills < 1 and <= 0 mutants)
     $this->artisan('qr:generate', ['data' => 'test', '--color' => '0,0,0,0'])
         ->assertSuccessful();
 
-    // Test exactly 100 (Kills > 99 and >= 100 mutants)
     $this->artisan('qr:generate', ['data' => 'test', '--color' => '0,0,0,100'])
         ->assertSuccessful();
 });
+
+test('it skips advanced confirmation prompt and enters advanced mode if ANY single advanced option is passed', function (string $option, string $value): void {
+    $command = $this->artisan('qr:generate', [
+        $option => $value,
+    ]);
+
+    $command->expectsQuestion('What data/payload should be encoded in the QR code?', 'test')
+        ->expectsQuestion('Where should the QR code be saved?', '');
+
+    if ($option !== '--size') {
+        $command->expectsQuestion('Size in pixels', '400');
+    }
+
+    if ($option !== '--color') {
+        $command->expectsQuestion('Foreground color (RGB or RGBA comma-separated)', '0,0,0');
+    }
+
+    if ($option !== '--backgroundColor') {
+        $command->expectsQuestion('Background color (RGB or RGBA comma-separated)', '255,255,255');
+    }
+
+    if ($option !== '--margin') {
+        $command->expectsQuestion('Margin', '4');
+    }
+
+    if ($option !== '--errorCorrection') {
+        $command->expectsChoice('Error correction level', 'M', ['L', 'M', 'Q', 'H']);
+    }
+
+    $command->assertSuccessful();
+})->with([
+    ['--size', '500'],
+    ['--color', '255,0,0'],
+    ['--backgroundColor', '0,0,0'],
+    ['--margin', '2'],
+    ['--errorCorrection', 'H'],
+]);

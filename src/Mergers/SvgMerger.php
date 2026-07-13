@@ -30,8 +30,8 @@ final readonly class SvgMerger implements MergerInterface
 
         $libxmlState = libxml_use_internal_errors(true);
         $this->domDocument->loadXML($this->svgContent);
-        libxml_clear_errors(); // @pest-mutate-ignore
-        libxml_use_internal_errors($libxmlState); // @pest-mutate-ignore
+        libxml_clear_errors();
+        libxml_use_internal_errors($libxmlState);
 
         $svgNode = $this->domDocument->documentElement;
 
@@ -59,17 +59,13 @@ final readonly class SvgMerger implements MergerInterface
             throw ImageMergeException::invalidImage();
         }
 
-        $logoRatio = $logoWidth / $logoHeight;
-        $targetWidth = $svgWidth * $this->percentage;
-        $targetHeight = $targetWidth / $logoRatio;
+        $boxWidth = $svgWidth * $this->percentage;
+        $boxHeight = $svgHeight * $this->percentage;
 
-        if ($targetHeight > $svgHeight * $this->percentage) { // @pest-mutate-ignore
-            $targetHeight = $svgHeight * $this->percentage;
-            $targetWidth = $targetHeight * $logoRatio;
-        }
+        $scale = min($boxWidth / $logoWidth, $boxHeight / $logoHeight);
 
-        $targetWidth = max(1.0, $targetWidth);
-        $targetHeight = max(1.0, $targetHeight);
+        $targetWidth = max(1.0, $logoWidth * $scale);
+        $targetHeight = max(1.0, $logoHeight * $scale);
 
         $x = ($svgWidth - $targetWidth) / 2;
         $y = ($svgHeight - $targetHeight) / 2;

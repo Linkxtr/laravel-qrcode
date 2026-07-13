@@ -47,22 +47,6 @@ test('it successfully merges and sets formatting for WEBP', function () use ($ti
     expect($result)->toBeString()->toContain('WEBP');
 });
 
-it('throws exception if transparent color cannot be created', function () use ($tinyPng): void {
-    global $mockImageColorAllocateAlpha;
-    $mockImageColorAllocateAlpha = false;
-
-    expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
-        ->toThrow(ImageMergeException::class, 'Failed to create transparent color.');
-});
-
-it('throws exception if image canvas cannot be created', function () use ($tinyPng): void {
-    global $mockImageCreateTrueColor;
-    $mockImageCreateTrueColor = false;
-
-    expect(fn (): string => (new RasterMerger($tinyPng, $tinyPng, 0.2))->merge())
-        ->toThrow(ImageMergeException::class, 'Failed to create image canvas.');
-});
-
 it('throws exception if output buffer capture fails', function () use ($tinyPng): void {
     global $mockObGetClean;
     $mockObGetClean = false;
@@ -112,7 +96,6 @@ it('constrains merge image if it exceeds vertical bounds', function (): void {
         ->and($colors['green'])->toBe(0)
         ->and($colors['blue'])->toBe(0);
 
-    // Verify it constrained width as well (mutant check)
     $bgIndex = imagecolorat($resultImage, 25, 30);
     $bgColors = imagecolorsforindex($resultImage, $bgIndex);
 
@@ -169,11 +152,191 @@ test('it throws a logic exception if an unsupported format bypasses validation',
     }
 });
 
-it('throws exception if imagefill returns false', function () use ($tinyPng): void {
-    global $mockImageFill;
-    $mockImageFill = false;
+test('it strictly scales images, casts coordinates, and blends alpha channels to kill all visual mutants', function (): void {
+    $sourceCanvas = \imagecreatetruecolor(101, 101);
+    \imagealphablending($sourceCanvas, false);
+    \imagesavealpha($sourceCanvas, true);
+    \imagefill($sourceCanvas, 0, 0, \imagecolorallocatealpha($sourceCanvas, 0, 0, 0, 127));
+    \ob_start();
+    \imagepng($sourceCanvas);
+    $sourcePng = \ob_get_clean();
 
-    $merger = new RasterMerger($tinyPng, $tinyPng, 0.2);
-    expect(fn (): string => $merger->merge())
-        ->toThrow(ImageMergeException::class, 'Failed to perform image merge operation.');
+    $mergeCanvas = \imagecreatetruecolor(100, 20);
+    \imagefill($mergeCanvas, 0, 0, \imagecolorallocate($mergeCanvas, 0, 255, 0));
+    \ob_start();
+    \imagepng($mergeCanvas);
+    $mergePng = \ob_get_clean();
+
+    $merger = new RasterMerger($sourcePng, $mergePng, 0.2);
+    $merger->setFormat(Format::PNG);
+
+    $resultBlob = $merger->merge();
+
+    $expectedCanvas = \imagecreatetruecolor(101, 101);
+    \imagealphablending($expectedCanvas, false);
+    \imagesavealpha($expectedCanvas, true);
+    \imagefill($expectedCanvas, 0, 0, \imagecolorallocatealpha($expectedCanvas, 0, 0, 0, 127));
+    \imagealphablending($expectedCanvas, true);
+
+    $srcObj = \imagecreatefromstring($sourcePng);
+    \imagecopy($expectedCanvas, $srcObj, 0, 0, 0, 0, 101, 101);
+
+    $mergeObj = \imagecreatefromstring($mergePng);
+    \imagecopyresampled($expectedCanvas, $mergeObj, 40, 48, 0, 0, 20, 4, 100, 20);
+    \imagesavealpha($expectedCanvas, true);
+
+    \ob_start();
+    \imagepng($expectedCanvas);
+    $expectedBlob = \ob_get_clean();
+
+    expect(md5($resultBlob))->toBe(md5($expectedBlob));
+});
+
+test('it enforces a strict minimum dimension of 1 pixel to kill max() boundary mutants', function (): void {
+    $source = \imagecreatetruecolor(100, 100);
+    \imagefill($source, 0, 0, \imagecolorallocate($source, 255, 255, 255));
+    \ob_start();
+    \imagepng($source);
+    $sourcePng = \ob_get_clean();
+
+    $merge = \imagecreatetruecolor(10, 10);
+    \imagefill($merge, 0, 0, \imagecolorallocate($merge, 0, 0, 0));
+    \ob_start();
+    \imagepng($merge);
+    $mergePng = \ob_get_clean();
+
+    $merger = new RasterMerger($sourcePng, $mergePng, 0.001);
+    $result = $merger->merge();
+
+    $img = \imagecreatefromstring($result);
+
+    expect(\imagecolorsforindex($img, \imagecolorat($img, 48, 48))['red'])->toBe(255);
+
+    expect(\imagecolorsforindex($img, \imagecolorat($img, 49, 49))['red'])->toBe(0);
+
+    expect(\imagecolorsforindex($img, \imagecolorat($img, 50, 50))['red'])->toBe(255);
+});
+
+test('it strictly scales tall images using the height boundary to kill math mutants', function (): void {
+    $source = \imagecreatetruecolor(100, 100);
+    \imagefill($source, 0, 0, \imagecolorallocate($source, 255, 255, 255));
+    \ob_start();
+    \imagepng($source);
+    $sourcePng = \ob_get_clean();
+
+    $merge = \imagecreatetruecolor(10, 100);
+    \imagefill($merge, 0, 0, \imagecolorallocate($merge, 0, 0, 0));
+    \ob_start();
+    \imagepng($merge);
+    $mergePng = \ob_get_clean();
+
+    $merger = new RasterMerger($sourcePng, $mergePng, 0.2);
+    $resultBlob = $merger->merge();
+    $img = \imagecreatefromstring($resultBlob);
+
+    expect(\imagecolorsforindex($img, \imagecolorat($img, 50, 39))['red'])->toBe(255);
+});
+
+test('it enforces a strict minimum dimension of exactly 1 pixel for both axes to kill max(2) mutants', function (): void {
+    $source = \imagecreatetruecolor(100, 100);
+    \imagefill($source, 0, 0, \imagecolorallocate($source, 0, 0, 255));
+    \ob_start();
+    \imagepng($source);
+    $sourcePng = \ob_get_clean();
+
+    $merge = \imagecreatetruecolor(10, 10);
+    \imagefill($merge, 0, 0, \imagecolorallocate($merge, 255, 0, 0));
+    \ob_start();
+    \imagepng($merge);
+    $mergePng = \ob_get_clean();
+
+    $merger = new RasterMerger($sourcePng, $mergePng, 0.001);
+    $img = \imagecreatefromstring($merger->merge());
+
+    expect(\imagecolorsforindex($img, \imagecolorat($img, 49, 49))['red'])->toBe(255);
+
+    expect(\imagecolorsforindex($img, \imagecolorat($img, 50, 49))['blue'])->toBe(255);
+
+    expect(\imagecolorsforindex($img, \imagecolorat($img, 49, 50))['blue'])->toBe(255);
+});
+
+test('it strictly disables alpha blending before canvas fill to guarantee a transparent background', function (): void {
+    $source = \imagecreatetruecolor(100, 100);
+    \imagealphablending($source, false);
+    \imagesavealpha($source, true);
+    \imagefill($source, 0, 0, \imagecolorallocatealpha($source, 0, 0, 0, 127));
+    \ob_start();
+    \imagepng($source);
+    $sourcePng = \ob_get_clean();
+
+    $merge = \imagecreatetruecolor(10, 10);
+    \imagealphablending($merge, false);
+    \imagesavealpha($merge, true);
+    \imagefill($merge, 0, 0, \imagecolorallocatealpha($merge, 0, 0, 0, 127));
+    \ob_start();
+    \imagepng($merge);
+    $mergePng = \ob_get_clean();
+
+    $merger = new RasterMerger($sourcePng, $mergePng, 0.2);
+    $img = \imagecreatefromstring($merger->merge());
+
+    expect(\imagecolorsforindex($img, \imagecolorat($img, 50, 50))['alpha'])->toBe(127);
+});
+
+test('it strictly maps all operations and coordinates to the canvas to kill GD rendering mutants', function (): void {
+    $source = \imagecreatetruecolor(10, 10);
+    \imagealphablending($source, false);
+    \imagesavealpha($source, true);
+    $transparent = \imagecolorallocatealpha($source, 0, 0, 0, 127);
+    \imagefill($source, 0, 0, $transparent);
+
+    $red = \imagecolorallocate($source, 255, 0, 0);
+    \imagesetpixel($source, 0, 0, $red);
+    \ob_start();
+    \imagepng($source);
+    $sourcePng = \ob_get_clean();
+    $merge = \imagecreatetruecolor(2, 2);
+    $green = \imagecolorallocate($merge, 0, 255, 0);
+    \imagefill($merge, 0, 0, $green);
+    \ob_start();
+    \imagepng($merge);
+    $mergePng = \ob_get_clean();
+
+    $merger = new RasterMerger($sourcePng, $mergePng, 0.2);
+    $result = \imagecreatefromstring($merger->merge());
+
+    $c00 = \imagecolorsforindex($result, \imagecolorat($result, 0, 0));
+    expect($c00['red'])->toBe(255)->and($c00['alpha'])->toBe(0);
+
+    $c01 = \imagecolorsforindex($result, \imagecolorat($result, 0, 1));
+    expect($c01['alpha'])->toBe(127);
+
+    $c10 = \imagecolorsforindex($result, \imagecolorat($result, 1, 0));
+    expect($c10['alpha'])->toBe(127);
+});
+
+test('it strictly enables alpha blending to composite transparent logos and saves the alpha channel', function (): void {
+    $source = \imagecreatetruecolor(10, 10);
+    \imagefill($source, 0, 0, \imagecolorallocate($source, 255, 255, 255));
+    \ob_start();
+    \imagepng($source);
+    $sourcePng = \ob_get_clean();
+
+    $merge = \imagecreatetruecolor(2, 2);
+    \imagealphablending($merge, false);
+    \imagesavealpha($merge, true);
+    \imagefill($merge, 0, 0, \imagecolorallocatealpha($merge, 0, 0, 0, 127));
+    \ob_start();
+    \imagepng($merge);
+    $mergePng = \ob_get_clean();
+
+    $merger = new RasterMerger($sourcePng, $mergePng, 0.2);
+    $merger->setFormat(Format::PNG);
+
+    $result = \imagecreatefromstring($merger->merge());
+
+    $color = \imagecolorsforindex($result, \imagecolorat($result, 4, 4));
+
+    expect($color['alpha'])->toBe(0)
+        ->and($color['red'])->toBe(255);
 });
