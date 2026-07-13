@@ -151,28 +151,6 @@ test('transparentColorCannotBeCreated sets correct error code and message', func
         ->toBe('Failed to create transparent color.');
 });
 
-test('mergeImageFillFailed sets correct error code and message', function (): void {
-    $imageMergeException = ImageMergeException::mergeImageFillFailed();
-
-    expect($imageMergeException)
-        ->toBeInstanceOf(ImageMergeException::class)
-        ->and($imageMergeException->getErrorCode())
-        ->toBe('MERGE_IMAGE_FILL_FAILED')
-        ->and($imageMergeException->getHelperMessage())
-        ->toBe('Failed to fill image with transparent color.');
-});
-
-test('failedToSaveAlphaChannelInformation sets correct error code and message', function (): void {
-    $imageMergeException = ImageMergeException::failedToSaveAlphaChannelInformation();
-
-    expect($imageMergeException)
-        ->toBeInstanceOf(ImageMergeException::class)
-        ->and($imageMergeException->getErrorCode())
-        ->toBe('FAILED_TO_SAVE_ALPHA_CHANNEL_INFORMATION')
-        ->and($imageMergeException->getHelperMessage())
-        ->toBe('Failed to save alpha channel information.');
-});
-
 test('failedToRenderImageBinary sets correct error code and message', function (): void {
     $imageMergeException = ImageMergeException::failedToRenderImageBinary();
 
@@ -182,28 +160,6 @@ test('failedToRenderImageBinary sets correct error code and message', function (
         ->toBe('FAILED_TO_RENDER_IMAGE_BINARY')
         ->and($imageMergeException->getHelperMessage())
         ->toBe('Failed to render image binary.');
-});
-
-test('failedToCopySourceImageToCanvas sets correct error code and message', function (): void {
-    $imageMergeException = ImageMergeException::failedToCopySourceImageToCanvas(1, 1);
-
-    expect($imageMergeException)
-        ->toBeInstanceOf(ImageMergeException::class)
-        ->and($imageMergeException->getErrorCode())
-        ->toBe('FAILED_TO_COPY_SOURCE_IMAGE_TO_CANVAS')
-        ->and($imageMergeException->getHelperMessage())
-        ->toBe('Failed to copy source image to canvas (Source: 1x1).');
-});
-
-test('failedToCopyResampleMergeImage sets correct error code and message', function (): void {
-    $imageMergeException = ImageMergeException::failedToCopyResampleMergeImage(1, 1, 1, 1);
-
-    expect($imageMergeException)
-        ->toBeInstanceOf(ImageMergeException::class)
-        ->and($imageMergeException->getErrorCode())
-        ->toBe('FAILED_TO_COPY_RESAMPLE_MERGE_IMAGE')
-        ->and($imageMergeException->getHelperMessage())
-        ->toBe('Failed to copy/resample merge image (Target: 1x1, Source: 1x1).');
 });
 
 test('invalidImageData sets correct error code and message', function (): void {
@@ -237,4 +193,15 @@ test('invalidSvgContent sets correct error code and message', function (): void 
         ->toBe('INVALID_SVG_CONTENT')
         ->and($imageMergeException->getHelperMessage())
         ->toBe('Invalid SVG content: closing tag not found.');
+});
+
+test('mergeProcessFailed sets correct error code and message', function (): void {
+    $imageMergeException = ImageMergeException::mergeProcessFailed();
+
+    expect($imageMergeException)
+        ->toBeInstanceOf(ImageMergeException::class)
+        ->and($imageMergeException->getErrorCode())
+        ->toBe('MERGE_PROCESS_FAILED')
+        ->and($imageMergeException->getHelperMessage())
+        ->toBe('Failed to perform image merge operation.');
 });

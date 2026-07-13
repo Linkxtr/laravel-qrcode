@@ -24,6 +24,15 @@ $getTallPng = function (): string {
     return $image->getImageBlob();
 };
 
+$getComplexPng = function (): string {
+    $image = new Imagick;
+    $image->newImage(20, 20, new ImagickPixel('white'));
+    $image->addNoiseImage(Imagick::NOISE_GAUSSIAN, Imagick::CHANNEL_ALL);
+    $image->setImageFormat('png');
+
+    return $image->getImageBlob();
+};
+
 test('it throws exception for invalid percentages', function () use ($tinyPng): void {
     expect(fn (): ImagickMerger => new ImagickMerger($tinyPng, $tinyPng, 0))
         ->toThrow(ImageMergeException::class, 'Percentage for merging the image must be between 0 and 1.');
@@ -111,4 +120,103 @@ test('it strictly maintains aspect ratio during calculations', function () use (
     expect($colors['r'])->toBe(0)
         ->and($colors['g'])->toBe(0)
         ->and($colors['b'])->toBe(0);
+});
+
+test('it strictly truncates composite coordinates and positions logo exactly in the center', function (): void {
+    $source = new Imagick;
+    $source->newImage(101, 101, new ImagickPixel('white'));
+    $source->setImageFormat('png');
+
+    $merge = new Imagick;
+    $merge->newImage(20, 20, new ImagickPixel('black'));
+    $merge->setImageFormat('png');
+
+    $merger = new ImagickMerger($source->getImageBlob(), $merge->getImageBlob(), 0.2);
+    $result = $merger->merge();
+
+    $img = new Imagick;
+    $img->readImageBlob($result);
+
+    $colors = $img->getImagePixelColor(40, 39)->getColor();
+    expect($colors['r'])->toBe(255)->and($colors['g'])->toBe(255)->and($colors['b'])->toBe(255);
+
+    $colorsLogo = $img->getImagePixelColor(40, 40)->getColor();
+    expect($colorsLogo['r'])->toBe(0)->and($colorsLogo['g'])->toBe(0)->and($colorsLogo['b'])->toBe(0);
+});
+
+test('it strictly resizes the merge image', function () use ($getTallPng): void {
+    $source = new Imagick;
+    $source->newImage(100, 100, new ImagickPixel('white'));
+    $source->setImageFormat('png');
+
+    $merger = new ImagickMerger($source->getImageBlob(), $getTallPng(), 0.5);
+    $result = $merger->merge();
+
+    $img = new Imagick;
+    $img->readImageBlob($result);
+
+    $colors = $img->getImagePixelColor(50, 10)->getColor();
+
+    expect($colors['r'])->toBe(255)->and($colors['g'])->toBe(255)->and($colors['b'])->toBe(255);
+});
+
+test('it strictly scales wide images using the width boundary', function (): void {
+    $source = new Imagick;
+    $source->newImage(100, 100, new ImagickPixel('white'));
+    $source->setImageFormat('png');
+
+    $merge = new Imagick;
+    $merge->newImage(100, 10, new ImagickPixel('black'));
+    $merge->setImageFormat('png');
+
+    $merger = new ImagickMerger($source->getImageBlob(), $merge->getImageBlob(), 0.2);
+    $result = $merger->merge();
+
+    $img = new Imagick;
+    $img->readImageBlob($result);
+
+    expect($img->getImagePixelColor(60, 49)->getColor()['r'])->toBe(255);
+    expect($img->getImagePixelColor(59, 49)->getColor()['r'])->toBe(0);
+});
+
+test('it enforces a strict minimum dimension of 1 pixel', function (): void {
+    $source = new Imagick;
+    $source->newImage(100, 100, new ImagickPixel('white'));
+    $source->setImageFormat('png');
+
+    $merge = new Imagick;
+    $merge->newImage(10, 10, new ImagickPixel('black'));
+    $merge->setImageFormat('png');
+
+    $merger = new ImagickMerger($source->getImageBlob(), $merge->getImageBlob(), 0.001);
+    $result = $merger->merge();
+
+    $img = new Imagick;
+    $img->readImageBlob($result);
+
+    expect($img->getImagePixelColor(49, 49)->getColor()['r'])->toBe(0);
+
+    expect($img->getImagePixelColor(50, 49)->getColor()['r'])->toBe(255);
+
+    expect($img->getImagePixelColor(49, 50)->getColor()['r'])->toBe(255);
+});
+
+test('it strictly applies a blur factor of exactly 1 during resize', function () use ($getComplexPng): void {
+    $complexImage = $getComplexPng();
+
+    $merger = new ImagickMerger($complexImage, $complexImage, 0.5);
+    $resultBlob = $merger->merge();
+
+    // Baseline with exact blur of 1
+    $expectedSource = new Imagick;
+    $expectedSource->readImageBlob($complexImage);
+
+    $expectedMerge = new Imagick;
+    $expectedMerge->readImageBlob($complexImage);
+    $expectedMerge->resizeImage(10, 10, Imagick::FILTER_LANCZOS, 1);
+
+    $expectedSource->compositeImage($expectedMerge, Imagick::COMPOSITE_DEFAULT, 5, 5);
+    $expectedSource->setImageFormat('png');
+
+    expect($resultBlob)->toBe($expectedSource->getImageBlob());
 });

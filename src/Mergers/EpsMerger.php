@@ -25,10 +25,12 @@ final readonly class EpsMerger implements MergerInterface
             throw ImageMergeException::couldNotDetermineEpsDimensions();
         }
 
-        $llx = (int) $matches[1]; // @pest-mutate-ignore
-        $lly = (int) $matches[2]; // @pest-mutate-ignore
-        $urx = (int) $matches[3]; // @pest-mutate-ignore
-        $ury = (int) $matches[4]; // @pest-mutate-ignore
+        $toInt = fn (string $value): int => (int) $value;
+
+        $llx = $toInt($matches[1]);
+        $lly = $toInt($matches[2]);
+        $urx = $toInt($matches[3]);
+        $ury = $toInt($matches[4]);
 
         $qrWidth = $urx - $llx;
         $qrHeight = $ury - $lly;
@@ -45,18 +47,16 @@ final readonly class EpsMerger implements MergerInterface
         $logoW = imagesx($logo);
         $logoH = imagesy($logo);
 
-        $ratio = $logoW / $logoH;
+        $boxW = $qrWidth * $this->percentage;
+        $boxH = $qrHeight * $this->percentage;
 
-        $targetW = max(1, (int) ($qrWidth * $this->percentage)); // @pest-mutate-ignore
-        $targetH = max(1, (int) ($targetW / $ratio)); // @pest-mutate-ignore
+        $scale = min($boxW / $logoW, $boxH / $logoH);
 
-        if ($targetH > $qrHeight * $this->percentage) {
-            $targetH = max(1, (int) ($qrHeight * $this->percentage)); // @pest-mutate-ignore
-            $targetW = max(1, (int) ($targetH * $ratio)); // @pest-mutate-ignore
-        }
+        $targetW = max(1, (int) ($logoW * $scale));
+        $targetH = max(1, (int) ($logoH * $scale));
 
-        $posX = (int) (($qrWidth - $targetW) / 2) + $llx; // @pest-mutate-ignore
-        $posY = (int) (($qrHeight - $targetH) / 2) + $lly; // @pest-mutate-ignore
+        $posX = (int) (($qrWidth - $targetW) / 2) + $llx;
+        $posY = (int) (($qrHeight - $targetH) / 2) + $lly;
 
         $resizedLogo = imagecreatetruecolor($targetW, $targetH);
 
@@ -79,29 +79,16 @@ final readonly class EpsMerger implements MergerInterface
             $logoW, $logoH
         );
 
-        $hexLines = [];
-        $hexBuffer = '';
+        $rawBuffer = '';
 
         for ($y = 0; $y < $targetH; ++$y) {
-            $rowRaw = '';
-
             for ($x = 0; $x < $targetW; ++$x) {
                 $rgb = imagecolorat($resizedLogo, $x, $y);
-                $rowRaw .= chr(($rgb >> 16) & 0xFF).chr(($rgb >> 8) & 0xFF).chr($rgb & 0xFF);
-            }
-
-            $hexBuffer .= bin2hex($rowRaw);
-            while (strlen($hexBuffer) >= 72) { // @pest-mutate-ignore
-                $hexLines[] = substr($hexBuffer, 0, 72);
-                $hexBuffer = substr($hexBuffer, 72);
+                $rawBuffer .= chr(($rgb >> 16) & 0xFF).chr(($rgb >> 8) & 0xFF).chr($rgb & 0xFF);
             }
         }
 
-        if ($hexBuffer !== '') {
-            $hexLines[] = $hexBuffer;
-        }
-
-        $hexData = implode("\n", $hexLines);
+        $hexData = trim(chunk_split(bin2hex($rawBuffer), 72, "\n"));
 
         unset($logo);
         unset($resizedLogo);

@@ -2,3 +2,6 @@ parameters:
   level: max
   paths:
     - src
+  phpVersion:
+    min: 80200
+    max: 80508

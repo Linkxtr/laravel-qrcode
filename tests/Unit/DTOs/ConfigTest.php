@@ -579,3 +579,44 @@ it('normalizes casing on Windows environments to prevent traversal', function ()
 
     Environment::clearMocks();
 });
+
+it('normalizes backslashes to forward slashes in path checks', function (): void {
+    $config = new Config;
+
+    $base = base_path();
+    $pathWithBackslashes = $base.'\\Support\\Fixtures\\images\\linkxtr.png';
+
+    expect(invade($config)->isPathInsideApplication($pathWithBackslashes))->toBeTrue();
+});
+
+it('kills IfNegated by strictly enforcing casing normalization on Windows', function (): void {
+    Environment::mockIsWindows(true);
+
+    $config = new Config;
+    $base = base_path();
+    $mangledPath = strtoupper($base).'/SuPpOrT/FiXtUrEs/LiNkXtR.pNg';
+
+    expect(invade($config)->isPathInsideApplication($mangledPath))->toBeTrue();
+
+    Environment::clearMocks();
+});
+
+it('handles trailing slashes securely on the base path', function (): void {
+    $GLOBALS['mockRealPath'] = base_path().'/';
+
+    $config = new Config;
+
+    $validPath = base_path().'/Support/Fixtures/images/linkxtr.png';
+
+    expect(invade($config)->isPathInsideApplication($validPath))->toBeTrue();
+});
+
+it('strictly normalizes backslashes to forward slashes for both base and resolved paths', function (): void {
+    $GLOBALS['mockRealPath'] = 'C:\\Fake\\Base\\Path';
+
+    $config = new Config;
+
+    $resolvedPath = 'C:\\Fake\\Base\\Path\\storage\\image.png';
+
+    expect(invade($config)->isPathInsideApplication($resolvedPath))->toBeTrue();
+});

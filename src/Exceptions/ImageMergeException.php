@@ -121,49 +121,11 @@ final class ImageMergeException extends RuntimeException implements QrCodeExcept
         return $exception;
     }
 
-    public static function mergeImageFillFailed(): self
-    {
-        $exception = new self('Failed to fill image with transparent color.');
-        $exception->errorCode = 'MERGE_IMAGE_FILL_FAILED';
-        $exception->helperMessage = 'Failed to fill image with transparent color.';
-
-        return $exception;
-    }
-
-    public static function failedToSaveAlphaChannelInformation(): self
-    {
-        $exception = new self('Failed to save alpha channel information.');
-        $exception->errorCode = 'FAILED_TO_SAVE_ALPHA_CHANNEL_INFORMATION';
-        $exception->helperMessage = 'Failed to save alpha channel information.';
-
-        return $exception;
-    }
-
     public static function failedToRenderImageBinary(): self
     {
         $exception = new self('Failed to render image binary.');
         $exception->errorCode = 'FAILED_TO_RENDER_IMAGE_BINARY';
         $exception->helperMessage = 'Failed to render image binary.';
-
-        return $exception;
-    }
-
-    public static function failedToCopySourceImageToCanvas(int $sourceWidth, int $sourceHeight): self
-    {
-        $message = sprintf('Failed to copy source image to canvas (Source: %dx%d).', $sourceWidth, $sourceHeight);
-        $exception = new self($message);
-        $exception->errorCode = 'FAILED_TO_COPY_SOURCE_IMAGE_TO_CANVAS';
-        $exception->helperMessage = $message;
-
-        return $exception;
-    }
-
-    public static function failedToCopyResampleMergeImage(int $targetLogoWidth, int $targetLogoHeight, int $mergeWidth, int $mergeHeight): self
-    {
-        $message = sprintf('Failed to copy/resample merge image (Target: %dx%d, Source: %dx%d).', $targetLogoWidth, $targetLogoHeight, $mergeWidth, $mergeHeight);
-        $exception = new self($message);
-        $exception->errorCode = 'FAILED_TO_COPY_RESAMPLE_MERGE_IMAGE';
-        $exception->helperMessage = $message;
 
         return $exception;
     }
@@ -191,6 +153,15 @@ final class ImageMergeException extends RuntimeException implements QrCodeExcept
         $exception = new self('Invalid SVG content: closing tag not found.');
         $exception->errorCode = 'INVALID_SVG_CONTENT';
         $exception->helperMessage = 'Invalid SVG content: closing tag not found.';
+
+        return $exception;
+    }
+
+    public static function mergeProcessFailed(): self
+    {
+        $exception = new self('Failed to perform image merge operation.');
+        $exception->errorCode = 'MERGE_PROCESS_FAILED';
+        $exception->helperMessage = 'Failed to perform image merge operation.';
 
         return $exception;
     }
