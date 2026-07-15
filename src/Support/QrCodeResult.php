@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Linkxtr\QrCode\Enums\Format;
+use Linkxtr\QrCode\Exceptions\CannotWriteFileException;
 use Stringable;
 
 final readonly class QrCodeResult implements Htmlable, Responsable, Stringable
@@ -61,5 +62,20 @@ final readonly class QrCodeResult implements Htmlable, Responsable, Stringable
             Format::EPS => 'application/postscript',
             default => 'image/'.$this->format->value,
         };
+    }
+
+    public function saveToFile(string $filename): void
+    {
+        $directory = dirname($filename);
+
+        if (! is_dir($directory)) {
+            throw CannotWriteFileException::toPath($filename);
+        }
+
+        $bytesWritten = @file_put_contents($filename, $this->content);
+
+        if ($bytesWritten === false) {
+            throw CannotWriteFileException::toPath($filename);
+        }
     }
 }

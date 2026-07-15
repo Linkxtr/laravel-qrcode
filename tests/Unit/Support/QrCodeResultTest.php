@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Http\Response;
 use Linkxtr\QrCode\Enums\Format;
+use Linkxtr\QrCode\Exceptions\CannotWriteFileException;
 use Linkxtr\QrCode\Support\QrCodeResult;
 
 it('can be cast to a string', function (): void {
@@ -70,4 +71,40 @@ it('sets the correct content type for svg responses', function (): void {
     $response = $result->toResponse(request());
 
     expect($response->headers->get('Content-Type'))->toBe('image/svg+xml');
+});
+
+test('generate throws exception if file_put_contents fails', function (): void {
+    $result = new QrCodeResult('<svg></svg>', Format::SVG);
+
+    global $mockFilePutContents;
+    $mockFilePutContents = true;
+
+    expect(fn () => $result->saveToFile('fail-test.svg'))
+        ->toThrow(CannotWriteFileException::class, 'Failed to write QR code to file: fail-test.svg');
+});
+
+it('throws an exception when attempting to save to a non-existent directory', function (): void {
+    $result = new QrCodeResult('<svg></svg>', Format::SVG);
+
+    $invalidPath = __DIR__.'/this_directory_does_not_exist/qrcode.png';
+
+    expect(fn () => $result->saveToFile($invalidPath))
+        ->toThrow(CannotWriteFileException::class);
+});
+
+it('can successfully generate and save a qr code to a file', function (): void {
+    $result = new QrCodeResult('<svg></svg>', Format::SVG);
+
+    $tempFile = sys_get_temp_dir().'/test_qrcode_'.uniqid().'.svg';
+
+    if (file_exists($tempFile)) {
+        unlink($tempFile);
+    }
+
+    $result->saveToFile($tempFile);
+
+    expect(file_exists($tempFile))->toBeTrue()
+        ->and(filesize($tempFile))->toBeGreaterThan(0);
+
+    unlink($tempFile);
 });
