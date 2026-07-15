@@ -106,4 +106,15 @@ return [
     |
     */
     'force_gd' => env('QR_CODE_FORCE_GD', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the cache configuration of the QR code.
+    |
+    */
+    'cache_enabled' => env('QR_CODE_CACHE_ENABLED', false),
+    'cache_ttl' => env('QR_CODE_CACHE_TTL', 1440),
 ];

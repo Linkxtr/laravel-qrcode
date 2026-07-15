@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Linkxtr\QrCode;
 
 use Carbon\Carbon;
+use DateInterval;
 use DateTimeInterface;
 use Illuminate\Support\Traits\Macroable;
 use Linkxtr\QrCode\DTOs\Config;
@@ -14,9 +15,8 @@ use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
-use Linkxtr\QrCode\Exceptions\CannotWriteFileException;
 use Linkxtr\QrCode\Exceptions\InvalidMacroReturnTypeException;
-use Linkxtr\QrCode\Renderers\BaconRenderer;
+use Linkxtr\QrCode\Support\CacheManager;
 use Linkxtr\QrCode\Support\DataTypeResolver;
 use Linkxtr\QrCode\Support\QrCodeResult;
 use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
@@ -85,22 +85,10 @@ final class Generator
 
     public function generate(string $text, ?string $filename = null): QrCodeResult
     {
-        $baconRenderer = new BaconRenderer($this->config);
-
-        $qrCodeResult = $baconRenderer->render($text);
+        $qrCodeResult = CacheManager::handle($this->config, $text);
 
         if ($filename !== null) {
-            $directory = dirname($filename);
-
-            if (! is_dir($directory)) {
-                throw CannotWriteFileException::toPath($filename);
-            }
-
-            $bytesWritten = @file_put_contents($filename, $qrCodeResult);
-
-            if ($bytesWritten === false) {
-                throw CannotWriteFileException::toPath($filename);
-            }
+            $qrCodeResult->saveToFile($filename);
         }
 
         return $qrCodeResult;
@@ -280,6 +268,24 @@ final class Generator
         $instance = clone $this;
 
         $instance->config->setMargin($margin);
+
+        return $instance;
+    }
+
+    public function cache(DateTimeInterface|DateInterval|int|null $ttl = null): static
+    {
+        $instance = clone $this;
+
+        $instance->config->setupCache($ttl);
+
+        return $instance;
+    }
+
+    public function withoutCache(): static
+    {
+        $instance = clone $this;
+
+        $instance->config->disableCache();
 
         return $instance;
     }

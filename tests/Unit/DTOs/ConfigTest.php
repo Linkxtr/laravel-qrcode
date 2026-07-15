@@ -45,7 +45,9 @@ test('it initializes with default values', function (): void {
         ->and($config->getBackgroundColorValue()->red)->toBe(255)
         ->and($config->getBackgroundColorValue()->green)->toBe(255)
         ->and($config->getBackgroundColorValue()->blue)->toBe(255)
-        ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
+        ->and($config->getBackgroundColorValue()->alpha)->toBe(100)
+        ->and($config->shouldCache())->toBe(false)
+        ->and($config->getCacheTtl())->toBe(1440);
 });
 
 test('it seeds configuration from array payload', function (): void {
@@ -57,6 +59,8 @@ test('it seeds configuration from array payload', function (): void {
         'encoding' => 'iso-8859-1',
         'color' => '10, 20, 30, 40',
         'background_color' => '0, 255, 0',
+        'cache_enabled' => true,
+        'cache_ttl' => 1441,
     ]);
 
     expect($config->getSize())->toBe(1)
@@ -71,7 +75,9 @@ test('it seeds configuration from array payload', function (): void {
         ->and($config->getBackgroundColorValue()->red)->toBe(0)
         ->and($config->getBackgroundColorValue()->green)->toBe(255)
         ->and($config->getBackgroundColorValue()->blue)->toBe(0)
-        ->and($config->getBackgroundColorValue()->alpha)->toBe(100);
+        ->and($config->getBackgroundColorValue()->alpha)->toBe(100)
+        ->and($config->shouldCache())->toBe(true)
+        ->and($config->getCacheTtl())->toBe(1441);
 });
 
 test('it falls back to default size when provide invalid size and margin', function (): void {
@@ -619,4 +625,21 @@ it('strictly normalizes backslashes to forward slashes for both base and resolve
     $resolvedPath = 'C:\\Fake\\Base\\Path\\storage\\image.png';
 
     expect(invade($config)->isPathInsideApplication($resolvedPath))->toBeTrue();
+});
+
+it('enables cache & sets ttl correctly when setupCache is called', function (): void {
+    $config = new Config;
+
+    $config->setupCache(1450);
+
+    expect($config->getCacheTtl())->toBe(1450)
+        ->and($config->shouldCache())->toBe(true);
+});
+
+it('disable cache correctly when disableCache called', function (): void {
+    $config = new Config;
+
+    $config->disableCache();
+
+    expect($config->shouldCache())->toBe(false);
 });

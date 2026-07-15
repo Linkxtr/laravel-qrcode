@@ -10,7 +10,6 @@ use Linkxtr\QrCode\Enums\EyeStyle;
 use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Enums\Style;
-use Linkxtr\QrCode\Exceptions\CannotWriteFileException;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\Support\QrCodeResult;
 
@@ -189,17 +188,16 @@ test('fluent configuration methods return a cloned instance with updated config'
         ->and(invade($merged2)->config->getImageMerge())->toBe($expectedContent)
         ->and(invade($merged2)->config->getImagePercentage())->toBe(0.2);
 
+    $cached = $generator->cache(5000);
+    expect($cached)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($cached)->config->getCacheTtl())->toBe(5000)
+        ->and(invade($cached)->config->shouldCache())->toBe(true);
+
+    $notCached = $cached->withoutCache();
+    expect($notCached)->toBeInstanceOf(Generator::class)->not->toBe($cached)
+        ->and(invade($notCached)->config->shouldCache())->toBe(false);
+
     expect(invade($generator)->config->getSize())->toBe(400);
-});
-
-test('generate throws exception if file_put_contents fails', function (): void {
-    $generator = new Generator;
-
-    global $mockFilePutContents;
-    $mockFilePutContents = true;
-
-    expect(fn (): QrCodeResult => $generator->generate('fail-test', 'fail-test.svg'))
-        ->toThrow(RuntimeException::class, 'Failed to write QR code to file: fail-test.svg');
 });
 
 test('it mathematically rejects arrays and objects inside color configurations', function (): void {
@@ -210,30 +208,4 @@ test('it mathematically rejects arrays and objects inside color configurations',
 
     expect(fn (): Generator => $generator->gradient([255, 0, 0], [0, new stdClass, 0]))
         ->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric.');
-});
-
-it('throws an exception when attempting to save to a non-existent directory', function (): void {
-    $generator = new Generator;
-
-    $invalidPath = __DIR__.'/this_directory_does_not_exist/qrcode.png';
-
-    expect(fn (): QrCodeResult => $generator->generate('Hello World', $invalidPath))
-        ->toThrow(CannotWriteFileException::class);
-});
-
-it('can successfully generate and save a qr code to a file', function (): void {
-    $generator = new Generator;
-
-    $tempFile = sys_get_temp_dir().'/test_qrcode_'.uniqid().'.svg';
-
-    if (file_exists($tempFile)) {
-        unlink($tempFile);
-    }
-
-    $generator->format('svg')->generate('Hello World', $tempFile);
-
-    expect(file_exists($tempFile))->toBeTrue()
-        ->and(filesize($tempFile))->toBeGreaterThan(0);
-
-    unlink($tempFile);
 });

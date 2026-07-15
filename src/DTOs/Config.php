@@ -6,6 +6,8 @@ namespace Linkxtr\QrCode\DTOs;
 
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
+use DateInterval;
+use DateTimeInterface;
 use Illuminate\Support\Facades\File;
 use Linkxtr\QrCode\Contracts\ColorInterface;
 use Linkxtr\QrCode\Enums\ColorModel;
@@ -116,6 +118,16 @@ final class Config
     private float $imagePercentage = .2;
 
     /**
+     * Whether the cache is enabled.
+     */
+    private bool $cacheEnabled = false;
+
+    /**
+     * The cache time to live.
+     */
+    private DateTimeInterface|DateInterval|int|null $cacheTtl = null;
+
+    /**
      * @param  array<mixed>  $config
      */
     public static function fromArray(array $config): self
@@ -154,6 +166,14 @@ final class Config
 
         if (isset($config['background_color']) && (is_string($config['background_color']) || is_array($config['background_color']))) {
             $instance->backgroundColorValue = Rgb::parse($config['background_color']);
+        }
+
+        if (isset($config['cache_enabled']) && is_bool($config['cache_enabled'])) {
+            $instance->cacheEnabled = $config['cache_enabled'];
+        }
+
+        if (isset($config['cache_ttl']) && is_int($config['cache_ttl'])) {
+            $instance->cacheTtl = $config['cache_ttl'];
         }
 
         return $instance;
@@ -439,6 +459,27 @@ final class Config
     public function getImagePercentage(): float
     {
         return $this->imagePercentage;
+    }
+
+    public function setupCache(DateTimeInterface|DateInterval|int|null $ttl = null): void
+    {
+        $this->cacheEnabled = true;
+        $this->cacheTtl = $ttl;
+    }
+
+    public function disableCache(): void
+    {
+        $this->cacheEnabled = false;
+    }
+
+    public function getCacheTtl(): int|DateInterval|DateTimeInterface
+    {
+        return $this->cacheTtl ?? 1440;
+    }
+
+    public function shouldCache(): bool
+    {
+        return $this->cacheEnabled;
     }
 
     private function isPathInsideApplication(string $resolvedPath): bool

@@ -43,7 +43,7 @@ namespace Linkxtr\QrCode\DTOs {
     }
 }
 
-namespace Linkxtr\QrCode {
+namespace Linkxtr\QrCode\Support {
     if (! isset($GLOBALS['mockFilePutContents'])) {
         $GLOBALS['mockFilePutContents'] = null;
     }
