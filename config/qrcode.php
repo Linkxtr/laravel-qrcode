@@ -115,6 +115,6 @@ return [
     | This option controls the cache configuration of the QR code.
     |
     */
-    'cache_enabled' => env('QRCODE_CACHE_ENABLED', false),
-    'cache_ttl' => env('QRCODE_CACHE_TTL', 1440),
+    'cache_enabled' => env('QR_CODE_CACHE_ENABLED', false),
+    'cache_ttl' => env('QR_CODE_CACHE_TTL', 1440),
 ];
