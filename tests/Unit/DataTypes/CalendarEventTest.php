@@ -258,3 +258,16 @@ it('ignores empty description and location', function (): void {
     expect((string) $event)->not->toContain('DESCRIPTION:')
         ->and((string) $event)->not->toContain('LOCATION:');
 });
+
+test('it sanitizes or rejects CRLF injection in calendar event uid to prevent iCalendar header injection', function (): void {
+    $event = new CalendarEvent(
+        summary: 'Team Sync',
+        start: '2026-10-06 10:00:00',
+        end: '2026-10-06 11:00:00',
+        uid: "event-123\r\nATTENDEE;CN=Injected:mailto:attacker@evil.com"
+    );
+
+    $output = (string) $event;
+
+    expect($output)->not->toContain("\r\nATTENDEE;CN=Injected:mailto:attacker@evil.com\r\n");
+});

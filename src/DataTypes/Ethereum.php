@@ -25,7 +25,7 @@ final readonly class Ethereum implements DataTypeInterface
         if ($amount === null) {
             $amountStr = '';
         } else {
-            $amountStr = (string) $amount;
+            $amountStr = $this->normalizeAmount($amount);
             if (! preg_match('/^(0|[1-9]\d*)(\.\d+)?$/', $amountStr)) {
                 throw InvalidEthereumArgumentException::invalidAmount($amountStr);
             }
@@ -43,5 +43,46 @@ final readonly class Ethereum implements DataTypeInterface
         }
 
         return self::PREFIX.$address;
+    }
+
+    private function normalizeAmount(float|string $amount): string
+    {
+        if (is_float($amount)) {
+            $amountStr = (string) $amount;
+            if (preg_match('/^[+-]?\d+(?:\.\d+)?e[+-]?\d+$/i', $amountStr)) {
+                return $this->convertScientificToDecimal($amountStr);
+            }
+
+            return $amountStr;
+        }
+
+        return $amount;
+    }
+
+    private function convertScientificToDecimal(string $str): string
+    {
+        $sign = '';
+        if (str_starts_with($str, '-')) {
+            $sign = '-';
+            $str = substr($str, 1);
+        }
+
+        [$mantissa, $exponent] = explode('e', strtolower($str));
+        $exp = (int) $exponent;
+        $parts = explode('.', $mantissa);
+        $intPart = $parts[0];
+        $fracPart = $parts[1] ?? '';
+
+        if ($exp > 0) {
+            $result = $intPart.$fracPart.str_repeat('0', max(0, $exp - strlen($fracPart)));
+        } else {
+            $result = '0.'.str_repeat('0', abs($exp) - strlen($intPart)).$intPart.$fracPart;
+        }
+
+        if (str_contains($result, '.')) {
+            $result = rtrim(rtrim($result, '0'), '.');
+        }
+
+        return $sign.($result === '' ? '0' : $result);
     }
 }

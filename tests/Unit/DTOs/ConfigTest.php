@@ -643,3 +643,24 @@ it('disable cache correctly when disableCache called', function (): void {
 
     expect($config->shouldCache())->toBe(false);
 });
+
+test('it successfully serializes and unserializes configuration without gradient', function (): void {
+    $config = new Config;
+    $serialized = serialize($config);
+    $unserialized = unserialize($serialized);
+
+    expect($unserialized)->toBeInstanceOf(Config::class)
+        ->and($unserialized->getSize())->toBe($config->getSize())
+        ->and($unserialized->getGradient())->toBeNull();
+});
+
+test('it successfully serializes and unserializes configuration with gradient enabled', function (): void {
+    $config = new Config;
+    $config->setupGradient(new Rgb(255, 0, 0), new Rgb(0, 0, 255), GradientType::VERTICAL);
+
+    $serialized = serialize($config);
+    $unserialized = unserialize($serialized);
+
+    expect($unserialized)->toBeInstanceOf(Config::class)
+        ->and($unserialized->getGradient())->toBeInstanceOf(Gradient::class);
+});

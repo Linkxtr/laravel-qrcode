@@ -209,3 +209,11 @@ test('it mathematically rejects arrays and objects inside color configurations',
     expect(fn (): Generator => $generator->gradient([255, 0, 0], [0, new stdClass, 0]))
         ->toThrow(InvalidArgumentException::class, 'RGB array values must be numeric.');
 });
+
+test('it generates a cached QR code when gradient is enabled without throwing SerializeNotSupportedException', function (): void {
+    $generator = (new Generator)->gradient([255, 0, 0], [0, 0, 255])->cache();
+
+    $qrCodeResult = $generator->generate('https://example.com');
+
+    expect($qrCodeResult)->toBeInstanceOf(QrCodeResult::class);
+});

@@ -37,8 +37,12 @@ final readonly class CalendarEvent implements DataTypeInterface
             throw InvalidCalendarEventArgumentException::endDateMustBeAfterStartDate();
         }
 
-        $this->uidValue = ($uid !== null && $uid !== '')
-            ? $uid
+        $sanitizedUid = ($uid !== null && $uid !== '')
+            ? str_replace(["\r\n", "\r", "\n"], '', $uid)
+            : null;
+
+        $this->uidValue = ($sanitizedUid !== null && $sanitizedUid !== '')
+            ? $sanitizedUid
             : sha1($this->summary.$this->startParsed->timestamp.$this->endParsed->timestamp.$this->description.$this->location).'@linkxtr-qrcode';
     }
 

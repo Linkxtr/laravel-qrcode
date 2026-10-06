@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Support\CacheManager;
@@ -58,4 +59,28 @@ test('it strictly formats the exact cache key to kill concatenation and hashing 
     $expectedKey = 'qrcode_'.md5($payload.serialize($config));
 
     expect($key)->toBe($expectedKey);
+});
+
+test('it produces identical cache keys regardless of dynamic DateTimeInterface TTL timestamps', function (): void {
+    $config1 = new Config;
+    $config1->setupCache(Carbon::parse('2026-10-06 10:00:00'));
+
+    $config2 = new Config;
+    $config2->setupCache(Carbon::parse('2026-10-06 10:00:01'));
+
+    $manager1 = new CacheManager($config1, 'same-payload');
+    $manager2 = new CacheManager($config2, 'same-payload');
+
+    $key1 = invade($manager1)->getKey();
+    $key2 = invade($manager2)->getKey();
+
+    expect($key1)->toBe($key2);
+});
+
+test('it accepts the payload parameter by name without parameter mismatch errors', function (): void {
+    $config = Config::fromArray(['cache_enabled' => false]);
+
+    $qrCodeResult = CacheManager::handle(config: $config, payload: 'https://example.com');
+
+    expect($qrCodeResult)->toBeInstanceOf(QrCodeResult::class);
 });
