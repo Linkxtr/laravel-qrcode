@@ -88,3 +88,9 @@ test('it formats large floats passed in scientific notation to valid integer str
 
     expect((string) $ethLarge)->toBe('ethereum:0x71C7656EC7ab88b098defB751B7401B5f6d8976F?amount=1000000000000000');
 });
+
+test('it preserves 18 decimal places when micro amount passed as float', function (): void {
+    $eth = new Ethereum('0x71C7656EC7ab88b098defB751B7401B5f6d8976F', 1e-18);
+
+    expect((string) $eth)->toBe('ethereum:0x71C7656EC7ab88b098defB751B7401B5f6d8976F?amount=0.000000000000000001');
+});

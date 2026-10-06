@@ -49,40 +49,13 @@ final readonly class Ethereum implements DataTypeInterface
     {
         if (is_float($amount)) {
             $amountStr = (string) $amount;
-            if (preg_match('/^[+-]?\d+(?:\.\d+)?e[+-]?\d+$/i', $amountStr)) {
-                return $this->convertScientificToDecimal($amountStr);
+            if (str_contains(strtolower($amountStr), 'e')) {
+                return rtrim(rtrim(sprintf('%.18f', $amount), '0'), '.');
             }
 
             return $amountStr;
         }
 
         return $amount;
-    }
-
-    private function convertScientificToDecimal(string $str): string
-    {
-        $sign = '';
-        if (str_starts_with($str, '-')) {
-            $sign = '-';
-            $str = substr($str, 1);
-        }
-
-        [$mantissa, $exponent] = explode('e', strtolower($str));
-        $exp = (int) $exponent;
-        $parts = explode('.', $mantissa);
-        $intPart = $parts[0];
-        $fracPart = $parts[1] ?? '';
-
-        if ($exp > 0) {
-            $result = $intPart.$fracPart.str_repeat('0', max(0, $exp - strlen($fracPart)));
-        } else {
-            $result = '0.'.str_repeat('0', abs($exp) - strlen($intPart)).$intPart.$fracPart;
-        }
-
-        if (str_contains($result, '.')) {
-            $result = rtrim(rtrim($result, '0'), '.');
-        }
-
-        return $sign.($result === '' ? '0' : $result);
     }
 }

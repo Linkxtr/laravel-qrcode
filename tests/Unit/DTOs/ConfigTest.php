@@ -656,11 +656,20 @@ test('it successfully serializes and unserializes configuration without gradient
 
 test('it successfully serializes and unserializes configuration with gradient enabled', function (): void {
     $config = new Config;
-    $config->setupGradient(new Rgb(255, 0, 0), new Rgb(0, 0, 255), GradientType::VERTICAL);
+    $config->setupGradient(new Rgb(11, 22, 33), new Rgb(44, 55, 66), GradientType::HORIZONTAL);
 
     $serialized = serialize($config);
     $unserialized = unserialize($serialized);
 
     expect($unserialized)->toBeInstanceOf(Config::class)
         ->and($unserialized->getGradient())->toBeInstanceOf(Gradient::class);
+
+    $gradient = $unserialized->getGradient();
+    expect($gradient->getStartColor()->toRgb()->getRed())->toBe(11)
+        ->and($gradient->getStartColor()->toRgb()->getGreen())->toBe(22)
+        ->and($gradient->getStartColor()->toRgb()->getBlue())->toBe(33)
+        ->and($gradient->getEndColor()->toRgb()->getRed())->toBe(44)
+        ->and($gradient->getEndColor()->toRgb()->getGreen())->toBe(55)
+        ->and($gradient->getEndColor()->toRgb()->getBlue())->toBe(66)
+        ->and($gradient->getType()->name())->toBe('HORIZONTAL');
 });
