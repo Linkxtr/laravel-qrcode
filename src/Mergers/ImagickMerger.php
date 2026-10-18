@@ -12,6 +12,8 @@ use Linkxtr\QrCode\Exceptions\ImageMergeException;
 
 final class ImagickMerger implements MergerInterface
 {
+    private const RESIZE_BLUR_FACTOR = 1;
+
     private Format $format = Format::PNG;
 
     public function __construct(
@@ -61,7 +63,12 @@ final class ImagickMerger implements MergerInterface
             $centerX = (int) (($sourceWidth - $targetLogoWidth) / 2);
             $centerY = (int) (($sourceHeight - $targetLogoHeight) / 2);
 
-            $merge->resizeImage($targetLogoWidth, $targetLogoHeight, Imagick::FILTER_LANCZOS, 1);
+            $merge->resizeImage(
+                $targetLogoWidth,
+                $targetLogoHeight,
+                Imagick::FILTER_LANCZOS,
+                self::RESIZE_BLUR_FACTOR
+            );
 
             $source->compositeImage($merge, Imagick::COMPOSITE_DEFAULT, $centerX, $centerY);
 
