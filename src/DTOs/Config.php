@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Linkxtr\QrCode\DTOs;
 
+use BaconQrCode\Renderer\Color\Rgb as BaconRgb;
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
+use BaconQrCode\Renderer\RendererStyle\GradientType as BaconGradientType;
 use DateInterval;
 use DateTimeInterface;
 use Illuminate\Support\Facades\File;
@@ -126,6 +128,116 @@ final class Config
      * The cache time to live.
      */
     private DateTimeInterface|DateInterval|int|null $cacheTtl = null;
+
+    /**
+     * @return array{
+     *     format: Format,
+     *     errorCorrectionLevel: ErrorCorrectionLevel,
+     *     style: Style,
+     *     styleSize: float,
+     *     eyeStyle: EyeStyle|null,
+     *     internalEyeStyle: EyeStyle|null,
+     *     size: int,
+     *     margin: int,
+     *     encoding: string,
+     *     colorModel: ColorModel,
+     *     colorValue: ColorInterface|null,
+     *     backgroundColorValue: ColorInterface|null,
+     *     eyeColors: array<int, EyeFill>,
+     *     gradient: array{start: array{int, int, int}, end: array{int, int, int}, type: string}|null,
+     *     imageMerge: string,
+     *     imagePercentage: float
+     * }
+     */
+    public function __serialize(): array
+    {
+        return [
+            'format' => $this->format,
+            'errorCorrectionLevel' => $this->errorCorrectionLevel,
+            'style' => $this->style,
+            'styleSize' => $this->styleSize,
+            'eyeStyle' => $this->eyeStyle,
+            'internalEyeStyle' => $this->internalEyeStyle,
+            'size' => $this->size,
+            'margin' => $this->margin,
+            'encoding' => $this->encoding,
+            'colorModel' => $this->colorModel,
+            'colorValue' => $this->colorValue,
+            'backgroundColorValue' => $this->backgroundColorValue,
+            'eyeColors' => $this->eyeColors,
+            'gradient' => $this->gradient instanceof Gradient ? [
+                'start' => [
+                    $this->gradient->getStartColor()->toRgb()->getRed(),
+                    $this->gradient->getStartColor()->toRgb()->getGreen(),
+                    $this->gradient->getStartColor()->toRgb()->getBlue(),
+                ],
+                'end' => [
+                    $this->gradient->getEndColor()->toRgb()->getRed(),
+                    $this->gradient->getEndColor()->toRgb()->getGreen(),
+                    $this->gradient->getEndColor()->toRgb()->getBlue(),
+                ],
+                'type' => $this->gradient->getType()->name(),
+            ] : null,
+            'imageMerge' => $this->imageMerge,
+            'imagePercentage' => $this->imagePercentage,
+        ];
+    }
+
+    /**
+     * @param  array{
+     *     format: Format,
+     *     errorCorrectionLevel: ErrorCorrectionLevel,
+     *     style: Style,
+     *     styleSize: float,
+     *     eyeStyle: EyeStyle|null,
+     *     internalEyeStyle: EyeStyle|null,
+     *     size: int,
+     *     margin: int,
+     *     encoding: string,
+     *     colorModel: ColorModel,
+     *     colorValue: ColorInterface|null,
+     *     backgroundColorValue: ColorInterface|null,
+     *     eyeColors: array<int, EyeFill>,
+     *     gradient: array{start: array{int, int, int}, end: array{int, int, int}, type: string}|null,
+     *     imageMerge: string,
+     *     imagePercentage: float
+     * }  $data
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->format = $data['format'];
+        $this->errorCorrectionLevel = $data['errorCorrectionLevel'];
+        $this->style = $data['style'];
+        $this->styleSize = $data['styleSize'];
+        $this->eyeStyle = $data['eyeStyle'];
+        $this->internalEyeStyle = $data['internalEyeStyle'];
+        $this->size = $data['size'];
+        $this->margin = $data['margin'];
+        $this->encoding = $data['encoding'];
+        $this->colorModel = $data['colorModel'];
+        $this->colorValue = $data['colorValue'];
+        $this->backgroundColorValue = $data['backgroundColorValue'];
+        $this->eyeColors = $data['eyeColors'];
+        if ($data['gradient'] !== null) {
+            $start = new BaconRgb(
+                $data['gradient']['start'][0],
+                $data['gradient']['start'][1],
+                $data['gradient']['start'][2]
+            );
+            $end = new BaconRgb(
+                $data['gradient']['end'][0],
+                $data['gradient']['end'][1],
+                $data['gradient']['end'][2]
+            );
+            $type = BaconGradientType::valueOf($data['gradient']['type']);
+            $this->gradient = new Gradient($start, $end, $type);
+        } else {
+            $this->gradient = null;
+        }
+
+        $this->imageMerge = $data['imageMerge'];
+        $this->imagePercentage = $data['imagePercentage'];
+    }
 
     /**
      * @param  array<mixed>  $config

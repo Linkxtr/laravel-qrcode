@@ -34,6 +34,7 @@
   },
   "require-dev": {
     "chillerlan/php-qrcode": "^6.0",
+    "laravel/pao": "^1.1",
     "laravel/pint": "^1.0",
     "orchestra/testbench": "^10.0|^11.0",
     "pestphp/pest": "^3.0|^4.0",

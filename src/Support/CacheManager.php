@@ -12,9 +12,9 @@ final readonly class CacheManager
 {
     public function __construct(private Config $config, private string $payload) {}
 
-    public static function handle(Config $config, string $paylod): QrCodeResult
+    public static function handle(Config $config, string $payload): QrCodeResult
     {
-        $cache = new self($config, $paylod);
+        $cache = new self($config, $payload);
 
         return $cache->getResult();
     }

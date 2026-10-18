@@ -6,7 +6,7 @@ use Linkxtr\QrCode\Facades\QrCode as QrCodeFacade;
 use Linkxtr\QrCode\Generator;
 use Linkxtr\QrCode\Support\QrCodeResult;
 
-if (! function_exists('qrcode')) {
+if (! function_exists('qrcode')) { // @codeCoverageIgnore
     /**
      * Get the QR Code generator instance or generate a QR code directly.
      *

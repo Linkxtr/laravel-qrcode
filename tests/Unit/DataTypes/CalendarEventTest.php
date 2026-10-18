@@ -258,3 +258,33 @@ it('ignores empty description and location', function (): void {
     expect((string) $event)->not->toContain('DESCRIPTION:')
         ->and((string) $event)->not->toContain('LOCATION:');
 });
+
+test('it sanitizes or rejects CRLF injection in calendar event uid to prevent iCalendar header injection', function (): void {
+    $event = new CalendarEvent(
+        summary: 'Team Sync',
+        start: '2026-10-06 10:00:00',
+        end: '2026-10-06 11:00:00',
+        uid: "event-123\r\nATTENDEE;CN=Injected:mailto:attacker@evil.com"
+    );
+
+    $output = (string) $event;
+
+    expect($output)->not->toContain("\r\nATTENDEE;CN=Injected:mailto:attacker@evil.com\r\n")
+        ->and(invade($event)->uidValue)->toBe('event-123ATTENDEE;CN=Injected:mailto:attacker@evil.com');
+
+    $eventCR = new CalendarEvent(summary: 'Test', start: 100, end: 200, uid: "custom\rid");
+    expect(invade($eventCR)->uidValue)->toBe('customid');
+
+    $eventLF = new CalendarEvent(summary: 'Test', start: 100, end: 200, uid: "custom\nid");
+    expect(invade($eventLF)->uidValue)->toBe('customid');
+
+    $eventCRLF = new CalendarEvent(summary: 'Test', start: 100, end: 200, uid: "custom\r\nid");
+    expect(invade($eventCRLF)->uidValue)->toBe('customid');
+
+    $eventWhitespace = new CalendarEvent(summary: 'Test', start: 100, end: 200, uid: "\r\n");
+    $eventNull = new CalendarEvent(summary: 'Test', start: 100, end: 200);
+    expect(invade($eventWhitespace)->uidValue)->toBe(invade($eventNull)->uidValue);
+
+    $eventEmpty = new CalendarEvent(summary: 'Test', start: 100, end: 200, uid: '');
+    expect(invade($eventEmpty)->uidValue)->toBe(invade($eventNull)->uidValue);
+});

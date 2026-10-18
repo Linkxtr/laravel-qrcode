@@ -16,6 +16,10 @@ use Linkxtr\QrCode\ValueObjects\Colors\Rgb;
 covers(RendererFactory::class);
 
 it('uses ImageRenderer when imagick is loaded', function (Format $format): void {
+    if (! class_exists(Imagick::class) && in_array($format, [Format::PNG, Format::WEBP], true)) {
+        test()->markTestSkipped('The Imagick class is physically required to instantiate raster backends.');
+    }
+
     Environment::enableExtension('imagick');
 
     $config = new Config;
