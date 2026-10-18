@@ -70,10 +70,14 @@ final class RasterMerger implements MergerInterface
         imagecopyresampled(
             $gdImage,
             $this->mergeImage->getImageResource(),
-            $centerX, $centerY,
-            self::ORIGIN, self::ORIGIN,
-            $targetLogoWidth, $targetLogoHeight,
-            $mergeWidth, $mergeHeight
+            $centerX,
+            $centerY,
+            self::ORIGIN,
+            self::ORIGIN,
+            $targetLogoWidth,
+            $targetLogoHeight,
+            $mergeWidth,
+            $mergeHeight
         );
 
         imagesavealpha($gdImage, true);
@@ -95,7 +99,7 @@ final class RasterMerger implements MergerInterface
 
         unset($gdImage);
 
-        if (! $success || $content === false || $content === '') { // @phpstan-ignore identical.alwaysFalse
+        if (! $success || $content === false || $content === '') {
             throw ImageMergeException::failedToRenderImageBinary();
         }
 
