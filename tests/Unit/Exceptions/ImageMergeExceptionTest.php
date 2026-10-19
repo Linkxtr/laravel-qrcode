@@ -97,6 +97,10 @@ test('failedToCaptureHexDataFromOutputBuffer sets correct error code and message
 });
 
 test('imagickException sets correct error code and message', function (): void {
+    if (! class_exists(ImagickException::class)) {
+        test()->markTestSkipped('The imagick extension is required to test ImagickException.');
+    }
+
     $imageMergeException = ImageMergeException::imagickException(new ImagickException('error'));
 
     expect($imageMergeException)

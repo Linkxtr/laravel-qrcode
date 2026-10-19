@@ -25,7 +25,7 @@ final readonly class Ethereum implements DataTypeInterface
         if ($amount === null) {
             $amountStr = '';
         } else {
-            $amountStr = (string) $amount;
+            $amountStr = $this->normalizeAmount($amount);
             if (! preg_match('/^(0|[1-9]\d*)(\.\d+)?$/', $amountStr)) {
                 throw InvalidEthereumArgumentException::invalidAmount($amountStr);
             }
@@ -43,5 +43,19 @@ final readonly class Ethereum implements DataTypeInterface
         }
 
         return self::PREFIX.$address;
+    }
+
+    private function normalizeAmount(float|string $amount): string
+    {
+        if (is_float($amount)) {
+            $amountStr = (string) $amount;
+            if (str_contains(strtolower($amountStr), 'e')) {
+                return rtrim(rtrim(sprintf('%.18f', $amount), '0'), '.');
+            }
+
+            return $amountStr;
+        }
+
+        return $amount;
     }
 }

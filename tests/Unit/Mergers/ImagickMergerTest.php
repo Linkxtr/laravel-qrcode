@@ -213,7 +213,7 @@ test('it strictly applies a blur factor of exactly 1 during resize', function ()
 
     $expectedMerge = new Imagick;
     $expectedMerge->readImageBlob($complexImage);
-    $expectedMerge->resizeImage(10, 10, Imagick::FILTER_LANCZOS, 1);
+    $expectedMerge->resizeImage(10, 10, Imagick::FILTER_LANCZOS, 1.0);
 
     $expectedSource->compositeImage($expectedMerge, Imagick::COMPOSITE_DEFAULT, 5, 5);
     $expectedSource->setImageFormat('png');

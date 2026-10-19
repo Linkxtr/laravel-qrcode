@@ -72,6 +72,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          composer remove --dev laravel/pao --no-update --no-interaction 2>/dev/null || true
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --prefer-dist --no-progress --prefer-stable --no-interaction
 
@@ -81,7 +82,7 @@ jobs:
           composer test:unit
 
       - name: Upload coverage
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
         with:
           name: coverage-report-${{ matrix.php }}-${{ matrix.laravel }}
