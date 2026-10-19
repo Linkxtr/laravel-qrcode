@@ -1,6 +1,8 @@
 {
   "name": "linkxtr/laravel-qrcode",
   "description": "A clean, modern, and easy-to-use QR code generator for Laravel",
+  "license": "MIT",
+  "type": "library",
   "keywords": [
     "laravel",
     "qrcode",
@@ -13,8 +15,6 @@
     "vcard",
     "payment"
   ],
-  "type": "library",
-  "license": "MIT",
   "authors": [
     {
       "name": "Khaled Sadek",
@@ -25,25 +25,28 @@
   "require": {
     "php": "^8.2",
     "bacon/bacon-qr-code": "^3.0",
-    "illuminate/contracts": "^12.0|^13.0",
-    "illuminate/support": "^12.0|^13.0"
+    "illuminate/contracts": "^12.0 || ^13.0",
+    "illuminate/support": "^12.0 || ^13.0"
+  },
+  "require-dev": {
+    "chillerlan/php-qrcode": "^6.0",
+    "ergebnis/composer-normalize": "^2.54",
+    "laravel/pao": "^1.1",
+    "laravel/pint": "^1.0",
+    "orchestra/testbench": "^10.0 || ^11.0",
+    "pestphp/pest": "^3.0 || ^4.0",
+    "pestphp/pest-plugin-laravel": "^3.0 || ^4.0",
+    "pestphp/pest-plugin-type-coverage": "^3.0 || ^4.0",
+    "phpstan/phpstan": "^2.0",
+    "rector/rector": "^1.0 || ^2.0",
+    "spatie/invade": "^2.1"
   },
   "suggest": {
     "ext-gd": "Required to generate PNG and WebP images via GD",
     "ext-imagick": "Required to generate PNG and WebP images via Imagick"
   },
-  "require-dev": {
-    "chillerlan/php-qrcode": "^6.0",
-    "laravel/pao": "^1.1|php:^8.3",
-    "laravel/pint": "^1.0",
-    "orchestra/testbench": "^10.0|^11.0",
-    "pestphp/pest": "^3.0|^4.0",
-    "pestphp/pest-plugin-laravel": "^3.0|^4.0",
-    "pestphp/pest-plugin-type-coverage": "^3.0|^4.0",
-    "phpstan/phpstan": "^2.0",
-    "rector/rector": "^1.0|^2.0",
-    "spatie/invade": "^2.1"
-  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
   "autoload": {
     "psr-4": {
       "Linkxtr\\QrCode\\": "src/"
@@ -57,14 +60,37 @@
       "Tests\\": "tests/"
     }
   },
+  "config": {
+    "allow-plugins": {
+      "ergebnis/composer-normalize": true,
+      "pestphp/pest-plugin": true,
+      "phpstan/extension-installer": true
+    },
+    "platform": {
+      "php": "8.3"
+    },
+    "sort-packages": true
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "3.x-dev"
+    },
+    "laravel": {
+      "aliases": {
+        "QrCode": "Linkxtr\\QrCode\\Facades\\QrCode"
+      },
+      "providers": [
+        "Linkxtr\\QrCode\\QrCodeServiceProvider"
+      ]
+    }
+  },
   "scripts": {
-    "refactor": "rector",
     "lint": "pint --parallel",
-    "test:refactor": "rector --dry-run",
-    "test:lint": "pint --parallel --test",
-    "test:types": "phpstan analyse --ansi",
-    "test:type-coverage": "pest --type-coverage --compact --coverage --min=100",
-    "test:unit": "pest --parallel --colors=always --coverage --min=100 --coverage-clover build/logs/clover.xml",
+    "mutate": [
+      "Composer\\Config::disableProcessTimeout",
+      "pest --parallel --mutate --covered-only"
+    ],
+    "refactor": "rector",
     "test": [
       "@test:refactor",
       "@test:lint",
@@ -72,31 +98,10 @@
       "@test:type-coverage",
       "@test:unit"
     ],
-    "mutate": [
-      "Composer\\Config::disableProcessTimeout",
-      "pest --parallel --mutate --covered-only"
-    ]
-  },
-  "config": {
-    "sort-packages": true,
-    "allow-plugins": {
-      "pestphp/pest-plugin": true,
-      "phpstan/extension-installer": true
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Linkxtr\\QrCode\\QrCodeServiceProvider"
-      ],
-      "aliases": {
-        "QrCode": "Linkxtr\\QrCode\\Facades\\QrCode"
-      }
-    },
-    "branch-alias": {
-      "dev-main": "3.x-dev"
-    }
-  },
-  "minimum-stability": "stable",
-  "prefer-stable": true
+    "test:lint": "pint --parallel --test",
+    "test:refactor": "rector --dry-run",
+    "test:type-coverage": "pest --type-coverage --compact --coverage --min=100",
+    "test:types": "phpstan analyse --ansi",
+    "test:unit": "pest --parallel --colors=always --coverage --min=100 --coverage-clover build/logs/clover.xml"
+  }
 }
