@@ -72,8 +72,9 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          composer remove --dev laravel/pao --no-update --no-interaction 2>/dev/null || true
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          composer update --prefer-dist --no-progress --prefer-stable --no-interaction --ignore-platform-req=php
+          composer update --prefer-dist --no-progress --prefer-stable --no-interaction
 
       - name: Run Tests
         run: |
