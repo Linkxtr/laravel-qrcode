@@ -673,3 +673,50 @@ test('it successfully serializes and unserializes configuration with gradient en
         ->and($gradient->getEndColor()->toRgb()->getBlue())->toBe(66)
         ->and($gradient->getType()->name())->toBe('HORIZONTAL');
 });
+
+test('it parses env-style string inputs for cache configuration', function (): void {
+    $config1 = Config::fromArray([
+        'cache_enabled' => 'true',
+        'cache_ttl' => '60',
+    ]);
+
+    expect($config1->shouldCache())->toBe(true)
+        ->and($config1->getCacheTtl())->toBe(60);
+
+    $config2 = Config::fromArray([
+        'cache_enabled' => '1',
+        'cache_ttl' => '120',
+    ]);
+
+    expect($config2->shouldCache())->toBe(true)
+        ->and($config2->getCacheTtl())->toBe(120);
+
+    $config3 = Config::fromArray([
+        'cache_enabled' => 'false',
+        'cache_ttl' => '0',
+    ]);
+
+    expect($config3->shouldCache())->toBe(false)
+        ->and($config3->getCacheTtl())->toBe(0);
+});
+
+test('it ignores invalid non-numeric string cache_ttl', function (): void {
+    $config = Config::fromArray([
+        'cache_enabled' => true,
+        'cache_ttl' => 'invalid-ttl',
+    ]);
+
+    expect($config->getCacheTtl())->toBe(1440);
+
+    $config = Config::fromArray([
+        'cache_ttl' => 'foo',
+    ]);
+
+    expect($config->getCacheTtl())->toBe(1440);
+
+    $config = Config::fromArray([
+        'cache_ttl' => '',
+    ]);
+
+    expect($config->getCacheTtl())->toBe(1440);
+});
