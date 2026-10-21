@@ -280,12 +280,18 @@ final class Config
             $instance->backgroundColorValue = Rgb::parse($config['background_color']);
         }
 
-        if (isset($config['cache_enabled']) && is_bool($config['cache_enabled'])) {
-            $instance->cacheEnabled = $config['cache_enabled'];
+        if (isset($config['cache_enabled'])) {
+            $instance->cacheEnabled = is_bool($config['cache_enabled'])
+                ? $config['cache_enabled']
+                : filter_var($config['cache_enabled'], FILTER_VALIDATE_BOOLEAN);
         }
 
-        if (isset($config['cache_ttl']) && is_int($config['cache_ttl'])) {
-            $instance->cacheTtl = $config['cache_ttl'];
+        if (isset($config['cache_ttl'])) {
+            if (is_int($config['cache_ttl'])) {
+                $instance->cacheTtl = $config['cache_ttl'];
+            } elseif (is_string($config['cache_ttl']) && is_numeric($config['cache_ttl'])) {
+                $instance->cacheTtl = (int) $config['cache_ttl'];
+            }
         }
 
         return $instance;

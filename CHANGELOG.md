@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Cache support (`cache()`, `withoutCache()`, `cache_enabled`, `cache_ttl`) with environment string coercion (#52).
+- `QrCodeResult::saveToFile()` method for file persistence (#52).
+- Laravel 12 and Laravel 13 support (`^12.0 || ^13.0`) (#52).
 - Static mapping for DataType resolution via `DataTypeResolver::MAP`.
 - Safe payload decoding and strict property initialization for Ethereum.
 - Deterministic UID generation for Calendar Events.
