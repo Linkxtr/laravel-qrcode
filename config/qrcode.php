@@ -113,8 +113,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option controls the cache configuration of the QR code.
+    | 'cache_ttl' is specified in seconds (default: 86400, 24 hours).
+    | 'cache_store' specifies the cache store to use (null uses default store).
     |
     */
     'cache_enabled' => filter_var(env('QR_CODE_CACHE_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
-    'cache_ttl' => (int) (env('QR_CODE_CACHE_TTL') ?? 1440),
+    'cache_ttl' => (int) (env('QR_CODE_CACHE_TTL') ?? 86400),
+    'cache_store' => env('QR_CODE_CACHE_STORE'),
 ];

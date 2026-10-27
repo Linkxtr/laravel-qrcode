@@ -26,7 +26,17 @@ final readonly class CacheManager
         }
 
         /** @var string $cachedQrCode */
-        $cachedQrCode = Cache::remember($this->getKey(), $this->config->getCacheTtl(), fn (): string => $this->generate()->__toString());
+        $cachedQrCode = $this->config->getCacheStore() !== null
+            ? Cache::store($this->config->getCacheStore())->remember(
+                $this->getKey(),
+                $this->config->getCacheTtl(),
+                fn (): string => $this->generate()->__toString()
+            )
+            : Cache::remember(
+                $this->getKey(),
+                $this->config->getCacheTtl(),
+                fn (): string => $this->generate()->__toString()
+            );
 
         return new QrCodeResult($cachedQrCode, $this->config->getFormat());
     }
@@ -42,6 +52,6 @@ final readonly class CacheManager
     {
         $serializedConfig = serialize($this->config);
 
-        return 'qrcode_'.md5($this->payload.$serializedConfig);
+        return 'qrcode_v3_'.md5($this->payload.$serializedConfig);
     }
 }
