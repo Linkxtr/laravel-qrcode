@@ -929,3 +929,13 @@ test('it strictly clears pre-existing global libxml errors in the finally block'
 
     libxml_use_internal_errors($initialState);
 });
+
+test('it falls back to svg when config format is not a string', function (): void {
+    config(['qrcode.format' => null]);
+    $component = new QrCodeComponent(data: 'https://linkxtr.com');
+    $closure = $component->render();
+    $html = $closure(['attributes' => new ComponentAttributeBag([])]);
+
+    expect($html)->toStartWith('<svg');
+    config(['qrcode.format' => 'svg']);
+});
