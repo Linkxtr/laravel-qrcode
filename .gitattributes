@@ -4,6 +4,7 @@
 # Ignore testing and development files for Composer downloads
 /tests/ export-ignore
 /.github/ export-ignore
+/art/ export-ignore
 /.styleci.yml export-ignore
 /phpunit.xml export-ignore
 /pest.yml export-ignore

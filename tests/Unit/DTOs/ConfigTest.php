@@ -47,7 +47,8 @@ test('it initializes with default values', function (): void {
         ->and($config->getBackgroundColorValue()->blue)->toBe(255)
         ->and($config->getBackgroundColorValue()->alpha)->toBe(100)
         ->and($config->shouldCache())->toBe(false)
-        ->and($config->getCacheTtl())->toBe(1440);
+        ->and($config->getCacheTtl())->toBe(86400)
+        ->and($config->getCacheStore())->toBeNull();
 });
 
 test('it seeds configuration from array payload', function (): void {
@@ -706,17 +707,49 @@ test('it ignores invalid non-numeric string cache_ttl', function (): void {
         'cache_ttl' => 'invalid-ttl',
     ]);
 
-    expect($config->getCacheTtl())->toBe(1440);
+    expect($config->getCacheTtl())->toBe(86400);
 
     $config = Config::fromArray([
         'cache_ttl' => 'foo',
     ]);
 
-    expect($config->getCacheTtl())->toBe(1440);
+    expect($config->getCacheTtl())->toBe(86400);
 
     $config = Config::fromArray([
         'cache_ttl' => '',
     ]);
 
-    expect($config->getCacheTtl())->toBe(1440);
+    expect($config->getCacheTtl())->toBe(86400);
+});
+
+test('it parses and manages cache_store configuration', function (): void {
+    $config = Config::fromArray([
+        'cache_store' => 'redis',
+    ]);
+
+    expect($config->getCacheStore())->toBe('redis');
+
+    $config->setCacheStore('memcached');
+    expect($config->getCacheStore())->toBe('memcached');
+
+    $config->setCacheStore('');
+    expect($config->getCacheStore())->toBeNull();
+
+    $emptyStoreConfig = Config::fromArray([
+        'cache_store' => '   ',
+    ]);
+    expect($emptyStoreConfig->getCacheStore())->toBeNull();
+
+    $config->setupCache(3600, 'array');
+    expect($config->getCacheTtl())->toBe(3600)
+        ->and($config->getCacheStore())->toBe('array')
+        ->and($config->shouldCache())->toBeTrue();
+});
+
+test('it throws descriptive exceptions for malformed color and background_color in fromArray', function (): void {
+    expect(fn (): Config => Config::fromArray(['color' => 'invalid-color']))
+        ->toThrow(InvalidConfigurationException::class, 'Invalid qrcode.color (QR_CODE_COLOR):');
+
+    expect(fn (): Config => Config::fromArray(['background_color' => 'invalid-color']))
+        ->toThrow(InvalidConfigurationException::class, 'Invalid qrcode.background_color (QR_CODE_BACKGROUND_COLOR):');
 });

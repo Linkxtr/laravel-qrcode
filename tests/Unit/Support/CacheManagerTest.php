@@ -24,12 +24,42 @@ test('it hits the cache and returns a valid result when caching is enabled', fun
 
     Cache::shouldReceive('remember')
         ->once()
-        ->withArgs(fn (string $key, int $ttl, Closure $callback): bool => str_starts_with($key, 'qrcode_') && $ttl === 600)
+        ->withArgs(fn (string $key, int $ttl, Closure $callback): bool => str_starts_with($key, 'qrcode_v3_') && $ttl === 600)
         ->andReturn('fake-cached-svg-string');
 
     $qrCodeResult = CacheManager::handle($config, 'my-payload');
 
     expect($qrCodeResult)->toBeInstanceOf(QrCodeResult::class);
+});
+
+test('it uses the specified cache store when configured', function (): void {
+    $config = Config::fromArray(['cache_enabled' => true, 'cache_store' => 'redis', 'cache_ttl' => 600]);
+
+    $storeMock = Mockery::mock();
+    $storeMock->shouldReceive('remember')
+        ->once()
+        ->withArgs(fn (string $key, int $ttl, Closure $callback): bool => str_starts_with($key, 'qrcode_v3_') && $ttl === 600)
+        ->andReturn('fake-cached-svg-string');
+
+    Cache::shouldReceive('store')
+        ->once()
+        ->with('redis')
+        ->andReturn($storeMock);
+
+    $qrCodeResult = CacheManager::handle($config, 'my-payload');
+
+    expect($qrCodeResult)->toBeInstanceOf(QrCodeResult::class);
+});
+
+test('it defaults cache ttl to 86400 seconds', function (): void {
+    $config = Config::fromArray(['cache_enabled' => true]);
+
+    Cache::shouldReceive('remember')
+        ->once()
+        ->withArgs(fn (string $key, int $ttl, Closure $callback): bool => str_starts_with($key, 'qrcode_v3_') && $ttl === 86400)
+        ->andReturn('fake-cached-svg-string');
+
+    CacheManager::handle($config, 'my-payload');
 });
 
 test('it strictly executes the closure to generate the qrcode on a cache miss', function (): void {
@@ -56,7 +86,7 @@ test('it strictly formats the exact cache key to kill concatenation and hashing 
 
     $key = invade($manager)->getKey();
 
-    $expectedKey = 'qrcode_'.md5($payload.serialize($config));
+    $expectedKey = 'qrcode_v3_'.md5($payload.serialize($config));
 
     expect($key)->toBe($expectedKey);
 });

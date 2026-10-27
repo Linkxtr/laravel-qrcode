@@ -272,11 +272,11 @@ final class Generator
         return $instance;
     }
 
-    public function cache(DateTimeInterface|DateInterval|int|null $ttl = null): static
+    public function cache(DateTimeInterface|DateInterval|int|null $ttl = null, ?string $store = null): static
     {
         $instance = clone $this;
 
-        $instance->config->setupCache($ttl);
+        $instance->config->setupCache($ttl, $store);
 
         return $instance;
     }

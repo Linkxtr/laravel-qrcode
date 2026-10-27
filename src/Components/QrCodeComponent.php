@@ -20,11 +20,11 @@ final class QrCodeComponent extends Component
 {
     public function __construct(
         public string $data,
-        public int $size = 100,
-        public string $format = 'svg',
+        public ?int $size = null,
+        public ?string $format = null,
         public ?string $color = null,
         public ?string $backgroundColor = null,
-        public int $margin = 0,
+        public ?int $margin = null,
         public ?string $style = null,
         public ?string $errorCorrection = null,
         public ?string $encoding = null,
@@ -41,14 +41,27 @@ final class QrCodeComponent extends Component
 
     public function render(): Closure
     {
-        if (! in_array($this->format, ['svg', 'png', 'webp'], true)) {
+        $configFormat = config('qrcode.format', 'svg');
+        $format = $this->format ?? (is_string($configFormat) ? $configFormat : 'svg');
+
+        if (! in_array($format, ['svg', 'png', 'webp'], true)) {
             throw InvalidConfigurationException::unsupportedFormat(
-                $this->format,
+                $format,
                 ['svg', 'png', 'webp']
             );
         }
 
-        $generator = QrCode::size($this->size)->format($this->format)->margin($this->margin);
+        $generator = QrCode::format($format);
+
+        $size = $this->size ?? config('qrcode.size');
+        if ($size !== null && is_numeric($size)) {
+            $generator = $generator->size((int) $size);
+        }
+
+        $margin = $this->margin ?? config('qrcode.margin');
+        if ($margin !== null && is_numeric($margin)) {
+            $generator = $generator->margin((int) $margin);
+        }
 
         if ($this->color !== null && $rgb = $this->resolveColor($this->color)) {
             $generator = $generator->color($rgb->red, $rgb->green, $rgb->blue, $rgb->alpha);
@@ -94,13 +107,13 @@ final class QrCodeComponent extends Component
             $generator = $generator->mergeString($this->mergeString, $this->mergePercentage);
         }
 
-        return function (array $data) use ($generator): string {
+        return function (array $data) use ($generator, $format): string {
             $htmlString = (string) $generator->generate($this->data);
 
             /** @var ComponentAttributeBag $attributes */
             $attributes = $data['attributes'];
 
-            if ($this->format === 'svg') {
+            if ($format === 'svg') {
                 return $this->prepareSvg($htmlString, $attributes);
             }
 
@@ -110,17 +123,14 @@ final class QrCodeComponent extends Component
 
             $base64 = base64_encode($htmlString);
 
-            return '<img '.$componentAttributeBag->toHtml().' src="data:image/'.$this->format.';base64,'.$base64.'" />';
+            return '<img '.$componentAttributeBag->toHtml().' src="data:image/'.$format.';base64,'.$base64.'" />';
         };
     }
 
     private function prepareSvg(string $svg, ComponentAttributeBag $componentAttributeBag): string
     {
-        $xmlDeclaration = '';
-
         if (preg_match('/^\s*<\?xml[^>]*\?>\s*/i', $svg, $matches)) {
-            $xmlDeclaration = $matches[0];
-            $svg = substr($svg, strlen($xmlDeclaration));
+            $svg = substr($svg, strlen($matches[0]));
         }
 
         $domDocument = new DOMDocument;
@@ -186,7 +196,7 @@ final class QrCodeComponent extends Component
                 $output .= $serialized;
             }
 
-            return $xmlDeclaration.$output;
+            return $output;
         } finally {
             libxml_clear_errors();
             libxml_use_internal_errors($libxmlState);

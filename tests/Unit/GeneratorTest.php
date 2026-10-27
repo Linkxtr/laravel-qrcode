@@ -191,7 +191,14 @@ test('fluent configuration methods return a cloned instance with updated config'
     $cached = $generator->cache(5000);
     expect($cached)->toBeInstanceOf(Generator::class)->not->toBe($generator)
         ->and(invade($cached)->config->getCacheTtl())->toBe(5000)
+        ->and(invade($cached)->config->getCacheStore())->toBeNull()
         ->and(invade($cached)->config->shouldCache())->toBe(true);
+
+    $cachedWithStore = $generator->cache(5000, 'redis');
+    expect($cachedWithStore)->toBeInstanceOf(Generator::class)->not->toBe($generator)
+        ->and(invade($cachedWithStore)->config->getCacheTtl())->toBe(5000)
+        ->and(invade($cachedWithStore)->config->getCacheStore())->toBe('redis')
+        ->and(invade($cachedWithStore)->config->shouldCache())->toBe(true);
 
     $notCached = $cached->withoutCache();
     expect($notCached)->toBeInstanceOf(Generator::class)->not->toBe($cached)
