@@ -27,7 +27,9 @@ final readonly class QrCodeResult implements Htmlable, Responsable, Stringable
     public function toHtml(): string
     {
         if ($this->format === Format::SVG) {
-            return (string) preg_replace('/^\s*<\?xml[^>]*\?>\s*/i', '', $this->content);
+            $stripped = preg_replace('/^\s*<\?xml[^>]*\?>\s*/i', '', $this->content);
+
+            return $stripped ?? $this->content;
         }
 
         $alt = __('QR Code');

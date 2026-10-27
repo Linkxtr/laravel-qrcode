@@ -41,8 +41,15 @@ final class QrCodeComponent extends Component
 
     public function render(): Closure
     {
-        $configFormat = config('qrcode.format', 'svg');
-        $format = $this->format ?? (is_string($configFormat) ? $configFormat : 'svg');
+        $format = $this->format;
+        if ($format === null) {
+            $configFormat = config('qrcode.format', 'svg');
+            if (is_string($configFormat)) {
+                $format = $configFormat;
+            } else {
+                $format = 'svg';
+            }
+        }
 
         if (! in_array($format, ['svg', 'png', 'webp'], true)) {
             throw InvalidConfigurationException::unsupportedFormat(
