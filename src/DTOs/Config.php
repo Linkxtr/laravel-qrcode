@@ -307,12 +307,8 @@ final class Config
                 : filter_var($config['cache_enabled'], FILTER_VALIDATE_BOOLEAN);
         }
 
-        if (isset($config['cache_ttl'])) {
-            if (is_int($config['cache_ttl'])) {
-                $instance->cacheTtl = $config['cache_ttl'];
-            } elseif (is_string($config['cache_ttl']) && is_numeric($config['cache_ttl'])) {
-                $instance->cacheTtl = (int) $config['cache_ttl'];
-            }
+        if (isset($config['cache_ttl']) && is_numeric($config['cache_ttl'])) {
+            $instance->cacheTtl = (int) $config['cache_ttl'];
         }
 
         if (isset($config['cache_store']) && is_string($config['cache_store']) && trim($config['cache_store']) !== '') {
@@ -609,7 +605,7 @@ final class Config
         $this->cacheEnabled = true;
         $this->cacheTtl = $ttl;
         if ($store !== null) {
-            $this->setCacheStore($store);
+            $this->setCacheStore(trim($store));
         }
     }
 
@@ -628,14 +624,14 @@ final class Config
         return $this->cacheStore;
     }
 
-    public function setCacheStore(?string $store): void
-    {
-        $this->cacheStore = $store !== null && trim($store) !== '' ? trim($store) : null;
-    }
-
     public function shouldCache(): bool
     {
         return $this->cacheEnabled;
+    }
+
+    private function setCacheStore(string $store): void
+    {
+        $this->cacheStore = $store !== '' ? $store : null;
     }
 
     private function isPathInsideApplication(string $resolvedPath): bool

@@ -724,15 +724,15 @@ test('it ignores invalid non-numeric string cache_ttl', function (): void {
 
 test('it parses and manages cache_store configuration', function (): void {
     $config = Config::fromArray([
-        'cache_store' => 'redis',
+        'cache_store' => ' redis',
     ]);
 
     expect($config->getCacheStore())->toBe('redis');
 
-    $config->setCacheStore('memcached');
+    $config->setupCache(60, ' memcached ');
     expect($config->getCacheStore())->toBe('memcached');
 
-    $config->setCacheStore('');
+    $config->setupCache(60, '');
     expect($config->getCacheStore())->toBeNull();
 
     $emptyStoreConfig = Config::fromArray([
