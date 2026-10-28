@@ -108,7 +108,7 @@ php artisan qr:generate
 Or pass flags directly:
 
 ```bash
-php artisan qr:generate --data="https://example.com" --output="public/qr.svg" --format=svg --size=400
+php artisan qr:generate "https://example.com" --output="public/qr.svg" --format=svg --size=400
 ```
 
 ### 4. High-Performance Caching
