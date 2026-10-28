@@ -15,7 +15,7 @@ env:
 jobs:
   tests:
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
