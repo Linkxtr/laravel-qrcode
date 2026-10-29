@@ -26,6 +26,12 @@ test('it throws exceptions for invalid formats', function (): void {
 
     $component2 = new QrCodeComponent(data: 'test', format: 'eps');
     expect(fn (): Closure => $component2->render())->toThrow(InvalidConfigurationException::class, 'Format must be one of the following values: svg, png, webp. Got: eps');
+
+    config(['qrcode.format' => 'invalid']);
+    QrCode::swap(new Generator(config('qrcode')));
+
+    $component3 = new QrCodeComponent(data: 'test');
+    expect(fn (): Closure => $component3->render())->toThrow(InvalidConfigurationException::class, 'Format must be one of the following values: svg, png, webp. Got: invalid');
 });
 
 test('it throws exception for path traversal attempts in merge', function (): void {

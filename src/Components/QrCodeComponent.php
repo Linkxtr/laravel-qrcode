@@ -9,6 +9,7 @@ use DOMDocument;
 use DOMElement;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
+use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Exceptions\GenerationException;
 use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
@@ -41,22 +42,7 @@ final class QrCodeComponent extends Component
 
     public function render(): Closure
     {
-        $format = $this->format;
-        if ($format === null) {
-            $configFormat = config('qrcode.format', 'svg');
-            if (is_string($configFormat)) {
-                $format = $configFormat;
-            } else {
-                $format = 'svg';
-            }
-        }
-
-        if (! in_array($format, ['svg', 'png', 'webp'], true)) {
-            throw InvalidConfigurationException::unsupportedFormat(
-                $format,
-                ['svg', 'png', 'webp']
-            );
-        }
+        $format = $this->format ? $this->validateFormat($this->format) : $this->resolveFormatFromConfig();
 
         $generator = QrCode::format($format);
 
@@ -120,7 +106,7 @@ final class QrCodeComponent extends Component
             /** @var ComponentAttributeBag $attributes */
             $attributes = $data['attributes'];
 
-            if ($format === 'svg') {
+            if ($format === Format::SVG) {
                 return $this->prepareSvg($htmlString, $attributes);
             }
 
@@ -130,8 +116,33 @@ final class QrCodeComponent extends Component
 
             $base64 = base64_encode($htmlString);
 
-            return '<img '.$componentAttributeBag->toHtml().' src="data:image/'.$format.';base64,'.$base64.'" />';
+            return '<img '.$componentAttributeBag->toHtml().' src="data:image/'.$format->value.';base64,'.$base64.'" />';
         };
+    }
+
+    private function validateFormat(string $format): Format
+    {
+        $formatEnum = Format::tryFrom($format);
+
+        if ($formatEnum === null || $formatEnum === Format::EPS) {
+            throw InvalidConfigurationException::unsupportedFormat(
+                $format,
+                ['svg', 'png', 'webp']
+            );
+        }
+
+        return $formatEnum;
+    }
+
+    private function resolveFormatFromConfig(): Format
+    {
+        $format = config('qrcode.format');
+
+        if (is_string($format)) {
+            return $this->validateFormat($format);
+        }
+
+        return Format::SVG;
     }
 
     private function prepareSvg(string $svg, ComponentAttributeBag $componentAttributeBag): string
