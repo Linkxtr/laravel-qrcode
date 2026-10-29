@@ -52,11 +52,15 @@ final readonly class QrCodeResult implements Htmlable, Responsable, Stringable
     {
         $etag = '"'.md5($this->content).'"';
 
-        return response($this->content, 200, [
+        $response = response($this->content, 200, [
             'Content-Type' => $this->getMimeType(),
             'ETag' => $etag,
-            'Cache-Control' => 'public, max-age=86400',
+            'Cache-Control' => 'private, max-age=86400',
         ]);
+
+        $response->isNotModified($request);
+
+        return $response;
     }
 
     public function isSvg(): bool

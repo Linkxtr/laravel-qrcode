@@ -92,16 +92,6 @@ test('it ignore invalid config value for size', function (): void {
     expect($html)->toContain('width="400"')->toContain('height="400"');
 });
 
-test('it accept config numeric values as string for size', function (): void {
-    config(['qrcode.size' => '300']);
-    QrCode::swap(new Generator(config('qrcode')));
-
-    $component = new QrCodeComponent(data: 'https://linkxtr.com');
-    $html = $component->render()(['attributes' => new ComponentAttributeBag([])]);
-
-    expect($html)->toContain('width="300"')->toContain('height="300"');
-});
-
 test('it strips xml declaration from svg output in prepareSvg', function (): void {
     $svgWithProlog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 0\"/></svg>";
 

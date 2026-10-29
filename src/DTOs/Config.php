@@ -281,11 +281,7 @@ final class Config
             try {
                 $instance->colorValue = Rgb::parse($config['color']);
             } catch (InvalidConfigurationException $exception) {
-                throw new InvalidConfigurationException(
-                    sprintf('Invalid qrcode.color (QR_CODE_COLOR): %s', $exception->getMessage()),
-                    $exception->getCode(),
-                    $exception
-                );
+                throw InvalidConfigurationException::withContext('Invalid qrcode.color (QR_CODE_COLOR)', $exception);
             }
         }
 
@@ -293,11 +289,7 @@ final class Config
             try {
                 $instance->backgroundColorValue = Rgb::parse($config['background_color']);
             } catch (InvalidConfigurationException $exception) {
-                throw new InvalidConfigurationException(
-                    sprintf('Invalid qrcode.background_color (QR_CODE_BACKGROUND_COLOR): %s', $exception->getMessage()),
-                    $exception->getCode(),
-                    $exception
-                );
+                throw InvalidConfigurationException::withContext('Invalid qrcode.background_color (QR_CODE_BACKGROUND_COLOR)', $exception);
             }
         }
 
@@ -603,7 +595,7 @@ final class Config
     public function setupCache(DateTimeInterface|DateInterval|int|null $ttl = null, ?string $store = null): void
     {
         $this->cacheEnabled = true;
-        $this->cacheTtl = $ttl;
+        $this->cacheTtl = $ttl ?? $this->cacheTtl;
         if ($store !== null) {
             $this->setCacheStore(trim($store));
         }

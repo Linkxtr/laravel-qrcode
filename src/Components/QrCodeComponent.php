@@ -46,14 +46,12 @@ final class QrCodeComponent extends Component
 
         $generator = QrCode::format($format);
 
-        $size = $this->size ?? config('qrcode.size');
-        if ($size !== null && is_numeric($size)) {
-            $generator = $generator->size((int) $size);
+        if ($this->size !== null) {
+            $generator = $generator->size($this->size);
         }
 
-        $margin = $this->margin ?? config('qrcode.margin');
-        if ($margin !== null && is_numeric($margin)) {
-            $generator = $generator->margin((int) $margin);
+        if ($this->margin !== null) {
+            $generator = $generator->margin($this->margin);
         }
 
         if ($this->color !== null && $rgb = $this->resolveColor($this->color)) {

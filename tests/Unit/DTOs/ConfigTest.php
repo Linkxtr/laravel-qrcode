@@ -747,9 +747,21 @@ test('it parses and manages cache_store configuration', function (): void {
 });
 
 test('it throws descriptive exceptions for malformed color and background_color in fromArray', function (): void {
-    expect(fn (): Config => Config::fromArray(['color' => 'invalid-color']))
-        ->toThrow(InvalidConfigurationException::class, 'Invalid qrcode.color (QR_CODE_COLOR):');
+    try {
+        Config::fromArray(['color' => 'invalid-color']);
+        $this->fail('Expected InvalidConfigurationException was not thrown.');
+    } catch (InvalidConfigurationException $invalidConfigurationException) {
+        expect($invalidConfigurationException->getMessage())->toStartWith('Invalid qrcode.color (QR_CODE_COLOR):')
+            ->and($invalidConfigurationException->getErrorCode())->toBe('INVALID_COLOR_FORMAT')
+            ->and($invalidConfigurationException->getHelperMessage())->not->toBeEmpty();
+    }
 
-    expect(fn (): Config => Config::fromArray(['background_color' => 'invalid-color']))
-        ->toThrow(InvalidConfigurationException::class, 'Invalid qrcode.background_color (QR_CODE_BACKGROUND_COLOR):');
+    try {
+        Config::fromArray(['background_color' => '#12']);
+        $this->fail('Expected InvalidConfigurationException was not thrown.');
+    } catch (InvalidConfigurationException $invalidConfigurationException) {
+        expect($invalidConfigurationException->getMessage())->toStartWith('Invalid qrcode.background_color (QR_CODE_BACKGROUND_COLOR):')
+            ->and($invalidConfigurationException->getErrorCode())->toBe('INVALID_HEX_COLOR_STRING')
+            ->and($invalidConfigurationException->getHelperMessage())->not->toBeEmpty();
+    }
 });
