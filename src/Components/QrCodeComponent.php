@@ -42,7 +42,7 @@ final class QrCodeComponent extends Component
 
     public function render(): Closure
     {
-        $format = $this->format ? $this->validateFormat($this->format) : $this->resolveFormatFromConfig();
+        $format = $this->format !== null ? $this->validateFormat($this->format) : $this->resolveFormatFromConfig();
 
         $generator = QrCode::format($format);
 
