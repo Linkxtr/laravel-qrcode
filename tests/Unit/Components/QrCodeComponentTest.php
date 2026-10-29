@@ -26,6 +26,12 @@ test('it throws exceptions for invalid formats', function (): void {
 
     $component2 = new QrCodeComponent(data: 'test', format: 'eps');
     expect(fn (): Closure => $component2->render())->toThrow(InvalidConfigurationException::class, 'Format must be one of the following values: svg, png, webp. Got: eps');
+
+    config(['qrcode.format' => 'invalid']);
+    QrCode::swap(new Generator(config('qrcode')));
+
+    $component3 = new QrCodeComponent(data: 'test');
+    expect(fn (): Closure => $component3->render())->toThrow(InvalidConfigurationException::class, 'Format must be one of the following values: svg, png, webp. Got: invalid');
 });
 
 test('it throws exception for path traversal attempts in merge', function (): void {
@@ -36,20 +42,64 @@ test('it throws exception for path traversal attempts in merge', function (): vo
 test('it generates default svg with injected title and accessibility attributes', function (): void {
     $component = new QrCodeComponent(data: 'https://linkxtr.com');
 
-    expect($component->margin)->toBe(0);
+    expect($component->margin)->toBeNull()
+        ->and($component->size)->toBeNull()
+        ->and($component->format)->toBeNull();
 
     $closure = $component->render();
     $html = $closure(['attributes' => new ComponentAttributeBag(['class' => 'qr-class'])]);
 
     expect($html)
-        ->toStartWith('<?xml')
-        ->toContain('<svg')
-        ->toContain('width="100"')
-        ->toContain('height="100"')
+        ->toStartWith('<svg')
+        ->not->toContain('<?xml')
+        ->toContain('width="400"')
+        ->toContain('height="400"')
         ->toContain('class="qr-class"')
         ->toContain('role="img"')
         ->toContain('aria-label="QR Code"')
         ->toContain('<title>QR Code</title>');
+});
+
+test('it inherits config values when size and margin are null or respects overrides', function (): void {
+    config(['qrcode.size' => 300, 'qrcode.margin' => 8]);
+    QrCode::swap(new Generator(config('qrcode')));
+
+    $defaultComponent = new QrCodeComponent(data: 'https://linkxtr.com');
+    $defaultHtml = $defaultComponent->render()(['attributes' => new ComponentAttributeBag([])]);
+
+    expect($defaultHtml)
+        ->toContain('width="300"')
+        ->toContain('height="300"');
+
+    $overriddenComponent = new QrCodeComponent(data: 'https://linkxtr.com', size: 150, margin: 2);
+    $overriddenHtml = $overriddenComponent->render()(['attributes' => new ComponentAttributeBag([])]);
+
+    expect($overriddenHtml)
+        ->toContain('width="150"')
+        ->toContain('height="150"');
+
+    config(['qrcode.size' => 400, 'qrcode.margin' => 4]);
+    QrCode::swap(new Generator([]));
+});
+
+test('it ignore invalid config value for size', function (): void {
+    config(['qrcode.size' => 'invalid-string']);
+    QrCode::swap(new Generator(config('qrcode')));
+
+    $component = new QrCodeComponent(data: 'https://linkxtr.com');
+    $html = $component->render()(['attributes' => new ComponentAttributeBag([])]);
+
+    expect($html)->toContain('width="400"')->toContain('height="400"');
+});
+
+test('it strips xml declaration from svg output in prepareSvg', function (): void {
+    $svgWithProlog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 0\"/></svg>";
+
+    $component = new QrCodeComponent(data: 'test');
+    $result = invade($component)->prepareSvg($svgWithProlog, new ComponentAttributeBag([]));
+
+    expect($result)->toStartWith('<svg')
+        ->and($result)->not->toContain('<?xml');
 });
 
 test('it respects and parses hex colors correctly', function (): void {
@@ -894,4 +944,14 @@ test('it strictly clears pre-existing global libxml errors in the finally block'
     expect(libxml_get_errors())->toBeEmpty();
 
     libxml_use_internal_errors($initialState);
+});
+
+test('it falls back to svg when config format is not a string', function (): void {
+    config(['qrcode.format' => null]);
+    $component = new QrCodeComponent(data: 'https://linkxtr.com');
+    $closure = $component->render();
+    $html = $closure(['attributes' => new ComponentAttributeBag([])]);
+
+    expect($html)->toStartWith('<svg');
+    config(['qrcode.format' => 'svg']);
 });

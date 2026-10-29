@@ -47,7 +47,8 @@ test('it initializes with default values', function (): void {
         ->and($config->getBackgroundColorValue()->blue)->toBe(255)
         ->and($config->getBackgroundColorValue()->alpha)->toBe(100)
         ->and($config->shouldCache())->toBe(false)
-        ->and($config->getCacheTtl())->toBe(1440);
+        ->and($config->getCacheTtl())->toBe(86400)
+        ->and($config->getCacheStore())->toBeNull();
 });
 
 test('it seeds configuration from array payload', function (): void {
@@ -706,17 +707,61 @@ test('it ignores invalid non-numeric string cache_ttl', function (): void {
         'cache_ttl' => 'invalid-ttl',
     ]);
 
-    expect($config->getCacheTtl())->toBe(1440);
+    expect($config->getCacheTtl())->toBe(86400);
 
     $config = Config::fromArray([
         'cache_ttl' => 'foo',
     ]);
 
-    expect($config->getCacheTtl())->toBe(1440);
+    expect($config->getCacheTtl())->toBe(86400);
 
     $config = Config::fromArray([
         'cache_ttl' => '',
     ]);
 
-    expect($config->getCacheTtl())->toBe(1440);
+    expect($config->getCacheTtl())->toBe(86400);
+});
+
+test('it parses and manages cache_store configuration', function (): void {
+    $config = Config::fromArray([
+        'cache_store' => ' redis',
+    ]);
+
+    expect($config->getCacheStore())->toBe('redis');
+
+    $config->setupCache(60, ' memcached ');
+    expect($config->getCacheStore())->toBe('memcached');
+
+    $config->setupCache(60, '');
+    expect($config->getCacheStore())->toBeNull();
+
+    $emptyStoreConfig = Config::fromArray([
+        'cache_store' => '   ',
+    ]);
+    expect($emptyStoreConfig->getCacheStore())->toBeNull();
+
+    $config->setupCache(3600, 'array');
+    expect($config->getCacheTtl())->toBe(3600)
+        ->and($config->getCacheStore())->toBe('array')
+        ->and($config->shouldCache())->toBeTrue();
+});
+
+test('it throws descriptive exceptions for malformed color and background_color in fromArray', function (): void {
+    try {
+        Config::fromArray(['color' => 'invalid-color']);
+        $this->fail('Expected InvalidConfigurationException was not thrown.');
+    } catch (InvalidConfigurationException $invalidConfigurationException) {
+        expect($invalidConfigurationException->getMessage())->toStartWith('Invalid qrcode.color (QR_CODE_COLOR):')
+            ->and($invalidConfigurationException->getErrorCode())->toBe('INVALID_COLOR_FORMAT')
+            ->and($invalidConfigurationException->getHelperMessage())->not->toBeEmpty();
+    }
+
+    try {
+        Config::fromArray(['background_color' => '#12']);
+        $this->fail('Expected InvalidConfigurationException was not thrown.');
+    } catch (InvalidConfigurationException $invalidConfigurationException) {
+        expect($invalidConfigurationException->getMessage())->toStartWith('Invalid qrcode.background_color (QR_CODE_BACKGROUND_COLOR):')
+            ->and($invalidConfigurationException->getErrorCode())->toBe('INVALID_HEX_COLOR_STRING')
+            ->and($invalidConfigurationException->getHelperMessage())->not->toBeEmpty();
+    }
 });

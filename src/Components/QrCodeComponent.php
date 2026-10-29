@@ -9,6 +9,7 @@ use DOMDocument;
 use DOMElement;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
+use Linkxtr\QrCode\Enums\Format;
 use Linkxtr\QrCode\Enums\GradientType;
 use Linkxtr\QrCode\Exceptions\GenerationException;
 use Linkxtr\QrCode\Exceptions\InvalidConfigurationException;
@@ -20,11 +21,11 @@ final class QrCodeComponent extends Component
 {
     public function __construct(
         public string $data,
-        public int $size = 100,
-        public string $format = 'svg',
+        public ?int $size = null,
+        public ?string $format = null,
         public ?string $color = null,
         public ?string $backgroundColor = null,
-        public int $margin = 0,
+        public ?int $margin = null,
         public ?string $style = null,
         public ?string $errorCorrection = null,
         public ?string $encoding = null,
@@ -41,14 +42,17 @@ final class QrCodeComponent extends Component
 
     public function render(): Closure
     {
-        if (! in_array($this->format, ['svg', 'png', 'webp'], true)) {
-            throw InvalidConfigurationException::unsupportedFormat(
-                $this->format,
-                ['svg', 'png', 'webp']
-            );
+        $format = $this->format !== null ? $this->validateFormat($this->format) : $this->resolveFormatFromConfig();
+
+        $generator = QrCode::format($format);
+
+        if ($this->size !== null) {
+            $generator = $generator->size($this->size);
         }
 
-        $generator = QrCode::size($this->size)->format($this->format)->margin($this->margin);
+        if ($this->margin !== null) {
+            $generator = $generator->margin($this->margin);
+        }
 
         if ($this->color !== null && $rgb = $this->resolveColor($this->color)) {
             $generator = $generator->color($rgb->red, $rgb->green, $rgb->blue, $rgb->alpha);
@@ -94,13 +98,13 @@ final class QrCodeComponent extends Component
             $generator = $generator->mergeString($this->mergeString, $this->mergePercentage);
         }
 
-        return function (array $data) use ($generator): string {
+        return function (array $data) use ($generator, $format): string {
             $htmlString = (string) $generator->generate($this->data);
 
             /** @var ComponentAttributeBag $attributes */
             $attributes = $data['attributes'];
 
-            if ($this->format === 'svg') {
+            if ($format === Format::SVG) {
                 return $this->prepareSvg($htmlString, $attributes);
             }
 
@@ -110,17 +114,39 @@ final class QrCodeComponent extends Component
 
             $base64 = base64_encode($htmlString);
 
-            return '<img '.$componentAttributeBag->toHtml().' src="data:image/'.$this->format.';base64,'.$base64.'" />';
+            return '<img '.$componentAttributeBag->toHtml().' src="data:image/'.$format->value.';base64,'.$base64.'" />';
         };
+    }
+
+    private function validateFormat(string $format): Format
+    {
+        $formatEnum = Format::tryFrom($format);
+
+        if ($formatEnum === null || $formatEnum === Format::EPS) {
+            throw InvalidConfigurationException::unsupportedFormat(
+                $format,
+                ['svg', 'png', 'webp']
+            );
+        }
+
+        return $formatEnum;
+    }
+
+    private function resolveFormatFromConfig(): Format
+    {
+        $format = config('qrcode.format');
+
+        if (is_string($format)) {
+            return $this->validateFormat($format);
+        }
+
+        return Format::SVG;
     }
 
     private function prepareSvg(string $svg, ComponentAttributeBag $componentAttributeBag): string
     {
-        $xmlDeclaration = '';
-
         if (preg_match('/^\s*<\?xml[^>]*\?>\s*/i', $svg, $matches)) {
-            $xmlDeclaration = $matches[0];
-            $svg = substr($svg, strlen($xmlDeclaration));
+            $svg = substr($svg, strlen($matches[0]));
         }
 
         $domDocument = new DOMDocument;
@@ -186,7 +212,7 @@ final class QrCodeComponent extends Component
                 $output .= $serialized;
             }
 
-            return $xmlDeclaration.$output;
+            return $output;
         } finally {
             libxml_clear_errors();
             libxml_use_internal_errors($libxmlState);

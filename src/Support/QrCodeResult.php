@@ -27,10 +27,15 @@ final readonly class QrCodeResult implements Htmlable, Responsable, Stringable
     public function toHtml(): string
     {
         if ($this->format === Format::SVG) {
-            return $this->content;
+            $stripped = preg_replace('/^\s*<\?xml[^>]*\?>\s*/i', '', $this->content);
+
+            return $stripped ?? $this->content;
         }
 
-        return sprintf('<img src="%s" alt="QR Code" />', $this->toDataUri());
+        $alt = __('QR Code');
+        $altText = is_string($alt) ? $alt : 'QR Code';
+
+        return sprintf('<img src="%s" alt="%s" />', $this->toDataUri(), e($altText));
     }
 
     public function toDataUri(): string
@@ -45,9 +50,17 @@ final readonly class QrCodeResult implements Htmlable, Responsable, Stringable
      */
     public function toResponse(mixed $request): Response
     {
-        return response($this->content, 200, [
+        $etag = '"'.md5($this->content).'"';
+
+        $response = response($this->content, 200, [
             'Content-Type' => $this->getMimeType(),
+            'ETag' => $etag,
+            'Cache-Control' => 'private, max-age=86400',
         ]);
+
+        $response->isNotModified($request);
+
+        return $response;
     }
 
     public function isSvg(): bool

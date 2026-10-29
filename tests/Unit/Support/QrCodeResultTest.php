@@ -37,10 +37,12 @@ it('can generate a data uri for binary formats', function (): void {
     expect($result->toDataUri())->toBe('data:image/png;base64,'.$base64);
 });
 
-it('returns raw content for toHtml when format is svg', function (): void {
-    $result = new QrCodeResult('<svg></svg>', Format::SVG);
+it('returns content without xml prolog for toHtml when format is svg', function (): void {
+    $resultWithProlog = new QrCodeResult("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg></svg>", Format::SVG);
+    $resultWithoutProlog = new QrCodeResult('<svg></svg>', Format::SVG);
 
-    expect($result->toHtml())->toBe('<svg></svg>');
+    expect($resultWithProlog->toHtml())->toBe('<svg></svg>')
+        ->and($resultWithoutProlog->toHtml())->toBe('<svg></svg>');
 });
 
 it('wraps binary formats in an img tag for toHtml', function (): void {
@@ -48,7 +50,7 @@ it('wraps binary formats in an img tag for toHtml', function (): void {
     $result = new QrCodeResult($content, Format::PNG);
     $base64 = base64_encode($content);
 
-    $expectedHtml = sprintf('<img src="data:image/png;base64,%s" alt="QR Code" />', $base64);
+    $expectedHtml = sprintf('<img src="data:image/png;base64,%s" alt="%s" />', $base64, e((string) __('QR Code')));
 
     expect($result->toHtml())->toBe($expectedHtml);
 });
@@ -62,15 +64,21 @@ it('can convert to a laravel http response', function (): void {
     expect($response)->toBeInstanceOf(Response::class)
         ->and($response->getStatusCode())->toBe(200)
         ->and($response->getContent())->toBe('binary-data')
-        ->and($response->headers->get('Content-Type'))->toBe('image/png');
+        ->and($response->headers->get('Content-Type'))->toBe('image/png')
+        ->and($response->headers->get('ETag'))->toBe('"'.md5('binary-data').'"')
+        ->and($response->headers->get('Cache-Control'))->toBe('max-age=86400, private');
 });
 
-it('sets the correct content type for svg responses', function (): void {
-    $result = new QrCodeResult('<svg></svg>', Format::SVG);
+it('sets the correct content type and headers for svg responses while preserving xml prolog', function (): void {
+    $svg = '<?xml version="1.0" encoding="UTF-8"?><svg></svg>';
+    $result = new QrCodeResult($svg, Format::SVG);
 
     $response = $result->toResponse(request());
 
-    expect($response->headers->get('Content-Type'))->toBe('image/svg+xml');
+    expect($response->headers->get('Content-Type'))->toBe('image/svg+xml')
+        ->and($response->getContent())->toBe($svg)
+        ->and($response->headers->get('ETag'))->toBe('"'.md5($svg).'"')
+        ->and($response->headers->get('Cache-Control'))->toBe('max-age=86400, private');
 });
 
 test('generate throws exception if file_put_contents fails', function (): void {

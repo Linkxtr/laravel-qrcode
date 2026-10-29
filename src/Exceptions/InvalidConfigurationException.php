@@ -206,4 +206,17 @@ final class InvalidConfigurationException extends InvalidArgumentException imple
 
         return $exception;
     }
+
+    public static function withContext(string $context, self $previous): self
+    {
+        $exception = new self(
+            sprintf('%s: %s', $context, $previous->getMessage()),
+            $previous->getCode(),
+            $previous
+        );
+        $exception->errorCode = $previous->errorCode;
+        $exception->helperMessage = $previous->helperMessage;
+
+        return $exception;
+    }
 }
