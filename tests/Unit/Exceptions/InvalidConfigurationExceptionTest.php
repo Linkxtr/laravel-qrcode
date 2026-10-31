@@ -165,3 +165,15 @@ test('invalidHexColor sets correct error code and message', function (): void {
         ->and($invalidConfigurationException->getErrorCode())->toBe('INVALID_HEX_COLOR')
         ->and($invalidConfigurationException->getHelperMessage())->toBe('Invalid hex color string provided.');
 });
+
+// test withContext function
+
+test('withContext sets correct error code and message', function (): void {
+    $invalidHexColor = InvalidConfigurationException::invalidHexColor();
+
+    $invalidConfigurationException = InvalidConfigurationException::withContext('invalidColorHex', $invalidHexColor);
+
+    expect($invalidConfigurationException)->toBeInstanceOf(InvalidConfigurationException::class)
+        ->and($invalidConfigurationException->getErrorCode())->toBe('INVALID_HEX_COLOR')
+        ->and($invalidConfigurationException->getHelperMessage())->toBe('Invalid hex color string provided.');
+});

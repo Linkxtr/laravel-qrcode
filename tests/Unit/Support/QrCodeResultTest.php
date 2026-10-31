@@ -66,7 +66,7 @@ it('can convert to a laravel http response', function (): void {
         ->and($response->getContent())->toBe('binary-data')
         ->and($response->headers->get('Content-Type'))->toBe('image/png')
         ->and($response->headers->get('ETag'))->toBe('"'.md5('binary-data').'"')
-        ->and($response->headers->get('Cache-Control'))->toBe('max-age=86400, public');
+        ->and($response->headers->get('Cache-Control'))->toBe('max-age=86400, private');
 });
 
 it('sets the correct content type and headers for svg responses while preserving xml prolog', function (): void {
@@ -78,7 +78,7 @@ it('sets the correct content type and headers for svg responses while preserving
     expect($response->headers->get('Content-Type'))->toBe('image/svg+xml')
         ->and($response->getContent())->toBe($svg)
         ->and($response->headers->get('ETag'))->toBe('"'.md5($svg).'"')
-        ->and($response->headers->get('Cache-Control'))->toBe('max-age=86400, public');
+        ->and($response->headers->get('Cache-Control'))->toBe('max-age=86400, private');
 });
 
 test('generate throws exception if file_put_contents fails', function (): void {

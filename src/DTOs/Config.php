@@ -281,11 +281,7 @@ final class Config
             try {
                 $instance->colorValue = Rgb::parse($config['color']);
             } catch (InvalidConfigurationException $exception) {
-                throw new InvalidConfigurationException(
-                    sprintf('Invalid qrcode.color (QR_CODE_COLOR): %s', $exception->getMessage()),
-                    $exception->getCode(),
-                    $exception
-                );
+                throw InvalidConfigurationException::withContext('Invalid qrcode.color (QR_CODE_COLOR)', $exception);
             }
         }
 
@@ -293,11 +289,7 @@ final class Config
             try {
                 $instance->backgroundColorValue = Rgb::parse($config['background_color']);
             } catch (InvalidConfigurationException $exception) {
-                throw new InvalidConfigurationException(
-                    sprintf('Invalid qrcode.background_color (QR_CODE_BACKGROUND_COLOR): %s', $exception->getMessage()),
-                    $exception->getCode(),
-                    $exception
-                );
+                throw InvalidConfigurationException::withContext('Invalid qrcode.background_color (QR_CODE_BACKGROUND_COLOR)', $exception);
             }
         }
 
@@ -313,10 +305,6 @@ final class Config
             } elseif (is_string($config['cache_ttl']) && is_numeric($config['cache_ttl'])) {
                 $instance->cacheTtl = (int) $config['cache_ttl'];
             }
-        }
-
-        if (isset($config['cache_store']) && is_string($config['cache_store']) && trim($config['cache_store']) !== '') {
-            $instance->cacheStore = trim($config['cache_store']);
         }
 
         return $instance;
@@ -607,9 +595,9 @@ final class Config
     public function setupCache(DateTimeInterface|DateInterval|int|null $ttl = null, ?string $store = null): void
     {
         $this->cacheEnabled = true;
-        $this->cacheTtl = $ttl;
+        $this->cacheTtl = $ttl ?? $this->cacheTtl;
         if ($store !== null) {
-            $this->setCacheStore($store);
+            $this->setCacheStore(trim($store));
         }
     }
 
@@ -628,14 +616,14 @@ final class Config
         return $this->cacheStore;
     }
 
-    public function setCacheStore(?string $store): void
-    {
-        $this->cacheStore = $store !== null && trim($store) !== '' ? trim($store) : null;
-    }
-
     public function shouldCache(): bool
     {
         return $this->cacheEnabled;
+    }
+
+    private function setCacheStore(string $store): void
+    {
+        $this->cacheStore = $store !== '' ? $store : null;
     }
 
     private function isPathInsideApplication(string $resolvedPath): bool
