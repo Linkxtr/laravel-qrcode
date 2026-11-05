@@ -18,7 +18,7 @@
 
 ## 🎨 Visual Showcase Gallery
 
-Every QR code below is an actual SVG generated directly by `linkxtr/laravel-qrcode` and verified with automated barcode decoding.
+Every QR code below was generated directly by `linkxtr/laravel-qrcode`. The test suite decodes generated output back to its original payload on every CI run, so "it scans" is an assertion, not a hope.
 
 | Style | Scannable Preview | 3-Line Fluent Snippet |
 | :--- | :---: | :--- |
@@ -26,7 +26,9 @@ Every QR code below is an actual SVG generated directly by `linkxtr/laravel-qrco
 | **2. Dot Modules + Circle Eyes**<br>Modern rounded aesthetic | <img src="art/showcase-dots.svg" width="135" alt="Dot Modules with Circle Eyes"> | <pre><code>QrCode::size(300)<br>    -&gt;style(&#39;dot&#39;)-&gt;eye(&#39;circle&#39;)<br>    -&gt;color(17, 24, 39)<br>    -&gt;generate(&#39;https://linkxtr.com&#39;);</code></pre> |
 | **3. Diagonal Gradient**<br>Vibrant two-tone transition | <img src="art/showcase-gradient.svg" width="135" alt="Diagonal Gradient QR Code"> | <pre><code>QrCode::size(300)<br>    -&gt;gradient([99, 102, 241], [236, 72, 153], &#39;diagonal&#39;)<br>    -&gt;eye(&#39;circle&#39;)<br>    -&gt;generate(&#39;https://linkxtr.com&#39;);</code></pre> |
 | **4. Multi-Color Custom Eyes**<br>Distinct corner branding | <img src="art/showcase-custom-eyes.svg" width="135" alt="Multi-Color Custom Eyes"> | <pre><code>QrCode::size(300)<br>    -&gt;color(31, 41, 55)<br>    -&gt;eyeColor(0, [239, 68, 68], [153, 27, 27])<br>    -&gt;eyeColor(1, [16, 185, 129], [6, 95, 70])<br>    -&gt;generate(&#39;https://linkxtr.com&#39;);</code></pre> |
-| **5. Center Logo Merge**<br>Embedded logo with high EC | <img src="art/showcase-logo.svg" width="135" alt="Center Logo Merge QR Code"> | <pre><code>QrCode::size(300)<br>    -&gt;errorCorrection(&#39;H&#39;)<br>    -&gt;merge(public_path(&#39;vendor/linkxtr/logo.png&#39;), 0.25)<br>    -&gt;generate(&#39;https://linkxtr.com&#39;);</code></pre> |
+| **5. Center Logo Merge**<br>Embedded logo with high EC | <img src="art/showcase-logo.svg" width="135" alt="Center Logo Merge QR Code"> | <pre><code>QrCode::size(300)<br>    -&gt;errorCorrection(&#39;H&#39;)<br>    -&gt;merge(public_path(&#39;images/logo.png&#39;), 0.25)<br>    -&gt;generate(&#39;https://linkxtr.com&#39;);</code></pre> |
+
+> The `public_path('images/logo.png')` above is illustrative — point `merge()` at any image that exists in your application, and keep `errorCorrection('H')` so the payload survives the overlay.
 
 ---
 
@@ -34,20 +36,22 @@ Every QR code below is an actual SVG generated directly by `linkxtr/laravel-qrco
 
 | Feature | `linkxtr/laravel-qrcode` | `simplesoftwareio/simple-qrcode` | Raw `endroid/qr-code` |
 | :--- | :---: | :---: | :---: |
-| **Active Maintenance** | ✅ **Actively Maintained** (v3.4.0) | ❌ Abandoned (Last: Feb 2021) | ✅ Active generic library |
-| **Laravel Compatibility** | ✅ **Laravel 12 & 13** | ❌ Laravel &le; 8 only | ⚠️ Requires manual wiring |
-| **PHP Support** | ✅ **PHP 8.2 – 8.5** | ❌ PHP &le; 8.0 | ✅ PHP 8.1+ |
-| **Underlying Engine** | `bacon/bacon-qr-code` v3 | `bacon/bacon-qr-code` v1/v2 | Custom rasterizer / Bacon |
+| **Active Maintenance** | ✅ **Actively Maintained** (v3.4.0, Oct 2026) | ⚠️ No release since Feb 2021 | ✅ Active generic library |
+| **Laravel Compatibility** | ✅ **Tested on Laravel 12 & 13** (CI matrix) | ⚠️ No declared Laravel constraint; no CI | ⚠️ Requires manual wiring |
+| **PHP Support** | ✅ **PHP 8.2 – 8.5** (CI matrix) | ⚠️ `>=7.2 \| ^8.0`, no CI matrix | ⚠️ Varies by version (latest 6.x needs 8.5) |
+| **Underlying Engine** | `bacon/bacon-qr-code` ^3 | `bacon/bacon-qr-code` ^2 | `bacon/bacon-qr-code` ^3 + GD/Imagick writers |
 | **Immutable Fluent Builder** | ✅ Cloned instances (no leak) | ❌ Mutable state leakage | ⚠️ Partial builder pattern |
 | **Laravel Facade** | ✅ `QrCode::...` (Drop-in familiar) | ✅ Legacy facade | ❌ None |
 | **Native Blade Component** | ✅ `<x-qr-code />` with accessible SVG | ❌ None | ❌ None |
 | **Artisan CLI Generator** | ✅ `php artisan qr:generate` | ❌ None | ❌ None |
 | **Laravel Cache Integration** | ✅ Built-in (`cache()`, TTL, stores) | ❌ None | ❌ None |
-| **Rich Data Types** | ✅ 12 built-in payloads | ⚠️ 5 basic payloads | ❌ None built-in |
+| **Rich Data Types** | ✅ 12 built-in payloads | ⚠️ 6 basic payloads | ❌ None built-in |
 | **Automated Scannability** | ✅ Every QR code decoded in CI | ❌ None | ❌ None |
-| **Quality & Coverage** | ✅ **100% Coverage & PHPStan Max** | ❌ Untyped legacy codebase | ⚠️ Variable |
+| **Quality & Coverage** | ✅ **100% Coverage & PHPStan Max** | ❌ No static analysis or test matrix | ⚠️ Variable |
 
-> **Drop-in Familiarity:** `linkxtr/laravel-qrcode` is built on `bacon/bacon-qr-code` with full Laravel idioms and drop-in familiarity for `simple-qrcode` users. Transitioning requires zero mental overhead while gaining full immutability, type safety, and first-class Laravel 12 & 13 support.
+> **Coming from `simple-qrcode`?** The fluent surface will feel familiar (`QrCode::size()->generate()`), but v3 does not ship a compatibility layer, so a handful of method names differ. The [migration guide](https://laravel-qrcode.mintlify.app/advanced/migrating-from-simple-qrcode) walks through each difference — it takes about ten minutes.
+>
+> Comparison data verified against Packagist on 2026-11-05.
 
 ---
 
