@@ -28,7 +28,7 @@ Every QR code below was generated directly by `linkxtr/laravel-qrcode`. The test
 | **4. Multi-Color Custom Eyes**<br>Distinct corner branding | <img src="art/showcase-custom-eyes.svg" width="135" alt="Multi-Color Custom Eyes"> | <pre><code>QrCode::size(300)<br>    -&gt;color(31, 41, 55)<br>    -&gt;eyeColor(0, [239, 68, 68], [153, 27, 27])<br>    -&gt;eyeColor(1, [16, 185, 129], [6, 95, 70])<br>    -&gt;generate(&#39;https://linkxtr.com&#39;);</code></pre> |
 | **5. Center Logo Merge**<br>Embedded logo with high EC | <img src="art/showcase-logo.svg" width="135" alt="Center Logo Merge QR Code"> | <pre><code>QrCode::size(300)<br>    -&gt;errorCorrection(&#39;H&#39;)<br>    -&gt;merge(public_path(&#39;images/logo.png&#39;), 0.25)<br>    -&gt;generate(&#39;https://linkxtr.com&#39;);</code></pre> |
 
-> The `public_path('images/logo.png')` above is illustrative — point `merge()` at any image that exists in your application, and keep `errorCorrection('H')` so the payload survives the overlay.
+> `merge()` expects a **raster** logo — point it at a PNG (or JPEG) that exists in your application; `public_path('images/logo.png')` is illustrative. An **SVG logo throws `ImageMergeException: Invalid image provided for merge`** when the output format is SVG, which is the default. Keep `errorCorrection('H')` so the payload survives the overlay.
 
 ---
 
@@ -39,7 +39,7 @@ Every QR code below was generated directly by `linkxtr/laravel-qrcode`. The test
 | **Active Maintenance** | ✅ **Actively Maintained** (v3.4.0, Oct 2026) | ⚠️ No release since Feb 2021 | ✅ Active generic library |
 | **Laravel Compatibility** | ✅ **Tested on Laravel 12 & 13** (CI matrix) | ⚠️ No declared Laravel constraint; no CI | ⚠️ Requires manual wiring |
 | **PHP Support** | ✅ **PHP 8.2 – 8.5** (CI matrix) | ⚠️ `>=7.2 \| ^8.0`, no CI matrix | ⚠️ Varies by version (latest 6.x needs 8.5) |
-| **Underlying Engine** | `bacon/bacon-qr-code` ^3 | `bacon/bacon-qr-code` ^2 | `bacon/bacon-qr-code` ^3 + GD/Imagick writers |
+| **Underlying Engine** | `bacon/bacon-qr-code` ^3 | `bacon/bacon-qr-code` ^2 | `bacon/bacon-qr-code` ^3 + GD-based writer |
 | **Immutable Fluent Builder** | ✅ Cloned instances (no leak) | ❌ Mutable state leakage | ⚠️ Partial builder pattern |
 | **Laravel Facade** | ✅ `QrCode::...` (Drop-in familiar) | ✅ Legacy facade | ❌ None |
 | **Native Blade Component** | ✅ `<x-qr-code />` with accessible SVG | ❌ None | ❌ None |

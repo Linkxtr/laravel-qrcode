@@ -1,21 +1,29 @@
 # Upgrade Guide
 
-## 3.3.x → 3.4.0: `cache_ttl` is now in seconds
+## 3.3.x → 3.4.0: `cache_ttl` is documented in seconds
 
-`cache_ttl` (and the `QR_CODE_CACHE_TTL` environment variable) used to be documented as **minutes**. It is now **seconds**, matching what Laravel's cache repository actually expects, and the default moved from `1440` to `86400` (24 hours).
+Both versions hand the integer straight to Laravel's cache repository, which has always read it as **seconds**. What 3.4.0 changed is the documentation and the shipped default:
 
-- **You never set it?** Nothing to do — the effective default is still 24 hours.
-- **You did set it?** Convert your value, otherwise your cache now expires 60× sooner.
+- 3.3.x documented the value as minutes and defaulted to `1440` — which was really 24 **minutes**.
+- 3.4.0 documents seconds and defaults to `86400` — 24 **hours**.
+
+Your configured value never changed meaning; only the default did.
 
 ```dotenv
-# Before (3.3.x): 1440 = 24 hours
+# 1440 has always meant 24 minutes, in both versions
 QR_CODE_CACHE_TTL=1440
 
-# After (3.4.0+): 86400 = 24 hours
+# If you wanted a day, this is the value you always wanted
 QR_CODE_CACHE_TTL=86400
 ```
 
-If you pass a TTL at runtime, `cache()` accepts a `DateInterval` or `DateTimeInterface` and is unaffected by this change:
+What to do depends on how you configured it:
+
+- **You set `QR_CODE_CACHE_TTL` (or passed a TTL yourself):** keep it. It still means seconds, exactly as before. If you picked `1440` believing it was a day, it has always been 24 minutes — raise it to `86400` now.
+- **You never set it and never published the config file:** the effective default grows from 24 minutes to 24 hours. No action needed unless you want the shorter lifetime, in which case set it explicitly.
+- **You published `config/qrcode.php`:** your copy still contains `env('QR_CODE_CACHE_TTL', 1440)` and therefore keeps the old 24-minute default. Set the environment variable, edit the published value to `86400`, or re-publish with `--force` and reapply your edits to adopt the new default.
+
+If you pass a TTL at runtime, `cache()` also accepts a `DateInterval` or `DateTimeInterface`, which is unaffected by any of this:
 
 ```php
 QrCode::cache(now()->addDay())->generate('https://example.com');
