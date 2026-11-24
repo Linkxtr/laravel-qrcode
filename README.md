@@ -12,7 +12,7 @@
 
 **`linkxtr/laravel-qrcode`** is the actively maintained, modern QR code generator engineered specifically for **Laravel 12 & 13** (and PHP 8.2–8.5). Built on the vector-native `bacon/bacon-qr-code` v3 engine, it pairs clean Laravel ergonomics with uncompromising engineering rigor—backed by an automated test suite that decodes and validates every generated QR code to prove real-world scannability.
 
-**[📚 Read the Full Documentation](https://laravel-qrcode.mintlify.app)**
+**[📚 Read the Full Documentation](https://docs.linkx.tr)**
 
 ---
 
@@ -49,7 +49,7 @@ Every QR code below was generated directly by `linkxtr/laravel-qrcode`. The test
 | **Automated Scannability** | ✅ Every QR code decoded in CI | ❌ None | ❌ None |
 | **Quality & Coverage** | ✅ **100% Coverage & PHPStan Max** | ❌ No static analysis or test matrix | ⚠️ Variable |
 
-> **Coming from `simple-qrcode`?** The fluent surface will feel familiar (`QrCode::size()->generate()`), but v3 does not ship a compatibility layer, so a handful of method names differ. The [migration guide](https://laravel-qrcode.mintlify.app/advanced/migrating-from-simple-qrcode) walks through each difference — it takes about ten minutes.
+> **Coming from `simple-qrcode`?** The fluent surface will feel familiar (`QrCode::size()->generate()`), but v3 does not ship a compatibility layer, so a handful of method names differ. The [migration guide](https://docs.linkx.tr/advanced/migrating-from-simple-qrcode) walks through each difference — it takes about ten minutes.
 >
 > Comparison data verified against Packagist on 2026-11-05.
 
@@ -164,13 +164,13 @@ QrCode::SMS('1234567890', 'Verification Code');
 
 For full installation guides, advanced customization (radial/diagonal gradients, CMYK color spaces, custom eye shapes), and macro registration, visit the official documentation:
 
-👉 **[laravel-qrcode.mintlify.app](https://laravel-qrcode.mintlify.app)**
+👉 **[laravel-qrcode.mintlify.app](https://docs.linkx.tr)**
 
 ---
 
 ## 🚀 Upgrading to V3
 
-If you are upgrading from `simplesoftwareio/simple-qrcode` or `linkxtr/laravel-qrcode` v1.x/v2.x, please refer to our **[Upgrade Guide](https://laravel-qrcode.mintlify.app/advanced/upgrade-guide)** for breaking changes and migration steps.
+If you are upgrading from `simplesoftwareio/simple-qrcode` or `linkxtr/laravel-qrcode` v1.x/v2.x, please refer to our **[Upgrade Guide](https://docs.linkx.tr/advanced/upgrade-guide)** for breaking changes and migration steps.
 
 ---
 
