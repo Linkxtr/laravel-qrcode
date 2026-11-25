@@ -4,4 +4,4 @@ parameters:
     - src
   phpVersion:
     min: 80200
-    max: 80508
+    max: 80600

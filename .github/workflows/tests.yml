@@ -20,27 +20,30 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php: 8.2
-            laravel: ^12.0
-            testbench: ^10.0
-          - php: 8.3
-            laravel: ^12.0
-            testbench: ^10.0
-          - php: 8.4
-            laravel: ^12.0
-            testbench: ^10.0
-          - php: 8.5
-            laravel: ^12.0
-            testbench: ^10.0
-          - php: 8.3
-            laravel: ^13.0
-            testbench: ^11.0
-          - php: 8.4
-            laravel: ^13.0
-            testbench: ^11.0
-          - php: 8.5
-            laravel: ^13.0
-            testbench: ^11.0
+          - php: '8.2'
+            laravel: '^12.0'
+            testbench: '^10.0'
+          - php: '8.3'
+            laravel: '^12.0'
+            testbench: '^10.0'
+          - php: '8.4'
+            laravel: '^12.0'
+            testbench: '^10.0'
+          - php: '8.5'
+            laravel: '^12.0'
+            testbench: '^10.0'
+          - php: '8.3'
+            laravel: '^13.0'
+            testbench: '^11.0'
+          - php: '8.4'
+            laravel: '^13.0'
+            testbench: '^11.0'
+          - php: '8.5'
+            laravel: '^13.0'
+            testbench: '^11.0'
+          - php: '8.6'
+            laravel: '^13.0'
+            testbench: '^11.0'
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -71,10 +74,13 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install Dependencies
+        env:
+          COMPOSER_FLAGS: ${{ matrix.php == '8.6' && '--ignore-platform-req=php' || '' }}
         run: |
           composer remove --dev laravel/pao --no-update --no-interaction 2>/dev/null || true
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          composer update --prefer-dist --no-progress --prefer-stable --no-interaction
+          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
+          composer require --dev "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --prefer-dist --no-progress --prefer-stable --no-interaction $COMPOSER_FLAGS
 
       - name: Run Tests
         run: |
@@ -83,15 +89,15 @@ jobs:
 
       - name: Upload coverage
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
-        if: always()
+        if: success() && !env.ACT
         with:
           name: coverage-report-${{ matrix.php }}-${{ matrix.laravel }}
           path: build/logs/clover.xml
-          if-no-files-found: error
+          if-no-files-found: ignore
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -101,7 +107,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
         with:
-          php-version: 8.4
+          php-version: '8.6'
           extensions: dom, curl, libxml, mbstring
           tools: composer:v2
 
@@ -119,14 +125,14 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          composer install --prefer-dist --no-progress --no-interaction
+          composer install --prefer-dist --no-progress --no-interaction --ignore-platform-req=php
 
       - name: Run Pint
         run: composer test:lint
 
   analyse:
     name: Static Analysis
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -136,7 +142,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
         with:
-          php-version: 8.4
+          php-version: '8.6'
           extensions: dom, curl, libxml, mbstring
           tools: composer:v2
 
@@ -154,7 +160,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          composer install --prefer-dist --no-progress --no-interaction
+          composer install --prefer-dist --no-progress --no-interaction --ignore-platform-req=php
 
       - name: Run PHPStan
         run: composer test:types
