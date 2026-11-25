@@ -10,7 +10,7 @@
 [![Scannability: Decode-Verified](https://img.shields.io/badge/Scannability-Decode--Verified-success?style=flat-square&logo=checkmarx&logoColor=white)](https://github.com/Linkxtr/laravel-qrcode)
 [![License](https://img.shields.io/packagist/l/linkxtr/laravel-qrcode.svg?style=flat-square)](https://packagist.org/packages/linkxtr/laravel-qrcode)
 
-**`linkxtr/laravel-qrcode`** is the actively maintained, modern QR code generator engineered specifically for **Laravel 12 & 13** (and PHP 8.2–8.5). Built on the vector-native `bacon/bacon-qr-code` v3 engine, it pairs clean Laravel ergonomics with uncompromising engineering rigor—backed by an automated test suite that decodes and validates every generated QR code to prove real-world scannability.
+**`linkxtr/laravel-qrcode`** is the actively maintained, modern QR code generator engineered specifically for **Laravel 12 & 13** (and PHP 8.2–8.6). Built on the vector-native `bacon/bacon-qr-code` v3 engine, it pairs clean Laravel ergonomics with uncompromising engineering rigor—backed by an automated test suite that decodes and validates every generated QR code to prove real-world scannability.
 
 **[📚 Read the Full Documentation](https://laravel-qrcode.mintlify.app)**
 
@@ -38,7 +38,7 @@ Every QR code below was generated directly by `linkxtr/laravel-qrcode`. The test
 | :--- | :---: | :---: | :---: |
 | **Active Maintenance** | ✅ **Actively Maintained** (v3.4.0, Oct 2026) | ⚠️ No release since Feb 2021 | ✅ Active generic library |
 | **Laravel Compatibility** | ✅ **Tested on Laravel 12 & 13** (CI matrix) | ⚠️ No declared Laravel constraint; no CI | ⚠️ Requires manual wiring |
-| **PHP Support** | ✅ **PHP 8.2 – 8.5** (CI matrix) | ⚠️ `>=7.2 \| ^8.0`, no CI matrix | ⚠️ Varies by version (latest 6.x needs 8.5) |
+| **PHP Support** | ✅ **PHP 8.2 – 8.6** (CI matrix) | ⚠️ `>=7.2 \| ^8.0`, no CI matrix | ⚠️ Varies by version (latest 6.x needs 8.5) |
 | **Underlying Engine** | `bacon/bacon-qr-code` ^3 | `bacon/bacon-qr-code` ^2 | `bacon/bacon-qr-code` ^3 + GD-based writer |
 | **Immutable Fluent Builder** | ✅ Cloned instances (no leak) | ❌ Mutable state leakage | ⚠️ Partial builder pattern |
 | **Laravel Facade** | ✅ `QrCode::...` (Drop-in familiar) | ✅ Legacy facade | ❌ None |

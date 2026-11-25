@@ -5,6 +5,7 @@ declare(strict_types=1);
 use BaconQrCode\Renderer\Color\Rgb as BaconRgb;
 use BaconQrCode\Renderer\RendererStyle\EyeFill;
 use BaconQrCode\Renderer\RendererStyle\Gradient;
+use Illuminate\Support\Facades\File;
 use Linkxtr\QrCode\DTOs\Config;
 use Linkxtr\QrCode\Enums\ColorModel;
 use Linkxtr\QrCode\Enums\ErrorCorrectionLevel;
@@ -362,18 +363,16 @@ test('it throws exception when path is a directory', function (): void {
 
 test('it throws exception when path is not readable', function (): void {
     $config = new Config;
-    try {
-        $filePath = __DIR__.'/../../Support/Fixtures/restricted.png';
-        file_put_contents($filePath, 'restricted');
-        chmod($filePath, 000);
+    $filePath = __DIR__.'/../../Support/Fixtures/images/linkxtr.png';
+    $resolvedPath = realpath($filePath);
 
-        $resolvedPath = realpath($filePath);
+    File::partialMock()
+        ->shouldReceive('isReadable')
+        ->once()
+        ->with($resolvedPath)
+        ->andReturn(false);
 
-        expect(fn () => $config->setupMergePath($filePath))->toThrow(InvalidConfigurationException::class, 'Failed to read image file: '.$resolvedPath);
-    } finally {
-        chmod($filePath, 0777);
-        unlink($filePath);
-    }
+    expect(fn () => $config->setupMergePath($filePath))->toThrow(InvalidConfigurationException::class, 'Failed to read image file: '.$resolvedPath);
 });
 
 test('it throws exception when file_get_contents returns false', function (): void {
